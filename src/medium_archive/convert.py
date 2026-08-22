@@ -55,6 +55,13 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
         picture = img.find_parent("picture")
         (picture or img).replace_with(new_img)
 
+    # Export grid layouts put several image <figure>s side by side in one
+    # row, which would render run together on a single line; break them
+    # onto separate lines (the page renders such grids one per line too).
+    for fig in body.find_all(["figure", "img"]):
+        if getattr(fig.next_sibling, "name", None) == fig.name:
+            fig.insert_after(doc.new_tag("br"))
+
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
         iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
@@ -70,7 +77,9 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
     for a in body.find_all("a"):
         href = a.get("href")
         if href and not href.startswith(("#", "mailto:")):
-            a["href"] = urljoin(base_url, href)
+            # export hrefs can contain literal spaces, which break the
+            # Markdown link syntax
+            a["href"] = urljoin(base_url, href).replace(" ", "%20")
 
     markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered

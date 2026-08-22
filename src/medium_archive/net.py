@@ -17,7 +17,7 @@ def make_session() -> requests.Session:
     return s
 
 
-TRANSIENT_STATUSES = (429, 500, 502, 503, 504)
+TRANSIENT_STATUSES = (500, 502, 503, 504)
 
 
 def fetch(session: requests.Session, url: str, retries: int = 4, **kw) -> requests.Response:
@@ -28,6 +28,16 @@ def fetch(session: requests.Session, url: str, retries: int = 4, **kw) -> reques
         except requests.RequestException as e:
             err = e
         else:
+            if r.status_code == 429:
+                # Rate limited: retrying immediately just digs the hole
+                # deeper. Surface the server's hint and give up; fetch is
+                # resumable, so re-run with a higher --delay.
+                after = r.headers.get("Retry-After")
+                if after:
+                    print(f"  429 rate limited; server says retry after {after}"
+                          f"{'s' if after.isdigit() else ''}", file=sys.stderr)
+                raise requests.HTTPError(f"429 for {url} -- raise --delay and re-run",
+                                         response=r)
             if r.status_code in TRANSIENT_STATUSES:
                 err = requests.HTTPError(f"{r.status_code} for {url}", response=r)
             else:

@@ -100,9 +100,10 @@ longer lists — work through the steps in order:
 3. **Review `raw/missing.json`** if the fetch summary mentions it: those
    posts survive only as web.archive.org captures. Open each entry's
    `wayback_url`, decide whether the post matters, and save what does by
-   hand — `fetch` cannot recover them. (Expect the occasional entry that is
-   just a mangled URL the crawler once saw; the `wayback_url` shows quickly
-   whether there is a real post behind it.)
+   hand — `fetch` cannot recover them. (Mangled URL variants the crawler
+   once saw — a truncated id, a stray hyphen — are matched to archived
+   posts and unflagged automatically; for anything left, the `wayback_url`
+   shows quickly whether there is a real post behind it.)
 
 4. **Merge account exports** (medium.com → Settings → Download your
    information), once per author for a multi-author publication, then let

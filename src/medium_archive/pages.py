@@ -114,11 +114,29 @@ def strip_tracking_pixels(node):
             img.decompose()
 
 
+def split_pre_paragraphs(article):
+    """Rendered pages pack consecutive code paragraphs as sibling <span>s
+    inside a single <pre>, so converting loses the boundary between them;
+    the account export keeps one <pre> per paragraph. Split to match."""
+    doc = BeautifulSoup("", "html.parser")
+    for pre in article.find_all("pre"):
+        kids = [c for c in pre.children
+                if c.name is not None or str(c).strip()]
+        if len(kids) < 2 or any(c.name != "span" for c in kids):
+            continue
+        for span in kids:
+            new_pre = doc.new_tag("pre")
+            pre.insert_before(new_pre)
+            new_pre.append(span.extract())
+        pre.decompose()
+
+
 def page_body(soup, tags=()):
     """<article> with Medium chrome removed."""
     article = soup.find("article") or soup.body
     for sel in (
         "h1",                      # title lives in front matter
+        ".pw-subtitle-paragraph",  # subtitle is metadata, not body
         '[data-testid="authorName"]',
         '[data-testid="storyPublishDate"]',
         '[data-testid="storyReadTime"]',
@@ -153,6 +171,11 @@ def page_body(soup, tags=()):
                 or (slugs and text.lower().replace(" ", "-") in slugs)):
             if el.find_parent(["p", "li", "h2", "h3", "h4", "blockquote", "figure", "pre"]) is None:
                 el.decompose()
+    # Section dividers render as <div role="separator"> with dot <span>s,
+    # not <hr>; the export uses a real <hr>.
+    for el in article.select('div[role="separator"]'):
+        el.replace_with(soup.new_tag("hr"))
+    split_pre_paragraphs(article)
     strip_tracking_pixels(article)
     strip_medium_footer(article)
     return article

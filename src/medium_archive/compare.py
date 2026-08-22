@@ -10,7 +10,7 @@ are guaranteed to convert as faithfully from the page as from the export.
 import difflib
 import json
 import sys
-from urllib.parse import unquote
+from urllib.parse import unquote_plus
 
 from bs4 import BeautifulSoup
 
@@ -23,8 +23,9 @@ from .urls import canonical_url
 
 def comparable_lines(markdown: str) -> list:
     """Lines that matter for agreement: blank-line layout is noise, and
-    the page and export sometimes percent-encode the same URL differently."""
-    return [unquote(l.rstrip()) for l in markdown.splitlines() if l.strip()]
+    the page and export sometimes encode the same URL differently
+    (%20 vs + vs a literal space)."""
+    return [unquote_plus(l.rstrip()) for l in markdown.splitlines() if l.strip()]
 
 
 def cmd_compare(args):

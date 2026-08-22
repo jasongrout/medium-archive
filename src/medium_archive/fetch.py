@@ -22,7 +22,7 @@ from .images import collect_image_urls, safe_filename
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
-from .urls import canonical_url, medium_id
+from .urls import canonical_url, medium_id, norm_key, slug_of
 
 
 def load_existing(dirs: list) -> set:
@@ -172,6 +172,26 @@ def cmd_fetch(args):
     missing = read_missing(raw_dir)
     skip = set(index) | load_existing(args.existing or [])
     by_id = {e.get("medium_id"): u for u, e in index.items()}
+
+    # The Wayback crawl index holds mangled variants of real post URLs
+    # (the id truncated by a character or two, a hyphen inserted mid-id);
+    # match those to archived posts so they are neither fetched nor
+    # flagged missing. A variant's key equals the real key, or is a
+    # near-complete prefix of it (truncation loses trailing characters).
+    keys = {norm_key(u): u for u in index}
+
+    def mangled_alias(url: str) -> str | None:
+        k = norm_key(url)
+        return next((u for ck, u in keys.items() if u != url
+                     and ck.startswith(k) and len(ck) - len(k) <= 4), None)
+
+    for url in [u for u in missing if mangled_alias(u)]:
+        print(f"unflagged from missing.json: {url}\n"
+              f"  is a mangled variant of the archived {mangled_alias(url)}",
+              file=sys.stderr)
+        del missing[url]
+        write_missing(raw_dir, missing)
+
     fetched = 0
     for n, (url, approx, source) in enumerate(entries, 1):
         if args.limit and fetched >= args.limit:
@@ -183,6 +203,12 @@ def cmd_fetch(args):
         alias = by_id.get(pid)
         already = url in skip or (alias is not None and (raw_dir / pid / "page.html").exists())
         if already and not args.force:
+            continue
+        variant_of = None if source == "file" else mangled_alias(url)
+        if variant_of:
+            print(f"[{n}/{len(entries)}] {url}\n"
+                  f"  assuming this is a mangled variant of the archived "
+                  f"{variant_of}; skipping", file=sys.stderr)
             continue
         dest = raw_dir / pid
         tmp = raw_dir / f"_tmp_{pid}"
@@ -214,6 +240,7 @@ def cmd_fetch(args):
                 entry.update({k: old[k] for k in ("in_export", "imported_at", "draft") if k in old})
             index[url] = entry
             by_id[pid] = url
+            keys[norm_key(url)] = url
             write_index(raw_dir, index)
             if url in missing:                   # it came back; unflag it
                 del missing[url]
@@ -236,8 +263,16 @@ def cmd_fetch(args):
                     "wayback_url": f"https://web.archive.org/web/{ts}/{url}",
                     "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 }
+                # A deleted post republished under a new id keeps its slug;
+                # point at the archived double so review is quick.
+                same = [u for u in index if u != url and slug_of(u) == slug_of(url)]
+                if same:
+                    missing[url]["same_slug_archived"] = same
                 write_missing(raw_dir, missing)
                 print(f"  GONE from Medium ({status}); flagged in raw/missing.json", file=sys.stderr)
+                if same:
+                    print(f"  (same slug is archived as {same[0]} -- likely "
+                          f"deleted and republished under a new id)", file=sys.stderr)
             else:
                 print(f"  FAILED {url}: {e}", file=sys.stderr)
             shutil.rmtree(tmp, ignore_errors=True)
