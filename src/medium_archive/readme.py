@@ -100,10 +100,10 @@ both should be redirected.
 
 ## Regenerating
 
-    medium-archive {base} --out {out} fetch              # incremental; add new posts
-    medium-archive {base} --out {out} compare            # verify page vs export conversion
-    medium-archive {base} --out {out} convert --clean    # rebuild posts/ from raw/
-    medium-archive {base} --out {out} stats              # summarize the archive
+    medium-archive fetch {base} --out {out}              # incremental; add new posts
+    medium-archive compare --out {out}                   # verify page vs export conversion
+    medium-archive convert --clean --out {out}           # rebuild posts/ from raw/
+    medium-archive stats --out {out}                     # summarize the archive
 """
 
 

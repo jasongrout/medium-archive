@@ -17,7 +17,7 @@ from markdownify import markdownify as html_to_md
 
 from .dates import parse_date
 from .export import export_body, parse_export
-from .fetch import read_index
+from .fetch import archive_base, read_index
 from .images import image_source
 from .pages import extract_metadata, feed_body, page_body
 from .readme import write_readme
@@ -201,5 +201,5 @@ def cmd_convert(args):
     if manifest:
         write_redirects(manifest, args.out)
     if not (args.out / "README.md").exists():
-        write_readme(args.out, args.base)
+        write_readme(args.out, args.base or archive_base(args.out) or "(unknown publication)")
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)

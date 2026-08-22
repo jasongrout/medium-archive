@@ -9,6 +9,7 @@ import re
 import shutil
 import sys
 import time
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -52,6 +53,17 @@ def load_existing(dirs: list) -> set:
 def read_index(raw_dir: Path) -> dict:
     p = raw_dir / "index.json"
     return json.loads(p.read_text()) if p.exists() else {}
+
+
+def archive_base(out: Path) -> str | None:
+    """The publication root derived from archived post URLs, for the
+    offline steps, which do not take the URL argument."""
+    hosts = Counter()
+    for url in read_index(out / "raw"):
+        p = urlsplit(url)
+        if p.scheme and p.netloc:
+            hosts[f"{p.scheme}://{p.netloc}"] += 1
+    return hosts.most_common(1)[0][0] if hosts else None
 
 
 def write_index(raw_dir: Path, index: dict):

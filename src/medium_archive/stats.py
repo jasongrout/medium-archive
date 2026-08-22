@@ -11,6 +11,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from .fetch import archive_base
+
 FRONT_RE = re.compile(r"\A---\n.*?\n---\n", re.S)
 MD_NOISE_RE = re.compile(r"!\[[^\]]*\]\([^)]*\)|\[([^\]]*)\]\([^)]*\)|[#>*`|-]")
 
@@ -62,7 +64,7 @@ def cmd_stats(args):
     sources = Counter(p.get("body_source") or "?" for p in posts)
     image_counts = [len(p.get("images") or []) for p in posts]
 
-    print(f"Archive: {args.base}")
+    print(f"Archive: {args.base or archive_base(args.out) or args.out}")
     print(f"\nPosts: {n}")
     if dates:
         print(f"  first {dates[0][:10]}, latest {dates[-1][:10]}")

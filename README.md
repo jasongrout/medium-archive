@@ -57,20 +57,21 @@ medium-archive --help
 ## Usage
 
 ```sh
-medium-archive https://blog.example.com/ fetch              # everything, newest first
-medium-archive https://blog.example.com/ fetch --limit 5    # smoke test
-medium-archive https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
-medium-archive https://blog.example.com/ import-export medium-export.zip
-medium-archive https://blog.example.com/ compare            # page vs export check
-medium-archive https://blog.example.com/ convert            # raw -> posts/
-medium-archive https://blog.example.com/ stats              # summarize the archive
-medium-archive https://blog.example.com/ all --limit 5      # fetch then convert
+medium-archive fetch https://blog.example.com/              # everything, newest first
+medium-archive fetch https://blog.example.com/ --limit 5    # smoke test
+medium-archive fetch https://blog.example.com/ --start 2024-12-31 --end 2024-01-01
+medium-archive import-export medium-export.zip
+medium-archive compare                                      # page vs export check
+medium-archive convert                                      # raw -> posts/
+medium-archive stats                                        # summarize the archive
+medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 ```
 
-The publication root URL is required; `/sitemap/sitemap.xml` and `/feed`
-must resolve under it. `--out DIR` (default: `medium_export`) sets the
-archive root. See `medium-archive URL fetch --help` and
-`medium-archive URL convert --help` for the per-step options: date windows,
+Only `fetch` and `all` need the publication root URL; `/sitemap/sitemap.xml`
+and `/feed` must resolve under it. The other steps work offline from the
+archive alone. `--out DIR` (default: `medium_export`) sets the archive root
+on every step. See `medium-archive fetch --help` and
+`medium-archive convert --help` for the per-step options: date windows,
 limits, fetch delays, skipping posts already in earlier archives, converting
 a single post, and more.
 

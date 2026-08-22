@@ -1,27 +1,34 @@
-"""Archive a Medium publication in two independent steps:
+"""Archive a Medium publication in independent steps:
 
-    fetch    pull raw material from Medium: page HTML, RSS feed item, and
-             full-resolution images, unmodified, into <out>/raw/
-    convert  turn the raw archive into Markdown + front matter + local images
-             in <out>/posts/, plus posts.json and redirects.csv
+    fetch          pull raw material from Medium: page HTML, RSS feed item,
+                   and full-resolution images, unmodified, into <out>/raw/
+    import-export  merge a Medium account export into <out>/raw/
+    compare        verify the page conversion against the account export
+    convert        turn the raw archive into Markdown + front matter + local
+                   images in <out>/posts/, plus posts.json and redirects.csv
+    stats          summarize the converted archive
 
-`convert` never touches the network, so it can be re-run freely while tuning
-the conversion (selectors, Markdown style, output layout) without hitting
-Medium again. `fetch` is incremental and resumable.
+Only `fetch` (and `all`) touches the network; the other steps can be re-run
+freely while tuning the conversion (selectors, Markdown style, output
+layout) without hitting Medium again. `fetch` is incremental and resumable.
 
 A Medium account export (medium.com -> Settings -> Download your
 information) can be merged into the raw archive with `import-export`; its
 posts/*.html files are the editor's own clean HTML and become the preferred
 body source on the next `convert`.
 
+Only fetch and all need the publication URL; the other steps work offline
+from the archive alone.
+
 Examples:
-    medium-archive https://blog.example.com/ fetch              # everything, newest first
-    medium-archive https://blog.example.com/ fetch --limit 5    # smoke test
-    medium-archive https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
-    medium-archive https://blog.example.com/ import-export medium-export.zip
-    medium-archive https://blog.example.com/ compare            # page vs export check
-    medium-archive https://blog.example.com/ convert            # raw -> posts/
-    medium-archive https://blog.example.com/ all --limit 5      # fetch then convert
+    medium-archive fetch https://blog.example.com/              # everything, newest first
+    medium-archive fetch https://blog.example.com/ --limit 5    # smoke test
+    medium-archive fetch https://blog.example.com/ --start 2024-12-31 --end 2024-01-01
+    medium-archive import-export medium-export.zip
+    medium-archive compare                                      # page vs export check
+    medium-archive convert                                      # raw -> posts/
+    medium-archive stats                                        # summarize the archive
+    medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
 Notes:
   * Discovery: sitemap (complete archive) merged with the RSS feed (~10 most
@@ -51,7 +58,6 @@ from .dates import parse_date
 from .export import cmd_import_export
 from .fetch import cmd_fetch
 
-
 def publication_url(text: str) -> str:
     p = urlparse(text)
     if p.scheme not in ("http", "https") or not p.netloc:
@@ -69,6 +75,9 @@ def parse_cli_date(text: str, end_of_day: bool) -> datetime:
 
 
 def add_fetch_args(p):
+    p.add_argument("base", type=publication_url, metavar="URL",
+                   help="publication root, e.g. https://blog.example.com/; "
+                        "/sitemap/sitemap.xml and /feed must resolve under it")
     p.add_argument("--urls", type=Path, metavar="FILE",
                    help="read post URLs from FILE (one per line, '#' comments) "
                         "instead of discovering them from sitemap + feed")
@@ -111,15 +120,18 @@ def add_convert_args(p):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("base", type=publication_url, metavar="URL",
-                    help="publication root, e.g. https://blog.example.com/; "
-                         "/sitemap/sitemap.xml and /feed must resolve under it")
-    ap.add_argument("--out", default="medium_export", type=Path, metavar="DIR",
-                    help="archive root (default: medium_export)")
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--out", default="medium_export", type=Path, metavar="DIR",
+                        help="archive root (default: medium_export)")
+    ap.set_defaults(base=None)   # only fetch and all take the URL
     sub = ap.add_subparsers(dest="command", required=True)
-    add_fetch_args(sub.add_parser("fetch", help="download raw material into <out>/raw/"))
-    imp = sub.add_parser("import-export",
-                         help="merge a Medium account export into <out>/raw/")
+
+    def parser(name, **kw):
+        return sub.add_parser(name, parents=[common], **kw)
+
+    add_fetch_args(parser("fetch", help="download raw material into <out>/raw/"))
+    imp = parser("import-export",
+                 help="merge a Medium account export into <out>/raw/")
     imp.add_argument("export_path", type=Path, metavar="ZIP_OR_DIR",
                      help="the export zip from medium.com Settings -> Download your "
                           "information, or an unzipped copy / its posts/ directory")
@@ -129,18 +141,18 @@ def main():
                           "publications (default: only merge into fetched posts)")
     imp.add_argument("--drafts", action="store_true",
                      help="also import draft_*.html files (default: skip drafts)")
-    add_convert_args(sub.add_parser("convert", help="convert <out>/raw/ into <out>/posts/"))
-    cmp_p = sub.add_parser("compare",
-                           help="verify the page conversion against the account export, "
-                                "offline; exits non-zero if any post differs")
+    add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
+    cmp_p = parser("compare",
+                   help="verify the page conversion against the account export, "
+                        "offline; exits non-zero if any post differs")
     cmp_p.add_argument("--only", action="append", metavar="URL",
                        help="compare just this post (repeatable; default: every post "
                             "that has both page.html and export.html)")
-    stats_p = sub.add_parser("stats", help="summarize the converted archive "
-                                           "(posts, authors, lengths, tags)")
+    stats_p = parser("stats", help="summarize the converted archive "
+                                   "(posts, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
                          help="how many authors/tags to list (default: 15)")
-    both = sub.add_parser("all", help="fetch then convert")
+    both = parser("all", help="fetch then convert")
     add_fetch_args(both)
     add_convert_args(both)
     args = ap.parse_args()
