@@ -101,6 +101,12 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
         src = iframe.get("src") or iframe.get("data-src") or ""
         iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
 
+    # Medium's editor emits things like <strong> </strong> between runs;
+    # markdownify drops whitespace-only emphasis, losing the space.
+    for el in body.find_all(["strong", "em", "b", "i"]):
+        if el.parent is not None and not el.get_text().strip():
+            el.replace_with(el.get_text())
+
     markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered
     # page serves plain spaces. Normalize so output is stable across sources.
