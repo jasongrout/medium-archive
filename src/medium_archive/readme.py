@@ -34,11 +34,18 @@ raw/
                                 Machine) found but Medium no longer serves
                                 (HTTP 404/410, or "soft-404": Medium's
                                 not-found page served with status 200):
-                                status, found_via, approx_date, wayback_url;
-                                present only when such posts exist. Their
+                                status, medium_id, found_via, approx_date
+                                (first Wayback capture; an upper bound on
+                                the publish date), wayback_url, checked_at,
+                                plus same_slug_archived when the archive
+                                holds the same slug under another id --
+                                the post was likely deleted and republished.
+                                Present only when such posts exist. Their
                                 content survives only as web.archive.org
                                 captures -- fetch does not recover it
-                                automatically
+                                automatically. Mangled variants of archived
+                                URLs (truncated ids, stray hyphens) are
+                                recognized and never flagged
   feed.xml                    the publication RSS feed as downloaded
   <medium_id>/                one directory per post (12-hex Medium id)
     page.html                 the post page, byte-for-byte as served
@@ -105,7 +112,9 @@ both should be redirected.
   even when an account export is available.
 * Posts flagged in `raw/missing.json` are gone from Medium (deleted or
   unpublished); each entry's `wayback_url` points at its web.archive.org
-  captures for manual recovery. A re-run of `fetch` re-checks them and
+  captures for manual recovery. An entry with `same_slug_archived` was
+  likely deleted and republished under a new id -- the archive already
+  holds the replacement. A re-run of `fetch` re-checks flagged posts and
   unflags any that reappear.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.

@@ -147,14 +147,17 @@ longer lists — work through the steps in order:
   unpublished — are flagged in `raw/missing.json`, with a `wayback_url`
   pointing at their web.archive.org captures for manual recovery.
   Medium serves its not-found page with HTTP 200, so gone posts are
-  detected from the page content, not just the status code. Re-running
-  `fetch` re-checks flagged posts and unflags any that reappear.
+  detected from the page content, not just the status code. A gone post
+  whose slug is archived under another id — likely deleted and republished
+  — is annotated with `same_slug_archived`. Re-running `fetch` re-checks
+  flagged posts and unflags any that reappear.
 * Medium boilerplate — the "was originally published on Medium" footer,
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become
   links and need manual replacement.
-* Medium rate-limits and may serve a bot wall; raise `--delay` on 429s and
-  re-run to resume.
+* Medium rate-limits and may serve a bot wall. A 429 is not retried —
+  fetch reports it (with the server's `Retry-After` hint, when sent) and
+  moves on; raise `--delay` and re-run to resume.
 
 ## Layout
 
