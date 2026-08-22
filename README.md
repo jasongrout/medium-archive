@@ -172,4 +172,6 @@ src/medium_archive/
   dates.py       date parsing and the --start/--end window check
   urls.py        Medium URL and post-identifier helpers
   readme.py      the README.md written into each archive
+tests/           offline tests (canned HTTP responses, no network);
+                 run with `uv run pytest`
 ```
