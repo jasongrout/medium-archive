@@ -30,6 +30,16 @@ Examples:
     medium-archive stats                                        # summarize the archive
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
+Recommended workflow for a comprehensive archive:
+  1. smoke test:               all URL --limit 5
+  2. fetch everything:         fetch URL          (re-run until "0 new")
+  3. review raw/missing.json:  posts surviving only on web.archive.org;
+                               recover the ones that matter by hand
+  4. merge account exports:    import-export ZIP (per author), then compare
+  5. convert, then stats:      a gap year in the counts means undiscovered
+                               posts; seed them with fetch --urls FILE
+  6. back up raw/; re-run fetch periodically until the blog moves
+
 Notes:
   * Discovery: sitemap merged with the RSS feed (~10 most recent posts, with
     full bodies) and the Wayback Machine's index of past captures — Medium's

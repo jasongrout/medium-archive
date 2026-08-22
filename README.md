@@ -75,6 +75,61 @@ on every step. See `medium-archive fetch --help` and
 limits, fetch delays, skipping posts already in earlier archives, converting
 a single post, and more.
 
+## Recommended workflow
+
+To archive a publication comprehensively — including posts Medium itself no
+longer lists — work through the steps in order:
+
+1. **Smoke-test** the whole pipeline on a handful of posts and eyeball the
+   result before committing to a long run:
+
+   ```sh
+   medium-archive all https://blog.example.com/ --limit 5 --out myblog
+   ```
+
+2. **Fetch everything.** Discovery merges the sitemap, the RSS feed, and the
+   Wayback Machine's index, so old posts missing from Medium's truncated
+   sitemap are found automatically. Fetching is incremental: interrupt and
+   re-run freely, raise `--delay` if Medium answers 429, and repeat until a
+   run reports `0 new`:
+
+   ```sh
+   medium-archive fetch https://blog.example.com/ --out myblog
+   ```
+
+3. **Review `raw/missing.json`** if the fetch summary mentions it: those
+   posts survive only as web.archive.org captures. Open each entry's
+   `wayback_url`, decide whether the post matters, and save what does by
+   hand — `fetch` cannot recover them. (Expect the occasional entry that is
+   just a mangled URL the crawler once saw; the `wayback_url` shows quickly
+   whether there is a real post behind it.)
+
+4. **Merge account exports** (medium.com → Settings → Download your
+   information), once per author for a multi-author publication, then let
+   `compare` verify the scraped pages against the export's clean HTML:
+
+   ```sh
+   medium-archive import-export alice-export.zip --out myblog
+   medium-archive compare --out myblog
+   ```
+
+   This step is optional but worthwhile: export bodies convert most
+   faithfully and carry exact publish timestamps.
+
+5. **Convert and check the totals.** `stats` shows posts per year, authors,
+   and tags — compare the year counts against the publication's own archive
+   pages or your memory of its history; a gap year means undiscovered
+   posts, which can be seeded from any URL list via `fetch --urls FILE`:
+
+   ```sh
+   medium-archive convert --out myblog
+   medium-archive stats --out myblog
+   ```
+
+6. **Back up `raw/`** — it is the only part that cannot be regenerated once
+   the Medium site is gone — and re-run `fetch` periodically until the day
+   the blog actually moves, to pick up posts published in the meantime.
+
 ## Notes
 
 * Discovery merges the sitemap with the RSS feed (roughly the ten most
