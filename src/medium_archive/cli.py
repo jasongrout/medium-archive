@@ -19,6 +19,7 @@ Examples:
     medium-archive https://blog.example.com/ fetch --limit 5    # smoke test
     medium-archive https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
     medium-archive https://blog.example.com/ import-export medium-export.zip
+    medium-archive https://blog.example.com/ compare            # page vs export check
     medium-archive https://blog.example.com/ convert            # raw -> posts/
     medium-archive https://blog.example.com/ all --limit 5      # fetch then convert
 
@@ -43,7 +44,9 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .compare import cmd_compare
 from .convert import cmd_convert
+from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
 from .fetch import cmd_fetch
@@ -127,6 +130,16 @@ def main():
     imp.add_argument("--drafts", action="store_true",
                      help="also import draft_*.html files (default: skip drafts)")
     add_convert_args(sub.add_parser("convert", help="convert <out>/raw/ into <out>/posts/"))
+    cmp_p = sub.add_parser("compare",
+                           help="verify the page conversion against the account export, "
+                                "offline; exits non-zero if any post differs")
+    cmp_p.add_argument("--only", action="append", metavar="URL",
+                       help="compare just this post (repeatable; default: every post "
+                            "that has both page.html and export.html)")
+    stats_p = sub.add_parser("stats", help="summarize the converted archive "
+                                           "(posts, authors, lengths, tags)")
+    stats_p.add_argument("--top", type=int, default=15, metavar="N",
+                         help="how many authors/tags to list (default: 15)")
     both = sub.add_parser("all", help="fetch then convert")
     add_fetch_args(both)
     add_convert_args(both)
@@ -138,3 +151,7 @@ def main():
         cmd_import_export(args)
     if args.command in ("convert", "all"):
         cmd_convert(args)
+    if args.command == "compare":
+        cmd_compare(args)
+    if args.command == "stats":
+        cmd_stats(args)

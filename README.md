@@ -19,12 +19,20 @@ It works in independent steps:
   timestamp, so they become the preferred body source; the scraped page
   still contributes tags, the updated date, the publication canonical URL,
   and the images.
+* **`compare`** (optional) verifies the page conversion offline: for every
+  post with both sources, it converts the body from the scraped page and
+  from the export independently and reports any disagreement. The two
+  should be identical, so a difference means new page chrome or a
+  conversion bug. It exits non-zero when posts differ, so it can gate
+  scripts.
 * **`convert`** turns the raw archive into Markdown files with front matter
   and local images in `<out>/posts/`, plus a `posts.json` manifest and a
   `redirects.csv` mapping old Medium URLs to the new post directories.
   It never touches the network, so it can be re-run freely while tuning the
   conversion (selectors, Markdown style, output layout) without hitting
   Medium again.
+* **`stats`** summarizes the converted archive: posts per year, authors,
+  article length quartiles, tag frequencies, image counts.
 
 The `raw/` layer is the source of truth — the only part that cannot be
 regenerated once the Medium site is gone — and everything else is derived
@@ -53,7 +61,9 @@ medium-archive https://blog.example.com/ fetch              # everything, newest
 medium-archive https://blog.example.com/ fetch --limit 5    # smoke test
 medium-archive https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
 medium-archive https://blog.example.com/ import-export medium-export.zip
+medium-archive https://blog.example.com/ compare            # page vs export check
 medium-archive https://blog.example.com/ convert            # raw -> posts/
+medium-archive https://blog.example.com/ stats              # summarize the archive
 medium-archive https://blog.example.com/ all --limit 5      # fetch then convert
 ```
 
@@ -85,6 +95,8 @@ src/medium_archive/
   fetch.py       the fetch step: download posts into <out>/raw/
   export.py      Medium account exports: parsing and the import-export step
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
+  compare.py     the compare step: verify page vs export conversion agreement
+  stats.py       the stats step: summarize the converted archive
   discovery.py   find post URLs via the sitemap tree and RSS feed
   pages.py       post page parsing: metadata extraction, body cleanup
   images.py      image source extraction and filenames
