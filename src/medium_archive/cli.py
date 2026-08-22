@@ -9,10 +9,16 @@
 the conversion (selectors, Markdown style, output layout) without hitting
 Medium again. `fetch` is incremental and resumable.
 
+A Medium account export (medium.com -> Settings -> Download your
+information) can be merged into the raw archive with `import-export`; its
+posts/*.html files are the editor's own clean HTML and become the preferred
+body source on the next `convert`.
+
 Examples:
     medium-archive https://blog.example.com/ fetch              # everything, newest first
     medium-archive https://blog.example.com/ fetch --limit 5    # smoke test
     medium-archive https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
+    medium-archive https://blog.example.com/ import-export medium-export.zip
     medium-archive https://blog.example.com/ convert            # raw -> posts/
     medium-archive https://blog.example.com/ all --limit 5      # fetch then convert
 
@@ -39,6 +45,7 @@ from urllib.parse import urlparse
 
 from .convert import cmd_convert
 from .dates import parse_date
+from .export import cmd_import_export
 from .fetch import cmd_fetch
 
 
@@ -108,6 +115,13 @@ def main():
                     help="archive root (default: medium_export)")
     sub = ap.add_subparsers(dest="command", required=True)
     add_fetch_args(sub.add_parser("fetch", help="download raw material into <out>/raw/"))
+    imp = sub.add_parser("import-export",
+                         help="merge a Medium account export into <out>/raw/")
+    imp.add_argument("export_path", type=Path, metavar="ZIP_OR_DIR",
+                     help="the export zip from medium.com Settings -> Download your "
+                          "information, or an unzipped copy / its posts/ directory")
+    imp.add_argument("--drafts", action="store_true",
+                     help="also import draft_*.html files (default: skip drafts)")
     add_convert_args(sub.add_parser("convert", help="convert <out>/raw/ into <out>/posts/"))
     both = sub.add_parser("all", help="fetch then convert")
     add_fetch_args(both)
@@ -116,5 +130,7 @@ def main():
 
     if args.command in ("fetch", "all"):
         cmd_fetch(args)
+    if args.command == "import-export":
+        cmd_import_export(args)
     if args.command in ("convert", "all"):
         cmd_convert(args)

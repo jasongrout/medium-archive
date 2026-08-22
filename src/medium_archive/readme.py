@@ -24,12 +24,17 @@ Medium. It has two layers:
 ```
 README.md                     this file
 raw/
-  index.json                  every fetched post, keyed by its Medium URL:
+  index.json                  every archived post, keyed by its Medium URL:
                                 medium_id, title, published (from the page),
-                                sitemap_date, fetched_at, images, in_feed
+                                sitemap_date, fetched_at, images, in_feed,
+                                plus in_export/imported_at/draft for posts
+                                merged from a Medium account export
   feed.xml                    the publication RSS feed as downloaded
   <medium_id>/                one directory per post (12-hex Medium id)
     page.html                 the post page, byte-for-byte as served
+    export.html               the post's file from a Medium account export,
+                                when one was merged in with `import-export`;
+                                the editor's own HTML, byte-for-byte
     feed_item.json            the post's RSS item, when the feed covered it
                                 at fetch time (title, author, tags, date,
                                 content_html). Only ~10 recent posts have one.
@@ -60,10 +65,10 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `original_path` | path component of `original_url`; what an old inbound link carries |
 | `medium_id`     | Medium's hex post id; Medium also resolves `/p/<id>` |
 | `slug`          | `original_path` with the id suffix removed |
-| `description`   | Medium's summary/description text |
-| `tags`          | tags (RSS categories when available, else scraped tag links) |
+| `description`   | the subtitle (from the account export) or Medium's summary text |
+| `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
 | `images`        | relative paths of images used by the body |
-| `body_source`   | `feed` (RSS `content:encoded`) or `page` (rendered HTML) |
+| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`) or `page` (rendered HTML) |
 
 ## Redirects
 
@@ -81,9 +86,13 @@ both should be redirected.
 * Medium boilerplate ("was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, author header) is stripped in `convert`.
   It is still present in `raw/page.html`.
-* `body_source: feed` posts are usually cleaner than `page` posts. Medium
-  only exposes feed bodies for recent posts, so most of the archive is
-  `page`. Review `page` posts for leftover chrome.
+* Body source preference is `export` > `feed` > `page` (override with
+  `convert --prefer-page`). Export bodies are the Medium editor's own HTML
+  and convert most faithfully; `page` posts may have leftover chrome, so
+  review them. The export contributes the exact first-publish timestamp and
+  the untruncated subtitle; tags, the updated date and the publication
+  canonical URL still come from the page, so fetching remains worthwhile
+  even when an account export is available.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.
 * Image filenames are `<NNN>-<original basename>`; the same asset served

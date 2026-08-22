@@ -3,12 +3,18 @@
 Archive a Medium publication as raw HTML plus a Markdown conversion, to
 support migrating a blog off Medium.
 
-It works in two independent steps:
+It works in independent steps:
 
 * **`fetch`** pulls raw material from Medium — each post's page HTML, its RSS
   feed item, and full-resolution images, unmodified — into `<out>/raw/`.
   Fetching is incremental and resumable, so it can be interrupted and re-run,
   and re-running later picks up only new posts.
+* **`import-export`** (optional) merges a Medium account export — the zip
+  from medium.com → Settings → Download your information — into `<out>/raw/`,
+  matched to fetched posts by Medium id. Export post files are the editor's
+  own clean HTML with the exact publish timestamp, so they become the
+  preferred body source; the scraped page still contributes tags, the
+  updated date, the publication canonical URL, and the images.
 * **`convert`** turns the raw archive into Markdown files with front matter
   and local images in `<out>/posts/`, plus a `posts.json` manifest and a
   `redirects.csv` mapping old Medium URLs to the new post directories.
@@ -42,6 +48,7 @@ medium-archive --help
 medium-archive https://blog.example.com/ fetch              # everything, newest first
 medium-archive https://blog.example.com/ fetch --limit 5    # smoke test
 medium-archive https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
+medium-archive https://blog.example.com/ import-export medium-export.zip
 medium-archive https://blog.example.com/ convert            # raw -> posts/
 medium-archive https://blog.example.com/ all --limit 5      # fetch then convert
 ```
@@ -72,6 +79,7 @@ a single post, and more.
 src/medium_archive/
   cli.py         argument parsing and the entry point
   fetch.py       the fetch step: download posts into <out>/raw/
+  export.py      Medium account exports: parsing and the import-export step
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
   discovery.py   find post URLs via the sitemap tree and RSS feed
   pages.py       post page parsing: metadata extraction, body cleanup

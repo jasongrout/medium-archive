@@ -18,6 +18,18 @@ MEDIUM_FOOTER_RE = re.compile(
     re.I,
 )
 
+# Medium's JSON-LD currently types posts as SocialMediaPosting.
+LD_POST_TYPES = ("NewsArticle", "Article", "BlogPosting", "SocialMediaPosting")
+
+# Un-hydrated page chrome that renders as bare text: separator dots,
+# clap/response count placeholders, the read-time line.
+PAGE_NOISE_RE = re.compile(r"·|-{1,2}|\d+ min read")
+
+ZOOM_HINT = "Press enter or click to view image in full size"
+
+APOLLO_TAGS_RE = re.compile(r'"tags":\[((?:\{"__ref":"Tag:[^"]+"\},?)+)\]')
+TAG_REF_RE = re.compile(r'"Tag:([^"]+)"')
+
 
 def parse_ld_json(soup) -> dict:
     for tag in soup.find_all("script", type="application/ld+json"):
@@ -26,9 +38,22 @@ def parse_ld_json(soup) -> dict:
         except json.JSONDecodeError:
             continue
         for item in (data if isinstance(data, list) else [data]):
-            if isinstance(item, dict) and item.get("@type") in ("NewsArticle", "Article", "BlogPosting"):
+            if isinstance(item, dict) and item.get("@type") in LD_POST_TYPES:
                 return item
     return {}
+
+
+def apollo_tags(soup) -> list:
+    """Tag slugs from the page's embedded Apollo state. The rendered tag
+    pills are plain <span>s now, so there are no /tag/ links to scrape."""
+    for tag in soup.find_all("script"):
+        text = tag.string or ""
+        if "__APOLLO_STATE__" not in text:
+            continue
+        m = APOLLO_TAGS_RE.search(text)
+        if m:
+            return TAG_REF_RE.findall(m.group(1))
+    return []
 
 
 def meta(soup, **attrs) -> str | None:
@@ -53,7 +78,8 @@ def extract_metadata(soup, url: str) -> dict:
         "date": ld.get("datePublished") or meta(soup, property="article:published_time") or "",
         "updated": ld.get("dateModified"),
         "description": ld.get("description") or meta(soup, name="description") or "",
-        "tags": [t.get_text(strip=True) for t in soup.select('a[href*="/tag/"], a[href*="/tagged/"]')],
+        "tags": [t.get_text(strip=True) for t in soup.select('a[href*="/tag/"], a[href*="/tagged/"]')]
+                or apollo_tags(soup),
     }
 
 
@@ -75,7 +101,7 @@ def strip_tracking_pixels(node):
             img.decompose()
 
 
-def page_body(soup):
+def page_body(soup, tags=()):
     """<article> with Medium chrome removed."""
     article = soup.find("article") or soup.body
     for sel in (
@@ -94,6 +120,25 @@ def page_body(soup):
         header = a.find_parent("div")
         if header and not header.find("p") and not header.find("figure"):
             header.decompose()
+    # Clap/vote widgets render their count as bare text; zoom hints sit
+    # inside the figure itself, next to the real image.
+    for el in article.select('[class*="pw-multi-vote"]'):
+        el.decompose()
+    for el in article.find_all(["span", "div"]):
+        if el.parent is not None and el.find("img") is None \
+                and el.get_text(strip=True) == ZOOM_HINT:
+            el.decompose()
+    # Tag pills are <span>s whose whole text is a tag name; only remove
+    # matches outside real content elements, so body words stay intact.
+    slugs = {t.lower().replace(" ", "-") for t in tags}
+    for el in article.find_all(["a", "span"]):
+        if el.parent is None or el.find("img") is not None:
+            continue
+        text = el.get_text(strip=True)
+        if (PAGE_NOISE_RE.fullmatch(text)
+                or (slugs and text.lower().replace(" ", "-") in slugs)):
+            if el.find_parent(["p", "li", "h2", "h3", "h4", "blockquote", "figure", "pre"]) is None:
+                el.decompose()
     strip_tracking_pixels(article)
     strip_medium_footer(article)
     return article

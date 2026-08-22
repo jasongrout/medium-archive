@@ -10,23 +10,30 @@ import re
 import shutil
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 from bs4 import BeautifulSoup
 from markdownify import markdownify as html_to_md
 
 from .dates import parse_date
+from .export import export_body, parse_export
 from .fetch import read_index
 from .images import image_source
 from .pages import extract_metadata, feed_body, page_body
 from .readme import write_readme
 from .urls import canonical_url, medium_id, slug_of
 
+EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
+              "updated": None, "description": "", "tags": []}
+
 
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> dict:
-    page_html = (raw / "page.html").read_text(encoding="utf-8")
-    soup = BeautifulSoup(page_html, "html.parser")
-    info = extract_metadata(soup, url)
+    soup = None
+    if (raw / "page.html").exists():
+        soup = BeautifulSoup((raw / "page.html").read_text(encoding="utf-8"), "html.parser")
+        info = extract_metadata(soup, url)
+    else:
+        info = {"url": url, **EMPTY_INFO}
 
     feed_item = None
     if (raw / "feed_item.json").exists():
@@ -39,15 +46,34 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
             d = parse_date(feed_item["date"])
             info["date"] = d.isoformat() if d else ""
 
+    exp = None
+    if (raw / "export.html").exists():
+        exp = parse_export((raw / "export.html").read_text(encoding="utf-8"))
+        info["title"] = info["title"] or exp["title"]
+        info["author"] = info["author"] or exp["author"]
+        info["author_url"] = info["author_url"] or exp["author_url"]
+        if exp["date"]:
+            info["date"] = exp["date"]      # exact first-publish timestamp
+        if exp["subtitle"]:
+            info["description"] = exp["subtitle"]   # the real subtitle, no title mashed in
+        if soup is None and exp["canonical_url"]:
+            info["url"] = exp["canonical_url"]
+
     img_map = {}
     if (raw / "images.json").exists():
         img_map = json.loads((raw / "images.json").read_text())
+    # the same asset appears under miro.medium.com and cdn-images-1.medium.com
+    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
 
-    if feed_item and feed_item.get("content_html") and not prefer_page:
-        body, body_source = feed_body(feed_item["content_html"]), "feed"
+    if soup is None and exp is None and not (feed_item and feed_item.get("content_html")):
+        raise RuntimeError("no page.html, export.html or feed body to convert")
+    if soup is not None and (prefer_page or not (exp or (feed_item and feed_item.get("content_html")))):
+        body, body_source = page_body(soup, info["tags"]), "page"
+    elif exp:
+        body, body_source = export_body(exp["soup"]), "export"
     else:
-        body, body_source = page_body(soup), "page"
-    doc = body if body.parent is None else soup   # owner for new_tag()
+        body, body_source = feed_body(feed_item["content_html"]), "feed"
+    doc = BeautifulSoup("", "html.parser")        # owner for new_tag()
 
     out_dir = posts_root / f"{(info['date'] or '')[:10] or 'undated'}-{slug_of(url)}"
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -59,7 +85,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
         if not src:
             img.decompose()
             continue
-        fname = img_map.get(src)
+        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
         if fname and (raw / "images" / fname).exists():
             (out_dir / "images").mkdir(exist_ok=True)
             shutil.copy2(raw / "images" / fname, out_dir / "images" / fname)
@@ -76,6 +102,9 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
         iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
 
     markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
+    # Export bodies keep the editor's non-breaking/hair spaces; the rendered
+    # page serves plain spaces. Normalize so output is stable across sources.
+    markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
     markdown = re.sub(r"\n{3,}", "\n\n", markdown).strip() + "\n"
     markdown = re.sub(r"(?:\n-{3,}\n)?\n[^\n]*was originally published[^\n]*\n*$", "\n", markdown)
     if "Continue reading on" in markdown and len(markdown) < 2000:
