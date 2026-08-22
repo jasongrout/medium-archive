@@ -19,6 +19,22 @@ It works in independent steps:
   timestamp, so they become the preferred body source; the scraped page
   still contributes tags, the updated date, the publication canonical URL,
   and the images.
+* **`import-ghost`** (optional) recovers a Ghost blog's posts from the
+  Wayback Machine — a separate import path from `fetch`: fetch handles
+  Medium URLs from the live site, import-ghost handles Ghost URLs that
+  survive only as web.archive.org captures (a common case: the publication
+  lived on Ghost, often on the same domain, before its Medium era, and only
+  some posts were migrated). Every page ever captured on the host is
+  considered, and pages whose HTML declares a Ghost generator are kept, so
+  it works for any Ghost version or permalink style. A post that was
+  migrated to Medium — recognized by slug or title — gets its Ghost capture
+  attached to the archived post as `ghost.html`, alongside the Medium page
+  (like `import-export` attaches `export.html`): the Ghost original often
+  has cleaner code blocks, the exact original timestamp, and the old URL
+  for redirects. `compare --ghost` diffs the two conversions per post, and
+  `convert --prefer-ghost` uses the Ghost body. Posts with no archived
+  counterpart are imported as posts of their own. Images are recovered
+  from Wayback captures too.
 * **`compare`** (optional) verifies the page conversion offline: for every
   post with both sources, it converts the body from the scraped page and
   from the export independently and reports any disagreement. The two
@@ -61,6 +77,7 @@ medium-archive fetch https://blog.example.com/              # everything, newest
 medium-archive fetch https://blog.example.com/ --limit 5    # smoke test
 medium-archive fetch https://blog.example.com/ --start 2024-12-31 --end 2024-01-01
 medium-archive import-export medium-export.zip
+medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
 medium-archive convert                                      # raw -> posts/
 medium-archive stats                                        # summarize the archive
@@ -117,7 +134,20 @@ longer lists — work through the steps in order:
    This step is optional but worthwhile: export bodies convert most
    faithfully and carry exact publish timestamps.
 
-5. **Convert and check the totals.** `stats` shows posts per year, authors,
+5. **Recover the blog's Ghost history**, if it has one (the earliest posts
+   in the Wayback Machine reveal it — a `generator` meta tag names the
+   platform). Ghost posts that were never migrated to Medium exist nowhere
+   else; migrated ones get their Ghost original attached to the archived
+   post, and `compare --ghost` shows where that original converts better
+   than Medium's copy (then cherry-pick with
+   `convert --prefer-ghost --only URL`):
+
+   ```sh
+   medium-archive import-ghost https://blog.example.com/ --out myblog
+   medium-archive compare --ghost --out myblog
+   ```
+
+6. **Convert and check the totals.** `stats` shows posts per year, authors,
    and tags — compare the year counts against the publication's own archive
    pages or your memory of its history; a gap year means undiscovered
    posts, which can be seeded from any URL list via `fetch --urls FILE`:
@@ -127,7 +157,7 @@ longer lists — work through the steps in order:
    medium-archive stats --out myblog
    ```
 
-6. **Back up `raw/`** — it is the only part that cannot be regenerated once
+7. **Back up `raw/`** — it is the only part that cannot be regenerated once
    the Medium site is gone — and re-run `fetch` periodically until the day
    the blog actually moves, to pick up posts published in the meantime.
 
@@ -166,6 +196,7 @@ src/medium_archive/
   cli.py         argument parsing and the entry point
   fetch.py       the fetch step: download posts into <out>/raw/
   export.py      Medium account exports: parsing and the import-export step
+  ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
   compare.py     the compare step: verify page vs export conversion agreement
   stats.py       the stats step: summarize the converted archive

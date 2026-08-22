@@ -24,12 +24,16 @@ Medium. It has two layers:
 ```
 README.md                     this file
 raw/
-  index.json                  every archived post, keyed by its Medium URL:
+  index.json                  every archived post, keyed by its Medium URL
+                                (or original URL for Ghost posts):
                                 medium_id, title, published (from the page),
                                 sitemap_date, found_via (feed/sitemap/
-                                wayback/file), fetched_at, images, in_feed,
-                                plus in_export/imported_at/draft for posts
-                                merged from a Medium account export
+                                wayback/file/ghost-wayback), fetched_at,
+                                images, in_feed, plus in_export/imported_at/
+                                draft for posts merged from a Medium account
+                                export, and in_ghost/ghost_url/
+                                ghost_imported_at for posts with a Ghost
+                                capture attached by `import-ghost`
   missing.json                posts that discovery (usually the Wayback
                                 Machine) found but Medium no longer serves
                                 (HTTP 404/410, or "soft-404": Medium's
@@ -47,8 +51,20 @@ raw/
                                 URLs (truncated ids, stray hyphens) are
                                 recognized and never flagged
   feed.xml                    the publication RSS feed as downloaded
-  <medium_id>/                one directory per post (12-hex Medium id)
-    page.html                 the post page, byte-for-byte as served
+  <medium_id>/                one directory per post (12-hex Medium id;
+                                `ghost-<slug>` for posts recovered with
+                                `import-ghost`)
+    page.html                 the post page, byte-for-byte as served (for
+                                Ghost posts: the Wayback capture)
+    ghost.html                the post's Ghost capture, when `import-ghost`
+                                found the post archived under both a Ghost
+                                and a Medium URL; an alternate body source
+                                alongside page.html, like export.html
+    ghost.json                for any post with a Ghost source: original_url,
+                                snapshot_timestamp, wayback_url, generator,
+                                and the Ghost page's own title/published
+                                (Medium migrations sometimes retitle posts
+                                and shift dates)
     export.html               the post's file from a Medium account export,
                                 when one was merged in with `import-export`;
                                 the editor's own HTML, byte-for-byte
@@ -82,17 +98,20 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `original_path` | path component of `original_url`; what an old inbound link carries |
 | `medium_id`     | Medium's hex post id; Medium also resolves `/p/<id>` |
 | `slug`          | `original_path` with the id suffix removed |
+| `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
 | `description`   | the subtitle (from the account export) or Medium's summary text |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
 | `images`        | relative paths of images used by the body |
-| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`) or `page` (rendered HTML) |
+| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML) or `ghost` (Ghost page from a Wayback capture) |
 
 ## Redirects
 
 `redirects.csv` has everything needed to map old Medium URLs to the new
 site once its URL scheme is decided. Inbound links to Medium posts may use
 the full slug+id path (`original_path`) or the short form `/p/<medium_id>`;
-both should be redirected.
+both should be redirected. A post with a `ghost_url` gets a second row for
+its Ghost path, so links from before the blog's Medium era keep working
+too.
 
 ## Conventions and caveats
 
@@ -116,6 +135,16 @@ both should be redirected.
   likely deleted and republished under a new id -- the archive already
   holds the replacement. A re-run of `fetch` re-checks flagged posts and
   unflags any that reappear.
+* Posts recovered with `import-ghost` come from a Ghost blog via the
+  Wayback Machine, not from Medium; their `original_url` is the Ghost URL,
+  `medium_id` is null, and their images come from Wayback captures too (an
+  image with no capture keeps its original, likely dead, URL). A post
+  archived from both platforms keeps the Medium page as its default body
+  source with the Ghost capture attached; `compare --ghost` diffs the two
+  conversions per post (Medium's importer often mangles code blocks), and
+  `convert --prefer-ghost` converts from the Ghost source instead -- at
+  the cost of any edits made on Medium after the migration. Attached Ghost
+  images are stored alongside the Medium ones with a `g` filename prefix.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.
 * Image filenames are `<NNN>-<original basename>`; the same asset served

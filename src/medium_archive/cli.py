@@ -3,6 +3,9 @@
     fetch          pull raw material from Medium: page HTML, RSS feed item,
                    and full-resolution images, unmodified, into <out>/raw/
     import-export  merge a Medium account export into <out>/raw/
+    import-ghost   recover a Ghost blog's posts from the Wayback Machine
+                   into <out>/raw/; posts also archived from Medium get the
+                   capture attached alongside the Medium page instead
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in <out>/posts/, plus posts.json and redirects.csv
@@ -25,6 +28,7 @@ Examples:
     medium-archive fetch https://blog.example.com/ --limit 5    # smoke test
     medium-archive fetch https://blog.example.com/ --start 2024-12-31 --end 2024-01-01
     medium-archive import-export medium-export.zip
+    medium-archive import-ghost https://blog.example.com/     # Ghost captures
     medium-archive compare                                      # page vs export check
     medium-archive convert                                      # raw -> posts/
     medium-archive stats                                        # summarize the archive
@@ -36,9 +40,15 @@ Recommended workflow for a comprehensive archive:
   3. review raw/missing.json:  posts surviving only on web.archive.org;
                                recover the ones that matter by hand
   4. merge account exports:    import-export ZIP (per author), then compare
-  5. convert, then stats:      a gap year in the counts means undiscovered
+  5. Ghost history:            if the blog ever lived on Ghost (e.g. before
+                               its Medium era), import-ghost URL recovers
+                               those posts from web.archive.org captures;
+                               compare --ghost then shows where the Ghost
+                               original converts better than Medium's copy
+                               (use convert --prefer-ghost for those)
+  6. convert, then stats:      a gap year in the counts means undiscovered
                                posts; seed them with fetch --urls FILE
-  6. back up raw/; re-run fetch periodically until the blog moves
+  7. back up raw/; re-run fetch periodically until the blog moves
 
 Notes:
   * Discovery: sitemap merged with the RSS feed (~10 most recent posts, with
@@ -73,6 +83,7 @@ from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
 from .fetch import cmd_fetch
+from .ghost import cmd_import_ghost
 
 def publication_url(text: str) -> str:
     p = urlparse(text)
@@ -133,6 +144,14 @@ def add_convert_args(p):
                         "<content:encoded> body is used when feed_item.json is present, "
                         "since it is cleaner HTML with proper code blocks and "
                         "full-resolution images")
+    p.add_argument("--prefer-ghost", action="store_true",
+                   help="when a post has an attached Ghost capture (ghost.html "
+                        "from import-ghost), convert its body from that instead "
+                        "of the Medium sources; the Ghost original often has "
+                        "cleaner code blocks, but misses any edits made on "
+                        "Medium after the migration. `compare --ghost` shows "
+                        "the differences per post; combine with --only to "
+                        "cherry-pick")
     p.add_argument("--only", action="append", metavar="URL",
                    help="convert just this post (repeatable; default: all)")
     p.add_argument("--clean", action="store_true",
@@ -163,6 +182,27 @@ def main():
                           "publications (default: only merge into fetched posts)")
     imp.add_argument("--drafts", action="store_true",
                      help="also import draft_*.html files (default: skip drafts)")
+    ghost = parser("import-ghost",
+                   help="recover a Ghost blog's posts from the Wayback "
+                        "Machine into <out>/raw/")
+    ghost.add_argument("base", type=publication_url, metavar="URL",
+                       help="the Ghost blog's root URL (often the publication's "
+                            "own domain); every page the Wayback Machine ever "
+                            "captured on this host is considered, and pages "
+                            "whose HTML declares a Ghost generator are kept")
+    ghost.add_argument("--urls", type=Path, metavar="FILE",
+                       help="check only these original post URLs (one per line, "
+                            "'#' comments) instead of scanning the whole host")
+    ghost.add_argument("--limit", type=int, default=0, metavar="N",
+                       help="stop after importing N new posts; 0 = no limit")
+    ghost.add_argument("--force", action="store_true",
+                       help="re-fetch posts already in the raw archive")
+    ghost.add_argument("--delay", type=float, default=1.5, metavar="SECONDS",
+                       help="sleep between Wayback requests; images sleep "
+                            "delay/4 (default: 1.5)")
+    ghost.add_argument("--no-images", action="store_true",
+                       help="skip image downloads (convert will keep the "
+                            "original, likely dead, URLs)")
     add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
@@ -170,6 +210,11 @@ def main():
     cmp_p.add_argument("--only", action="append", metavar="URL",
                        help="compare just this post (repeatable; default: every post "
                             "that has both page.html and export.html)")
+    cmp_p.add_argument("--ghost", action="store_true",
+                       help="instead: diff each attached Ghost capture against the "
+                            "post's Medium conversion. Informational (exit 0; "
+                            "differences are expected) -- shows where Medium's "
+                            "import mangled a post, to guide convert --prefer-ghost")
     stats_p = parser("stats", help="summarize the converted archive "
                                    "(posts, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
@@ -183,6 +228,8 @@ def main():
         cmd_fetch(args)
     if args.command == "import-export":
         cmd_import_export(args)
+    if args.command == "import-ghost":
+        cmd_import_ghost(args)
     if args.command in ("convert", "all"):
         cmd_convert(args)
     if args.command == "compare":

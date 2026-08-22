@@ -19,7 +19,8 @@ from .dates import parse_date
 from .export import export_body, parse_export
 from .fetch import archive_base, read_index
 from .images import image_source
-from .pages import extract_metadata, feed_body, page_body
+from .pages import (extract_metadata, feed_body, ghost_body, ghost_metadata,
+                    is_ghost_page, page_body)
 from .readme import write_readme
 from .urls import canonical_url, medium_id, slug_of
 
@@ -90,13 +91,25 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
     return markdown, used_images
 
 
-def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> dict:
+def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
+                 prefer_ghost: bool = False) -> dict:
     soup = None
+    ghost = False
     if (raw / "page.html").exists():
         soup = BeautifulSoup((raw / "page.html").read_text(encoding="utf-8"), "html.parser")
-        info = extract_metadata(soup, url)
+        ghost = is_ghost_page(soup)   # a Ghost capture saved by import-ghost
+        info = ghost_metadata(soup, url) if ghost else extract_metadata(soup, url)
     else:
         info = {"url": url, **EMPTY_INFO}
+
+    # A Ghost capture attached to a Medium post (import-ghost found the post
+    # archived under both URLs); an alternate body source, like export.html.
+    ghost_soup, gmeta = None, {}
+    if (raw / "ghost.html").exists():
+        ghost_soup = BeautifulSoup((raw / "ghost.html").read_text(encoding="utf-8"),
+                                   "html.parser")
+    if (raw / "ghost.json").exists():
+        gmeta = json.loads((raw / "ghost.json").read_text())
 
     feed_item = None
     if (raw / "feed_item.json").exists():
@@ -126,9 +139,15 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
     if (raw / "images.json").exists():
         img_map = json.loads((raw / "images.json").read_text())
 
-    if soup is None and exp is None and not (feed_item and feed_item.get("content_html")):
-        raise RuntimeError("no page.html, export.html or feed body to convert")
-    if soup is not None and (prefer_page or not (exp or (feed_item and feed_item.get("content_html")))):
+    have_feed = bool(feed_item and feed_item.get("content_html"))
+    if soup is None and exp is None and ghost_soup is None and not have_feed:
+        raise RuntimeError("no page.html, export.html, ghost.html or feed body to convert")
+    if ghost:                          # page.html is itself a Ghost capture
+        body, body_source = ghost_body(soup), "ghost"
+    elif ghost_soup is not None and (prefer_ghost
+                                     or not (soup is not None or exp or have_feed)):
+        body, body_source = ghost_body(ghost_soup), "ghost"
+    elif soup is not None and (prefer_page or not (exp or have_feed)):
         body, body_source = page_body(soup, info["tags"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
@@ -146,6 +165,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
         print(f"  warning: body is only {len(markdown)} chars; check selectors", file=sys.stderr)
 
     canon = canonical_url(info["url"])
+    ghost_url = gmeta.get("original_url")
     front = {
         "title": info["title"],
         "author": info["author"],
@@ -156,6 +176,9 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
         "original_path": urlparse(canon).path,
         "medium_id": medium_id(canon),
         "slug": slug_of(canon),
+        # the post's URL on the blog's Ghost incarnation, when import-ghost
+        # attached a capture; old inbound links may carry this path too
+        "ghost_url": ghost_url if ghost_url != canon else None,
         "description": info["description"],
         "tags": sorted(set(info["tags"])),
         "images": used_images,
@@ -178,6 +201,10 @@ def write_redirects(manifest: dict, out: Path):
         rows.append(",".join(q(x) for x in (
             p.get("original_path"), p.get("medium_id"), url, Path(p["dir"]).name,
             (p.get("date") or "")[:10], p.get("title"))))
+        if p.get("ghost_url"):    # old inbound links to the Ghost URL, too
+            rows.append(",".join(q(x) for x in (
+                urlparse(p["ghost_url"]).path, p.get("medium_id"), p["ghost_url"],
+                Path(p["dir"]).name, (p.get("date") or "")[:10], p.get("title"))))
     (out / "redirects.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
 
 
@@ -202,7 +229,8 @@ def cmd_convert(args):
         raw = raw_dir / entry["medium_id"]
         print(f"[{n}/{len(targets)}] {url}", file=sys.stderr)
         try:
-            manifest[url] = convert_post(url, raw, posts_root, args.prefer_page)
+            manifest[url] = convert_post(url, raw, posts_root, args.prefer_page,
+                                         getattr(args, "prefer_ghost", False))
             ok += 1
         except Exception as e:
             print(f"  FAILED: {e}", file=sys.stderr)

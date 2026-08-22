@@ -5,7 +5,7 @@ Shared by fetch (for the publish-date check) and convert.
 
 import json
 import re
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
@@ -94,6 +94,60 @@ def extract_metadata(soup, url: str) -> dict:
         "description": ld.get("description") or meta(soup, name="description") or "",
         "tags": apollo_tags(soup) or anchor_tags(soup),
     }
+
+
+def is_ghost_page(soup) -> bool:
+    """Pages saved by import-ghost: Ghost stamps every page it renders
+    with a generator meta tag, across versions and themes."""
+    return (meta(soup, name="generator") or "").startswith("Ghost")
+
+
+def ghost_metadata(soup, url: str) -> dict:
+    """extract_metadata plus Ghost fallbacks. Newer Ghost versions emit
+    JSON-LD, which extract_metadata already reads; older ones (0.x) only
+    have Open Graph tags, and the author and tags live in theme markup."""
+    info = extract_metadata(soup, url)
+    if not info["date"]:
+        t = soup.find("time", datetime=True)
+        if t:
+            info["date"] = t["datetime"]
+    if not info["description"]:
+        info["description"] = meta(soup, property="og:description") or ""
+    if not info["author"]:
+        # Casper-style footer: <section class="author"><h4><a href="/author/x">
+        for a in soup.select('.author h4 a, .author-card-name a, a[href*="/author/"]'):
+            name = a.get_text(strip=True)
+            if name and not name.lower().startswith("more posts"):
+                info["author"] = name
+                info["author_url"] = urljoin(info["url"], a.get("href", "")) or None
+                break
+    article = soup.find("article")
+    if article:
+        # Ghost puts each tag on the article element as a tag-<slug> class.
+        tags = [c[len("tag-"):] for c in article.get("class", [])
+                if c.startswith("tag-") and len(c) > len("tag-")]
+        if tags:
+            info["tags"] = tags
+    return info
+
+
+def ghost_body(soup):
+    """The post content of a Ghost page, theme chrome removed. Ghost themes
+    keep the content in a dedicated section (Casper: .post-content, later
+    .post-full-content), separate from the title/date header and the
+    author/share footer."""
+    article = soup.find("article") or soup.body
+    body = article.select_one('[class*="post-content"]')
+    if body is None:
+        body = article
+        for sel in ("header", "footer", "h1"):
+            for t in body.select(sel):
+                t.decompose()
+    for sel in ("script", "style", "noscript", "form", "button", "svg",
+                '[class*="subscribe"]'):
+        for t in body.select(sel):
+            t.decompose()
+    return body
 
 
 def strip_medium_footer(node):

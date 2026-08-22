@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 from .convert import to_markdown
 from .export import export_body, parse_export
 from .fetch import read_index
-from .pages import extract_metadata, page_body
+from .pages import extract_metadata, ghost_body, page_body
 from .urls import canonical_url
 
 
@@ -28,7 +28,66 @@ def comparable_lines(markdown: str) -> list:
     return [unquote_plus(l.rstrip()) for l in markdown.splitlines() if l.strip()]
 
 
+def compare_ghost(args):
+    """Review mode (--ghost): for every post with an attached Ghost capture,
+    diff the Ghost conversion against the post's best Medium conversion.
+    Differences are expected -- Medium's importer mangles code blocks and
+    formatting -- so nothing is gated; the diffs show which posts are worth
+    converting with --prefer-ghost (or where Medium carries later edits)."""
+    raw_dir = args.out / "raw"
+    index = read_index(raw_dir)
+    if not index:
+        sys.exit(f"nothing to compare: {raw_dir}/index.json missing or empty")
+    targets = [canonical_url(u) for u in args.only] if args.only else list(index)
+
+    identical, differing, skipped = 0, 0, 0
+    for url in targets:
+        entry = index.get(url) or {}
+        raw = raw_dir / entry.get("medium_id", "")
+        if not (raw / "ghost.html").exists():
+            skipped += 1
+            continue
+        img_map = {}
+        if (raw / "images.json").exists():
+            img_map = json.loads((raw / "images.json").read_text())
+
+        gsoup = BeautifulSoup((raw / "ghost.html").read_text(encoding="utf-8"),
+                              "html.parser")
+        ghost_md, _ = to_markdown(ghost_body(gsoup), url, img_map, raw)
+        if (raw / "export.html").exists():
+            exp = parse_export((raw / "export.html").read_text(encoding="utf-8"))
+            medium_md, medium_src = to_markdown(export_body(exp["soup"]), url,
+                                                img_map, raw)[0], "export"
+        elif (raw / "page.html").exists():
+            soup = BeautifulSoup((raw / "page.html").read_text(encoding="utf-8"),
+                                 "html.parser")
+            info = extract_metadata(soup, url)
+            medium_md, medium_src = to_markdown(page_body(soup, info["tags"]),
+                                                info["url"], img_map, raw)[0], "page"
+        else:
+            skipped += 1
+            continue
+
+        ghost_lines = comparable_lines(ghost_md)
+        medium_lines = comparable_lines(medium_md)
+        if ghost_lines == medium_lines:
+            identical += 1
+            continue
+        differing += 1
+        print(f"DIFFERS {url}")
+        for line in difflib.unified_diff(medium_lines, ghost_lines,
+                                         medium_src, "ghost", lineterm="", n=1):
+            print(f"  {line}")
+        print()
+
+    print(f"compare --ghost done: {identical} identical, {differing} differ, "
+          f"{skipped} without an attached Ghost capture (informational only; "
+          f"differences are expected)", file=sys.stderr)
+
+
 def cmd_compare(args):
+    if getattr(args, "ghost", False):
+        return compare_ghost(args)
     raw_dir = args.out / "raw"
     index = read_index(raw_dir)
     if not index:

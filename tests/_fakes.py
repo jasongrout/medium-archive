@@ -4,13 +4,17 @@ import requests
 
 
 class FakeResp:
-    def __init__(self, text="", status=200):
+    def __init__(self, text="", status=200, content=None):
         self.text = text
         self.status_code = status
+        self.content = text.encode() if content is None else content
 
     def raise_for_status(self):
         if self.status_code >= 400:
             raise requests.HTTPError(f"{self.status_code} error", response=self)
+
+    def iter_content(self, chunk_size):
+        yield self.content
 
 
 class FakeSession:
