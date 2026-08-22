@@ -126,7 +126,7 @@ def cmd_fetch(args):
         except Exception:
             pass
     else:
-        entries, feed = discover(session, args.base, raw_dir)
+        entries, feed = discover(session, args.base, raw_dir, wayback=args.wayback)
 
     entries = [e for e in entries if in_window(e[1], start, end)]
     dated = sorted((e for e in entries if e[1] is not None), key=lambda e: e[1],

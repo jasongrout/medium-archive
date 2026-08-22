@@ -1,14 +1,19 @@
-"""Post discovery: the publication sitemap tree and RSS feed."""
+"""Post discovery: the publication sitemap tree, RSS feed, and the
+Wayback Machine's index of past captures."""
 
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 from bs4 import BeautifulSoup
 
 from .dates import parse_date
 from .net import fetch
-from .urls import canonical_url, is_post_url
+from .urls import canonical_url, is_post_url, medium_id
+
+WAYBACK_CDX = "https://web.archive.org/cdx/search/cdx"
 
 
 def walk_sitemap(session, url, base_host, seen=None) -> list:
@@ -65,7 +70,50 @@ def fetch_feed(session, base: str, raw_dir: Path) -> dict:
     return parse_feed(xml_text, urlparse(base).netloc)
 
 
-def discover(session, base: str, raw_dir: Path) -> tuple[list, dict]:
+def wayback_urls(session, base: str) -> list:
+    """[(url, first_capture_date), ...] for every post URL the Wayback Machine
+    has ever captured on the publication host.
+
+    Medium's sitemap only reaches a few years back, so older posts -- still
+    live on Medium -- are invisible to sitemap+feed discovery. The CDX index
+    of past captures recovers their URLs; the posts themselves are then
+    fetched from the live site as usual. Like sitemap lastmod, the
+    first-capture date is an approximation that can only be later than the
+    publish date.
+    """
+    p = urlparse(base)
+    entries, resume = [], None
+    while True:
+        query = urlencode({
+            "url": p.netloc + "/*",
+            "fl": "original,timestamp",
+            "collapse": "urlkey",     # one row per URL: its earliest capture
+            "limit": 10000,
+            "showResumeKey": "true",
+        })
+        if resume:
+            query += "&resumeKey=" + resume   # returned already URL-encoded
+        lines = fetch(session, f"{WAYBACK_CDX}?{query}").text.splitlines()
+        resume = None
+        for i, line in enumerate(lines):
+            if not line.strip():              # blank line, then the resume key
+                resume = next((l.strip() for l in lines[i + 1:] if l.strip()), None)
+                break
+            original, _, ts = line.strip().rpartition(" ")
+            u = canonical_url(f"{p.scheme}://{p.netloc}{urlparse(original).path}")
+            if not is_post_url(u, p.netloc):
+                continue
+            try:
+                d = datetime.strptime(ts, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
+            except ValueError:
+                d = None
+            entries.append((u, d))
+        if not resume:
+            return entries
+        time.sleep(1)
+
+
+def discover(session, base: str, raw_dir: Path, wayback: bool = False) -> tuple[list, dict]:
     """([(url, approx_date)], feed_items). Saves the feed XML to raw/feed.xml."""
     base_host = urlparse(base).netloc
     feed = {}
@@ -78,8 +126,21 @@ def discover(session, base: str, raw_dir: Path) -> tuple[list, dict]:
         entries += walk_sitemap(session, base.rstrip("/") + "/sitemap/sitemap.xml", base_host)
     except Exception as e:
         print(f"sitemap failed ({e}); only feed posts will be available", file=sys.stderr)
+    if wayback:
+        try:
+            found = wayback_urls(session, base)
+            print(f"wayback: {len(found)} candidate post URLs", file=sys.stderr)
+            entries += found
+        except Exception as e:
+            print(f"wayback failed ({e}); continuing without it", file=sys.stderr)
+    # Earlier sources win: feed (true publish dates), then sitemap, then
+    # wayback. Keyed by Medium id so the same post under an old slug (Medium
+    # redirects them) does not become a second entry.
     best = {}
-    for u, d in entries:          # feed entries come first; their dates are true publish dates
-        if u not in best or best[u] is None:
-            best[u] = d
-    return list(best.items()), feed
+    for u, d in entries:
+        key = medium_id(u) or u
+        if key not in best:
+            best[key] = (u, d)
+        elif best[key][1] is None and d is not None:
+            best[key] = (best[key][0], d)
+    return list(best.values()), feed
