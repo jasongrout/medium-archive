@@ -5,6 +5,7 @@ Shared by fetch (for the publish-date check) and convert.
 
 import json
 import re
+from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 
@@ -22,8 +23,8 @@ MEDIUM_FOOTER_RE = re.compile(
 LD_POST_TYPES = ("NewsArticle", "Article", "BlogPosting", "SocialMediaPosting")
 
 # Un-hydrated page chrome that renders as bare text: separator dots,
-# clap/response count placeholders, the read-time line.
-PAGE_NOISE_RE = re.compile(r"·|-{1,2}|\d+ min read")
+# clap/response count placeholders, the read-time line, story badges.
+PAGE_NOISE_RE = re.compile(r"·|-{1,2}|\d+ min read|Featured|Member-only( story)?")
 
 ZOOM_HINT = "Press enter or click to view image in full size"
 
@@ -41,6 +42,19 @@ def parse_ld_json(soup) -> dict:
             if isinstance(item, dict) and item.get("@type") in LD_POST_TYPES:
                 return item
     return {}
+
+
+def anchor_tags(soup) -> list:
+    """Tag names from /tag/ or /tagged/ links (older rendered pages). The
+    path must start there: a body link to e.g. a GitHub release also
+    contains '/tag/' but is not a Medium tag."""
+    out = []
+    for a in soup.select("a[href]"):
+        if urlparse(a["href"]).path.startswith(("/tag/", "/tagged/")):
+            t = a.get_text(strip=True)
+            if t and t not in out:
+                out.append(t)
+    return out
 
 
 def apollo_tags(soup) -> list:
@@ -78,8 +92,7 @@ def extract_metadata(soup, url: str) -> dict:
         "date": ld.get("datePublished") or meta(soup, property="article:published_time") or "",
         "updated": ld.get("dateModified"),
         "description": ld.get("description") or meta(soup, name="description") or "",
-        "tags": [t.get_text(strip=True) for t in soup.select('a[href*="/tag/"], a[href*="/tagged/"]')]
-                or apollo_tags(soup),
+        "tags": apollo_tags(soup) or anchor_tags(soup),
     }
 
 
@@ -131,8 +144,9 @@ def page_body(soup, tags=()):
     # Tag pills are <span>s whose whole text is a tag name; only remove
     # matches outside real content elements, so body words stay intact.
     slugs = {t.lower().replace(" ", "-") for t in tags}
-    for el in article.find_all(["a", "span"]):
-        if el.parent is None or el.find("img") is not None:
+    for el in article.find_all(["a", "span", "p"]):
+        if (el.parent is None or el.find("img") is not None
+                or "pw-post-body-paragraph" in (el.get("class") or [])):
             continue
         text = el.get_text(strip=True)
         if (PAGE_NOISE_RE.fullmatch(text)
