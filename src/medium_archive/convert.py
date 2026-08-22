@@ -10,7 +10,7 @@ import re
 import shutil
 import sys
 from pathlib import Path
-from urllib.parse import urlparse, urlsplit
+from urllib.parse import urljoin, urlparse, urlsplit
 
 from bs4 import BeautifulSoup
 from markdownify import markdownify as html_to_md
@@ -106,6 +106,13 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
     for el in body.find_all(["strong", "em", "b", "i"]):
         if el.parent is not None and not el.get_text().strip():
             el.replace_with(el.get_text())
+
+    # The rendered page links same-publication posts relatively; those
+    # would break off Medium (and redirects.csv matches absolute URLs).
+    for a in body.find_all("a"):
+        href = a.get("href")
+        if href and not href.startswith(("#", "mailto:")):
+            a["href"] = urljoin(info["url"], href)
 
     markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered

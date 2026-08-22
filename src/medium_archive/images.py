@@ -54,10 +54,23 @@ def is_tracking_pixel(src: str) -> bool:
     return "medium.com/_/stat" in src or "/_/stat?" in src
 
 
+AVATAR_RESIZE_RE = re.compile(r"/resize:fill:(\d+):(\d+)[:/]")
+
+
+def is_avatar(img_tag) -> bool:
+    """Avatars are served with a small square fill resize; content images
+    use fit resizes."""
+    raw = " ".join(filter(None, (img_tag.get(a) for a in ("src", "srcset", "data-src"))))
+    m = AVATAR_RESIZE_RE.search(raw)
+    return bool(m) and int(m.group(1)) <= 176 and int(m.group(2)) <= 176
+
+
 def safe_filename(url: str, index: int) -> str:
     name = unquote(Path(urlsplit(url).path).name) or "image"
     name = re.sub(r"[^A-Za-z0-9._-]", "_", name)[:80]
-    if "." not in name:
+    if name.endswith("."):      # extension-less asset ids can end in "."
+        name += "bin"
+    elif "." not in name:
         name += ".bin"
     return f"{index:03d}-{name}"
 
@@ -72,6 +85,8 @@ def collect_image_urls(page_html: str, feed_item: dict | None) -> list:
     for soup in sources:
         root = soup.find("article") or soup
         for img in root.find_all("img"):
+            if is_avatar(img):
+                continue
             src = image_source(img)
             if src and not is_tracking_pixel(src) and src not in urls:
                 urls.append(src)
