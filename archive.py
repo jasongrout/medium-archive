@@ -9,8 +9,7 @@
 # ]
 # ///
 """
-Archive a Medium publication (default: https://blog.jupyter.org/) in two
-independent steps:
+Archive a Medium publication in two independent steps:
 
     fetch    pull raw material from Medium: page HTML, RSS feed item, and
              full-resolution images, unmodified, into <out>/raw/
@@ -40,22 +39,22 @@ Output layout:
 
 Requirements:
     Dependencies are declared in the PEP 723 block above:
-        uv run scrape_medium_blog.py <command> [options]
+        uv run archive.py <url> <command> [options]
     Or: pip install requests beautifulsoup4 markdownify lxml
 
 Usage:
-    python scrape_medium_blog.py fetch                   # everything, newest first
-    python scrape_medium_blog.py fetch --limit 5         # smoke test
-    python scrape_medium_blog.py fetch --start 2024-12-31 --end 2024-01-01
-    python scrape_medium_blog.py convert                 # raw -> posts/
-    python scrape_medium_blog.py all --limit 5           # fetch then convert
+    python archive.py https://blog.example.com/ fetch              # everything, newest first
+    python archive.py https://blog.example.com/ fetch --limit 5    # smoke test
+    python archive.py https://blog.example.com/ fetch --start 2024-12-31 --end 2024-01-01
+    python archive.py https://blog.example.com/ convert            # raw -> posts/
+    python archive.py https://blog.example.com/ all --limit 5      # fetch then convert
 
-Common options (fetch, convert, all):
+Arguments and common options (fetch, convert, all):
+    URL               Publication root, e.g. https://blog.example.com/;
+                      /sitemap/sitemap.xml and /feed must resolve under it.
     --out DIR         Archive root. Default: medium_export
 
 fetch options:
-    --base URL        Publication root; /sitemap/sitemap.xml and /feed must
-                      resolve under it. Default: https://blog.jupyter.org/
     --urls FILE       Read post URLs from FILE (one per line, '#' comments)
                       instead of discovering them from sitemap + feed.
     --start DATE      Most recent publish date to include (YYYY-MM-DD or ISO
@@ -545,8 +544,8 @@ both should be redirected.
 
 ## Regenerating
 
-    uv run {script} --out {out} fetch              # incremental; add new posts
-    uv run {script} --out {out} convert --clean    # rebuild posts/ from raw/
+    uv run {script} {base} --out {out} fetch              # incremental; add new posts
+    uv run {script} {base} --out {out} convert --clean    # rebuild posts/ from raw/
 """
 
 
@@ -554,7 +553,7 @@ def write_readme(out: Path, base: str):
     out.mkdir(parents=True, exist_ok=True)
     (out / "README.md").write_text(README_TEMPLATE.format(
         base=base.rstrip("/"),
-        script=Path(sys.argv[0]).name or "scrape_medium_blog.py",
+        script=Path(sys.argv[0]).name or "archive.py",
         date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         out=out,
     ), encoding="utf-8")
@@ -837,7 +836,7 @@ def cmd_convert(args):
     if manifest:
         write_redirects(manifest, args.out)
     if not (args.out / "README.md").exists():
-        write_readme(args.out, getattr(args, "base", "https://blog.jupyter.org/"))
+        write_readme(args.out, args.base)
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
 
 
@@ -845,7 +844,6 @@ def cmd_convert(args):
 # CLI
 # --------------------------------------------------------------------------- #
 def add_fetch_args(p):
-    p.add_argument("--base", default="https://blog.jupyter.org/")
     p.add_argument("--urls", type=Path)
     p.add_argument("--start", type=lambda t: parse_cli_date(t, True), default=None)
     p.add_argument("--end", type=lambda t: parse_cli_date(t, False), default=None)
@@ -863,8 +861,17 @@ def add_convert_args(p):
     p.add_argument("--clean", action="store_true")
 
 
+def publication_url(text: str) -> str:
+    p = urlparse(text)
+    if p.scheme not in ("http", "https") or not p.netloc:
+        raise argparse.ArgumentTypeError(f"not an http(s) URL: {text!r}")
+    return text
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("base", type=publication_url, metavar="URL",
+                    help="publication root, e.g. https://blog.example.com/")
     ap.add_argument("--out", default="medium_export", type=Path)
     sub = ap.add_subparsers(dest="command", required=True)
     add_fetch_args(sub.add_parser("fetch", help="download raw material into <out>/raw/"))
