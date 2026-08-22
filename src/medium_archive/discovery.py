@@ -113,7 +113,7 @@ def wayback_urls(session, base: str) -> list:
         time.sleep(1)
 
 
-def discover(session, base: str, raw_dir: Path, wayback: bool = False) -> tuple[list, dict]:
+def discover(session, base: str, raw_dir: Path, wayback: bool = True) -> tuple[list, dict]:
     """([(url, approx_date, source)], feed_items). Saves the feed XML to
     raw/feed.xml. source is the first of feed/sitemap/wayback that listed the
     URL, so source == "wayback" means Medium itself no longer lists the post."""

@@ -78,20 +78,21 @@ a single post, and more.
 ## Notes
 
 * Discovery merges the sitemap with the RSS feed (roughly the ten most
-  recent posts, with full, cleaner bodies). Medium's sitemap only lists the
-  last few years of posts; older posts are still live on Medium but
-  invisible to sitemap+feed discovery. `--wayback` adds the Wayback
-  Machine's index of past captures (web.archive.org) as a third source to
-  recover their URLs — the posts themselves are still fetched from the live
-  site — and `--urls FILE` can seed URLs collected any other way. The real
-  publish date from each page is checked against `--start`/`--end` after
-  fetching, since sitemap dates are modification dates and Wayback dates
-  are first-capture dates.
-* Posts that discovery finds but Medium no longer serves (404/410 —
-  deleted or unpublished) are flagged in `raw/missing.json`, with a
-  `wayback_url` pointing at their web.archive.org captures for manual
-  recovery. Re-running `fetch` re-checks flagged posts and unflags any
-  that reappear.
+  recent posts, with full, cleaner bodies) and the Wayback Machine's index
+  of past captures (web.archive.org). Medium's sitemap only lists the last
+  few years of posts; older posts are still live on Medium but invisible to
+  sitemap+feed discovery, so the Wayback index recovers their URLs — the
+  posts themselves are still fetched from the live site (`--no-wayback`
+  skips this source, and `--urls FILE` can seed URLs collected any other
+  way). The real publish date from each page is checked against
+  `--start`/`--end` after fetching, since sitemap dates are modification
+  dates and Wayback dates are first-capture dates.
+* Posts that discovery finds but Medium no longer serves — deleted or
+  unpublished — are flagged in `raw/missing.json`, with a `wayback_url`
+  pointing at their web.archive.org captures for manual recovery.
+  Medium serves its not-found page with HTTP 200, so gone posts are
+  detected from the page content, not just the status code. Re-running
+  `fetch` re-checks flagged posts and unflags any that reappear.
 * Medium boilerplate — the "was originally published on Medium" footer,
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become
@@ -109,7 +110,7 @@ src/medium_archive/
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
   compare.py     the compare step: verify page vs export conversion agreement
   stats.py       the stats step: summarize the converted archive
-  discovery.py   find post URLs via the sitemap tree and RSS feed
+  discovery.py   find post URLs via the sitemap tree, RSS feed, and Wayback Machine
   pages.py       post page parsing: metadata extraction, body cleanup
   images.py      image source extraction and filenames
   net.py         HTTP session and retrying GET

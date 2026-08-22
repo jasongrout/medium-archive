@@ -86,10 +86,27 @@ def write_missing(raw_dir: Path, missing: dict):
         p.unlink()
 
 
+class PostGone(Exception):
+    """The URL no longer resolves to a post on Medium."""
+    def __init__(self, status):
+        super().__init__(str(status))
+        self.status = status
+
+
+def looks_gone(html: str) -> bool:
+    """Medium serves its PAGE NOT FOUND page with HTTP 200 (behind
+    Cloudflare, to a browser user-agent), so a status check alone misses
+    deleted posts. Real post pages always carry an ld+json metadata block;
+    the not-found page has none."""
+    return "ld+json" not in html and "PAGE NOT FOUND" in html
+
+
 def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
     """Save page.html, feed_item.json, images/ and images.json into dest."""
     r = fetch(session, url)
+    if looks_gone(r.text):
+        raise PostGone("soft-404")
     dest.mkdir(parents=True, exist_ok=True)
     (dest / "page.html").write_text(r.text, encoding="utf-8")
     if feed_item:
@@ -141,7 +158,7 @@ def cmd_fetch(args):
         except Exception:
             pass
     else:
-        entries, feed = discover(session, args.base, raw_dir, wayback=args.wayback)
+        entries, feed = discover(session, args.base, raw_dir, wayback=not args.no_wayback)
 
     entries = [e for e in entries if in_window(e[1], start, end)]
     dated = sorted((e for e in entries if e[1] is not None), key=lambda e: e[1],
@@ -203,8 +220,9 @@ def cmd_fetch(args):
                 write_missing(raw_dir, missing)
             fetched += 1
         except Exception as e:
-            status = getattr(getattr(e, "response", None), "status_code", None)
-            if status in (404, 410):
+            status = e.status if isinstance(e, PostGone) else \
+                getattr(getattr(e, "response", None), "status_code", None)
+            if status in (404, 410, "soft-404"):
                 # Discovery (usually the Wayback Machine) knows the post, but
                 # Medium no longer serves it: deleted, unpublished, or the
                 # account is gone. Flag it; its content only survives as
