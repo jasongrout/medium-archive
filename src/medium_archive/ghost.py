@@ -40,7 +40,7 @@ WAYBACK_CDX = "https://web.archive.org/cdx/search/cdx"
 # toolbar or rewritten links; im_ resolves to the nearest image capture.
 SNAPSHOT = "https://web.archive.org/web/{ts}id_/{url}"
 IMAGE_SNAPSHOT = "https://web.archive.org/web/{ts}im_/{url}"
-MAX_SNAPSHOT_TRIES = 4
+MAX_SNAPSHOT_TRIES = 12
 
 NON_POST_PREFIXES = (
     "/tag/", "/tagged/", "/author/", "/page/", "/rss", "/feed",
@@ -89,6 +89,8 @@ def ghost_captures(session, base: str) -> dict:
                 resume = next((l.strip() for l in lines[i + 1:] if l.strip()), None)
                 break
             original, _, ts = line.strip().rpartition(" ")
+            if "?" in original:      # tracking-param variants (Medium's ?gi=,
+                continue             # utm_*) capture the same page, off-era
             path = urlparse(original).path
             if not may_be_post(path):
                 continue
@@ -117,11 +119,25 @@ def is_ghost_post(soup) -> bool:
     return is_ghost_page(soup) and meta(soup, property="og:type") == "article"
 
 
+def snapshot_candidates(timestamps: list) -> list:
+    """Which captures to try, newest first. A URL that kept being captured
+    after the blog left Ghost has its newest captures all post-Ghost
+    (not-found pages, another platform), so trying only the newest few
+    would miss the Ghost captures below them: spend half the budget on
+    the newest captures and spread the rest across the full history."""
+    if len(timestamps) <= MAX_SNAPSHOT_TRIES:
+        return timestamps
+    head = timestamps[:MAX_SNAPSHOT_TRIES // 2]
+    rest = timestamps[len(head):]
+    k = MAX_SNAPSHOT_TRIES - len(head)
+    return head + [rest[round(i * (len(rest) - 1) / (k - 1))] for i in range(k)]
+
+
 def fetch_snapshot(session, url: str, timestamps: list):
-    """The newest capture of `url` that is a Ghost post page, as
+    """The newest tried capture of `url` that is a Ghost post page, as
     (timestamp, html, soup); (None, None, None) if none of the tried
     captures qualifies (e.g. only Medium-era captures of the path exist)."""
-    for ts in timestamps[:MAX_SNAPSHOT_TRIES]:
+    for ts in snapshot_candidates(timestamps):
         try:
             html = fetch(session, SNAPSHOT.format(ts=ts, url=url)).text
         except Exception as e:

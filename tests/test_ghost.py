@@ -63,6 +63,7 @@ MEDIUM_PAGE = """<html><head><script type="application/ld+json">
 MEDIUM_404 = "<html><head><title>Not found</title></head><body>gone</body></html>"
 
 CDX = """\
+http://blog.example.com/2015/03/04/hello-world/?gi=aa11bb22cc33 20200101000000
 http://blog.example.com:80/2015/03/04/hello-world/ 20150401000000
 http://blog.example.com/2015/03/04/hello-world/ 20180101000000
 http://blog.example.com/2015/05/05/migrated/ 20150601000000
@@ -181,10 +182,12 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
         assert "Ghost 0.5" in (twin_raw / "ghost.html").read_text()
         assert json.loads((twin_raw / "ghost.json").read_text())["original_url"] == ghost_url
 
-    # non-post URLs (tag, asset, amp, front page, Medium-era) never requested
+    # non-post URLs (tag, asset, amp, front page, Medium-era) never
+    # requested; ?gi= tracking variants contribute no capture timestamps
     snapshot_calls = [c for c in session.calls if "id_/" in c]
     assert not any("/tag/" in c or "/assets/" in c or "/amp" in c
-                   or "0123456789ab" in c for c in snapshot_calls)
+                   or "0123456789ab" in c or "20200101000000" in c
+                   for c in snapshot_calls)
 
     # standalone ghost posts convert as before
     convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
@@ -217,6 +220,17 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
 
     # compare --ghost reports the difference without gating (no SystemExit)
     comparemod.cmd_compare(SimpleNamespace(out=tmp_path, only=None, ghost=True))
+
+
+def test_snapshot_candidates_spread_past_a_post_ghost_era():
+    # 20 captures: newest 8 are post-Ghost-era; a naive newest-N-only pick
+    # would never reach the Ghost captures below them
+    ts = [f"{2020 - i:04d}0101000000" for i in range(20)]
+    picked = ghostmod.snapshot_candidates(ts)
+    assert len(picked) == ghostmod.MAX_SNAPSHOT_TRIES
+    assert picked[:6] == ts[:6]                    # still prefers newest
+    assert picked[-1] == ts[-1]                    # reaches the oldest
+    assert ghostmod.snapshot_candidates(ts[:5]) == ts[:5]   # few -> all
 
 
 def test_ghost_comparable_blocks_normalizes_migration_noise():
