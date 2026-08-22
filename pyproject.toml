@@ -1,0 +1,19 @@
+[project]
+name = "medium-archive"
+version = "0.1.0"
+description = "Archive a Medium publication as raw HTML plus a Markdown conversion"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "markdownify",
+    "lxml",
+]
+
+[project.scripts]
+medium-archive = "medium_archive.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
