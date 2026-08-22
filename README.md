@@ -77,10 +77,16 @@ a single post, and more.
 
 ## Notes
 
-* Discovery merges the sitemap (the complete archive) with the RSS feed
-  (roughly the ten most recent posts, with full, cleaner bodies). The real
+* Discovery merges the sitemap with the RSS feed (roughly the ten most
+  recent posts, with full, cleaner bodies). Medium's sitemap only lists the
+  last few years of posts; older posts are still live on Medium but
+  invisible to sitemap+feed discovery. `--wayback` adds the Wayback
+  Machine's index of past captures (web.archive.org) as a third source to
+  recover their URLs — the posts themselves are still fetched from the live
+  site — and `--urls FILE` can seed URLs collected any other way. The real
   publish date from each page is checked against `--start`/`--end` after
-  fetching, since sitemap dates are modification dates.
+  fetching, since sitemap dates are modification dates and Wayback dates
+  are first-capture dates.
 * Medium boilerplate — the "was originally published on Medium" footer,
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become

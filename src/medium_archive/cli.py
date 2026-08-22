@@ -31,10 +31,13 @@ Examples:
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
 Notes:
-  * Discovery: sitemap (complete archive) merged with the RSS feed (~10 most
-    recent posts, with full bodies). Sitemap <lastmod> is a modification
-    date; it orders and pre-filters, and the real publish date from each
-    page is re-checked against --start/--end after fetching.
+  * Discovery: sitemap merged with the RSS feed (~10 most recent posts, with
+    full bodies). Medium's sitemap only lists the last few years; --wayback
+    adds the Wayback Machine's index of past captures to find older posts,
+    and --urls FILE can seed URLs collected elsewhere. Sitemap <lastmod> and
+    first-capture dates are approximations that order and pre-filter; the
+    real publish date from each page is re-checked against --start/--end
+    after fetching.
   * Redirects: front matter carries original_url, original_path (the path an
     old inbound link carries), medium_id (Medium also resolves /p/<id>) and
     slug; redirects.csv collects these for every converted post.
@@ -81,6 +84,12 @@ def add_fetch_args(p):
     p.add_argument("--urls", type=Path, metavar="FILE",
                    help="read post URLs from FILE (one per line, '#' comments) "
                         "instead of discovering them from sitemap + feed")
+    p.add_argument("--wayback", action="store_true",
+                   help="also discover post URLs from the Wayback Machine's index of "
+                        "past captures (web.archive.org); Medium's sitemap only lists "
+                        "the last few years, so older posts -- still live on Medium -- "
+                        "need this to be found. Posts are still fetched from the live "
+                        "site")
     p.add_argument("--start", type=lambda t: parse_cli_date(t, True), default=None, metavar="DATE",
                    help="most recent publish date to include (YYYY-MM-DD or ISO timestamp; "
                         "a bare date includes the whole day); fetching proceeds backward "
