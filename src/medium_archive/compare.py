@@ -9,6 +9,7 @@ are guaranteed to convert as faithfully from the page as from the export.
 
 import difflib
 import json
+import re
 import sys
 from urllib.parse import unquote_plus
 
@@ -28,12 +29,66 @@ def comparable_lines(markdown: str) -> list:
     return [unquote_plus(l.rstrip()) for l in markdown.splitlines() if l.strip()]
 
 
+# The differences Medium's importer introduces mechanically when a Ghost
+# post is migrated: straightened quotes become curly, hyphens become
+# en/em-dashes, ellipses are combined. Both sides are folded to the plain
+# form so only authored changes remain.
+TYPOGRAPHY = str.maketrans({
+    "‘": "'", "’": "'",           # curly single quotes
+    "“": '"', "”": '"',           # curly double quotes
+    "–": "-", "—": "-",           # en/em-dash
+    "…": "...",
+    "︎": None, "️": None,   # emoji variation selectors (↩︎ vs ↩)
+})
+LINK_TITLE_RE = re.compile(r'\(([^()\s]+) "[^"]*"\)')    # (url "title") -> (url)
+HEADING_RE = re.compile(r"^#{1,6} ")
+IMAGE_RE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
+HARD_BREAK_RE = re.compile(r"  +\n")     # <br> renders as two trailing spaces
+ORDERED_ITEM_RE = re.compile(r"^\d+[.)] ")
+SELF_LINK_RE = re.compile(r"\[([^\]]+)\]\(\1\)")     # [url](url) -> url
+DASH_RE = re.compile(r"(?<=\S) ?--? ?(?=\S)")        # a -- b / a - b -> a-b
+
+
+def ghost_comparable_blocks(markdown: str) -> list:
+    """Comparison units for --ghost mode: paragraphs rather than lines,
+    with Medium's mechanical migration differences normalized away --
+    curly typography, dash spelling and spacing, headings flattened or
+    demoted (the marker is dropped, the text kept), list marker style,
+    emphasis re-nesting, footnote anchor syntax, rehosted/renamed image
+    files, reflowed line wrapping (a plain newline is wrapping and
+    merges; a <br> hard break is a paragraph boundary and splits), and
+    the hero image Medium prepends. What survives is authored content:
+    text edits, and images or paragraphs present on only one side."""
+    blocks = []
+    for raw_block in re.split(r"\n\s*\n", markdown):
+        for block in HARD_BREAK_RE.split(raw_block):
+            block = unquote_plus(" ".join(block.split()))
+            if not block:
+                continue
+            block = block.translate(TYPOGRAPHY)
+            block = HEADING_RE.sub("", block)
+            block = ORDERED_ITEM_RE.sub("", block)
+            block = IMAGE_RE.sub("![image]", block)
+            block = block.replace("**", "").replace("*", "")
+            block = block.replace("#fn:", "#fn").replace("#fnref:", "#fnref")
+            block = re.sub(r"\[\[(\d+)\]\]", r"[\1]", block)   # [[1]] -> [1]
+            block = LINK_TITLE_RE.sub(r"(\1)", block)
+            block = SELF_LINK_RE.sub(r"\1", block)
+            block = DASH_RE.sub("-", block)
+            blocks.append(block)
+    if blocks and blocks[0] == "![image]":
+        blocks = blocks[1:]
+    return blocks
+
+
 def compare_ghost(args):
     """Review mode (--ghost): for every post with an attached Ghost capture,
     diff the Ghost conversion against the post's best Medium conversion.
-    Differences are expected -- Medium's importer mangles code blocks and
-    formatting -- so nothing is gated; the diffs show which posts are worth
-    converting with --prefer-ghost (or where Medium carries later edits)."""
+    Medium's mechanical migration differences (typography, heading levels,
+    image renames, line wrapping) are normalized away first, so a reported
+    difference is authored content: an image or paragraph Medium dropped
+    (worth converting with --prefer-ghost) or an edit made after the
+    migration (worth keeping on the Medium side). Nothing is gated."""
     raw_dir = args.out / "raw"
     index = read_index(raw_dir)
     if not index:
@@ -68,9 +123,11 @@ def compare_ghost(args):
             skipped += 1
             continue
 
-        ghost_lines = comparable_lines(ghost_md)
-        medium_lines = comparable_lines(medium_md)
-        if ghost_lines == medium_lines:
+        ghost_lines = ghost_comparable_blocks(ghost_md)
+        medium_lines = ghost_comparable_blocks(medium_md)
+        # a block-boundary shift alone (a heading merged into its
+        # paragraph, a <p> split moved) is not a content difference
+        if " ".join(ghost_lines) == " ".join(medium_lines):
             identical += 1
             continue
         differing += 1
@@ -81,8 +138,8 @@ def compare_ghost(args):
         print()
 
     print(f"compare --ghost done: {identical} identical, {differing} differ, "
-          f"{skipped} without an attached Ghost capture (informational only; "
-          f"differences are expected)", file=sys.stderr)
+          f"{skipped} without an attached Ghost capture (informational only)",
+          file=sys.stderr)
 
 
 def cmd_compare(args):

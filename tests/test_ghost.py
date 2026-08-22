@@ -219,6 +219,25 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     comparemod.cmd_compare(SimpleNamespace(out=tmp_path, only=None, ghost=True))
 
 
+def test_ghost_comparable_blocks_normalizes_migration_noise():
+    medium = ("![](images/001-hero_3AfgbRQ1Lyj.png)\n\n"     # Medium's hero
+        "### The big split\n\n"
+        "Today’s release — “the notebook” – is out…\n\n"
+        "![](images/001-1_3AfgbRQ1LyjE6hVwWVU8zw.png)\n\n"
+        "Two packages:\n\na js one\n\na py one\n\n"           # real <p> breaks
+        "A paragraph that Medium\nkept on several\nlines.\n")
+    ghost = ("The big split\n\n"                              # heading flattened
+        'Today\'s release - "the notebook" - is out...\n\n'
+        "![multi-select demo](images/g001-4-1-multi-merge.gif)\n\n"
+        "Two packages:  \na js one  \na py one\n\n"           # <br> hard breaks
+        "A paragraph that Medium kept on several lines.\n")
+    assert comparemod.ghost_comparable_blocks(medium) == \
+        comparemod.ghost_comparable_blocks(ghost)
+    # a dropped image is authored content, not noise: it stays visible
+    assert comparemod.ghost_comparable_blocks(ghost + "\n![x](images/g002-y.png)\n") \
+        != comparemod.ghost_comparable_blocks(medium)
+
+
 def test_import_ghost_rerun_is_idempotent(tmp_path, monkeypatch):
     seed_index(tmp_path)
     run_import(tmp_path, monkeypatch)

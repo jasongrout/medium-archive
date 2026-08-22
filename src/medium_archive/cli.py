@@ -212,9 +212,11 @@ def main():
                             "that has both page.html and export.html)")
     cmp_p.add_argument("--ghost", action="store_true",
                        help="instead: diff each attached Ghost capture against the "
-                            "post's Medium conversion. Informational (exit 0; "
-                            "differences are expected) -- shows where Medium's "
-                            "import mangled a post, to guide convert --prefer-ghost")
+                            "post's Medium conversion, with Medium's mechanical "
+                            "migration differences (typography, heading levels, "
+                            "image renames, line wrapping) normalized away. "
+                            "Informational (exit 0) -- what it reports is dropped "
+                            "or edited content, to guide convert --prefer-ghost")
     stats_p = parser("stats", help="summarize the converted archive "
                                    "(posts, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
