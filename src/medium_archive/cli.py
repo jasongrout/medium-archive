@@ -218,7 +218,7 @@ def main():
                             "Informational (exit 0) -- what it reports is dropped "
                             "or edited content, to guide convert --prefer-ghost")
     stats_p = parser("stats", help="summarize the converted archive "
-                                   "(posts, authors, lengths, tags)")
+                                   "(posts, provenance, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
                          help="how many authors/tags to list (default: 15)")
     both = parser("all", help="fetch then convert")

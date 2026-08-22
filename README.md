@@ -47,8 +47,10 @@ It works in independent steps:
   It never touches the network, so it can be re-run freely while tuning the
   conversion (selectors, Markdown style, output layout) without hitting
   Medium again.
-* **`stats`** summarizes the converted archive: posts per year, authors,
-  article length quartiles, tag frequencies, image counts.
+* **`stats`** summarizes the converted archive: posts per year, provenance
+  (how each post was discovered — feed, sitemap, Wayback, Ghost era — which
+  sources were recovered for it, and which one each body was converted
+  from), authors, article length quartiles, tag frequencies, image counts.
 
 The `raw/` layer is the source of truth — the only part that cannot be
 regenerated once the Medium site is gone — and everything else is derived
