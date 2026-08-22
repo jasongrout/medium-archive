@@ -1,7 +1,9 @@
 """The stats step: summarize the converted archive.
 
 Works from posts.json and the converted bodies in <out>/posts/, so run
-convert first. Everything is offline.
+convert first; raw/index.json and raw/missing.json, when present, add
+provenance detail (how each post was discovered, which sources were
+recovered). Everything is offline.
 """
 
 import json
@@ -11,7 +13,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from .fetch import archive_base
+from .fetch import archive_base, read_index, read_missing
 
 FRONT_RE = re.compile(r"\A---\n.*?\n---\n", re.S)
 MD_NOISE_RE = re.compile(r"!\[[^\]]*\]\([^)]*\)|\[([^\]]*)\]\([^)]*\)|[#>*`|-]")
@@ -36,11 +38,48 @@ def top(counter: Counter, n: int, total: int) -> str:
                      for name, count in counter.most_common(n))
 
 
+def print_provenance(out: Path, manifest: dict, sources: Counter):
+    """Where the archive's material came from: how each post was discovered
+    (raw/index.json's found_via), which extra sources were recovered for it
+    (account export, Ghost capture, RSS feed item), which source each body
+    was converted from, and how many discovered posts Medium no longer
+    serves at all (raw/missing.json)."""
+    index = read_index(out / "raw")
+    missing = read_missing(out / "raw")
+
+    print("\nProvenance:")
+    entries = [index.get(url) or {} for url in manifest]
+    if index:
+        found = Counter(e.get("found_via") or "?" for e in entries)
+        print("  discovered via: " + ", ".join(f"{s}: {c}" for s, c in found.most_common()))
+        if found.get("wayback"):
+            print("    (wayback: Medium itself no longer lists these; "
+                  "found in the web.archive.org index)")
+        if found.get("ghost-wayback"):
+            print("    (ghost-wayback: recovered from the blog's pre-Medium "
+                  "Ghost site via the Wayback Machine)")
+        n_feed = sum(1 for e in entries if e.get("in_feed"))
+        n_export = sum(1 for e in entries if e.get("in_export"))
+        n_drafts = sum(1 for e in entries if e.get("draft"))
+        extra = [f"{n_feed} in the RSS feed",
+                 f"{n_export} in an account export"
+                 + (f" (drafts: {n_drafts})" if n_drafts else "")]
+        n_ghost = sum(1 for e in entries if e.get("in_ghost"))
+        if n_ghost:
+            extra.append(f"{n_ghost} with a Ghost capture attached")
+        print("  also sourced: " + ", ".join(extra))
+    print("  body converted from: " + ", ".join(f"{s}: {c}" for s, c in sources.most_common()))
+    if missing:
+        print(f"  gone from Medium: {len(missing)} discovered but no longer "
+              f"served; only Wayback captures remain (raw/missing.json)")
+
+
 def cmd_stats(args):
     manifest_path = args.out / "posts.json"
     if not manifest_path.exists():
         sys.exit(f"no stats to report: {manifest_path} missing (run convert first)")
-    posts = list(json.loads(manifest_path.read_text()).values())
+    manifest = json.loads(manifest_path.read_text())
+    posts = list(manifest.values())
     if not posts:
         sys.exit("no stats to report: posts.json is empty")
     n = len(posts)
@@ -69,7 +108,8 @@ def cmd_stats(args):
     if dates:
         print(f"  first {dates[0][:10]}, latest {dates[-1][:10]}")
         print("  per year: " + ", ".join(f"{y}: {c}" for y, c in sorted(years.items())))
-    print("  body source: " + ", ".join(f"{s}: {c}" for s, c in sources.most_common()))
+
+    print_provenance(args.out, manifest, sources)
 
     print(f"\nAuthors: {len(authors)}")
     print(top(authors, args.top, n))
