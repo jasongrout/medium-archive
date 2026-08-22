@@ -120,6 +120,10 @@ def main():
     imp.add_argument("export_path", type=Path, metavar="ZIP_OR_DIR",
                      help="the export zip from medium.com Settings -> Download your "
                           "information, or an unzipped copy / its posts/ directory")
+    imp.add_argument("--all", action="store_true",
+                     help="also import export posts that do not match a post already "
+                          "in the archive, e.g. unlisted posts or posts from other "
+                          "publications (default: only merge into fetched posts)")
     imp.add_argument("--drafts", action="store_true",
                      help="also import draft_*.html files (default: skip drafts)")
     add_convert_args(sub.add_parser("convert", help="convert <out>/raw/ into <out>/posts/"))

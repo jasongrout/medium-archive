@@ -11,10 +11,14 @@ It works in independent steps:
   and re-running later picks up only new posts.
 * **`import-export`** (optional) merges a Medium account export — the zip
   from medium.com → Settings → Download your information — into `<out>/raw/`,
-  matched to fetched posts by Medium id. Export post files are the editor's
-  own clean HTML with the exact publish timestamp, so they become the
-  preferred body source; the scraped page still contributes tags, the
-  updated date, the publication canonical URL, and the images.
+  matched to fetched posts by Medium id. An export holds everything its
+  author ever wrote, so by default only files matching a post already in
+  the archive are merged (`--all` imports the rest, `--drafts` includes
+  drafts); run it once per author for a multi-author publication. Export
+  post files are the editor's own clean HTML with the exact publish
+  timestamp, so they become the preferred body source; the scraped page
+  still contributes tags, the updated date, the publication canonical URL,
+  and the images.
 * **`convert`** turns the raw archive into Markdown files with front matter
   and local images in `<out>/posts/`, plus a `posts.json` manifest and a
   `redirects.csv` mapping old Medium URLs to the new post directories.
