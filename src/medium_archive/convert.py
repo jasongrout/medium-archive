@@ -27,6 +27,60 @@ EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
               "updated": None, "description": "", "tags": []}
 
 
+def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | None = None):
+    """Rewrite images, iframes and links in a body and render it to
+    Markdown; shared by convert and compare. With out_dir, referenced
+    images are copied into out_dir/images/; without, mapped filenames are
+    still used but nothing is written. Returns (markdown, used_images)."""
+    doc = BeautifulSoup("", "html.parser")        # owner for new_tag()
+    # the same asset appears under miro.medium.com and cdn-images-1.medium.com
+    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
+
+    used_images = []
+    for img in body.find_all("img"):
+        src = image_source(img)
+        if not src:
+            img.decompose()
+            continue
+        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
+        if fname and (out_dir is None or (raw / "images" / fname).exists()):
+            if out_dir is not None:
+                (out_dir / "images").mkdir(exist_ok=True)
+                shutil.copy2(raw / "images" / fname, out_dir / "images" / fname)
+            local = f"images/{fname}"
+            used_images.append(local)
+        else:
+            local = src                         # not downloaded; keep remote URL
+        new_img = doc.new_tag("img", src=local, alt=img.get("alt", ""))
+        picture = img.find_parent("picture")
+        (picture or img).replace_with(new_img)
+
+    for iframe in body.find_all("iframe"):
+        src = iframe.get("src") or iframe.get("data-src") or ""
+        iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
+
+    # Medium's editor emits things like <strong> </strong> between runs;
+    # markdownify drops whitespace-only emphasis, losing the space.
+    for el in body.find_all(["strong", "em", "b", "i"]):
+        if el.parent is not None and not el.get_text().strip():
+            el.replace_with(el.get_text())
+
+    # The rendered page links same-publication posts relatively; those
+    # would break off Medium (and redirects.csv matches absolute URLs).
+    for a in body.find_all("a"):
+        href = a.get("href")
+        if href and not href.startswith(("#", "mailto:")):
+            a["href"] = urljoin(base_url, href)
+
+    markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
+    # Export bodies keep the editor's non-breaking/hair spaces; the rendered
+    # page serves plain spaces. Normalize so output is stable across sources.
+    markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
+    markdown = re.sub(r"\n{3,}", "\n\n", markdown).strip() + "\n"
+    markdown = re.sub(r"(?:\n-{3,}\n)?\n[^\n]*was originally published[^\n]*\n*$", "\n", markdown)
+    return markdown, used_images
+
+
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> dict:
     soup = None
     if (raw / "page.html").exists():
@@ -62,8 +116,6 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
     img_map = {}
     if (raw / "images.json").exists():
         img_map = json.loads((raw / "images.json").read_text())
-    # the same asset appears under miro.medium.com and cdn-images-1.medium.com
-    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
 
     if soup is None and exp is None and not (feed_item and feed_item.get("content_html")):
         raise RuntimeError("no page.html, export.html or feed body to convert")
@@ -73,53 +125,12 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool) -> di
         body, body_source = export_body(exp["soup"]), "export"
     else:
         body, body_source = feed_body(feed_item["content_html"]), "feed"
-    doc = BeautifulSoup("", "html.parser")        # owner for new_tag()
 
     out_dir = posts_root / f"{(info['date'] or '')[:10] or 'undated'}-{slug_of(url)}"
     shutil.rmtree(out_dir, ignore_errors=True)
     out_dir.mkdir(parents=True)
 
-    used_images = []
-    for img in body.find_all("img"):
-        src = image_source(img)
-        if not src:
-            img.decompose()
-            continue
-        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
-        if fname and (raw / "images" / fname).exists():
-            (out_dir / "images").mkdir(exist_ok=True)
-            shutil.copy2(raw / "images" / fname, out_dir / "images" / fname)
-            local = f"images/{fname}"
-            used_images.append(local)
-        else:
-            local = src                         # not downloaded; keep remote URL
-        new_img = doc.new_tag("img", src=local, alt=img.get("alt", ""))
-        picture = img.find_parent("picture")
-        (picture or img).replace_with(new_img)
-
-    for iframe in body.find_all("iframe"):
-        src = iframe.get("src") or iframe.get("data-src") or ""
-        iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
-
-    # Medium's editor emits things like <strong> </strong> between runs;
-    # markdownify drops whitespace-only emphasis, losing the space.
-    for el in body.find_all(["strong", "em", "b", "i"]):
-        if el.parent is not None and not el.get_text().strip():
-            el.replace_with(el.get_text())
-
-    # The rendered page links same-publication posts relatively; those
-    # would break off Medium (and redirects.csv matches absolute URLs).
-    for a in body.find_all("a"):
-        href = a.get("href")
-        if href and not href.startswith(("#", "mailto:")):
-            a["href"] = urljoin(info["url"], href)
-
-    markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
-    # Export bodies keep the editor's non-breaking/hair spaces; the rendered
-    # page serves plain spaces. Normalize so output is stable across sources.
-    markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
-    markdown = re.sub(r"\n{3,}", "\n\n", markdown).strip() + "\n"
-    markdown = re.sub(r"(?:\n-{3,}\n)?\n[^\n]*was originally published[^\n]*\n*$", "\n", markdown)
+    markdown, used_images = to_markdown(body, info["url"], img_map, raw, out_dir)
     if "Continue reading on" in markdown and len(markdown) < 2000:
         print("  warning: body looks truncated", file=sys.stderr)
     if len(markdown) < 200:

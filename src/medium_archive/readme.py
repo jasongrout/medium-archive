@@ -101,6 +101,7 @@ both should be redirected.
 ## Regenerating
 
     medium-archive {base} --out {out} fetch              # incremental; add new posts
+    medium-archive {base} --out {out} compare            # verify page vs export conversion
     medium-archive {base} --out {out} convert --clean    # rebuild posts/ from raw/
 """
 
