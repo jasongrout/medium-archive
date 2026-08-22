@@ -85,9 +85,10 @@ def cmd_import_export(args):
     raw_dir = args.out / "raw"
     index = read_index(raw_dir)
     by_id = {e.get("medium_id"): url for url, e in index.items()}
-    imported = drafts = skipped = 0
+    imported = drafts = unmatched = skipped = 0
     for name, text in iter_export_files(args.export_path):
-        if name.startswith("draft_") and not args.drafts:
+        draft = name.startswith("draft_")
+        if draft and not args.drafts:
             drafts += 1
             continue
         meta = parse_export(text)
@@ -95,6 +96,12 @@ def cmd_import_export(args):
         if not pid:
             print(f"  skipped {name}: no Medium id in footer or filename", file=sys.stderr)
             skipped += 1
+            continue
+        # An account export holds everything its author ever wrote -- posts
+        # in other publications, responses. Only merge files matching a post
+        # this archive already knows unless --all asks for the rest.
+        if not draft and pid not in by_id and not args.all:
+            unmatched += 1
             continue
         dest = raw_dir / pid
         dest.mkdir(parents=True, exist_ok=True)
@@ -111,5 +118,7 @@ def cmd_import_export(args):
         imported += 1
     write_index(raw_dir, index)
     print(f"import-export done: {imported} posts into {raw_dir}"
+          + (f", {unmatched} not in this archive skipped"
+             " (fetch first, or use --all to import them)" if unmatched else "")
           + (f", {drafts} drafts skipped (use --drafts to include)" if drafts else "")
           + (f", {skipped} unidentifiable skipped" if skipped else ""), file=sys.stderr)

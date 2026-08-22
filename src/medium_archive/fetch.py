@@ -126,14 +126,19 @@ def cmd_fetch(args):
 
     index = read_index(raw_dir)
     skip = set(index) | load_existing(args.existing or [])
+    by_id = {e.get("medium_id"): u for u, e in index.items()}
     fetched = 0
     for n, (url, approx) in enumerate(entries, 1):
         if args.limit and fetched >= args.limit:
             print(f"reached --limit {args.limit}", file=sys.stderr)
             break
-        if url in skip and not args.force:
-            continue
         pid = medium_id(url) or re.sub(r"[^A-Za-z0-9]", "_", url)[-40:]
+        # The same post may be indexed under another URL: import-export keys
+        # by the export's canonical URL. Skip only if its page was fetched.
+        alias = by_id.get(pid)
+        already = url in skip or (alias is not None and (raw_dir / pid / "page.html").exists())
+        if already and not args.force:
+            continue
         dest = raw_dir / pid
         tmp = raw_dir / f"_tmp_{pid}"
         print(f"[{n}/{len(entries)}] {url}", file=sys.stderr)
@@ -145,9 +150,11 @@ def cmd_fetch(args):
                 shutil.rmtree(tmp, ignore_errors=True)
                 continue
             if dest.exists():
+                if (dest / "export.html").exists():   # not fetch's to lose
+                    shutil.copy2(dest / "export.html", tmp / "export.html")
                 shutil.rmtree(dest)
             tmp.rename(dest)
-            index[url] = {
+            entry = {
                 "medium_id": pid,
                 "title": info["title"],
                 "published": info["published"],
@@ -156,6 +163,11 @@ def cmd_fetch(args):
                 "images": info["image_count"],
                 "in_feed": url in feed,
             }
+            if alias is not None and alias != url:    # re-key under the fetched URL
+                old = index.pop(alias)
+                entry.update({k: old[k] for k in ("in_export", "imported_at", "draft") if k in old})
+            index[url] = entry
+            by_id[pid] = url
             write_index(raw_dir, index)
             fetched += 1
         except Exception as e:
