@@ -17,19 +17,25 @@ def make_session() -> requests.Session:
     return s
 
 
+TRANSIENT_STATUSES = (429, 500, 502, 503, 504)
+
+
 def fetch(session: requests.Session, url: str, retries: int = 4, **kw) -> requests.Response:
     backoff = 2.0
     for attempt in range(retries):
         try:
             r = session.get(url, timeout=30, **kw)
-            if r.status_code in (429, 500, 502, 503, 504):
-                raise requests.HTTPError(f"{r.status_code} for {url}")
-            r.raise_for_status()
-            return r
-        except (requests.RequestException, requests.HTTPError) as e:
-            if attempt == retries - 1:
-                raise
-            print(f"  retry {attempt + 1}/{retries - 1} after error: {e}", file=sys.stderr)
-            time.sleep(backoff)
-            backoff *= 2
+        except requests.RequestException as e:
+            err = e
+        else:
+            if r.status_code in TRANSIENT_STATUSES:
+                err = requests.HTTPError(f"{r.status_code} for {url}", response=r)
+            else:
+                r.raise_for_status()   # permanent 4xx: raises with r attached, no retry
+                return r
+        if attempt == retries - 1:
+            raise err
+        print(f"  retry {attempt + 1}/{retries - 1} after error: {err}", file=sys.stderr)
+        time.sleep(backoff)
+        backoff *= 2
     raise RuntimeError("unreachable")

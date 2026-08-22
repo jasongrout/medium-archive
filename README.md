@@ -87,6 +87,11 @@ a single post, and more.
   publish date from each page is checked against `--start`/`--end` after
   fetching, since sitemap dates are modification dates and Wayback dates
   are first-capture dates.
+* Posts that discovery finds but Medium no longer serves (404/410 —
+  deleted or unpublished) are flagged in `raw/missing.json`, with a
+  `wayback_url` pointing at their web.archive.org captures for manual
+  recovery. Re-running `fetch` re-checks flagged posts and unflags any
+  that reappear.
 * Medium boilerplate — the "was originally published on Medium" footer,
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become

@@ -26,9 +26,17 @@ README.md                     this file
 raw/
   index.json                  every archived post, keyed by its Medium URL:
                                 medium_id, title, published (from the page),
-                                sitemap_date, fetched_at, images, in_feed,
+                                sitemap_date, found_via (feed/sitemap/
+                                wayback/file), fetched_at, images, in_feed,
                                 plus in_export/imported_at/draft for posts
                                 merged from a Medium account export
+  missing.json                posts that discovery (usually the Wayback
+                                Machine) found but Medium no longer serves
+                                (404/410): status, found_via, approx_date,
+                                wayback_url; present only when such posts
+                                exist. Their content survives only as
+                                web.archive.org captures -- fetch does not
+                                recover it automatically
   feed.xml                    the publication RSS feed as downloaded
   <medium_id>/                one directory per post (12-hex Medium id)
     page.html                 the post page, byte-for-byte as served
@@ -93,6 +101,10 @@ both should be redirected.
   the untruncated subtitle; tags, the updated date and the publication
   canonical URL still come from the page, so fetching remains worthwhile
   even when an account export is available.
+* Posts flagged in `raw/missing.json` are gone from Medium (deleted or
+  unpublished); each entry's `wayback_url` points at its web.archive.org
+  captures for manual recovery. A re-run of `fetch` re-checks them and
+  unflags any that reappear.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.
 * Image filenames are `<NNN>-<original basename>`; the same asset served

@@ -71,6 +71,21 @@ def write_index(raw_dir: Path, index: dict):
     (raw_dir / "index.json").write_text(json.dumps(index, indent=2, ensure_ascii=False))
 
 
+def read_missing(raw_dir: Path) -> dict:
+    p = raw_dir / "missing.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
+def write_missing(raw_dir: Path, missing: dict):
+    """raw/missing.json: posts discovery found but Medium no longer serves."""
+    p = raw_dir / "missing.json"
+    if missing:
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(missing, indent=2, ensure_ascii=False))
+    elif p.exists():
+        p.unlink()
+
+
 def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
     """Save page.html, feed_item.json, images/ and images.json into dest."""
@@ -120,7 +135,7 @@ def cmd_fetch(args):
     feed = {}
     if args.urls:
         lines = [l.strip() for l in args.urls.read_text().splitlines()]
-        entries = [(canonical_url(l), None) for l in lines if l and not l.startswith("#")]
+        entries = [(canonical_url(l), None, "file") for l in lines if l and not l.startswith("#")]
         try:
             feed = fetch_feed(session, args.base, raw_dir)
         except Exception:
@@ -137,10 +152,11 @@ def cmd_fetch(args):
           f"{'' if end is None else f', end={end:%Y-%m-%d}'}", file=sys.stderr)
 
     index = read_index(raw_dir)
+    missing = read_missing(raw_dir)
     skip = set(index) | load_existing(args.existing or [])
     by_id = {e.get("medium_id"): u for u, e in index.items()}
     fetched = 0
-    for n, (url, approx) in enumerate(entries, 1):
+    for n, (url, approx, source) in enumerate(entries, 1):
         if args.limit and fetched >= args.limit:
             print(f"reached --limit {args.limit}", file=sys.stderr)
             break
@@ -171,6 +187,7 @@ def cmd_fetch(args):
                 "title": info["title"],
                 "published": info["published"],
                 "sitemap_date": approx.isoformat() if approx else None,
+                "found_via": source,
                 "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "images": info["image_count"],
                 "in_feed": url in feed,
@@ -181,10 +198,34 @@ def cmd_fetch(args):
             index[url] = entry
             by_id[pid] = url
             write_index(raw_dir, index)
+            if url in missing:                   # it came back; unflag it
+                del missing[url]
+                write_missing(raw_dir, missing)
             fetched += 1
         except Exception as e:
-            print(f"  FAILED {url}: {e}", file=sys.stderr)
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if status in (404, 410):
+                # Discovery (usually the Wayback Machine) knows the post, but
+                # Medium no longer serves it: deleted, unpublished, or the
+                # account is gone. Flag it; its content only survives as
+                # web.archive.org captures.
+                ts = f"{approx:%Y%m%d%H%M%S}" if approx else "*"
+                missing[url] = {
+                    "status": status,
+                    "medium_id": medium_id(url),
+                    "found_via": source,
+                    "approx_date": approx.isoformat() if approx else None,
+                    "wayback_url": f"https://web.archive.org/web/{ts}/{url}",
+                    "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                }
+                write_missing(raw_dir, missing)
+                print(f"  GONE from Medium ({status}); flagged in raw/missing.json", file=sys.stderr)
+            else:
+                print(f"  FAILED {url}: {e}", file=sys.stderr)
             shutil.rmtree(tmp, ignore_errors=True)
         time.sleep(args.delay)
     write_readme(args.out, args.base)
-    print(f"fetch done: {fetched} new, {len(index)} total in {raw_dir}", file=sys.stderr)
+    summary = f"fetch done: {fetched} new, {len(index)} total in {raw_dir}"
+    if missing:
+        summary += f"; {len(missing)} posts gone from Medium -> {raw_dir / 'missing.json'}"
+    print(summary, file=sys.stderr)

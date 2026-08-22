@@ -114,33 +114,36 @@ def wayback_urls(session, base: str) -> list:
 
 
 def discover(session, base: str, raw_dir: Path, wayback: bool = False) -> tuple[list, dict]:
-    """([(url, approx_date)], feed_items). Saves the feed XML to raw/feed.xml."""
+    """([(url, approx_date, source)], feed_items). Saves the feed XML to
+    raw/feed.xml. source is the first of feed/sitemap/wayback that listed the
+    URL, so source == "wayback" means Medium itself no longer lists the post."""
     base_host = urlparse(base).netloc
     feed = {}
     try:
         feed = fetch_feed(session, base, raw_dir)
     except Exception as e:
         print(f"feed failed ({e}); continuing without feed bodies", file=sys.stderr)
-    entries = [(u, parse_date(it["date"])) for u, it in feed.items()]
+    entries = [(u, parse_date(it["date"]), "feed") for u, it in feed.items()]
     try:
-        entries += walk_sitemap(session, base.rstrip("/") + "/sitemap/sitemap.xml", base_host)
+        entries += [(u, d, "sitemap") for u, d in
+                    walk_sitemap(session, base.rstrip("/") + "/sitemap/sitemap.xml", base_host)]
     except Exception as e:
         print(f"sitemap failed ({e}); only feed posts will be available", file=sys.stderr)
     if wayback:
         try:
             found = wayback_urls(session, base)
             print(f"wayback: {len(found)} candidate post URLs", file=sys.stderr)
-            entries += found
+            entries += [(u, d, "wayback") for u, d in found]
         except Exception as e:
             print(f"wayback failed ({e}); continuing without it", file=sys.stderr)
     # Earlier sources win: feed (true publish dates), then sitemap, then
     # wayback. Keyed by Medium id so the same post under an old slug (Medium
     # redirects them) does not become a second entry.
     best = {}
-    for u, d in entries:
+    for u, d, s in entries:
         key = medium_id(u) or u
         if key not in best:
-            best[key] = (u, d)
+            best[key] = [u, d, s]
         elif best[key][1] is None and d is not None:
-            best[key] = (best[key][0], d)
-    return list(best.values()), feed
+            best[key][1] = d
+    return [tuple(e) for e in best.values()], feed

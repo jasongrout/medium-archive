@@ -37,7 +37,8 @@ Notes:
     and --urls FILE can seed URLs collected elsewhere. Sitemap <lastmod> and
     first-capture dates are approximations that order and pre-filter; the
     real publish date from each page is re-checked against --start/--end
-    after fetching.
+    after fetching. Discovered posts that Medium no longer serves (404/410)
+    are flagged in raw/missing.json with a wayback_url for manual recovery.
   * Redirects: front matter carries original_url, original_path (the path an
     old inbound link carries), medium_id (Medium also resolves /p/<id>) and
     slug; redirects.csv collects these for every converted post.
