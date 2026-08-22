@@ -32,11 +32,13 @@ raw/
                                 merged from a Medium account export
   missing.json                posts that discovery (usually the Wayback
                                 Machine) found but Medium no longer serves
-                                (404/410): status, found_via, approx_date,
-                                wayback_url; present only when such posts
-                                exist. Their content survives only as
-                                web.archive.org captures -- fetch does not
-                                recover it automatically
+                                (HTTP 404/410, or "soft-404": Medium's
+                                not-found page served with status 200):
+                                status, found_via, approx_date, wayback_url;
+                                present only when such posts exist. Their
+                                content survives only as web.archive.org
+                                captures -- fetch does not recover it
+                                automatically
   feed.xml                    the publication RSS feed as downloaded
   <medium_id>/                one directory per post (12-hex Medium id)
     page.html                 the post page, byte-for-byte as served
