@@ -5,6 +5,10 @@ The two pipelines produce identical Markdown when the page cleanup is
 working, so a difference means new page chrome or a conversion bug. Run it
 after fetching new posts or when tuning convert; posts it reports clean
 are guaranteed to convert as faithfully from the page as from the export.
+
+Differences are printed to stdout as a unified patch (one file diff per
+post, title/URL in '#' comment lines), so `compare > review.patch` yields
+a file any diff viewer can render; the summary goes to stderr.
 """
 
 import difflib
@@ -18,6 +22,7 @@ from bs4 import BeautifulSoup
 from .convert import to_markdown
 from .export import export_body, parse_export
 from .fetch import read_index
+from .fixup import load_fixups, read_raw
 from .pages import extract_metadata, ghost_body, page_body
 from .urls import canonical_url
 
@@ -49,6 +54,21 @@ SELF_LINK_RE = re.compile(r"\[([^\]]+)\]\(\1\)")     # [url](url) -> url
 DASH_RE = re.compile(r"(?<=\S) ?--? ?(?=\S)")        # a -- b / a - b -> a-b
 
 
+FENCE_RE = re.compile(r"```.*?(?:```|\Z)", re.S)
+
+
+def _fence_split(markdown: str):
+    """(is_fence, segment) pairs; a fenced code block is one segment."""
+    pos = 0
+    for m in FENCE_RE.finditer(markdown):
+        if m.start() > pos:
+            yield False, markdown[pos:m.start()]
+        yield True, m.group()
+        pos = m.end()
+    if pos < len(markdown):
+        yield False, markdown[pos:]
+
+
 def ghost_comparable_blocks(markdown: str) -> list:
     """Comparison units for --ghost mode: paragraphs rather than lines,
     with Medium's mechanical migration differences normalized away --
@@ -57,8 +77,25 @@ def ghost_comparable_blocks(markdown: str) -> list:
     emphasis re-nesting, footnote anchor syntax, rehosted/renamed image
     files, reflowed line wrapping (a plain newline is wrapping and
     merges; a <br> hard break is a paragraph boundary and splits), and
-    the hero image Medium prepends. What survives is authored content:
-    text edits, and images or paragraphs present on only one side."""
+    the hero image Medium prepends. A fenced code block is one unit
+    regardless of internal blank lines or hard breaks, and its text is
+    not URL-decoded (code has literal '+' and '%'). What survives is
+    authored content: text edits, and images or paragraphs present on
+    only one side."""
+    blocks = []
+    for is_fence, segment in _fence_split(markdown):
+        if is_fence:
+            block = " ".join(segment.split()).translate(TYPOGRAPHY)
+            if block:
+                blocks.append(block)
+            continue
+        blocks.extend(_prose_blocks(segment))
+    if blocks and blocks[0] == "![image]":
+        blocks = blocks[1:]
+    return blocks
+
+
+def _prose_blocks(markdown: str) -> list:
     blocks = []
     for raw_block in re.split(r"\n\s*\n", markdown):
         for block in HARD_BREAK_RE.split(raw_block):
@@ -76,9 +113,20 @@ def ghost_comparable_blocks(markdown: str) -> list:
             block = SELF_LINK_RE.sub(r"\1", block)
             block = DASH_RE.sub("-", block)
             blocks.append(block)
-    if blocks and blocks[0] == "![image]":
-        blocks = blocks[1:]
     return blocks
+
+
+def print_patch(title, url, note, a_lines, b_lines):
+    """One file diff of a patch stream: the post's two conversions as
+    a/<slug>.md -> b/<slug>.md, preceded by '#' comment lines naming the
+    post and which conversion each side is (patch tools ignore them)."""
+    name = url.rstrip("/").rsplit("/", 1)[-1] + ".md"
+    print(f"# {title}\n# {url}  ({note})")
+    print(f"diff --git a/{name} b/{name}")
+    for line in difflib.unified_diff(a_lines, b_lines,
+                                     f"a/{name}", f"b/{name}", lineterm=""):
+        print(line)
+    print()
 
 
 def compare_ghost(args):
@@ -94,6 +142,7 @@ def compare_ghost(args):
     if not index:
         sys.exit(f"nothing to compare: {raw_dir}/index.json missing or empty")
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
+    fixups = load_fixups(args.out)
 
     identical, differing, skipped = 0, 0, 0
     for url in targets:
@@ -104,17 +153,17 @@ def compare_ghost(args):
             continue
         img_map = {}
         if (raw / "images.json").exists():
-            img_map = json.loads((raw / "images.json").read_text())
+            img_map = json.loads(read_raw(raw / "images.json", fixups))
 
-        gsoup = BeautifulSoup((raw / "ghost.html").read_text(encoding="utf-8"),
+        gsoup = BeautifulSoup(read_raw(raw / "ghost.html", fixups),
                               "html.parser")
         ghost_md, _ = to_markdown(ghost_body(gsoup), url, img_map, raw)
         if (raw / "export.html").exists():
-            exp = parse_export((raw / "export.html").read_text(encoding="utf-8"))
+            exp = parse_export(read_raw(raw / "export.html", fixups))
             medium_md, medium_src = to_markdown(export_body(exp["soup"]), url,
                                                 img_map, raw)[0], "export"
         elif (raw / "page.html").exists():
-            soup = BeautifulSoup((raw / "page.html").read_text(encoding="utf-8"),
+            soup = BeautifulSoup(read_raw(raw / "page.html", fixups),
                                  "html.parser")
             info = extract_metadata(soup, url)
             medium_md, medium_src = to_markdown(page_body(soup, info["tags"]),
@@ -131,11 +180,9 @@ def compare_ghost(args):
             identical += 1
             continue
         differing += 1
-        print(f"DIFFERS {url}")
-        for line in difflib.unified_diff(medium_lines, ghost_lines,
-                                         medium_src, "ghost", lineterm="", n=1):
-            print(f"  {line}")
-        print()
+        print_patch(entry.get("title", url), url,
+                    f"a: medium {medium_src} conversion, b: ghost capture",
+                    medium_lines, ghost_lines)
 
     print(f"compare --ghost done: {identical} identical, {differing} differ, "
           f"{skipped} without an attached Ghost capture (informational only)",
@@ -150,6 +197,7 @@ def cmd_compare(args):
     if not index:
         sys.exit(f"nothing to compare: {raw_dir}/index.json missing or empty")
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
+    fixups = load_fixups(args.out)
 
     identical, differing, no_export, no_page, missing = 0, [], 0, 0, 0
     for url in targets:
@@ -167,11 +215,11 @@ def cmd_compare(args):
 
         img_map = {}
         if (raw / "images.json").exists():
-            img_map = json.loads((raw / "images.json").read_text())
-        soup = BeautifulSoup((raw / "page.html").read_text(encoding="utf-8"), "html.parser")
+            img_map = json.loads(read_raw(raw / "images.json", fixups))
+        soup = BeautifulSoup(read_raw(raw / "page.html", fixups), "html.parser")
         info = extract_metadata(soup, url)
         page_md, _ = to_markdown(page_body(soup, info["tags"]), info["url"], img_map, raw)
-        exp = parse_export((raw / "export.html").read_text(encoding="utf-8"))
+        exp = parse_export(read_raw(raw / "export.html", fixups))
         export_md, _ = to_markdown(export_body(exp["soup"]), info["url"], img_map, raw)
 
         page_lines = comparable_lines(page_md)
@@ -180,11 +228,9 @@ def cmd_compare(args):
             identical += 1
             continue
         differing.append(url)
-        print(f"DIFFERS {url}")
-        for line in difflib.unified_diff(page_lines, export_lines,
-                                         "page", "export", lineterm="", n=1):
-            print(f"  {line}")
-        print()
+        print_patch(entry.get("title", url), url,
+                    "a: page conversion, b: export conversion",
+                    page_lines, export_lines)
 
     print(f"compare done: {identical} identical, {len(differing)} differ"
           + (f", {no_export} without export.html" if no_export else "")

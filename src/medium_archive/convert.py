@@ -18,6 +18,7 @@ from markdownify import markdownify as html_to_md
 from .dates import parse_date
 from .export import export_body, parse_export
 from .fetch import archive_base, read_index
+from .fixup import load_fixups, read_raw
 from .images import image_source
 from .pages import (extract_metadata, feed_body, ghost_body, ghost_metadata,
                     is_ghost_page, page_body)
@@ -63,6 +64,13 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
         if getattr(fig.next_sibling, "name", None) == fig.name:
             fig.insert_after(doc.new_tag("br"))
 
+    # Export <pre> blocks break lines with <br>, which markdownify renders
+    # as hard breaks (trailing double-space) -- invisible noise inside a
+    # code fence, where a plain newline is the faithful form.
+    for pre in body.find_all("pre"):
+        for br in pre.find_all("br"):
+            br.replace_with("\n")
+
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
         iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
@@ -92,11 +100,11 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
 
 
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
-                 prefer_ghost: bool = False) -> dict:
+                 prefer_ghost: bool = False, fixups: dict = None) -> dict:
     soup = None
     ghost = False
     if (raw / "page.html").exists():
-        soup = BeautifulSoup((raw / "page.html").read_text(encoding="utf-8"), "html.parser")
+        soup = BeautifulSoup(read_raw(raw / "page.html", fixups), "html.parser")
         ghost = is_ghost_page(soup)   # a Ghost capture saved by import-ghost
         info = ghost_metadata(soup, url) if ghost else extract_metadata(soup, url)
     else:
@@ -106,14 +114,14 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     # archived under both URLs); an alternate body source, like export.html.
     ghost_soup, gmeta = None, {}
     if (raw / "ghost.html").exists():
-        ghost_soup = BeautifulSoup((raw / "ghost.html").read_text(encoding="utf-8"),
+        ghost_soup = BeautifulSoup(read_raw(raw / "ghost.html", fixups),
                                    "html.parser")
     if (raw / "ghost.json").exists():
-        gmeta = json.loads((raw / "ghost.json").read_text())
+        gmeta = json.loads(read_raw(raw / "ghost.json", fixups))
 
     feed_item = None
     if (raw / "feed_item.json").exists():
-        feed_item = json.loads((raw / "feed_item.json").read_text())
+        feed_item = json.loads(read_raw(raw / "feed_item.json", fixups))
         info["author"] = info["author"] or feed_item.get("author", "")
         info["title"] = info["title"] or feed_item.get("title", "")
         if feed_item.get("tags"):
@@ -124,7 +132,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
 
     exp = None
     if (raw / "export.html").exists():
-        exp = parse_export((raw / "export.html").read_text(encoding="utf-8"))
+        exp = parse_export(read_raw(raw / "export.html", fixups))
         info["title"] = info["title"] or exp["title"]
         info["author"] = info["author"] or exp["author"]
         info["author_url"] = info["author_url"] or exp["author_url"]
@@ -137,7 +145,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
 
     img_map = {}
     if (raw / "images.json").exists():
-        img_map = json.loads((raw / "images.json").read_text())
+        img_map = json.loads(read_raw(raw / "images.json", fixups))
 
     have_feed = bool(feed_item and feed_item.get("content_html"))
     if soup is None and exp is None and ghost_soup is None and not have_feed:
@@ -220,6 +228,10 @@ def cmd_convert(args):
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() and not args.clean else {}
 
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
+    fixups = load_fixups(args.out)
+    if fixups:
+        print(f"fixups: patching {len(fixups)} raw file(s) in memory "
+              f"from {args.out / 'fixups'}", file=sys.stderr)
     ok = 0
     for n, url in enumerate(targets, 1):
         entry = index.get(url)
@@ -230,7 +242,8 @@ def cmd_convert(args):
         print(f"[{n}/{len(targets)}] {url}", file=sys.stderr)
         try:
             manifest[url] = convert_post(url, raw, posts_root, args.prefer_page,
-                                         getattr(args, "prefer_ghost", False))
+                                         getattr(args, "prefer_ghost", False),
+                                         fixups)
             ok += 1
         except Exception as e:
             print(f"  FAILED: {e}", file=sys.stderr)

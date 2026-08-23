@@ -67,6 +67,12 @@ Notes:
   * Medium's "was originally published in ... on Medium" footer and stat
     tracking pixels are removed. Embedded gists/iframes become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
+  * Fixups: unified patches in <out>/fixups/*.patch (targets named
+    <medium_id>/<file>, '#' comment lines welcome) are applied to the
+    in-memory raw sources by convert and compare, so authored defects --
+    a broken href in a capture, a mangled paragraph in an export -- can
+    be corrected reproducibly without editing the archived bytes. A hunk
+    that no longer applies aborts the run rather than being skipped.
   * The archive layout is documented in the README.md written into <out>/.
 Progress is written to stderr.
 """
@@ -206,7 +212,9 @@ def main():
     add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
-                        "offline; exits non-zero if any post differs")
+                        "offline; differences print as a unified patch on stdout "
+                        "(redirect to a .patch file for a diff viewer); exits "
+                        "non-zero if any post differs")
     cmp_p.add_argument("--only", action="append", metavar="URL",
                        help="compare just this post (repeatable; default: every post "
                             "that has both page.html and export.html)")

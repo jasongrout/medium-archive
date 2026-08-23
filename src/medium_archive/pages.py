@@ -137,10 +137,10 @@ def ghost_body(soup):
     .post-full-content), separate from the title/date header and the
     author/share footer."""
     article = soup.find("article") or soup.body
-    body = article.select_one('[class*="post-content"]')
+    body = article.select_one('[class*="post-full-content"], [class*="post-content"]')
     if body is None:
         body = article
-        for sel in ("header", "footer", "h1"):
+        for sel in ("header", "footer", 'h1[class*="title"]'):
             for t in body.select(sel):
                 t.decompose()
     for sel in ("script", "style", "noscript", "form", "button", "svg",
