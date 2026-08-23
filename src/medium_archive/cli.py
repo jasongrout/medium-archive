@@ -68,12 +68,15 @@ Notes:
   * Medium's "was originally published in ... on Medium" footer and stat
     tracking pixels are removed. Embedded gists/iframes become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
-  * Fixups: unified patches in <out>/fixups/*.patch (targets named
-    <medium_id>/<file>, '#' comment lines welcome) are applied to the
-    in-memory raw sources by convert and compare, so authored defects --
-    a broken href in a capture, a mangled paragraph in an export -- can
-    be corrected reproducibly without editing the archived bytes. A hunk
-    that no longer applies aborts the run rather than being skipped.
+  * Fixups: files in <out>/fixups/ are applied to the in-memory raw
+    sources by convert and compare, so authored defects -- a broken href
+    in a capture, a typo, a mangled paragraph in an export -- can be
+    corrected reproducibly without editing the archived bytes. *.sub
+    files hold reviewable single-line substitutions (file: target, then
+    old:/new: pairs, optional count:, old-regex: for regexes; '#'
+    comments); *.patch files hold unified patches for structural edits
+    (targets named <medium_id>/<file>). A substitution or hunk that no
+    longer applies aborts the run rather than being skipped.
   * The archive layout is documented in the README.md written into <out>/.
 Progress is written to stderr.
 """

@@ -43,7 +43,16 @@ Completed (code + fixups, validated by a full `convert --clean`, a clean
   whitespace-only hard-break lines between image-grid entries are
   normalized to blank lines (outside code fences). Four fixups in the
   archive correct authored missing-space-after-period typos
-  (`*-sentence-space.patch`, `b7e82b5e1202-caption-space.patch`).
+  (`*-sentence-space.sub`, `b7e82b5e1202-caption-space.sub`).
+- **Substitution fixups** — raw HTML is often one enormous line, so a
+  unified diff of a one-character fix embeds the whole line twice and
+  cannot be reviewed. `fixups/*.sub` files now hold single-line
+  `old:`/`new:` substitutions (optional exact `count:`, `old-regex:`
+  for regexes) that fail loudly like patch hunks; `*.patch` remains for
+  structural edits. The archive's six newest fixups use it, covering
+  every Medium-side copy of the text (export, rendered page, and the
+  page's embedded editor state), so the fix holds whichever body source
+  converts.
 
 ## 1. Recover the 8 empty `undated-*` posts (main remaining item)
 

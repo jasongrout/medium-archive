@@ -1,5 +1,5 @@
-"""Fixup patches: parsing <out>/fixups/*.patch and applying hunks to the
-in-memory text of raw files."""
+"""Fixups: parsing <out>/fixups/*.patch and *.sub and applying them to
+the in-memory text of raw files."""
 
 import difflib
 
@@ -92,6 +92,78 @@ def test_two_files_in_one_patch(tmp_path):
     fixups = load_fixups(out)
     assert read_raw(out / "raw" / "abc123" / "ghost.html", fixups) == FIXED
     assert read_raw(out / "raw" / "abc123" / "export.html", fixups) == "x\nz\n"
+
+
+def test_sub_literal(tmp_path):
+    out = write_out(tmp_path, patches=[("fix.sub",
+        "# a one-character fix, reviewable\n"
+        "file: abc123/ghost.html\n"
+        "old: <p>two</p>\n"
+        "new: <p>2</p>\n")])
+    assert read_raw(out / "raw" / "abc123" / "ghost.html", load_fixups(out)) == FIXED
+
+
+def test_sub_count_must_match_exactly(tmp_path):
+    raw = RAW + RAW                        # pattern occurs twice
+    out = write_out(tmp_path, raw_text=raw, patches=[("fix.sub",
+        "file: abc123/ghost.html\nold: <p>two</p>\nnew: <p>2</p>\n")])
+    with pytest.raises(SystemExit, match="matches 2 time"):
+        read_raw(out / "raw" / "abc123" / "ghost.html", load_fixups(out))
+    out2 = write_out(tmp_path / "b", raw_text=raw, patches=[("fix.sub",
+        "file: abc123/ghost.html\ncount: 2\nold: <p>two</p>\nnew: <p>2</p>\n")])
+    got = read_raw(out2 / "raw" / "abc123" / "ghost.html", load_fixups(out2))
+    assert got == FIXED + FIXED
+
+
+def test_sub_missing_text_aborts(tmp_path):
+    out = write_out(tmp_path, patches=[("fix.sub",
+        "file: abc123/ghost.html\nold: <p>gone</p>\nnew: <p>x</p>\n")])
+    with pytest.raises(SystemExit, match="matches 0 time"):
+        read_raw(out / "raw" / "abc123" / "ghost.html", load_fixups(out))
+
+
+def test_sub_regex(tmp_path):
+    out = write_out(tmp_path, patches=[("fix.sub",
+        "file: abc123/ghost.html\n"
+        "count: 4\n"
+        r"old-regex: <p>(\w+)</p>" + "\n"
+        r"new: <div>\1</div>" + "\n")])
+    got = read_raw(out / "raw" / "abc123" / "ghost.html", load_fixups(out))
+    assert got == RAW.replace("<p>", "<div>").replace("</p>", "</div>")
+
+
+def test_sub_several_files_and_pairs(tmp_path):
+    out = write_out(tmp_path, patches=[("fix.sub",
+        "file: abc123/ghost.html\n"
+        "old: <p>two</p>\n"
+        "new: <p>2</p>\n"
+        "file: abc123/export.html\n"
+        "old: y\n"
+        "new: z\n")])
+    (out / "raw" / "abc123" / "export.html").write_text("x\ny\n")
+    fixups = load_fixups(out)
+    assert read_raw(out / "raw" / "abc123" / "ghost.html", fixups) == FIXED
+    assert read_raw(out / "raw" / "abc123" / "export.html", fixups) == "x\nz\n"
+
+
+def test_sub_malformed_aborts(tmp_path):
+    for i, (bad, msg) in enumerate([
+            ("old: x\n", "'old' without 'new'"),
+            ("new: x\n", "'new' without 'old'"),
+            ("old: x\nnew: y\n", "before 'file:'"),
+            ("file: abc123/ghost.html\nnonsense line\n", "malformed")]):
+        out = write_out(tmp_path / str(i), patches=[("fix.sub", bad)])
+        with pytest.raises(SystemExit, match=msg):
+            load_fixups(out)
+
+
+def test_sub_and_patch_apply_in_name_order(tmp_path):
+    # a.sub rewrites two -> 2; b.patch then rewrites the result
+    out = write_out(tmp_path, patches=[
+        ("a.sub", "file: abc123/ghost.html\nold: <p>two</p>\nnew: <p>2</p>\n"),
+        ("b.patch", patch_text(FIXED, FIXED.replace("<p>2</p>", "<p>22</p>")))])
+    got = read_raw(out / "raw" / "abc123" / "ghost.html", load_fixups(out))
+    assert got == FIXED.replace("<p>2</p>", "<p>22</p>")
 
 
 def test_pure_insertion(tmp_path):
