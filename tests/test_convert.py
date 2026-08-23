@@ -100,9 +100,42 @@ def test_double_br_in_pre_stays_a_blank_line():
 
 def test_double_br_kept_without_a_ghost_origin():
     # in posts authored in Medium's own editor, <br><br> is an
-    # intentional paragraph break, not migration damage
+    # intentional paragraph break, not migration damage: the text stays
+    # split (the whitespace-only middle line renders as a blank line)
     md = md_of("<p>But that is not all...<br><br>The SQLite support</p>")
-    assert md == "But that is not all...  \n  \nThe SQLite support\n"
+    assert md == "But that is not all...  \n\nThe SQLite support\n"
+
+
+def test_whitespace_only_lines_become_blank_outside_fences():
+    # image grids separate entries with a <br>, which markdownify renders
+    # as a line holding only a hard break (two spaces)
+    md = md_of('<figure><img src="https://x.com/a.png"/></figure>'
+               '<figure><img src="https://x.com/b.png"/></figure>')
+    assert not any(l != "" and l.strip() == "" for l in md.split("\n"))
+
+
+def test_whitespace_lines_inside_fences_are_kept():
+    md = md_of("<pre>a = 1<br>  <br>b = 2</pre>")
+    assert "\na = 1\n  \nb = 2\n" in md
+
+
+def test_leading_divider_is_dropped():
+    # the divider that followed the removed subtitle block; a body must
+    # not open with ---, which also reads as front matter to some tools
+    md = md_of("<hr/><p>First real paragraph.</p><hr/><p>Later.</p>")
+    assert md == "First real paragraph.\n\n---\n\nLater.\n"
+
+
+def test_figcaption_renders_italic():
+    md = md_of('<figure><img src="https://x.com/a.png"/>'
+               '<figcaption>A robot in the browser</figcaption></figure>')
+    assert "*A robot in the browser*" in md
+
+
+def test_already_italic_figcaption_is_not_double_wrapped():
+    md = md_of('<figure><img src="https://x.com/a.png"/>'
+               '<figcaption><em>Already italic</em></figcaption></figure>')
+    assert "*Already italic*" in md and "**" not in md
 
 
 def test_iframe_embed_link_text_has_no_brackets():
@@ -129,6 +162,23 @@ def test_byline_avatar_on_custom_subdomain_is_stripped():
     body = page_body(BeautifulSoup(html, "html.parser"))
     assert body.find("img") is None
     assert "Real content" in body.get_text()
+
+
+def test_leading_heading_repeating_the_title_is_dropped():
+    # some pages render the post title as a body <h3> instead of the
+    # usual <h1>; the title lives in front matter, so drop the repeat
+    html = ('<article><h3>My Great Post</h3>'
+            '<p>Real content.</p><h3>My Great Post</h3></article>')
+    body = page_body(BeautifulSoup(html, "html.parser"), title="My Great Post")
+    headings = body.find_all("h3")
+    assert len(headings) == 1          # a later repeat is authored content
+    assert "Real content" in body.get_text()
+
+
+def test_leading_heading_that_is_not_the_title_stays():
+    html = '<article><h3>Introduction</h3><p>Real content.</p></article>'
+    body = page_body(BeautifulSoup(html, "html.parser"), title="My Great Post")
+    assert body.find("h3") is not None
 
 
 def test_empty_app_shell_fails_instead_of_converting_chrome(tmp_path):

@@ -34,6 +34,16 @@ Completed (code + fixups, validated by a full `convert --clean`, a clean
   `medium-archive lint`: leftover Medium chrome, unclosed fences, missing
   image files, remote Medium CDN images; exits non-zero on defects so
   regressions surface on every convert (`src/medium_archive/lint.py`).
+- **Readability pass** (second audit round): figure captions render in
+  italics, matching Medium's small-gray caption styling (including
+  orphan captions whose figure never hydrated its image); a leading
+  heading that repeats the post title is dropped (two posts rendered
+  their title as a body `<h3>` with no `<h1>`); a body no longer opens
+  with the `---` divider left over from the removed subtitle block;
+  whitespace-only hard-break lines between image-grid entries are
+  normalized to blank lines (outside code fences). Four fixups in the
+  archive correct authored missing-space-after-period typos
+  (`*-sentence-space.patch`, `b7e82b5e1202-caption-space.patch`).
 
 ## 1. Recover the 8 empty `undated-*` posts (main remaining item)
 

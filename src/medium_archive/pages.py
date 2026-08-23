@@ -201,7 +201,7 @@ def split_pre_paragraphs(article):
         pre.decompose()
 
 
-def page_body(soup, tags=()):
+def page_body(soup, tags=(), title=""):
     """<article> with Medium chrome removed."""
     article = soup.find("article") or soup.body
     for sel in (
@@ -248,6 +248,14 @@ def page_body(soup, tags=()):
     # not <hr>; the export uses a real <hr>.
     for el in article.select('div[role="separator"]'):
         el.replace_with(soup.new_tag("hr"))
+    # Some pages render the post title as a body <h3> instead of the <h1>
+    # Medium normally uses (removed above); the title lives in the front
+    # matter, so a leading heading that repeats it is a duplicate.
+    first = article.find(["h1", "h2", "h3", "h4", "p", "figure", "pre",
+                          "ul", "ol", "blockquote"])
+    if (first is not None and first.name.startswith("h") and title
+            and first.get_text(strip=True) == title.strip()):
+        first.decompose()
     split_pre_paragraphs(article)
     strip_tracking_pixels(article)
     strip_medium_footer(article)

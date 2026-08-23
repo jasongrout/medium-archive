@@ -88,6 +88,18 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
         for br in pre.find_all("br"):
             br.replace_with("\n")
 
+    # Medium styles figure captions as small gray text under the image;
+    # italics is the Markdown idiom that keeps them visually distinct
+    # from body prose (including captions whose figure lost its image --
+    # some captures never hydrate the image element).
+    for cap in body.find_all("figcaption"):
+        if cap.get_text(strip=True) and not (
+                len(cap.contents) == 1 and cap.contents[0].name in ("em", "i")):
+            em = doc.new_tag("em")
+            for child in list(cap.children):
+                em.append(child.extract())
+            cap.append(em)
+
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
         iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
@@ -112,8 +124,23 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered
     # page serves plain spaces. Normalize so output is stable across sources.
     markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
+    # markdownify renders the grid-separating <br>s as whitespace-only
+    # "hard break" lines; those are just blank lines to Markdown, so
+    # normalize them away -- except in code fences, where whitespace is
+    # content.
+    lines, fence = markdown.split("\n"), False
+    for i, line in enumerate(lines):
+        if re.match(r"^`{3,}", line):
+            fence = not fence
+        elif not fence and line.strip() == "":
+            lines[i] = ""
+    markdown = "\n".join(lines)
     markdown = re.sub(r"\n{3,}", "\n\n", markdown).strip() + "\n"
     markdown = re.sub(r"(?:\n-{3,}\n)?\n[^\n]*was originally published[^\n]*\n*$", "\n", markdown)
+    # A body must not open with a section divider: it is the separator
+    # that followed the (removed) subtitle block, and a leading --- also
+    # reads as more front matter to some Markdown tooling.
+    markdown = re.sub(r"^(?:-{3,}\n+)+", "", markdown)
     return markdown, used_images
 
 
@@ -186,7 +213,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
                                      or not (have_page or exp or have_feed)):
         body, body_source = ghost_body(ghost_soup), "ghost"
     elif have_page and (prefer_page or not (exp or have_feed)):
-        body, body_source = page_body(soup, info["tags"]), "page"
+        body, body_source = page_body(soup, info["tags"], info["title"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
     else:

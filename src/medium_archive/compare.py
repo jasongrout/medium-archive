@@ -166,8 +166,9 @@ def compare_ghost(args):
             soup = BeautifulSoup(read_raw(raw / "page.html", fixups),
                                  "html.parser")
             info = extract_metadata(soup, url)
-            medium_md, medium_src = to_markdown(page_body(soup, info["tags"]),
-                                                info["url"], img_map, raw)[0], "page"
+            medium_md, medium_src = to_markdown(
+                page_body(soup, info["tags"], info["title"]),
+                info["url"], img_map, raw)[0], "page"
         else:
             skipped += 1
             continue
@@ -218,7 +219,8 @@ def cmd_compare(args):
             img_map = json.loads(read_raw(raw / "images.json", fixups))
         soup = BeautifulSoup(read_raw(raw / "page.html", fixups), "html.parser")
         info = extract_metadata(soup, url)
-        page_md, _ = to_markdown(page_body(soup, info["tags"]), info["url"], img_map, raw)
+        page_md, _ = to_markdown(page_body(soup, info["tags"], info["title"]),
+                                 info["url"], img_map, raw)
         exp = parse_export(read_raw(raw / "export.html", fixups))
         export_md, _ = to_markdown(export_body(exp["soup"]), info["url"], img_map, raw)
 
