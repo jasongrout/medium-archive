@@ -18,10 +18,17 @@ Last full validation, all four against all 333 posts:
   in-page anchors that never survived the original Medium conversion
   (old footnote anchors, also dead in `posts/`) and one h3→h5 heading
   jump published that way in 2015.
-- **hugo** (hugo 0.152.2): 1128 pages, 676 alias redirect stubs (old
-  Medium slug+id, `/p/<id>` and Ghost-era paths), tag+author taxonomy
-  pages, site and per-term RSS. Search needs `pagefind --site public`
-  after the build.
+- **hugo** (hugo 0.158.0, Dream theme): site.json targets
+  [Dream](https://github.com/g1eny0ung/hugo-theme-dream) (clone it into
+  `site-hugo/themes/dream`; the exporter prints the command while it is
+  missing — Dream needs Hugo ≥ 0.158). 1131 pages: masonry cards with
+  covers from each post's images (241 webp-encoded), per-post bylines,
+  Dream's built-in search, /posts archives timeline, tag+author pages
+  and feeds, an Authors nav item, the Jupyter avatar (`avatar.png`,
+  cropped from an archived post image), and 1000+ alias redirect stubs
+  for old Medium slug+id, `/p/<id>` and Ghost-era paths. Rendering
+  verified page-by-page in headless Chromium. Note: Dream loads
+  alpine/masonry/fuse from cdn.jsdelivr.net at view time.
 - **zola** (zola 0.21.0): 333 pages in ~2 s, taxonomy pages and
   per-term Atom feeds, aliases, and a working search box (built-in
   elasticlunr index). The 53 dead in-page anchors are reported as

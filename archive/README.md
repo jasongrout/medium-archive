@@ -25,7 +25,14 @@ Medium. It has two layers:
   rewriting, and `site.json`) into `site-hugo/`, `site-zola/` and
   `site-pelican/` -- hugo/zola add tag+author taxonomy pages, per-term
   feeds and redirect-stub aliases for old paths, zola a working search
-  box; render with `hugo server`, `zola serve`, or `pelican -l`.
+  box; render with `hugo server`, `zola serve`, or `pelican -l`. The
+  hugo step can target a real theme named in site.json's hugo section
+  (first-class support for Dream, hugo-theme-dream, Hugo >= 0.158:
+  summary-card covers from each post's images, bylines, its search page
+  and archives timeline, a site avatar); clone the theme once into
+  site-hugo/themes/ -- regeneration preserves it. This archive's
+  site.json targets Dream, with `avatar.png` (the Jupyter logo mark,
+  cropped from an archived post image) as the site avatar.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
