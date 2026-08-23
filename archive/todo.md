@@ -1,19 +1,37 @@
 # Archive notes and remaining work
 
-## 0. MyST site
+## 0. Site builds (MyST, Hugo, Zola, Pelican)
 
-`medium-archive myst --out .` builds the browsable site in `site/`
-(gitignored, like `posts/` — both regenerate from `raw/` + `fixups/`);
-`site.json` holds the hand-written site title, description and
-landing-page intro. Render with `myst start` or `myst build --html`
-inside `site/` (`npm install -g mystmd`; the first build downloads the
-book-theme template). Last full validation: `myst build --html` renders
-all 333 pages with built-in full-text search; the only warnings are
-~57 links to in-page anchors that never survived the original Medium
-conversion (old footnote anchors, also dead in `posts/`), one h3→h5
-heading jump published that way in 2015, and Medium-hosted images on
-any post whose images were never fetched (none currently — `lint` is
-clean).
+`medium-archive myst|hugo|zola|pelican --out .` builds a browsable site
+in `site/`, `site-hugo/`, `site-zola/`, or `site-pelican/` (all
+gitignored, like `posts/` — everything regenerates from `raw/` +
+`fixups/`); `site.json` holds the hand-written site title, description,
+landing-page intro, and (for hugo/zola) the base_url baked into
+absolute links and redirect stubs. The four exporters share page URLs
+and link rewriting, so the generators can be compared on identical
+content, then the keepers kept and the rest ignored.
+
+Last full validation, all four against all 333 posts:
+
+- **myst** (`myst build --html`, mystmd 1.10.1): all pages render, with
+  built-in full-text search. The only warnings are ~57 links to
+  in-page anchors that never survived the original Medium conversion
+  (old footnote anchors, also dead in `posts/`) and one h3→h5 heading
+  jump published that way in 2015.
+- **hugo** (hugo 0.152.2): 1128 pages, 676 alias redirect stubs (old
+  Medium slug+id, `/p/<id>` and Ghost-era paths), tag+author taxonomy
+  pages, site and per-term RSS. Search needs `pagefind --site public`
+  after the build.
+- **zola** (zola 0.21.0): 333 pages in ~2 s, taxonomy pages and
+  per-term Atom feeds, aliases, and a working search box (built-in
+  elasticlunr index). The 53 dead in-page anchors are reported as
+  warnings (`link_checker.internal_level = "warn"` in the generated
+  config).
+- **pelican** (pelican 4.12.0): 333 articles with Pelican's built-in
+  theme, tag/author pages, site and per-tag/author Atom feeds; only
+  cosmetic empty-image-alt warnings (Medium images rarely carry alt
+  text). Search via Pagefind, redirects via each site's
+  `redirects.csv` (Pelican has no alias mechanism).
 
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and
