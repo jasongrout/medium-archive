@@ -64,7 +64,14 @@ def lint_post(post_dir: Path) -> tuple[list, list]:
         if not fenced:
             m = MEDIUM_CDN_RE.search(line)
             if m:
-                errors.append(f"remote Medium CDN image: {m.group(1)[:80]}")
+                # a body recovered from the page's embedded editor state
+                # keeps remote URLs by design until the post is re-fetched
+                # with its images; anywhere else a CDN URL is a defect
+                if front.get("body_source") == "state":
+                    warnings.append("remote image, not fetched yet: "
+                                    f"{m.group(1)[:80]}")
+                else:
+                    errors.append(f"remote Medium CDN image: {m.group(1)[:80]}")
 
     if sum(1 for line in body.split("\n") if FENCE_RE.match(line)) % 2:
         errors.append("odd number of code-fence lines (unclosed fence)")

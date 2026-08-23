@@ -126,6 +126,17 @@ def test_leading_divider_is_dropped():
     assert md == "First real paragraph.\n\n---\n\nLater.\n"
 
 
+def test_medium_tracking_source_param_is_stripped():
+    md = md_of('<a href="https://github.com/x/y?source=post_page-----1a2b'
+               '---------------------------------------">repo</a>')
+    assert md == "[repo](https://github.com/x/y)\n"
+
+
+def test_non_medium_source_param_survives():
+    md = md_of('<a href="https://example.com/?source=rss&x=1">link</a>')
+    assert md == "[link](https://example.com/?source=rss&x=1)\n"
+
+
 def test_figcaption_renders_italic():
     md = md_of('<figure><img src="https://x.com/a.png"/>'
                '<figcaption>A robot in the browser</figcaption></figure>')

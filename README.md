@@ -194,6 +194,13 @@ longer lists — work through the steps in order:
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become
   links and need manual replacement.
+* Medium sometimes serves a post page as its bare application shell — no
+  server-rendered article, no JSON-LD, page title just "Medium". `convert`
+  recovers such posts from the page's embedded editor state
+  (`window.__APOLLO_STATE__`), which still carries the full paragraph
+  list, markups, title, timestamps, author and tags (`body_source:
+  state`). Only the images are lost to the shell: they were never
+  fetched, so the body keeps remote URLs until the post is re-fetched.
 * Medium rate-limits and may serve a bot wall. A 429 is not retried —
   fetch reports it (with the server's `Retry-After` hint, when sent) and
   moves on; raise `--delay` and re-run to resume.

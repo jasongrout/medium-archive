@@ -10,7 +10,8 @@ import re
 import shutil
 import sys
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, urlsplit
+from urllib.parse import (parse_qsl, urlencode, urljoin, urlparse, urlsplit,
+                          urlunsplit)
 
 from bs4 import BeautifulSoup
 from markdownify import MarkdownConverter
@@ -23,6 +24,7 @@ from .images import image_source
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json)
+from .state import apollo_post_state, state_body, state_metadata
 from .readme import write_readme
 from .urls import canonical_url, medium_id, resolve_canonical, slug_of
 
@@ -44,6 +46,19 @@ class _Converter(MarkdownConverter):
         fence = "`" * (max(map(len, runs)) + 1)
         start, end = md.index("```"), md.rindex("```")
         return md[:start] + fence + md[start + 3:end] + fence + md[end + 3:]
+
+
+def _strip_tracking(url: str) -> str:
+    """Drop the `source=` telemetry parameter Medium's renderer appends
+    to every link it emits, on any host. The dash-run value pattern
+    (post_page----..., user_mention---...) marks it as Medium's, so a
+    target site's own source parameter survives."""
+    parts = urlsplit(url)
+    if "source=" not in parts.query:
+        return url
+    q = [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
+         if not (k == "source" and "---" in v)]
+    return urlunsplit(parts._replace(query=urlencode(q)))
 
 
 def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | None = None):
@@ -117,7 +132,7 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
         if href and not href.startswith(("#", "mailto:")):
             # export hrefs can contain literal spaces, which break the
             # Markdown link syntax
-            a["href"] = urljoin(base_url, href).replace(" ", "%20")
+            a["href"] = _strip_tracking(urljoin(base_url, href).replace(" ", "%20"))
 
     markdown = _Converter(heading_style="ATX", bullets="-",
                           strip=["span"]).convert(str(body))
@@ -147,17 +162,26 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
                  prefer_ghost: bool = False, fixups: dict = None) -> dict:
     soup = None
+    state = None
     ghost = page_shell = False
     if (raw / "page.html").exists():
-        soup = BeautifulSoup(read_raw(raw / "page.html", fixups), "html.parser")
+        page_text = read_raw(raw / "page.html", fixups)
+        soup = BeautifulSoup(page_text, "html.parser")
         ghost = is_ghost_page(soup)   # a Ghost capture saved by import-ghost
         info = ghost_metadata(soup, url) if ghost else extract_metadata(soup, url)
         # Medium sometimes serves an empty app shell -- nav chrome with no
         # article markup, JSON-LD or title. Converting it would produce a
         # post of nav links, and it is long enough to slip past the short-
-        # body warning; it is not a body source at all.
+        # body warning; it is not a body source at all. But the data the
+        # client would have rendered is usually still in the page, in its
+        # embedded editor state -- recover from that.
         page_shell = (not ghost and soup.find("article") is None
                       and not parse_ld_json(soup) and not info["title"])
+        if page_shell:
+            state = apollo_post_state(page_text, raw.name)
+            if state is not None:
+                info.update(state_metadata(state, raw.name))
+                info["url"] = info["url"] or url
     else:
         info = {"url": url, **EMPTY_INFO}
 
@@ -202,22 +226,26 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
 
     have_feed = bool(feed_item and feed_item.get("content_html"))
     have_page = soup is not None and not page_shell
-    if not have_page and exp is None and ghost_soup is None and not have_feed:
+    if not have_page and exp is None and ghost_soup is None and not have_feed \
+            and state is None:
         raise RuntimeError(
-            "page.html is Medium's empty app shell (no article); re-fetch it"
-            if page_shell else
+            "page.html is Medium's empty app shell (no article or embedded "
+            "state); re-fetch it" if page_shell else
             "no page.html, export.html, ghost.html or feed body to convert")
     if ghost:                          # page.html is itself a Ghost capture
         body, body_source = ghost_body(soup), "ghost"
     elif ghost_soup is not None and (prefer_ghost
-                                     or not (have_page or exp or have_feed)):
+                                     or not (have_page or exp or have_feed
+                                             or state is not None)):
         body, body_source = ghost_body(ghost_soup), "ghost"
     elif have_page and (prefer_page or not (exp or have_feed)):
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
-    else:
+    elif have_feed:
         body, body_source = feed_body(feed_item["content_html"]), "feed"
+    else:                              # shell page: its embedded editor state
+        body, body_source = state_body(state, raw.name, info["title"]), "state"
 
     # A post with a Ghost origin carries Medium's migration line-break
     # damage in its Medium-side sources; the Ghost capture itself doesn't.

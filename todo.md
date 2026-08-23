@@ -54,25 +54,30 @@ Completed (code + fixups, validated by a full `convert --clean`, a clean
   page's embedded editor state), so the fix holds whichever body source
   converts.
 
-## 1. Recover the 8 empty `undated-*` posts (main remaining item)
+- **Shell posts recovered from the embedded editor state** — the 8 posts
+  whose `page.html` is Medium's empty app shell (title "Medium", no
+  article markup) turned out to carry the complete post in
+  `window.__APOLLO_STATE__`: ordered paragraphs with markups, image ids,
+  title, publish timestamps, author and tags. `convert` now reconstructs
+  such posts from that state (`body_source: state`,
+  `src/medium_archive/state.py`), so all 333 posts convert, with real
+  dates and titles (`2019-12-29-voilà-is-now-an-official-jupyter-
+  subproject` instead of `undated-…`). A shell with no usable state
+  still fails loudly.
+- **Medium link telemetry stripped** — Medium's renderer appends a
+  `source=post_page---…`-style query parameter to links it emits, on any
+  host; `to_markdown` now drops it (the dash-run value pattern marks it
+  as Medium's, so a site's own `source` parameter survives). Cleaned 35
+  links across 22 posts.
 
-These posts' `page.html` captures are Medium's empty shell (title
-"Medium", no article markup), so `convert` now reports them FAILED and
-they are absent from `posts/`, `posts.json` and `redirects.csv`:
+## 1. Fetch the 8 recovered posts' images (main remaining item)
 
-- undated-a-gallery-of-voilà-examples (a2ce7ef99130)
-- undated-a-slideshow-template-for-voilà-apps (435f67d10b4f)
-- undated-and-voilà (f6a2c08a4a93)
-- undated-jupyterlite-jupyter-️-webassembly-️-python (f6e2e41ab3fa)
-- undated-need-for-speed-voilà-edition (a9e1300ab3b2)
-- undated-online-collaboration-café-launch-… (b713edadf15)
-- undated-voilà-is-now-an-official-jupyter-subproject (87d659583490)
-- undated-voilà-0-5-0-homecoming (66f2465aa86f)
-
-Plan: re-fetch each `page.html` from the live site or the Wayback Machine
-(`fetch --urls FILE --force` with the 8 URLs from `raw/index.json`, or
-recover by hand into `raw/<id>/page.html`). Needs network access, which
-the 2026-08-23 session did not have.
+The shell captures never hydrated their images, so the recovered posts
+(`body_source: state` in posts.json) keep remote `miro.medium.com` URLs
+— 52 of them, each listed as a `lint` warning. Re-fetch the posts from
+the live site (`fetch --urls FILE --force` with their URLs from
+`raw/index.json`) to pull the images and a rendered `page.html`. Needs
+network access, which the 2026-08-23 sessions did not have.
 
 ## 2. Smaller observations (optional)
 
