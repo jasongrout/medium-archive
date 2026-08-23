@@ -9,6 +9,8 @@
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in <out>/posts/, plus posts.json and redirects.csv
+    myst           build a MyST (mystmd) site in <out>/site/ from the
+                   converted posts, ready for `myst start` / `myst build`
     lint           scan converted posts for conversion-defect signatures
     stats          summarize the converted archive
 
@@ -32,6 +34,7 @@ Examples:
     medium-archive import-ghost https://blog.example.com/     # Ghost captures
     medium-archive compare                                      # page vs export check
     medium-archive convert                                      # raw -> posts/
+    medium-archive myst                                         # posts/ -> site/
     medium-archive stats                                        # summarize the archive
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
@@ -90,6 +93,7 @@ from urllib.parse import urlparse
 from .compare import cmd_compare
 from .convert import cmd_convert
 from .lint import cmd_lint
+from .myst import cmd_myst
 from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
@@ -216,6 +220,16 @@ def main():
                        help="skip image downloads (convert will keep the "
                             "original, likely dead, URLs)")
     add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
+    parser("myst", help="build a MyST (mystmd) site in <out>/site/ from the "
+                        "converted posts: one page per post, a chronological "
+                        "landing page, a year-grouped table of contents, "
+                        "in-publication links rewritten to site pages, and a "
+                        "redirect map from old inbound paths to page URLs. "
+                        "Rebuilt from scratch each run; site-wide text (title, "
+                        "description, landing-page intro) comes from an "
+                        "optional hand-written <out>/site.json. Render with "
+                        "`myst start` or `myst build --html` inside <out>/site/ "
+                        "(https://mystmd.org)")
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
                         "offline; differences print as a unified patch on stdout "
@@ -256,6 +270,8 @@ def main():
         cmd_import_ghost(args)
     if args.command in ("convert", "all"):
         cmd_convert(args)
+    if args.command == "myst":
+        cmd_myst(args)
     if args.command == "compare":
         cmd_compare(args)
     if args.command == "lint":

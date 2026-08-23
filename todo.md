@@ -53,6 +53,19 @@ clean `lint` run, and the offline test suite):
   editor-state copy: its markup offsets index into the stored text, so
   editing it would skew them.
 
+- **`myst` subcommand** — builds a MyST (mystmd) site in `<out>/site/`
+  from the converted posts, so a browsable blog reproduces offline from
+  `raw/` + `fixups/` (`convert` then `myst`). One page per post with its
+  filename as the URL slug (date-prefixed only when several posts share a
+  slug), year-grouped TOC, chronological landing page, in-publication
+  links rewritten to site pages, MyST-hostile prose escaped (`@handle`
+  would parse as a citation, paired `$` as math), and a site-level
+  `redirects.csv` from every old inbound path (slug+id, `/p/<id>`,
+  Ghost-era) to its page URL. Site-wide text comes from a hand-written
+  `<out>/site.json`. Validated with a full `myst build --html` over the
+  real archive: 333/333 pages, no warnings beyond pre-existing dead
+  in-page anchors from the Medium era (`src/medium_archive/myst.py`).
+
 ## Remaining
 
 Nothing pending in the tool itself. Archive-specific follow-ups (posts

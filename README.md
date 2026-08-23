@@ -47,6 +47,19 @@ It works in independent steps:
   It never touches the network, so it can be re-run freely while tuning the
   conversion (selectors, Markdown style, output layout) without hitting
   Medium again.
+* **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
+  `<out>/site/` from the converted posts: one page per post (its filename
+  is the page's URL slug), a chronological landing page, a year-grouped
+  table of contents, and a `site/redirects.csv` mapping every old inbound
+  path — Medium slug+id, `/p/<id>`, Ghost-era — to its page URL. Links
+  between posts of the publication are rewritten from Medium URLs to site
+  pages, front matter is reshaped to MyST's schema, and prose MyST would
+  misparse (`@handle` mentions as citations, paired `$` signs as math) is
+  escaped. Like `convert` it never touches the network, so the whole site
+  reproduces from `raw/` + `fixups/`: `convert` then `myst`. Site-wide
+  text (title, description, landing-page intro) comes from an optional
+  hand-written `<out>/site.json`. Render the result with `myst start` or
+  `myst build --html` inside `<out>/site/` (`npm install -g mystmd`).
 * **`lint`** scans the converted posts for conversion-defect signatures —
   leftover Medium chrome, unclosed code fences, images referenced but
   missing on disk, remote Medium CDN images. It exits non-zero when a
@@ -87,6 +100,7 @@ medium-archive import-export medium-export.zip
 medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
 medium-archive convert                                      # raw -> posts/
+medium-archive myst                                         # posts/ -> site/
 medium-archive lint                                         # check for conversion defects
 medium-archive stats                                        # summarize the archive
 medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
@@ -223,6 +237,7 @@ src/medium_archive/
   export.py      Medium account exports: parsing and the import-export step
   ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
+  myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site/
   compare.py     the compare step: verify page vs export conversion agreement
   lint.py        the lint step: scan converted posts for defect signatures
   stats.py       the stats step: summarize the converted archive
