@@ -65,6 +65,18 @@ clean `lint` run, and the offline test suite):
   `<out>/site.json`. Validated with a full `myst build --html` over the
   real archive: 333/333 pages, no warnings beyond pre-existing dead
   in-page anchors from the Medium era (`src/medium_archive/myst.py`).
+- **`hugo`, `zola`, `pelican` subcommands** — the same site for those
+  generators (`site-hugo/`, `site-zola/`, `site-pelican/`), sharing
+  page URLs, link rewriting, `site.json`, and per-site redirect maps
+  through `src/medium_archive/sites.py`, so generators can be compared
+  on identical content. Hugo and Zola get tag+author taxonomy pages
+  with per-term feeds, old inbound paths as alias redirect stubs, and
+  a minimal self-contained theme; Zola's templates wire its built-in
+  search index to a working search box (and its link checker is set to
+  warn, not fail, on the Medium-era dead in-page anchors); Pelican
+  relies on its built-in theme, with colocated images rewritten to
+  `{attach}` links. Each validated with a real generator build over
+  the full archive (hugo 0.152.2, zola 0.21.0, pelican 4.12.0).
 
 ## Remaining
 

@@ -60,6 +60,23 @@ It works in independent steps:
   text (title, description, landing-page intro) comes from an optional
   hand-written `<out>/site.json`. Render the result with `myst start` or
   `myst build --html` inside `<out>/site/` (`npm install -g mystmd`).
+* **`hugo`**, **`zola`** and **`pelican`** (optional) do the same for
+  those generators, into `<out>/site-hugo/`, `<out>/site-zola/` and
+  `<out>/site-pelican/` — same page URLs (`/posts/<slug>/`), same link
+  rewriting, same `site.json`, and a `redirects.csv` in each site — so
+  the generators can be compared on identical content. Each plays to its
+  engine's strengths: `hugo` and `zola` get tag *and* author taxonomy
+  pages with per-term RSS/Atom feeds, plus every old inbound path as an
+  `aliases` entry, which renders into static redirect stubs that work on
+  any host; `zola` additionally wires the generator's built-in full-text
+  search index to a search box, so search works with no extra tooling;
+  `pelican` uses Pelican's built-in theme, tag/author pages and feeds
+  with nothing generated but content and a config. `hugo` and `zola`
+  ship a small self-contained theme (a few templates and one
+  stylesheet) that any real theme can replace without touching
+  `content/`. Render with `hugo server`, `zola serve`, or `pelican -l`
+  respectively; for search on Hugo or Pelican, run
+  [Pagefind](https://pagefind.app) over the build output.
 * **`lint`** scans the converted posts for conversion-defect signatures —
   leftover Medium chrome, unclosed code fences, images referenced but
   missing on disk, remote Medium CDN images. It exits non-zero when a
@@ -101,6 +118,9 @@ medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
 medium-archive convert                                      # raw -> posts/
 medium-archive myst                                         # posts/ -> site/
+medium-archive hugo                                         # posts/ -> site-hugo/
+medium-archive zola                                         # posts/ -> site-zola/
+medium-archive pelican                                      # posts/ -> site-pelican/
 medium-archive lint                                         # check for conversion defects
 medium-archive stats                                        # summarize the archive
 medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
@@ -238,6 +258,11 @@ src/medium_archive/
   ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
   myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site/
+  hugo.py        the hugo step: <out>/posts/ -> a Hugo site in <out>/site-hugo/
+  zola.py        the zola step: <out>/posts/ -> a Zola site in <out>/site-zola/
+  pelican.py     the pelican step: <out>/posts/ -> a Pelican site in <out>/site-pelican/
+  sites.py       machinery shared by the site exporters: page slugs, the
+                 in-publication link map, redirect maps, site.json
   compare.py     the compare step: verify page vs export conversion agreement
   lint.py        the lint step: scan converted posts for defect signatures
   stats.py       the stats step: summarize the converted archive

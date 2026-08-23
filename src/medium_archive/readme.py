@@ -25,8 +25,13 @@ Medium. It has two layers:
   inbound path to its page URL. Regenerate it any time (`convert` then
   `myst`); render it with `myst start` or `myst build --html` inside
   `site/` (https://mystmd.org). Site-wide text lives in a hand-written
-  `site.json` (title, description, landing-page intro), versioned with the
-  archive.
+  `site.json` (title, description, landing-page intro, optional base_url),
+  versioned with the archive. `medium-archive hugo`, `zola` and `pelican`
+  build the same site for those generators (same page URLs, link
+  rewriting, and `site.json`) into `site-hugo/`, `site-zola/` and
+  `site-pelican/` -- hugo/zola add tag+author taxonomy pages, per-term
+  feeds and redirect-stub aliases for old paths, zola a working search
+  box; render with `hugo server`, `zola serve`, or `pelican -l`.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
@@ -115,6 +120,12 @@ site/                         optional MyST site built by `medium-archive
                                 the filename is the page's URL slug
     images/<filename>         hard links to the images in posts/
   redirects.csv               old inbound path -> new page URL
+site-hugo/, site-zola/,       optional Hugo/Zola/Pelican sites built by
+site-pelican/                   `medium-archive hugo|zola|pelican`: the same
+                                posts as content/posts/<slug>/index.md with
+                                generator-native front matter, config, and
+                                (hugo, zola) a minimal theme; each carries
+                                its own redirects.csv
 ```
 
 ## Front matter (posts/*/index.md)
@@ -210,6 +221,9 @@ too.
     medium-archive lint --out {out}                      # check for conversion defects
     medium-archive stats --out {out}                     # summarize the archive
     medium-archive myst --out {out}                      # rebuild site/ from posts/
+    medium-archive hugo --out {out}                      # rebuild site-hugo/
+    medium-archive zola --out {out}                      # rebuild site-zola/
+    medium-archive pelican --out {out}                   # rebuild site-pelican/
 """
 
 

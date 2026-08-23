@@ -11,6 +11,9 @@
                    images in <out>/posts/, plus posts.json and redirects.csv
     myst           build a MyST (mystmd) site in <out>/site/ from the
                    converted posts, ready for `myst start` / `myst build`
+    hugo           build a Hugo site in <out>/site-hugo/
+    zola           build a Zola site in <out>/site-zola/
+    pelican        build a Pelican site in <out>/site-pelican/
     lint           scan converted posts for conversion-defect signatures
     stats          summarize the converted archive
 
@@ -35,6 +38,7 @@ Examples:
     medium-archive compare                                      # page vs export check
     medium-archive convert                                      # raw -> posts/
     medium-archive myst                                         # posts/ -> site/
+    medium-archive hugo                                         # posts/ -> site-hugo/
     medium-archive stats                                        # summarize the archive
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
@@ -93,7 +97,10 @@ from urllib.parse import urlparse
 from .compare import cmd_compare
 from .convert import cmd_convert
 from .lint import cmd_lint
+from .hugo import cmd_hugo
 from .myst import cmd_myst
+from .pelican import cmd_pelican
+from .zola import cmd_zola
 from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
@@ -230,6 +237,28 @@ def main():
                         "optional hand-written <out>/site.json. Render with "
                         "`myst start` or `myst build --html` inside <out>/site/ "
                         "(https://mystmd.org)")
+    parser("hugo", help="build a Hugo site in <out>/site-hugo/ from the "
+                        "converted posts: leaf bundles with taxonomy pages "
+                        "and per-term RSS for tags and authors, old inbound "
+                        "paths as aliases (static redirect stubs), a small "
+                        "self-contained theme, and a redirect map. Render "
+                        "with `hugo server` inside <out>/site-hugo/ "
+                        "(https://gohugo.io); `pagefind --site public` adds "
+                        "search after `hugo`")
+    parser("zola", help="build a Zola site in <out>/site-zola/ from the "
+                        "converted posts: taxonomy pages and per-term Atom "
+                        "feeds for tags and authors, a site feed, a working "
+                        "full-text search box, aliases for old inbound "
+                        "paths, a small self-contained set of templates, "
+                        "and a redirect map. Render with `zola serve` "
+                        "inside <out>/site-zola/ (https://www.getzola.org)")
+    parser("pelican", help="build a Pelican site in <out>/site-pelican/ from "
+                           "the converted posts: tag and author listing "
+                           "pages and Atom feeds (site-wide and per "
+                           "tag/author) from Pelican's built-in theme, plus "
+                           "a redirect map. Render with `pelican -l` inside "
+                           "<out>/site-pelican/ (https://getpelican.com; "
+                           "`pip install pelican markdown`)")
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
                         "offline; differences print as a unified patch on stdout "
@@ -272,6 +301,12 @@ def main():
         cmd_convert(args)
     if args.command == "myst":
         cmd_myst(args)
+    if args.command == "hugo":
+        cmd_hugo(args)
+    if args.command == "zola":
+        cmd_zola(args)
+    if args.command == "pelican":
+        cmd_pelican(args)
     if args.command == "compare":
         cmd_compare(args)
     if args.command == "lint":
