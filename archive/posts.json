@@ -305,7 +305,7 @@
       "images/003-1_HAs9F-B9l77KolI3ZZTH3g.png",
       "images/004-1_wfxS4HhzRfU5-bbKYfPonA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-05-28-a-users-journey-with-plugin-playground-from-first-idea-to-installable-jupyterlab"
   },
   "https://blog.jupyter.org/our-new-jupyter-foundation-community-manager-61129cf288b1": {
@@ -323,7 +323,7 @@
     "description": "Our new Jupyter Foundation Community Manager The Jupyter Foundation is excited to announce that we have contracted with Jason Grout to be a part-time Jupyter Foundation Community Manager. The primary …",
     "tags": [],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-05-18-our-new-jupyter-foundation-community-manager"
   },
   "https://blog.jupyter.org/nb-cli-a-command-line-interface-for-ai-agents-and-notebook-automation-996ad7edacd9": {
@@ -353,7 +353,7 @@
       "images/004-0_OkFJLojf_qblg8Uv.png",
       "images/005-0__uwMJpQQ-GZTs1Fh.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-05-11-nb-cli-a-command-line-interface-for-ai-agents-and-notebook-automation"
   },
   "https://blog.jupyter.org/a-jupyter-workshop-demystifying-myst-markdown-in-education-612995ff6d56": {
@@ -374,7 +374,7 @@
       "jupyter-book"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-04-30-a-jupyter-workshop-demystifying-myst-markdown-in-education"
   },
   "https://blog.jupyter.org/how-we-combine-multiple-repositories-into-one-website-at-jupyterbook-org-588c0197a369": {
@@ -398,7 +398,7 @@
     "images": [
       "images/001-1_5u-ku4TtFxBSmtmjTPqhfA_2x.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-04-22-how-we-combine-multiple-repositories-into-one-website-at-jupyterbook-org"
   },
   "https://blog.jupyter.org/exploring-petabytes-of-the-night-sky-jupyter-notebooks-at-noirlabs-astro-data-lab-science-ae012dfd4723": {
@@ -428,7 +428,7 @@
       "images/004-1_JDuoMo_2SgPJ-b_md9nslg.png",
       "images/005-1_SvI9n6mkoQ5th35aClATWQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-04-20-exploring-petabytes-of-the-night-sky-jupyter-notebooks-at-noirlabs-astro-data-la"
   },
   "https://blog.jupyter.org/the-myst-anywidget-directive-daa55c348ab2": {
@@ -452,7 +452,7 @@
     "images": [
       "images/001-1_TksTxGw_ahJkRxlsIVU5_g.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-04-16-the-myst-anywidget-directive"
   },
   "https://blog.jupyter.org/better-sharing-ux-with-nbgitpuller-and-contextual-error-handling-18eb5c83dc1b": {
@@ -480,7 +480,7 @@
       "images/006-1_prhJ0nFlArAhfFwFFZbbLA.png",
       "images/007-1_iE8c5G51r3qL8ITBFiOZKg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-04-09-better-sharing-ux-with-nbgitpuller-and-contextual-error-handling"
   },
   "https://blog.jupyter.org/berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-help-from-2i2c-f0f22d0b5ba5": {
@@ -504,7 +504,7 @@
     "images": [
       "images/001-1_7pRDcpGYyl1R6pBWsIC5UQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-04-08-berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-"
   },
   "https://blog.jupyter.org/ibm-brings-jupyter-and-spark-to-the-mainframe-74bec140245f": {
@@ -548,7 +548,7 @@
     "images": [
       "images/001-0_lkUWCUNKiKhXcUUK.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-03-26-whats-new-in-myst-markdown-1-8-2"
   },
   "https://blog.jupyter.org/jupyter-security-sprint-march-31st-5a2293de5cd5": {
@@ -573,7 +573,7 @@
     "images": [
       "images/001-1_OphBxiSYkkxD-KWM4wcatA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-03-20-jupyter-security-sprint-march-31st"
   },
   "https://blog.jupyter.org/700-jupyterlab-4-extensions-8ac295b3d974": {
@@ -603,7 +603,7 @@
       "images/006-0_GSE92ExuZWmjQHtA.bin",
       "images/007-1_CkZpwkmEKNiXm_XsiBRACQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-03-13-700-jupyterlab-4-extensions"
   },
   "https://blog.jupyter.org/call-for-applications-community-manager-for-jupyterhub-and-jupyter-book-88b128a1a7b9": {
@@ -629,7 +629,7 @@
     "images": [
       "images/001-1__jfvloGZbtvcYdoZ0N6orA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-03-05-call-for-applications-community-manager-for-jupyterhub-and-jupyter-book"
   },
   "https://blog.jupyter.org/mybinder-org-adding-request-origin-to-events-archive-92fe0f954eab": {
@@ -652,7 +652,7 @@
     "images": [
       "images/001-1_gICbzIC3Qbq6ireueH1FYA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-02-02-mybinder-org-adding-request-origin-to-events-archive"
   },
   "https://blog.jupyter.org/expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps-7fb98eece82e": {
@@ -679,7 +679,7 @@
       "images/003-0_CyW1M7dUYYwo9Po0.png",
       "images/004-0_QxCgIK0N8j8jDhVC.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-02-19-expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps"
   },
   "https://blog.jupyter.org/jupyterlite-officially-joins-project-jupyter-77df24c8db80": {
@@ -732,7 +732,7 @@
     "images": [
       "images/001-1_R6exYjMGAakITpsy0WDcAQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-02-16-jupyter-community-call-february-2026"
   },
   "https://blog.jupyter.org/instantly-view-parquet-files-in-jupyterlab-with-arbalister-4799c28bbce7": {
@@ -759,7 +759,7 @@
       "images/002-1_CHOorqcOpRmlHlHFIPpF-A.png",
       "images/003-1_6qFKCpSW5d3GT1p6EOfekg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2026-01-29-instantly-view-parquet-files-in-jupyterlab-with-arbalister"
   },
   "https://blog.jupyter.org/jupyterlite-0-7-is-released-67db4d1609ad": {
@@ -790,7 +790,7 @@
       "images/006-0_nbMbf0ppEOPuY0Ur.png",
       "images/007-0_5lm4W0GV98Yy1q9l.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-12-04-jupyterlite-0-7-is-released"
   },
   "https://blog.jupyter.org/jupyterlab-4-5-and-notebook-7-5-are-available-1bcd1fa19a47": {
@@ -819,7 +819,7 @@
       "images/004-0_Jd_3FHeg3saSiwRs.png",
       "images/005-0_V05aZinAy9fytWaU.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-11-24-jupyterlab-4-5-and-notebook-7-5-are-available"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-early-2026-a9ce9670ba19": {
@@ -861,7 +861,7 @@
       "jupyterhub"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-11-16-scaling-maintainer-intuition-with-pull-request-triage-boards"
   },
   "https://blog.jupyter.org/jupyter-community-call-december-2025-f0cf14e857ed": {
@@ -886,7 +886,7 @@
     "images": [
       "images/001-1_5sfekG4Kp-oJAmpmejRqGw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-11-13-jupyter-community-call-december-2025"
   },
   "https://blog.jupyter.org/announcing-our-first-jupyter-community-funded-proposals-dd5263c19be3": {
@@ -911,7 +911,7 @@
     "images": [
       "images/001-1_mLI9dFl_eCv-u4S_t1J71Q_2x.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-11-04-announcing-our-first-jupyter-community-funded-proposals"
   },
   "https://blog.jupyter.org/gnu-octave-meets-jupyterlite-compute-anywhere-anytime-8b033afbbcdc": {
@@ -938,7 +938,7 @@
       "images/001-1__Ha5vHmLH66mSH3WFg1fxg.png",
       "images/002-1_lKsfXJGc7_tM1ONU5Ej0Ng.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-10-16-gnu-octave-meets-jupyterlite-compute-anywhere-anytime"
   },
   "https://blog.jupyter.org/your-ideas-our-support-jupyter-community-call-for-funding-proposals-f4642590ae76": {
@@ -963,7 +963,7 @@
     "images": [
       "images/001-1_62F-8MV2IQQToNrR4GdU_g.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-08-28-your-ideas-our-support-jupyter-community-call-for-funding-proposals"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-are-back-3cca15d02975": {
@@ -1011,7 +1011,7 @@
     "images": [
       "images/001-1_gmOBCJ-kSWiaSxWWpECerQ.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-07-31-jupyter-community-call-september-2025"
   },
   "https://blog.jupyter.org/real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter-and-qgis-d25dbe2832a6": {
@@ -1044,7 +1044,7 @@
       "images/008-1_rliFUY5GuF6sqKnjho66EQ.png",
       "images/009-1_0_qw_xXLELz_8gHUB-3JZw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-02-26-real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter"
   },
   "https://blog.jupyter.org/c-in-jupyter-interpreting-c-in-the-web-c9d93542f20b": {
@@ -1085,7 +1085,7 @@
       "images/015-1_uJRTSmvJ8OgZbDLliI5BkQ.png",
       "images/016-1_w-SeiUeAmHPcMeIY84tb0w.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-06-19-c-in-jupyter-interpreting-c-in-the-web"
   },
   "https://blog.jupyter.org/jupyterlite-0-6-0-is-released-b4bc69bfc8f4": {
@@ -1118,7 +1118,7 @@
       "images/009-1_mDE6gcWgCV_izR-LxNdf5g.png",
       "images/010-1_ELbE4YunBEU1TtlXT0jxuA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-06-12-jupyterlite-0-6-0-is-released"
   },
   "https://blog.jupyter.org/jupyter-community-call-june-2025-2a34ba44ca13": {
@@ -1144,7 +1144,7 @@
     "images": [
       "images/001-1_yIEU3e51tbC4uOdX4w9v4Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-05-22-jupyter-community-call-june-2025"
   },
   "https://blog.jupyter.org/jupyterlab-4-4-and-notebook-7-4-are-available-aca2782d4f3d": {
@@ -1173,7 +1173,7 @@
       "images/004-0_9RGYIRu0foogfJC-.png",
       "images/005-0_Ivi-4TMFnn-lcz4S.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-05-21-jupyterlab-4-4-and-notebook-7-4-are-available"
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-2504029fc5a9": {
@@ -1205,7 +1205,7 @@
       "images/006-1_gwYPh1yExp-OR0e7q3e5pA.jpeg",
       "images/007-1_nj6HDIgEnZzC9G3bBdnnbg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-05-15-congratulations-distinguished-contributors"
   },
   "https://blog.jupyter.org/r-in-the-browser-announcing-our-webassembly-distribution-9450e9539ed5": {
@@ -1236,7 +1236,7 @@
       "images/006-0_SKvqpunHcz3i2mBG.bin",
       "images/007-1_9VQSZHRow-lBASg0wxfklg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-02-28-r-in-the-browser-announcing-our-webassembly-distribution"
   },
   "https://blog.jupyter.org/exploring-open-access-art-using-the-deno-jupyter-kernel-da0ad084966e": {
@@ -1275,7 +1275,7 @@
       "images/015-0_wa5EYkPYIidClyna.png",
       "images/016-0_u40CvXdHxGXBjEOp.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-04-17-exploring-open-access-art-using-the-deno-jupyter-kernel"
   },
   "https://blog.jupyter.org/benjamin-ragan-kelley-59a6bf015ea9": {
@@ -1299,7 +1299,7 @@
       "images/002-1_KAE0N_xnOR9iHM4opZW5cQ.jpeg",
       "images/003-0_8MVJWeKy1_BOYGpm.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-10-03-benjamin-ragan-kelley"
   },
   "https://blog.jupyter.org/voila-gridstack-template-8a431c2b353e": {
@@ -1327,7 +1327,7 @@
       "images/003-1_-mUCyFUfu2JxnuzTMK0aNg.png",
       "images/004-1_NNMhrJSc49KE-AF5HoFGTw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-11-11-voila-gridstack-template"
   },
   "https://blog.jupyter.org/jupytercon-2025-c654a31a584e": {
@@ -1351,7 +1351,7 @@
     "images": [
       "images/001-1__2ttDyIYFGjwOobsV8T_vQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-03-31-jupytercon-2025"
   },
   "https://blog.jupyter.org/project-jupyters-2025-executive-council-elections-605b183ec64c": {
@@ -1398,7 +1398,7 @@
     "images": [
       "images/001-1_NOEeFGGHdpGZMHSq5ykl9A.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-03-03-simplifying-and-speeding-up-binder-builds-with-buildkit"
   },
   "https://blog.jupyter.org/building-ai-agents-for-jupyterlab-using-notebook-intelligence-0515d4c41a61": {
@@ -1428,7 +1428,7 @@
       "images/004-1_2BZGe7aGPnNTPY79ZNhUDQ.png",
       "images/005-1_CYXJbXzmMGnuW_c_ktwkgA.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-02-24-building-ai-agents-for-jupyterlab-using-notebook-intelligence"
   },
   "https://blog.jupyter.org/announcing-jupytercad-3-0-d8f4b7b0a719": {
@@ -1459,7 +1459,7 @@
       "images/005-0_RPV4uLZ7SYZ0_KwH.bin",
       "images/006-1_ne6lm0Wifp81ZLEIB6fxiQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-02-17-announcing-jupytercad-3-0"
   },
   "https://blog.jupyter.org/join-jupyterhub-on-zulip-chat-4c17491bd96d": {
@@ -1484,7 +1484,7 @@
     "images": [
       "images/001-1_szQUtcTU4TbmrkGrSNzBpw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-02-06-join-jupyterhub-on-zulip-chat"
   },
   "https://blog.jupyter.org/jupyter-community-call-february-2025-163de1701169": {
@@ -1508,7 +1508,7 @@
       "open-source-software"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-01-30-jupyter-community-call-february-2025"
   },
   "https://blog.jupyter.org/introducing-notebook-intelligence-3648c306b91a": {
@@ -1547,7 +1547,7 @@
       "images/013-1_H6fNVs50mmQcsYlTAE17bg.gif",
       "images/014-1_5qQDXByT8dHSHMs86geeiQ.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2025-01-13-introducing-notebook-intelligence"
   },
   "https://blog.jupyter.org/build-your-jupyter-dashboard-using-solara-569fa5b16e9c": {
@@ -1580,7 +1580,7 @@
       "images/008-1_MhxvqxsURNH-1X9yr2La4g.png",
       "images/009-1_5Ujq7HfB0YnX9yoAzFZmwA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-12-17-build-your-jupyter-dashboard-using-solara"
   },
   "https://blog.jupyter.org/jupyterlab-4-3-and-notebook-7-3-are-available-eaaa7227d61b": {
@@ -1607,7 +1607,7 @@
       "images/003-0_sZAliNNu3C2wamFo.bin",
       "images/004-0_6FYCiWSCRcxPNeVP.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-12-05-jupyterlab-4-3-and-notebook-7-3-are-available"
   },
   "https://blog.jupyter.org/jupyterlite-terminal-edb3f80dc1c0": {
@@ -1636,7 +1636,7 @@
       "images/007-1__qX0_9_LgO1r9Is5Oj7u5Q.png",
       "images/008-1_5xqYgXmsS6dJsonJCBU23g.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-11-13-jupyterlite-terminal"
   },
   "https://blog.jupyter.org/november-2024-jupyter-community-call-f5d0761c67a1": {
@@ -1660,7 +1660,7 @@
       "python"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-10-21-november-2024-jupyter-community-call"
   },
   "https://blog.jupyter.org/automate-your-releases-with-the-jupyter-releaser-701e7b9841e6": {
@@ -1686,7 +1686,7 @@
       "images/002-1_ViuKQhOWZPVULL6kQOPwPw.gif",
       "images/003-1_GRhRcQOAClvvQbBvWFkOjg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-10-28-automate-your-releases-with-the-jupyter-releaser"
   },
   "https://blog.jupyter.org/project-jupyter-joins-lf-charities-6daa30a46dab": {
@@ -1738,7 +1738,7 @@
       "images/001-1_iGMClCbnpOvUlZ5xoiAASA.gif",
       "images/002-1_0hhaIizZhuUGbSRCcsuZLA.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-09-13-exploring-a-documents-timeline-in-jupyterlab"
   },
   "https://blog.jupyter.org/interactive-mapping-with-ipyopenlayers-2b8bc93bb6c4": {
@@ -1768,7 +1768,7 @@
       "images/005-0_4q0M7_QjVtXcrItA.bin",
       "images/006-1_KVMcn3qI6S79S9N8nKIy1Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-09-05-interactive-mapping-with-ipyopenlayers"
   },
   "https://blog.jupyter.org/announcing-the-2023-jupyter-distinguished-contributor-award-recipients-1b2cc4ba203f": {
@@ -1794,7 +1794,7 @@
     "images": [
       "images/001-0_psjWHR7z2EmlvZlF.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-09-04-announcing-the-2023-jupyter-distinguished-contributor-award-recipients"
   },
   "https://blog.jupyter.org/binderhub-is-out-of-beta-fa2781a229d6": {
@@ -1818,7 +1818,7 @@
     "images": [
       "images/001-1_zGQcuph2mrh7ry_tH_QJYQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-04-26-binderhub-is-out-of-beta"
   },
   "https://blog.jupyter.org/mybinder-org-serves-two-million-launches-7543ae498a2a": {
@@ -1844,7 +1844,7 @@
       "images/002-1_t6_W35g1Kl1Yr8oGPVlyIA.png",
       "images/003-1_gHu0NhZgTuRlvnD7eDI6Og.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-11-13-mybinder-org-serves-two-million-launches"
   },
   "https://blog.jupyter.org/automating-mybinder-org-dependency-upgrades-in-10-steps-bb5e38542059": {
@@ -1871,7 +1871,7 @@
       "images/001-0_Q2M1l10DYVxDsTsl.png",
       "images/002-0_eMFYBJMC-Rktt1T3.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-07-17-automating-mybinder-org-dependency-upgrades-in-10-steps"
   },
   "https://blog.jupyter.org/community-building-report-project-jupyter-5a0fd7c8b08d": {
@@ -1897,7 +1897,7 @@
     "images": [
       "images/001-1_AuDqkqkQjDlNIr96Vc2o1Q.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-08-29-community-building-report-project-jupyter"
   },
   "https://blog.jupyter.org/ipydatagrid-is-now-part-of-project-jupyter-3b3dfb877664": {
@@ -1924,7 +1924,7 @@
       "images/003-0_wKlCImr0LtGDpeDz.bin",
       "images/004-0_U5H7uyoSLf0pZm6q.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-08-22-ipydatagrid-is-now-part-of-project-jupyter"
   },
   "https://blog.jupyter.org/ipywidgets-5-0-895e98da83a": {
@@ -2009,7 +2009,7 @@
       "python"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-09-15-release-of-ipython-5-5-and-6-2"
   },
   "https://blog.jupyter.org/jupytergis-d63b7adf9d0c": {
@@ -2034,7 +2034,7 @@
     "images": [
       "images/001-1_IkYCf2cbk3SaxaROQ0eUsA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-06-12-jupytergis"
   },
   "https://blog.jupyter.org/jupyterlab-4-2-and-notebook-7-2-are-available-b5e6b3c753de": {
@@ -2061,7 +2061,7 @@
       "images/003-1_z8boqvL968A1NbhHbIDAdA.png",
       "images/004-1_A-q4OYlI3gptT2CyU_mzoA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-05-22-jupyterlab-4-2-and-notebook-7-2-are-available"
   },
   "https://blog.jupyter.org/cuda-enabled-jupyter-docker-images-8a9f8b8f2158": {
@@ -2085,7 +2085,7 @@
       "jupyter"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-04-16-cuda-enabled-jupyter-docker-images"
   },
   "https://blog.jupyter.org/make-your-pandas-or-polars-dataframes-interactive-with-itables-2-0-c64e75468fe6": {
@@ -2114,7 +2114,7 @@
       "images/003-1_pMZabsjGnznieY-wjpn8HQ.gif",
       "images/004-1_U3_wuju-3UVQRWRxHo2Gmw.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-03-19-make-your-pandas-or-polars-dataframes-interactive-with-itables-2-0"
   },
   "https://blog.jupyter.org/security-release-jupyter-notebook-4-3-1-808e1f3bb5e2": {
@@ -2165,7 +2165,7 @@
       "images/005-1_ZmM2yk2twSA01msHOZU2sg.gif",
       "images/006-1_Q6vDiTD9ct3_7sBMUbvDrw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-03-11-jupyterlab-desktop-ui-modes"
   },
   "https://blog.jupyter.org/python-environment-management-using-jupyterlab-desktop-cli-e57485c9287c": {
@@ -2195,7 +2195,7 @@
       "images/004-1_-PEjCqxG5nEddcZRVulleg.png",
       "images/005-1_hJV8jjrhpQFsq019FV3AqA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-03-01-python-environment-management-using-jupyterlab-desktop-cli"
   },
   "https://blog.jupyter.org/jupyterlab-4-1-and-notebook-7-1-are-here-20bfc3c10217": {
@@ -2249,7 +2249,7 @@
     "images": [
       "images/001-0_4FQGtOrs8XWEQ75G.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-02-22-curvenote-joins-the-mybinder-org-federation"
   },
   "https://blog.jupyter.org/jupyterlab-3-end-of-maintenance-879778927db2": {
@@ -2307,7 +2307,7 @@
       "images/011-1_zcPcX9XNoBC0b4KbkmassA.png",
       "images/012-1_plmarhiU7kTDrpBrpKzkiw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-02-19-python-environment-management-in-jupyterlab-desktop"
   },
   "https://blog.jupyter.org/bringing-modern-javascript-to-the-jupyter-notebook-fc998095081e": {
@@ -2340,7 +2340,7 @@
       "images/007-1_i8svfV32WtGxOxKCQv0-UA.png",
       "images/008-1_Lq2UGOudjDsPyzNFtHXr2Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-09-24-bringing-modern-javascript-to-the-jupyter-notebook"
   },
   "https://blog.jupyter.org/the-jupytext-menu-is-back-3e6212e8c090": {
@@ -2372,7 +2372,7 @@
       "images/006-1_n31jAKcy96wrrTYR3qCuXA.png",
       "images/007-1_1oj4Jrdz8hOhG90rYZckEA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-01-31-the-jupytext-menu-is-back"
   },
   "https://blog.jupyter.org/meet-xeus-r-a-future-proof-jupyter-kernel-for-r-1adc5fdd09ab": {
@@ -2402,7 +2402,7 @@
       "images/006-1_5QOitnpbBdDNpQ9ERIILpg.png",
       "images/007-1_jWuiihVGV0_7utFx3Tzvng.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2024-01-22-meet-xeus-r-a-future-proof-jupyter-kernel-for-r"
   },
   "https://blog.jupyter.org/jupyter-media-strategy-social-media-update-e4d6171b0580": {
@@ -2473,7 +2473,7 @@
       "open-source"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-12-08-open-community-call"
   },
   "https://blog.jupyter.org/and-voici-e02367197ba2": {
@@ -2503,7 +2503,7 @@
       "images/006-0_FA4jYIdu6lJ4-U4p.jpg",
       "images/007-0_TOhdhVrxFO17XsXl.jpg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-12-06-and-voici"
   },
   "https://blog.jupyter.org/project-jupyter-computatio-nalnarratives-as-the-engine-of-collaborative-data-science-2b5fb94c3c58": {
@@ -2550,14 +2550,14 @@
       "images/005-1_FTlpril_YV5W6-xYelNrtA.gif",
       "images/006-1_gGWqElhixsQA-cGOzWcb7w.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-10-23-plug-your-application-into-the-jupyter-world"
   },
   "https://blog.jupyter.org/voilà-0-5-0-homecoming-66f2465aa86f": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
+    "title": "Voilà 0.5.0 : Homecoming",
+    "author": "Duc Trung Le",
+    "author_url": "https://medium.com/@trungleduc",
+    "date": "2023-09-25T14:54:53Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/voilà-0-5-0-homecoming-66f2465aa86f",
     "original_path": "/voilà-0-5-0-homecoming-66f2465aa86f",
@@ -2565,7 +2565,7 @@
     "slug": "voilà-0-5-0-homecoming",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "Voila 0.5.0 is here!",
     "tags": [
       "dashboard",
       "jupyter",
@@ -2573,8 +2573,8 @@
       "voilà"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-voilà-0-5-0-homecoming"
+    "body_source": "state",
+    "dir": "posts/2023-09-25-voilà-0-5-0-homecoming"
   },
   "https://blog.jupyter.org/generative-ai-in-jupyter-3f7174824862": {
     "title": "Generative AI in Jupyter",
@@ -2617,7 +2617,7 @@
       "images/018-0_hfX4LQ_08sjeDoKE.bin",
       "images/019-0_65ivwhUugkG0UUR8.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-08-02-generative-ai-in-jupyter"
   },
   "https://blog.jupyter.org/desktop-gis-software-in-the-cloud-with-jupyterhub-ddced297019a": {
@@ -2644,7 +2644,7 @@
       "images/001-1_ZG76hcKdS3-4PppQ6lSnuQ.png",
       "images/002-0__t2MDU659mlYEvxD.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-08-02-desktop-gis-software-in-the-cloud-with-jupyterhub"
   },
   "https://blog.jupyter.org/announcing-jupyter-notebook-7-8d6d66126dcf": {
@@ -2699,7 +2699,7 @@
     "images": [
       "images/001-1_8C-9fnjUJwJ56vdcNX0-bA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-07-28-european-commission-funds-jupyter-bug-bounty-program"
   },
   "https://blog.jupyter.org/jupytercon-2023-recordings-now-live-on-youtube-17564b75a2a": {
@@ -2757,7 +2757,7 @@
       "images/008-1_0vn1t-SlN8LvAKLrVAiHoA.gif",
       "images/001-1_VCG-57YX8IrfTyeby3Ybjg.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-07-11-anywidget-jupyter-widgets-made-easy"
   },
   "https://blog.jupyter.org/nbviewer-and-githubs-rate-limit-e5f544bf81b6": {
@@ -2826,7 +2826,7 @@
       "images/002-0_5OLBiA8tmTbD1Nan.png",
       "images/003-0_vD9AcycD3qSCAJgu.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-06-19-a-theme-editor-for-jupyterlab"
   },
   "https://blog.jupyter.org/from-intern-to-mentor-6055df406999": {
@@ -2850,7 +2850,7 @@
       "outreachy"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-06-19-from-intern-to-mentor"
   },
   "https://blog.jupyter.org/collaborative-cad-in-jupyterlab-8eb9e8f81f0": {
@@ -2884,7 +2884,7 @@
       "images/009-0_3Y8y-PCaP2B9a6de.jpg",
       "images/010-0_A1jOuQ60SPZ_NTVv.jpg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-06-02-collaborative-cad-in-jupyterlab"
   },
   "https://blog.jupyter.org/jupyterlab-4-0-is-here-388d05e03442": {
@@ -2912,7 +2912,7 @@
       "images/002-1_382cHBlUd2-kgWzpci8OOw.gif",
       "images/003-1_DL6GE3nEYT9SGn7oDGnydQ.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-06-05-jupyterlab-4-0-is-here"
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-7a7b215b8bd0": {
@@ -2944,7 +2944,7 @@
       "images/009-1_F2Bw8lZIsIfk8hsw_wHGWQ.jpeg",
       "images/010-1_awcttRVT1kQ1dWqJig7DWQ.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-06-02-congratulations-distinguished-contributors"
   },
   "https://blog.jupyter.org/a-2019-retrospective-from-the-binder-project-57a449517362": {
@@ -2974,7 +2974,7 @@
       "images/005-1_WVSV4_bwWlGWnT0k8xrlWg.png",
       "images/006-0_pzbKC79Svh5Xrtev.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-01-15-a-2019-retrospective-from-the-binder-project"
   },
   "https://blog.jupyter.org/introducing-learn-python-with-jupyter-11214f152159": {
@@ -3000,7 +3000,7 @@
     "images": [
       "images/001-1_YogfUsOzSo54H_RaM8t8iA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-04-28-introducing-learn-python-with-jupyter"
   },
   "https://blog.jupyter.org/mybinder-org-reducing-capacity-c93ccfc6413f": {
@@ -3021,7 +3021,7 @@
       "jupyter"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-04-25-mybinder-org-reducing-capacity"
   },
   "https://blog.jupyter.org/jupyter-notebook-format-workshop-outcomes-c45faf113018": {
@@ -3047,7 +3047,7 @@
     "images": [
       "images/001-1_OfVNHv8zp7Tn2I0hRIkN4Q.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-04-12-jupyter-notebook-format-workshop-outcomes"
   },
   "https://blog.jupyter.org/accurately-counting-daily-weekly-monthly-active-users-on-jupyterhub-6fbec6c6ce2f": {
@@ -3073,7 +3073,7 @@
     "images": [
       "images/001-0_VYHSKwQ5Jp-L3ArS.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-03-27-accurately-counting-daily-weekly-monthly-active-users-on-jupyterhub"
   },
   "https://blog.jupyter.org/embed-interactive-itkwidgets-3d-renderings-into-jupyterlite-deployments-10eb9ea30980": {
@@ -3099,7 +3099,7 @@
     "images": [
       "images/001-0__zowwA1kefuHdpEX.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-03-10-embed-interactive-itkwidgets-3d-renderings-into-jupyterlite-deployments"
   },
   "https://blog.jupyter.org/updating-defaults-on-mybinder-org-4df41d601955": {
@@ -3125,14 +3125,14 @@
     "images": [
       "images/001-1_0dd02RZZwHXDo-Fr3tdB5w.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-03-09-updating-defaults-on-mybinder-org"
   },
   "https://blog.jupyter.org/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
+    "title": "Online Collaboration Café launch: JupyterHub team meetings to become more collaborative spaces!",
+    "author": "Sarah Gibson",
+    "author_url": "https://medium.com/@drsarahlgibson",
+    "date": "2023-02-27T08:49:46Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15",
     "original_path": "/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15",
@@ -3140,15 +3140,15 @@
     "slug": "online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collabo",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "The JupyterHub team are refactoring our monthly meeting into a collaborative, co-working space that is more accessible and inclusive to…",
     "tags": [
       "collaboration",
       "community",
       "jupyterhub"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collabo"
+    "body_source": "state",
+    "dir": "posts/2023-02-27-online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collabo"
   },
   "https://blog.jupyter.org/improving-the-accessibility-of-jupyter-6c695db518d3": {
     "title": "Improving the accessibility of Jupyter",
@@ -3173,7 +3173,7 @@
       "images/001-0_-v-lL8LJ8DIqlgXb.bin",
       "images/002-0_7imwXY7uST5QSNfi.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-02-24-improving-the-accessibility-of-jupyter"
   },
   "https://blog.jupyter.org/jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-have-opened-c1bae085125a": {
@@ -3199,7 +3199,7 @@
     "images": [
       "images/001-1_Z4u6ayzHYFz5ljFqlfmLFQ.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-02-09-jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h"
   },
   "https://blog.jupyter.org/introducing-the-new-jupyterlab-desktop-bca1982bdb23": {
@@ -3239,7 +3239,7 @@
       "images/014-1_X5leMTxvjzD6mxjHsJ8U7w.png",
       "images/015-1_bnE1NDA7n9HEqEo7f8lr8A.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-02-09-introducing-the-new-jupyterlab-desktop"
   },
   "https://blog.jupyter.org/introducing-jupyter-scheduler-f9e82676c388": {
@@ -3276,7 +3276,7 @@
       "images/011-1_HrkANk8wyWRqXocQdnQ5mA.jpeg",
       "images/012-1_E40JRdqbPa7diRn6TXoCMQ.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-12-14-introducing-jupyter-scheduler"
   },
   "https://blog.jupyter.org/report-on-the-jupyterlite-community-workshop-aafaefe254ef": {
@@ -3302,7 +3302,7 @@
       "images/001-1_KA7njvnlfwBrg6Pfg3_nQg.jpeg",
       "images/002-1_S2p3XarrcVRgEDcMnJseHg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-01-27-report-on-the-jupyterlite-community-workshop"
   },
   "https://blog.jupyter.org/jupytercon-2023-keynotes-c6b5d3d964e5": {
@@ -3326,7 +3326,7 @@
       "images/001-1_kUq8eGVktgpE-YvYEpjxnA.png",
       "images/002-1_GkEduEK9m-AkwMzHj7qBOg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-01-18-jupytercon-2023-keynotes"
   },
   "https://blog.jupyter.org/announcing-a-new-jupyter-governance-model-and-our-first-executive-council-39b3989dc064": {
@@ -3351,7 +3351,7 @@
     "images": [
       "images/001-1_bILOKGalg_DgzOpUbVa-ow.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-01-13-announcing-a-new-jupyter-governance-model-and-our-first-executive-council"
   },
   "https://blog.jupyter.org/a-jupyter-kernel-for-gnu-octave-b6d29e56341f": {
@@ -3385,7 +3385,7 @@
       "images/010-1_h3ZtdyQicGecxGFPkc3tYQ.jpeg",
       "images/011-1_vUpNORkYEpszm-vTZoSXwg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2023-01-11-a-jupyter-kernel-for-gnu-octave"
   },
   "https://blog.jupyter.org/an-sql-solution-for-jupyter-ef4a00a0d925": {
@@ -3416,7 +3416,7 @@
       "images/005-0_cZCb7p2dP8Y27P7P.png",
       "images/006-1_S-w69baox7Q1D997a5yKNw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-02-03-an-sql-solution-for-jupyter"
   },
   "https://blog.jupyter.org/openness-diversity-and-dignity-a-foundation-for-global-collaboration-f7c71fba523": {
@@ -3460,26 +3460,26 @@
     "dir": "posts/2017-07-14-jupytercon-nyc-august-22nd-25th"
   },
   "https://blog.jupyter.org/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490",
-    "original_path": "/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490",
+    "title": "Voilà is now a Jupyter subproject",
+    "author": "Sylvain Corlay",
+    "author_url": "https://medium.com/@SylvainCorlay",
+    "date": "2019-12-29T12:11:11Z",
+    "updated": "2019-12-29T12:15:50Z",
+    "original_url": "https://blog.jupyter.org/voilà-is-now-an-official-jupyter-subproject-87d659583490",
+    "original_path": "/voilà-is-now-an-official-jupyter-subproject-87d659583490",
     "medium_id": "87d659583490",
-    "slug": "voil%C3%A0-is-now-an-official-jupyter-subproject",
+    "slug": "voilà-is-now-an-official-jupyter-subproject",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "It is a great pleasure to announce that the Voilà project has been incorporated as a Jupyter subproject. Voilà will now be subject to the…",
     "tags": [
       "dashboard",
       "jupyter",
       "visualization"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-voil%C3%A0-is-now-an-official-jupyter-subproject"
+    "body_source": "state",
+    "dir": "posts/2019-12-29-voilà-is-now-an-official-jupyter-subproject"
   },
   "https://blog.jupyter.org/elyra-reaches-1-0-0-41039dc06405": {
     "title": "Elyra reaches 1.0.0",
@@ -3514,7 +3514,7 @@
       "images/012-1_0bctBbTkft3J9fzAzVwwvg.png",
       "images/013-1_-MRRK-LICe2zRigofJAA5Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-08-10-elyra-reaches-1-0-0"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-jupyter-for-education-82af9e34b510": {
@@ -3539,7 +3539,7 @@
     "images": [
       "images/001-1_oqQfLSu5KKFN8rIr1w-PBw.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-12-05-jupyter-community-workshop-jupyter-for-education"
   },
   "https://blog.jupyter.org/jupyterlab-desktop-2022-recap-28bdf00205c6": {
@@ -3571,7 +3571,7 @@
       "images/006-1_etwh9xez4D1QUvidnWSLtw.png",
       "images/007-1_mgKvubVj6SFsC5s9mDBIJg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-12-13-jupyterlab-desktop-2022-recap"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-the-notebook-file-format-8133ed606118": {
@@ -3591,7 +3591,7 @@
       "jupyter-notebook"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-12-08-jupyter-community-workshop-the-notebook-file-format"
   },
   "https://blog.jupyter.org/introducing-jupyterhubs-outreachy-interns-december-2022-cohort-23aaf4613556": {
@@ -3617,7 +3617,7 @@
     "images": [
       "images/001-1_mRtgDdoRwjO3Kb2nSGOsdw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-12-07-introducing-jupyterhubs-outreachy-interns-december-2022-cohort"
   },
   "https://blog.jupyter.org/disc-sprint-nyc-2018-548780d0f40": {
@@ -3640,7 +3640,7 @@
       "images/001-1_E4wfBHKLHL_Hb85HN8dIRQ.png",
       "images/002-1_Sst82t-Cm-DktVViFQ0I6w.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-10-22-disc-sprint-nyc-2018"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-1-0-ddc8b0d6e989": {
@@ -3662,7 +3662,7 @@
       "python"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-09-15-jupyter-notebook-5-1-0"
   },
   "https://blog.jupyter.org/jupyter-server-2-0-is-released-121ac99e909a": {
@@ -3685,7 +3685,7 @@
       "jupyterlab"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-12-06-jupyter-server-2-0-is-released"
   },
   "https://blog.jupyter.org/jupyter-pop-up-march-21-boston-b736d842fa8f": {
@@ -3711,7 +3711,7 @@
     "images": [
       "images/001-1_uYXtEHsSpXF7flT8eZdeQQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-02-09-jupyter-pop-up-march-21-boston"
   },
   "https://blog.jupyter.org/jupyter-conference-advisory-committee-9c096d308552": {
@@ -3757,7 +3757,7 @@
       "postmortem"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-12-14-incident-report-jupyter-services-down"
   },
   "https://blog.jupyter.org/jupyter-notebooks-for-post-election-audits-4bdd13d3e800": {
@@ -3782,7 +3782,7 @@
       "images/001-1_FD23qGCK5K87ZUiqwmNusQ.jpeg",
       "images/002-1_QJaAodid6j5QL57iutniEg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-01-22-jupyter-notebooks-for-post-election-audits"
   },
   "https://blog.jupyter.org/report-on-the-jupyter-community-workshop-77016ab1d49b": {
@@ -3808,7 +3808,7 @@
     "images": [
       "images/001-1_4INQIu9-TYhC8euvTLXfVQ.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-11-30-report-on-the-jupyter-community-workshop"
   },
   "https://blog.jupyter.org/the-superheros-and-the-magic-wand-596acaab722a": {
@@ -3837,7 +3837,7 @@
       "images/003-1_3nDwvUQiUfa54OsDPqKNag.gif",
       "images/004-1_egrzbBcwyaxm7-793O7uiQ.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-03-19-the-superheros-and-the-magic-wand"
   },
   "https://blog.jupyter.org/juan-klopper-c33c2fd0ed36": {
@@ -3864,7 +3864,7 @@
       "images/001-1_Pv7g_IdbOpvxFT_BW3Z4xA.png",
       "images/002-1_zYJGVYB9SJGnrhiq1IzVqA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-08-03-juan-klopper"
   },
   "https://blog.jupyter.org/mybinder-ovhcloud-e2ce3d9701fc": {
@@ -3889,7 +3889,7 @@
     "images": [
       "images/001-1_Hb4_lgwkmAmw--MbWzaKLw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-11-23-mybinder-ovhcloud"
   },
   "https://blog.jupyter.org/community-workshop-jupyterlite-e992c61f5d7f": {
@@ -3913,7 +3913,7 @@
     "images": [
       "images/001-1_Zayr-b0FjuEZGr-plrEl3Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-11-10-community-workshop-jupyterlite"
   },
   "https://blog.jupyter.org/jupytercon-is-back-in-2023-90e5c25eeec9": {
@@ -3936,7 +3936,7 @@
     "images": [
       "images/001-1_GslKp6rRM7toDFuHWPRjyA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-10-17-jupytercon-is-back-in-2023"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-update-current-round-review-and-a-sneak-peek-into-round-4-11119040c814": {
@@ -3962,7 +3962,7 @@
     "images": [
       "images/001-1_a7mofwpcTFfxFGIZ6FsQXA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-10-12-jupyter-community-workshops-update-current-round-review-and-a-sneak-peek-into-ro"
   },
   "https://blog.jupyter.org/accelerating-jupyterlab-68942bb8d602": {
@@ -3991,7 +3991,7 @@
       "images/005-0_P3blJAk0ZNg4obBV.bin",
       "images/006-1_OwFstCVzAGZX3EiQejEWog.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-10-10-accelerating-jupyterlab"
   },
   "https://blog.jupyter.org/lucy-dagostino-mcgowan-13adbdedccf0": {
@@ -4017,7 +4017,7 @@
       "images/001-1__-QyPyiBBZTWsD27ElsXUw.jpeg",
       "images/002-1_zYJGVYB9SJGnrhiq1IzVqA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-08-16-lucy-dagostino-mcgowan"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-the-future-of-jupyter-widgets-475f67288da0": {
@@ -4040,7 +4040,7 @@
     "images": [
       "images/001-1_16fTregYuv8Vu0T6AUzuVA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-09-20-jupyter-community-workshop-the-future-of-jupyter-widgets"
   },
   "https://blog.jupyter.org/jupyter-notebook-6-5-0-release-candidate-4c229c6dab55": {
@@ -4063,7 +4063,7 @@
     "images": [
       "images/001-1_xw3KHBE_XmDg72zKiZ-LZw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-09-15-jupyter-notebook-6-5-0-release-candidate"
   },
   "https://blog.jupyter.org/upgrading-nbgrader-99c56ae56c47": {
@@ -4091,7 +4091,7 @@
       "images/004-1_KlCHlIFqOeXmqzGmwlh52w.png",
       "images/005-1_C1fPJUhN8pk86GIXCQq5AA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-09-15-upgrading-nbgrader"
   },
   "https://blog.jupyter.org/packaging-for-jupyter-in-2022-c7be64c38926": {
@@ -4117,7 +4117,7 @@
     "images": [
       "images/001-1_SL9lt02en8mWEJylo9sFhw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-09-06-packaging-for-jupyter-in-2022"
   },
   "https://blog.jupyter.org/xeus-is-now-a-jupyter-subproject-c4ec5a1bf30b": {
@@ -4142,7 +4142,7 @@
       "images/002-0_Mh5cOdG7YWJxrFSw.gif",
       "images/003-1__77MmwnTvIhdFVM8noFAIA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-02-04-xeus-is-now-a-jupyter-subproject"
   },
   "https://blog.jupyter.org/zero-to-jupyterhub-helm-chart-0-8-b99e0a79fd2a": {
@@ -4166,7 +4166,7 @@
     "images": [
       "images/001-1_XRxmQ4Mmd48iE7ST-zdcUg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-02-21-zero-to-jupyterhub-helm-chart-0-8"
   },
   "https://blog.jupyter.org/the-international-binder-federation-4f6235c1537e": {
@@ -4190,7 +4190,7 @@
     "images": [
       "images/001-1_D0lhgUpJeWhb6K7igl4DvQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-07-01-the-international-binder-federation"
   },
   "https://blog.jupyter.org/jupytercon-nyc-august-2017-8e21f649d83e": {
@@ -4233,7 +4233,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-07-05-requiring-2fa-for-jupyter-github-organizations"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-0-909c6c172d78": {
@@ -4284,7 +4284,7 @@
       "images/003-0_KSNrd_DXpVWHkvPC.bin",
       "images/004-0_Z2TP8VlU-j14Taxo.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-07-29-visual-programming-in-jupyterlab-with-blockly"
   },
   "https://blog.jupyter.org/mamba-meets-jupyterlite-88ef49ac4dc8": {
@@ -4313,7 +4313,7 @@
       "images/003-1_rKzDNlHO6LnhH1ZDyb996g.png",
       "images/004-1_JCiZIwwkFen5kwEA2rK4SA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-07-14-mamba-meets-jupyterlite"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-c7491a3cca00": {
@@ -4338,7 +4338,7 @@
     "images": [
       "images/001-1_eQGWQqYPRRDdxzlINXqpXw.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-04-26-jupyter-community-workshops"
   },
   "https://blog.jupyter.org/national-scale-interactive-computing-2c104455e062": {
@@ -4364,7 +4364,7 @@
     "images": [
       "images/001-1_L8MzmheO2NZQBH0t-BGpFg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-08-22-national-scale-interactive-computing"
   },
   "https://blog.jupyter.org/elife-sprint-integrating-stencila-and-binder-18834e9ad584": {
@@ -4394,7 +4394,7 @@
       "images/003-0_osOwhBZGwlnr5FNk.png",
       "images/001-1_H28MLVCxQzhuXzKzbMyiZA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-12-10-elife-sprint-integrating-stencila-and-binder"
   },
   "https://blog.jupyter.org/securely-pushing-to-github-from-a-jupyterhub-3ee42dfdc54f": {
@@ -4419,7 +4419,7 @@
       "images/001-1_9E0cif7g07xWAOfsFFmijw.png",
       "images/002-1_B3qjACXLBG9pBOlzY8WNxA.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-04-21-securely-pushing-to-github-from-a-jupyterhub"
   },
   "https://blog.jupyter.org/jupyter-events-update-67315ebb0afa": {
@@ -4445,7 +4445,7 @@
     "images": [
       "images/001-1_uhDlQi-PPNLA-B97MTUG_A.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-04-21-jupyter-events-update"
   },
   "https://blog.jupyter.org/inspector-jupyterlab-404cce3e1df6": {
@@ -4473,7 +4473,7 @@
       "images/003-1_OtluradnAZEDP_Cpe7x-hQ.gif",
       "images/004-0_Rb8PCWI-Ozz0Fhxy.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-04-11-inspector-jupyterlab"
   },
   "https://blog.jupyter.org/jupyter-hackathon-series-in-hawaii-97b3d1fbce68": {
@@ -4501,7 +4501,7 @@
       "images/002-0_HUVKNECmXfmpSkla.bin",
       "images/003-0_hMVNa7sCovpibf7o.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-12-06-jupyter-hackathon-series-in-hawaii"
   },
   "https://blog.jupyter.org/jupyter-for-science-user-facilities-and-high-performance-computing-de178106872": {
@@ -4527,7 +4527,7 @@
     "images": [
       "images/001-1_VqdM1ZzoT6oepd6UZCRIyA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-07-09-jupyter-for-science-user-facilities-and-high-performance-computing"
   },
   "https://blog.jupyter.org/jupyter-accessibility-workshops-wrap-up-8649dfe5f89": {
@@ -4551,7 +4551,7 @@
     "images": [
       "images/001-1_QIA-0zt6dhu3vh3HmwWPhA_2x.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-04-09-jupyter-accessibility-workshops-wrap-up"
   },
   "https://blog.jupyter.org/please-dont-disable-authentication-in-jupyter-servers-dd197206e7f6": {
@@ -4572,7 +4572,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-04-05-please-dont-disable-authentication-in-jupyter-servers"
   },
   "https://blog.jupyter.org/introducing-templates-for-jupyter-widget-layouts-f72bcb35a662": {
@@ -4601,7 +4601,7 @@
       "images/004-1_W1gbrgs8aDSs2ZezDQ5v7Q.png",
       "images/005-1_Bf8ZF5xTHU68f5OdrPBLtA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-07-04-introducing-templates-for-jupyter-widget-layouts"
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-bc349fa60d68": {
@@ -4633,7 +4633,7 @@
       "images/010-1_t761M0eIk-LY-tLy25csQQ.jpeg",
       "images/011-1_Cw8VcAfJKv42NLtAN6v-rw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-03-16-congratulations-distinguished-contributors"
   },
   "https://blog.jupyter.org/jupyter-everywhere-f8151c2cc6e8": {
@@ -4668,7 +4668,7 @@
       "images/010-1_rBRr_6uBceP-shArkLcXhQ.png",
       "images/011-1_Ab9PIO4Zs-6MOYhzF4GXPA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-03-15-jupyter-everywhere"
   },
   "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-2-aae1dbcdb9ac": {
@@ -4692,7 +4692,7 @@
     "images": [
       "images/001-1_3OIwnxchEIUmvNykISrNiA_2x.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-03-04-join-us-for-the-jupyter-accessibility-workshops-part-2"
   },
   "https://blog.jupyter.org/jupyterlab-the-next-generation-of-the-jupyter-notebook-5c949dabea3": {
@@ -4740,7 +4740,7 @@
       "images/001-1_ZbqjB3evW_yB_SKFjqliWA.png",
       "images/002-1_NmiVFxvco2bgm4S3dUYRIw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-09-22-jupyterlab-desktop-app-now-available"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-for-jan-aug-2020-710f687e30f4": {
@@ -4788,7 +4788,7 @@
     "images": [
       "images/001-1_2_TYKwP_RInA4QVp9UhMhw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-01-12-release-of-ipython-8-0"
   },
   "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-1-133e0e522d1b": {
@@ -4812,7 +4812,7 @@
     "images": [
       "images/001-1_ZORe-fp96fICnLv1-p-GLw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2022-01-06-join-us-for-the-jupyter-accessibility-workshops-part-1"
   },
   "https://blog.jupyter.org/jupyter-community-2021-update-84c5cd3c5e75": {
@@ -4874,14 +4874,14 @@
       "images/014-1_8f05EGZrQyBxZr-Byn_vxg.gif",
       "images/015-1_9gJsZRQ9CUEd2Uz_I_BBJw.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-12-14-jupyter-games"
   },
   "https://blog.jupyter.org/need-for-speed-voilà-edition-a9e1300ab3b2": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
+    "title": "Need for Speed: Voilà edition",
+    "author": "Duc Trung Le",
+    "author_url": "https://medium.com/@trungleduc",
+    "date": "2021-12-10T14:52:56Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/need-for-speed-voilà-edition-a9e1300ab3b2",
     "original_path": "/need-for-speed-voilà-edition-a9e1300ab3b2",
@@ -4889,15 +4889,15 @@
     "slug": "need-for-speed-voilà-edition",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "TL;DR: Voilà 0.3.0 is now available!",
     "tags": [
       "dashboard",
       "jupyter",
       "voila"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-need-for-speed-voilà-edition"
+    "body_source": "state",
+    "dir": "posts/2021-12-10-need-for-speed-voilà-edition"
   },
   "https://blog.jupyter.org/jupyterhub-2-0-7a038715e96d": {
     "title": "JupyterHub 2.0",
@@ -4918,7 +4918,7 @@
       "notebook"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-12-01-jupyterhub-2-0"
   },
   "https://blog.jupyter.org/ipython-parallel-in-2021-2945985c032a": {
@@ -4942,7 +4942,7 @@
     "images": [
       "images/001-1_5W4lCfV_HPwSmFP88niiJg.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-11-30-ipython-parallel-in-2021"
   },
   "https://blog.jupyter.org/how-i-automated-authorised-cloud-deployments-from-pull-requests-with-github-actions-13f890538e32": {
@@ -4969,7 +4969,7 @@
       "images/001-0_CxrmnyCYbWVYXn0B.png",
       "images/002-1_8XZ7K2yXsNdRUTUPhfCYwA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-11-22-how-i-automated-authorised-cloud-deployments-from-pull-requests-with-github-acti"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-5-0-17b2e2d4f7f": {
@@ -4991,7 +4991,7 @@
       "python"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-05-25-jupyter-notebook-5-5-0"
   },
   "https://blog.jupyter.org/ploomber-maintainable-and-collaborative-pipelines-in-jupyter-acb3ad2101a7": {
@@ -5029,7 +5029,7 @@
       "images/012-1_tVXeHFlmpPJDMewgRRCNYQ.png",
       "images/013-1_z1jqY7VI33dE2R2YO_SeBw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-09-01-ploomber-maintainable-and-collaborative-pipelines-in-jupyter"
   },
   "https://blog.jupyter.org/xeus-lite-379e96bb199d": {
@@ -5065,7 +5065,7 @@
       "images/010-1_AaO7Or9i6ZDmYR3PNGXh9Q.png",
       "images/011-1_b-X9cmzXfq7NIXeEwfEzow.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-10-25-xeus-lite"
   },
   "https://blog.jupyter.org/czi-awards-three-eoss-grants-to-jupyter-community-members-6aef43bd9468": {
@@ -5091,7 +5091,7 @@
     "images": [
       "images/001-1_UBrbPqVueIypC9GA9wAccg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-10-14-czi-awards-three-eoss-grants-to-jupyter-community-members"
   },
   "https://blog.jupyter.org/diving-into-leadership-to-build-push-button-code-df2a075c9914": {
@@ -5119,7 +5119,7 @@
       "images/002-1_0M4Cmt18vZIGBOUGjToP3A.jpeg",
       "images/003-1_skpynPlvqIbdx3BUph76iA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-10-15-diving-into-leadership-to-build-push-button-code"
   },
   "https://blog.jupyter.org/looking-at-notebooks-from-a-new-perspective-bfd06797f188": {
@@ -5151,7 +5151,7 @@
       "images/007-1_DqBf2bE3M7ynUy-Kv0qIbA.gif",
       "images/008-1_xbhgaimjN9YclTKtIQojGQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-10-05-looking-at-notebooks-from-a-new-perspective"
   },
   "https://blog.jupyter.org/xeus-2-0-cb460d4daed4": {
@@ -5176,7 +5176,7 @@
       "images/002-0_zUMSbNcno1BZSfjO.jpeg",
       "images/003-1_kGCA9WV-Gf5tiNqqy9vTMQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-09-28-xeus-2-0"
   },
   "https://blog.jupyter.org/from-jupyter-to-the-moon-2e432df402c8": {
@@ -5213,7 +5213,7 @@
       "images/013-0_ArP2iU5tKYDHvvZd.gif",
       "images/014-0_NiFI9An8ZGVDSYyG.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-09-24-from-jupyter-to-the-moon"
   },
   "https://blog.jupyter.org/connect-to-a-jupyterhub-from-visual-studio-code-ed7ed3a31bcb": {
@@ -5244,7 +5244,7 @@
       "images/007-1_hm9yZinnwlF3EqeXuossBQ.png",
       "images/008-1__FILTBgRJ76bq5R7LYFGww.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-12-09-connect-to-a-jupyterhub-from-visual-studio-code"
   },
   "https://blog.jupyter.org/trusted-ci-cybersecurity-engagement-with-jupyter-859a5f5d7201": {
@@ -5266,7 +5266,7 @@
       "trusted-ci"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-09-15-trusted-ci-cybersecurity-engagement-with-jupyter"
   },
   "https://blog.jupyter.org/community-note-8e9e6e30760": {
@@ -5309,7 +5309,7 @@
     "images": [
       "images/001-1_v0isW10uaM0t1DyKOIL02Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-09-01-jupyter-role-in-chaosdb"
   },
   "https://blog.jupyter.org/field-report-on-the-kernel-community-workshop-a4ad73a1a718": {
@@ -5338,7 +5338,7 @@
       "images/003-1_xv77xrNuUHKLjLinum0dlQ.gif",
       "images/004-1_ZWbPC-X8_5rIU_kP03ztog.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-10-07-field-report-on-the-kernel-community-workshop"
   },
   "https://blog.jupyter.org/report-on-the-jupyter-community-workshop-on-dashboarding-14f8ad9f3c0": {
@@ -5363,7 +5363,7 @@
       "images/001-1_e8gJ4j2hCn4XMPagp6etOA.jpeg",
       "images/002-1_FMKOoximrvz6sASKu19C-g.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-02-14-report-on-the-jupyter-community-workshop-on-dashboarding"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-2019-year-in-review-8876336924e4": {
@@ -5417,7 +5417,7 @@
     "images": [
       "images/001-1_oJ6puCw-3TFeXii-rWfRzw.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-09-26-south-america-jupyter-community-workshop"
   },
   "https://blog.jupyter.org/cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyter-notebook-a70fae0d3239": {
@@ -5441,7 +5441,7 @@
       "updates"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-08-09-cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyte"
   },
   "https://blog.jupyter.org/build-a-jupyter-widget-with-react-and-typescript-d83e07340fa3": {
@@ -5468,7 +5468,7 @@
       "images/001-0_lnZS93JgKwZAZD1m.bin",
       "images/002-1_cEy6OgSDz854q4Z0VJ59aQ.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-07-30-build-a-jupyter-widget-with-react-and-typescript"
   },
   "https://blog.jupyter.org/nbviewer-has-a-new-host-ovhcloud-28bcab6a7ab4": {
@@ -5491,7 +5491,7 @@
       "notebook"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-03-06-nbviewer-has-a-new-host-ovhcloud"
   },
   "https://blog.jupyter.org/jupyterlab-3-0-is-out-4f58385e25bb": {
@@ -5524,14 +5524,14 @@
       "images/008-1_fDQBE4twamqnpxvAevzGuw.png",
       "images/009-1_iZTmCAefbExeTZNJKWy4cQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-01-05-jupyterlab-3-0-is-out"
   },
   "https://blog.jupyter.org/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
+    "title": "JupyterLite: Jupyter ❤️ WebAssembly ❤️ Python",
+    "author": "Jeremy Tuloup",
+    "author_url": "https://medium.com/@jeremy.tuloup",
+    "date": "2021-07-13T09:11:43Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa",
     "original_path": "/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa",
@@ -5539,7 +5539,7 @@
     "slug": "jupyterlite-jupyter-️-webassembly-️-python",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "JupyterLite is a JupyterLab distribution that runs entirely in the web browser, backed by in-browser language kernels powered by…",
     "tags": [
       "data-science",
       "jupyter",
@@ -5547,8 +5547,8 @@
       "webassembly"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-jupyterlite-jupyter-️-webassembly-️-python"
+    "body_source": "state",
+    "dir": "posts/2021-07-13-jupyterlite-jupyter-️-webassembly-️-python"
   },
   "https://blog.jupyter.org/how-we-made-jupyter-notebooks-collaborative-with-yjs-b8dff6a9d8af": {
     "title": "How we made Jupyter Notebooks collaborative with Yjs",
@@ -5568,7 +5568,7 @@
       "images/001-0_HvwrxmA_sBtU0SaO.bin",
       "images/002-1_BBSKYgAom2NJoQLvOwyJLg.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-06-04-how-we-made-jupyter-notebooks-collaborative-with-yjs"
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-149deff3033c": {
@@ -5597,7 +5597,7 @@
       "images/009-1_BUhAOUYEJwUcYQMe6HkvRA.png",
       "images/010-1_HjJch2-9eBjL7u2voPaggA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-05-25-congratulations-distinguished-contributors"
   },
   "https://blog.jupyter.org/setting-up-a-production-ready-tljh-deployment-3c81c0ada18f": {
@@ -5620,7 +5620,7 @@
     "images": [
       "images/001-1_4zZBoheuyfPsemCzc_O7jg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-06-04-setting-up-a-production-ready-tljh-deployment"
   },
   "https://blog.jupyter.org/enabling-the-jupyterlab-debugger-with-ipykernel-8d7248f522b0": {
@@ -5647,7 +5647,7 @@
       "images/003-1_8_HgQuq5_HXhLXSdfGnhrA.jpeg",
       "images/004-1_LpuIpGQIDYMhv5IBthmwcA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-05-13-enabling-the-jupyterlab-debugger-with-ipykernel"
   },
   "https://blog.jupyter.org/retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel-8096b8b223d0": {
@@ -5685,7 +5685,7 @@
       "images/013-0__yqb6gJ-JbnECfs7.png",
       "images/014-1_n9MydI9CDW9vlav1gMlo0Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-05-27-retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel"
   },
   "https://blog.jupyter.org/outreachy-jupyter-supporting-diversity-in-open-communities-dfa78db4b0bd": {
@@ -5711,7 +5711,7 @@
     "images": [
       "images/001-1_OsCmvuJ-lLeC7UtWK8CkNA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-11-28-outreachy-jupyter-supporting-diversity-in-open-communities"
   },
   "https://blog.jupyter.org/nbterm-jupyter-notebooks-in-the-terminal-6a2b55d08b70": {
@@ -5735,7 +5735,7 @@
       "images/001-1_jZFC3kPJqxMSUeCGd7PHxw.jpeg",
       "images/002-1_s6BRdEgITBGOR0y1Ec7GSQ.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-04-26-nbterm-jupyter-notebooks-in-the-terminal"
   },
   "https://blog.jupyter.org/lessons-learned-from-jupyters-contributor-in-residence-pilot-427e2b361a7b": {
@@ -5761,7 +5761,7 @@
       "images/001-0_6hQJEAS34fJRY65r.bin",
       "images/002-0_WUb7phui0cNKOuL8.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-03-11-lessons-learned-from-jupyters-contributor-in-residence-pilot"
   },
   "https://blog.jupyter.org/abracadabra-bringing-the-magics-to-xeus-python-9d17bcfacb4": {
@@ -5793,7 +5793,7 @@
       "images/006-0_2sBOFFsk_322apCe.png",
       "images/007-0_5XdymjYwzZe-hvy8.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-02-18-abracadabra-bringing-the-magics-to-xeus-python"
   },
   "https://blog.jupyter.org/genomic-data-representation-in-jupyter-c57a5bb518d6": {
@@ -5819,7 +5819,7 @@
       "images/002-1_681fIddZAaQc8w72MmmIiw.gif",
       "images/003-1_wACAwVx0PZAsEH8myXyUqg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-02-08-genomic-data-representation-in-jupyter"
   },
   "https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09": {
@@ -5851,7 +5851,7 @@
       "images/007-1_lD3D5a2W8GHc3g-J6A-hDQ.png",
       "images/008-1_BUap43L0AqEpdc_4YVA9xg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-02-26-simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator"
   },
   "https://blog.jupyter.org/a-curiously-recurring-widget-library-261a65bd56fe": {
@@ -5879,7 +5879,7 @@
       "images/004-1_IULQ8LZDnLFMmB1nsbNF0Q.gif",
       "images/005-0_TQpdhVZSAnE-XOrm.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-01-27-a-curiously-recurring-widget-library"
   },
   "https://blog.jupyter.org/robotic-process-automation-with-jupyterlab-713b5630e457": {
@@ -5914,7 +5914,7 @@
       "images/009-1_zwPmx9pH4pkXOxowHQOsuQ.jpeg",
       "images/010-1_YQZupQRMB6JJfhM_byi2KA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-01-18-robotic-process-automation-with-jupyterlab"
   },
   "https://blog.jupyter.org/dashboarding-with-jupyterlab-3-789fcb1a5857": {
@@ -5945,7 +5945,7 @@
       "images/006-1_y3NheY8vpXLUDnh7Cpnruw.png",
       "images/007-1_TSPSpj2D0UODcXXAgbHOXg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2021-01-08-dashboarding-with-jupyterlab-3"
   },
   "https://blog.jupyter.org/survey-jupyterlab-and-beyond-88c7fbd27a79": {
@@ -5969,7 +5969,7 @@
     "images": [
       "images/001-0_S4dN8Xv6KHGnEh1U.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-12-14-survey-jupyterlab-and-beyond"
   },
   "https://blog.jupyter.org/a-c-backend-for-vega-lite-bd2524b247c2": {
@@ -5998,7 +5998,7 @@
       "images/005-1_AQTFHOwHXS3uJUC6WKR6WA.gif",
       "images/006-1_smY4K4tEKudPztWWxpBNvw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-12-02-a-c-backend-for-vega-lite"
   },
   "https://blog.jupyter.org/teaching-and-learning-with-jupyter-c1d965f7b93a": {
@@ -6022,7 +6022,7 @@
     "images": [
       "images/001-1_wOfBLJW4hIryREyEtsYHmg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-01-07-teaching-and-learning-with-jupyter"
   },
   "https://blog.jupyter.org/tema-okun-a7e5f1f0cd05": {
@@ -6049,7 +6049,7 @@
       "images/001-1_WUZj93A-VftEeOJiaouFOA.jpeg",
       "images/002-1_vqs1Rj8BzZcOpQY-DTzbRw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-10-12-tema-okun"
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-f617e40689e7": {
@@ -6090,7 +6090,7 @@
       "images/019-1_zzMGEKteHwTNRIOwxGj65g.jpeg",
       "images/020-1_3bN6bdYkLBhe9DRoI9IpgA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-11-20-congratulations-distinguished-contributors"
   },
   "https://blog.jupyter.org/reusable-code-snippets-in-jupyterlab-8d75a0f9d207": {
@@ -6123,7 +6123,7 @@
       "images/007-0_QdPljYYKAYvqaP0Q.png",
       "images/008-0_BdqSU9blQk8YG6kC.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-11-18-reusable-code-snippets-in-jupyterlab"
   },
   "https://blog.jupyter.org/jupyter-meets-the-earth-1b0eb33c83f": {
@@ -6149,7 +6149,7 @@
       "images/001-1_s3i12gpdCYyM0srHQkPZnw.png",
       "images/002-1_djLNdz13Z4kickGSQFCNUQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-09-09-jupyter-meets-the-earth"
   },
   "https://blog.jupyter.org/devops-intelligence-3ff48a76b525": {
@@ -6178,30 +6178,30 @@
       "images/003-0_OISxo-kkYAl_9j0O.png",
       "images/004-1_TafHbpdZRN28gzxWoSn2_Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-04-06-devops-intelligence"
   },
   "https://blog.jupyter.org/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130",
-    "original_path": "/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130",
+    "title": "A Gallery of Voilà Examples",
+    "author": "Jeremy Tuloup",
+    "author_url": "https://medium.com/@jeremy.tuloup",
+    "date": "2019-07-09T10:53:27Z",
+    "updated": "2020-01-21T14:00:18Z",
+    "original_url": "https://blog.jupyter.org/a-gallery-of-voilà-examples-a2ce7ef99130",
+    "original_path": "/a-gallery-of-voilà-examples-a2ce7ef99130",
     "medium_id": "a2ce7ef99130",
-    "slug": "a-gallery-of-voil%C3%A0-examples",
+    "slug": "a-gallery-of-voilà-examples",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "Voilà is one of the latest addition to the Jupyter ecosystem, and can be used to turn notebooks into standalone applications and…",
     "tags": [
       "data-science",
       "jupyter",
       "voila"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-a-gallery-of-voil%C3%A0-examples"
+    "body_source": "state",
+    "dir": "posts/2019-07-09-a-gallery-of-voilà-examples"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-2-0-9c5b3ea672f": {
     "title": "Jupyter Notebook 5.2.0",
@@ -6222,7 +6222,7 @@
       "python"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-10-13-jupyter-notebook-5-2-0"
   },
   "https://blog.jupyter.org/jupyterday-in-the-triangle-913591d31d81": {
@@ -6247,7 +6247,7 @@
     "images": [
       "images/001-1_9MMPJjHlUPZompHm1aKBcg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-10-04-jupyterday-in-the-triangle"
   },
   "https://blog.jupyter.org/on-demand-notebooks-with-jupyterhub-jupyter-enterprise-gateway-and-kubernetes-e8e423695cbf": {
@@ -6273,7 +6273,7 @@
     "images": [
       "images/001-1_F_jJ1nDSQgBhrkbsEXB93Q.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-10-16-on-demand-notebooks-with-jupyterhub-jupyter-enterprise-gateway-and-kubernetes"
   },
   "https://blog.jupyter.org/jupyter-notebook-security-fixes-59817e86a711": {
@@ -6295,7 +6295,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-11-19-jupyter-notebook-security-fixes"
   },
   "https://blog.jupyter.org/jupyter-notebook-xssi-security-fix-546cd95babb0": {
@@ -6313,7 +6313,7 @@
     "description": "Jupyter notebook XSSI security fix We have just released Jupyter notebook 5.7.6 with a security fix for a cross-site inclusion (XSSI) vulnerability, where content from a Jupyter server could be …",
     "tags": [],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-03-09-jupyter-notebook-xssi-security-fix"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-jupyter-server-design-and-roadmap-workshop-6e6760cc5098": {
@@ -6337,7 +6337,7 @@
       "jupyter-server"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-04-30-jupyter-community-workshop-jupyter-server-design-and-roadmap-workshop"
   },
   "https://blog.jupyter.org/integrating-output-in-documentation-with-jupyter-sphinx-ecf569ddab85": {
@@ -6363,7 +6363,7 @@
       "images/002-1_rPi05lekdRaC4KuSYd4Zng.png",
       "images/003-1_KqpHDFn7RehnmftNBwDPiQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-05-30-integrating-output-in-documentation-with-jupyter-sphinx"
   },
   "https://blog.jupyter.org/https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackathon-2eff14df298a": {
@@ -6387,7 +6387,7 @@
       "university-of-edinburgh"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-05-22-https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackat"
   },
   "https://blog.jupyter.org/kellie-ottoboni-receives-award-for-post-election-auditing-notebook-96e7277863d1": {
@@ -6407,7 +6407,7 @@
       "elections"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-04-02-kellie-ottoboni-receives-award-for-post-election-auditing-notebook"
   },
   "https://blog.jupyter.org/introducing-traefikproxy-a-new-jupyterhub-proxy-based-on-traefik-4839e972faf6": {
@@ -6435,7 +6435,7 @@
       "images/002-1_A--P2mM21Cj6gfWImInnww.png",
       "images/003-1_DQjZmUX2a6nzPJzFdZJqTw.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-03-06-introducing-traefikproxy-a-new-jupyterhub-proxy-based-on-traefik"
   },
   "https://blog.jupyter.org/notebook-4-1-release-37d6ae621f83": {
@@ -6493,7 +6493,7 @@
       "images/006-1_T9WU53MjGAIX6i9XYsnL1w.png",
       "images/007-0_kREnDs33Zid5X4QE.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-10-14-ipygany-jupyter-into-the-third-dimension"
   },
   "https://blog.jupyter.org/jupyter-meets-the-earth-earthcube-community-meeting-4bb9fb49cada": {
@@ -6527,7 +6527,7 @@
       "images/009-1_YfKDEmbHLgt-3eJlRqClaw.png",
       "images/010-1_OOkrUZhvWq5ywRPlaQ8QDA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-08-17-jupyter-meets-the-earth-earthcube-community-meeting"
   },
   "https://blog.jupyter.org/omoju-miller-435db40d347e": {
@@ -6553,7 +6553,7 @@
       "images/001-1_XfG5wBdnXZ-vHu0bHhSCVA.jpeg",
       "images/002-1_zYJGVYB9SJGnrhiq1IzVqA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-09-29-omoju-miller"
   },
   "https://blog.jupyter.org/the-templating-system-of-nbconvert-6-47ea781eacd2": {
@@ -6585,7 +6585,7 @@
       "images/008-1_BTJSFb_pQ8TSVwc6bPgjbA.png",
       "images/009-1_ey1ie8kpgPMTvHU6nvjKvw.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-09-26-the-templating-system-of-nbconvert-6"
   },
   "https://blog.jupyter.org/slicerjupyter-a-3d-slicer-kernel-for-interactive-publications-6f2ad829f635": {
@@ -6621,7 +6621,7 @@
       "images/010-1_Cy9QfZytimqXQut2-bdcIA.png",
       "images/011-1_YKNdPIBH39iFBIL9nD_kfg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-07-08-slicerjupyter-a-3d-slicer-kernel-for-interactive-publications"
   },
   "https://blog.jupyter.org/binder-with-zenodo-af68ed6648a6": {
@@ -6651,7 +6651,7 @@
       "images/005-1_xOABVY2hNtVmjV5-LXreFw.gif",
       "images/006-1_hFRv6rDl9BekAFkxDpowOg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-06-21-binder-with-zenodo"
   },
   "https://blog.jupyter.org/jupyterlab-ros-3dc9dab7f421": {
@@ -6685,7 +6685,7 @@
       "images/008-1_HnFdxHmGARUXhanv9pDCYg.png",
       "images/009-1_uyE3rS6qzPDbNAJE5Mfx1A.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-08-11-jupyterlab-ros"
   },
   "https://blog.jupyter.org/announcing-the-new-jupyter-book-cbf7aa8bc72e": {
@@ -6714,7 +6714,7 @@
       "images/004-0_yKc7ku6ENbclkhg1.png",
       "images/005-0_-5xZV1SW6nA4ARWx.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-08-12-announcing-the-new-jupyter-book"
   },
   "https://blog.jupyter.org/anima-anandkumar-274f2619c90d": {
@@ -6740,7 +6740,7 @@
       "images/001-1_meN5OOGZsFvR2n29GQk_7Q.jpeg",
       "images/002-1_Kgh_PUbWPifxrPLgicKBMQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-07-13-anima-anandkumar"
   },
   "https://blog.jupyter.org/jeremy-howard-8dace7b4a34a": {
@@ -6766,7 +6766,7 @@
       "images/001-1_Ebx6DZ_ltN15SsAOqLy0Lg.jpeg",
       "images/002-1_zYJGVYB9SJGnrhiq1IzVqA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-07-21-jeremy-howard"
   },
   "https://blog.jupyter.org/jupytercon-online-more-than-a-conference-4677cf25a915": {
@@ -6787,7 +6787,7 @@
       "images/001-1_7Nhmp9LOykUJeh_3jyv_bw.png",
       "images/002-1_VODm5zl3bnizzjJxyb-mPA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-06-29-jupytercon-online-more-than-a-conference"
   },
   "https://blog.jupyter.org/a-jupyter-kernel-for-sqlite-9549c5dcf551": {
@@ -6816,7 +6816,7 @@
       "images/005-1_wiJsOB9OWiAGwuaoycfc0w.png",
       "images/006-1_S-w69baox7Q1D997a5yKNw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-06-11-a-jupyter-kernel-for-sqlite"
   },
   "https://blog.jupyter.org/plasma-a-learning-platform-powered-by-jupyter-1b850fcd8624": {
@@ -6847,7 +6847,7 @@
       "images/007-1_0n1kaev7c81I45SZ0HoLxQ.gif",
       "images/008-1_-mk2TL1LTFBzkfW4JX30Pw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-05-11-plasma-a-learning-platform-powered-by-jupyter"
   },
   "https://blog.jupyter.org/cir-report-i-1ca418c230cd": {
@@ -6875,7 +6875,7 @@
       "images/003-1_qaJ2OXcIQc9qeHDhH4ZUyw.gif",
       "images/004-1_7IYmviNQrZQtsDBcx95-9Q.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-05-07-cir-report-i"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol-2409409ed7ec": {
@@ -6898,7 +6898,7 @@
     "images": [
       "images/001-1_3piu1NkMJz9_5sA_j2wCdA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-04-04-jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol"
   },
   "https://blog.jupyter.org/interactive-graph-visualization-in-jupyter-with-ipycytoscape-a8828a54ab63": {
@@ -6929,7 +6929,7 @@
       "images/006-0_-Lcpj92fbL3Zr7N3.png",
       "images/007-1_S-w69baox7Q1D997a5yKNw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-04-30-interactive-graph-visualization-in-jupyter-with-ipycytoscape"
   },
   "https://blog.jupyter.org/a-visual-debugger-for-jupyter-914e61716559": {
@@ -6990,7 +6990,7 @@
     "images": [
       "images/001-1_IwySdMiNeUvnSvLeNJgUWg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2020-02-07-jupytercon-2020-is-a-go"
   },
   "https://blog.jupyter.org/jupyter-ascending-1bf5b362d97e": {
@@ -7030,7 +7030,7 @@
       "jupyter"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-01-29-jupyter-community-workshop-jupyter-for-scientific-user-facilities-and-high-perfo"
   },
   "https://blog.jupyter.org/the-jupyterhub-and-binder-contributor-in-residence-56708d1e3069": {
@@ -7056,22 +7056,22 @@
     "images": [
       "images/001-1_guy_H5cSnar8-qnscfVuzw_2x.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-11-26-the-jupyterhub-and-binder-contributor-in-residence"
   },
   "https://blog.jupyter.org/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f",
-    "original_path": "/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f",
+    "title": "A slideshow template for Voilà apps",
+    "author": "Marianne Corvellec",
+    "author_url": "https://medium.com/@marianne.corvellec",
+    "date": "2019-10-29T10:32:34Z",
+    "updated": "2019-10-29T14:11:26Z",
+    "original_url": "https://blog.jupyter.org/a-slideshow-template-for-voilà-apps-435f67d10b4f",
+    "original_path": "/a-slideshow-template-for-voilà-apps-435f67d10b4f",
     "medium_id": "435f67d10b4f",
-    "slug": "a-slideshow-template-for-voil%C3%A0-apps",
+    "slug": "a-slideshow-template-for-voilà-apps",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "Voilà can now serve your interactive dashboards in a slideshow format.",
     "tags": [
       "dashboard",
       "data-science",
@@ -7080,8 +7080,8 @@
       "voila"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-a-slideshow-template-for-voil%C3%A0-apps"
+    "body_source": "state",
+    "dir": "posts/2019-10-29-a-slideshow-template-for-voilà-apps"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-26a8417e5b6a": {
     "title": "Jupyter Community Workshops: Call for Proposals",
@@ -7102,7 +7102,7 @@
       "open-source"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-11-14-jupyter-community-workshops-call-for-proposals"
   },
   "https://blog.jupyter.org/ipycanvas-a-python-canvas-for-jupyter-bbb51e4777f7": {
@@ -7137,7 +7137,7 @@
       "images/009-0_gt0KurDRJ50ZIIvf.png",
       "images/010-1_GH0Cfo-a2zZuJFrJyKrebA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-10-25-ipycanvas-a-python-canvas-for-jupyter"
   },
   "https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a": {
@@ -7179,7 +7179,7 @@
       "images/017-1_6-g_O5JJQn4uSoAreSq9Pw_2x.jpeg",
       "images/018-1_eZ36LOdroOy_-KBEN8TLlg_2x.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-09-24-interactive-gis-in-jupyter-with-ipyleaflet"
   },
   "https://blog.jupyter.org/building-a-calculator-jupyter-kernel-4aed5764a295": {
@@ -7208,7 +7208,7 @@
       "images/004-0_kJeaW70rAkyeYh5l.bin",
       "images/005-0_o8XXbdwfzxiC8Nmj.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-07-16-building-a-calculator-jupyter-kernel"
   },
   "https://blog.jupyter.org/99-ways-to-extend-the-jupyter-ecosystem-11e5dab7c54": {
@@ -7240,7 +7240,7 @@
       "images/006-1_DQA3TQcVSJBtWxSMD-sq-g.gif",
       "images/007-1_1AzOXjN6O9SrqptsxVLeqQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-06-18-99-ways-to-extend-the-jupyter-ecosystem"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-dashboarding-with-project-jupyter-b0e421bdf164": {
@@ -7263,30 +7263,30 @@
     "images": [
       "images/001-1_r86y02IscdD91lt-mwYswg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-02-19-jupyter-community-workshop-dashboarding-with-project-jupyter"
   },
   "https://blog.jupyter.org/and-voil%C3%A0-f6a2c08a4a93": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/and-voil%C3%A0-f6a2c08a4a93",
-    "original_path": "/and-voil%C3%A0-f6a2c08a4a93",
+    "title": "And voilà!",
+    "author": "QuantStack",
+    "author_url": "https://medium.com/@QuantStack",
+    "date": "2019-06-11T17:42:35Z",
+    "updated": "2021-01-08T08:38:30Z",
+    "original_url": "https://blog.jupyter.org/and-voilà-f6a2c08a4a93",
+    "original_path": "/and-voilà-f6a2c08a4a93",
     "medium_id": "f6a2c08a4a93",
-    "slug": "and-voil%C3%A0",
+    "slug": "and-voilà",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "",
+    "description": "… from Jupyter notebooks to standalone applications and dashboards",
     "tags": [
       "dashboards",
       "data-science",
       "jupyter"
     ],
     "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-and-voil%C3%A0"
+    "body_source": "state",
+    "dir": "posts/2019-06-11-and-voilà"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-south-america-d8e482652952": {
     "title": "Jupyter Community Workshop: South America",
@@ -7309,7 +7309,7 @@
       "south-america"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-05-28-jupyter-community-workshop-south-america"
   },
   "https://blog.jupyter.org/jupyter-qtconsole-4-4-81f2eaad5706": {
@@ -7339,7 +7339,7 @@
       "images/004-1_-igw-HIOCrpYtZ6Mux2pOQ.png",
       "images/005-1_cfTo2oa6tJU_UzNMPB_miw.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-09-18-jupyter-qtconsole-4-4"
   },
   "https://blog.jupyter.org/how-to-deploy-jupyterhub-with-kubernetes-on-openstack-f8f6120d4b1": {
@@ -7376,7 +7376,7 @@
       "images/011-1_X6gU8TYrMV9v-GarkSWvaQ.png",
       "images/012-1_BvlZVRfsREg9GLQxZsvVCA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-10-15-how-to-deploy-jupyterhub-with-kubernetes-on-openstack"
   },
   "https://blog.jupyter.org/announcing-jupyterhub-1-0-8fff78acad7f": {
@@ -7400,7 +7400,7 @@
       "images/001-1_VozbyUHN9qTICXzQSKQvfw.png",
       "images/002-1_e5FwpbvGl7SFbl9vGevBwA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-05-04-announcing-jupyterhub-1-0"
   },
   "https://blog.jupyter.org/ros-jupyter-b7e82b5e1202": {
@@ -7429,7 +7429,7 @@
       "images/003-1_puvws-ulE4ShvCd9inzo0g.png",
       "images/004-1_WqG2vz1hl2X0-Z2TZFFSAQ.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-04-07-ros-jupyter"
   },
   "https://blog.jupyter.org/open-redirect-vulnerability-in-jupyter-jupyterhub-adf43583f1e4": {
@@ -7452,7 +7452,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-03-28-open-redirect-vulnerability-in-jupyter-jupyterhub"
   },
   "https://blog.jupyter.org/authoring-custom-jupyter-widgets-2884a462e724": {
@@ -7487,7 +7487,7 @@
       "images/003-1_lK1Zi8_qorxl5ZrL_ZMc7w.png",
       "images/006-1_FnkBH8yA-PfCNCxXA2PNIw.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-03-05-authoring-custom-jupyter-widgets"
   },
   "https://blog.jupyter.org/the-future-of-jupytercon-2019-and-beyond-9e3002faaf48": {
@@ -7592,7 +7592,7 @@
       "images/012-1_3XxIdWaB7HRmRDY_PzOGaQ.gif",
       "images/013-1_1YuyD-AQ0fzVOStuxhChWw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2019-01-09-a-new-python-kernel-for-jupyter"
   },
   "https://blog.jupyter.org/introducing-repo2docker-61a593c0752d": {
@@ -7618,7 +7618,7 @@
       "images/001-1_mZMTfkZE6o94aIr6DG-hYA.png",
       "images/002-1_lPmCcgJois-PygoFXI6Bhw.gif"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-12-14-introducing-repo2docker"
   },
   "https://blog.jupyter.org/ipython-7-0-async-repl-a35ce050f7f7": {
@@ -7648,7 +7648,7 @@
       "images/005-1_LBoQBdKymSQYv_k1Yb1jAg.png",
       "images/006-1_aJEDRVPyMtyaiDQGXsx6-w.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-09-27-ipython-7-0-async-repl"
   },
   "https://blog.jupyter.org/introducing-jupyter-enterprise-gateway-db4859f86762": {
@@ -7677,7 +7677,7 @@
       "images/003-1__R0tS0CZLy__LmL7o5b6vg.png",
       "images/004-1_9QJMPJLTZ04CFLc30aapTg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-09-17-introducing-jupyter-enterprise-gateway"
   },
   "https://blog.jupyter.org/synopsis-jupytercon-2018-education-track-6f9b3f4d8dd9": {
@@ -7700,7 +7700,7 @@
     "images": [
       "images/001-1_gTmXUbSg_koWhh3hIW7dhA.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-08-22-synopsis-jupytercon-2018-education-track"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-cbd34ac82549": {
@@ -7746,7 +7746,7 @@
       "images/001-1_-DqMOJzy1XN-UnTaLKZaow.jpeg",
       "images/002-1_Dd2zMnOvFbSdzClbeBxuFg.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-04-11-jupytercon-2018-registration-open"
   },
   "https://blog.jupyter.org/security-fix-for-jupyter-notebook-450f272b6932": {
@@ -7767,7 +7767,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-07-18-security-fix-for-jupyter-notebook"
   },
   "https://blog.jupyter.org/the-big-split-9d7b88a031a7": {
@@ -7853,7 +7853,7 @@
     "images": [
       "images/001-1_3o8wyeVbjpWInCh82qZeNA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-02-06-announcing-jupyter-day-atlanta-spring-2018"
   },
   "https://blog.jupyter.org/jupyterdays-boston-2016-80816ab9954f": {
@@ -7938,7 +7938,7 @@
       "images/001-0_bxsg6Ki5hqSN64yo.bin",
       "images/002-1_kNk_CB4cP4xv2epHxCKXFw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-03-15-jupytercon-2018-nyc-august-21-25"
   },
   "https://blog.jupyter.org/jupyterhub-0-9-54d43bd08a08": {
@@ -7959,7 +7959,7 @@
       "jupyterhub"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-06-18-jupyterhub-0-9"
   },
   "https://blog.jupyter.org/i-python-you-r-we-julia-baf064ca1fb6": {
@@ -7982,7 +7982,7 @@
       "images/003-1_DEtOH4NVIEGL65S598P6kQ.png",
       "images/004-1_jJ1qjNDSNeBm78cnBLZsIg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-05-29-i-python-you-r-we-julia"
   },
   "https://blog.jupyter.org/new-funding-for-jupyter-12009a836867": {
@@ -8074,7 +8074,7 @@
       "images/011-1_E2blHOSA9Gah1DZe1t8tKA.png",
       "images/012-1_DodrT-K2jBSmbAbEhmfbEg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-04-24-interpreted-c-for-gis-with-jupyter"
   },
   "https://blog.jupyter.org/release-of-ipython-5-0-8ce60b8d2e8e": {
@@ -8147,7 +8147,7 @@
       "images/002-1_0O1x_D0FTRUwX-6qdo1whA.png",
       "images/003-1_AquKZXRbdFxzY74sTj34VA.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-03-23-we-analyzed-1-million-jupyter-notebooks-now-you-can-too-guest-post"
   },
   "https://blog.jupyter.org/reproducible-data-dependencies-for-python-guest-post-d0f68293a99": {
@@ -8175,7 +8175,7 @@
       "images/002-0_6qBidoOcMQHZuZt2.bin",
       "images/003-1_cZJ19W0a1ZcO9S6hhJQW_g.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-03-13-reproducible-data-dependencies-for-python-guest-post"
   },
   "https://blog.jupyter.org/a-diagram-editor-for-jupyterlab-a254121ff919": {
@@ -8200,7 +8200,7 @@
     "images": [
       "images/001-0_SQhbgeWA5hO5_nt7.bin"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-02-26-a-diagram-editor-for-jupyterlab"
   },
   "https://blog.jupyter.org/jupyterlab-is-ready-for-users-5a6f039b8906": {
@@ -8250,7 +8250,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-02-16-security-fix-for-jupyterhub-gitlab-oauthenticator"
   },
   "https://blog.jupyter.org/announcing-the-jupyterhub-helm-chart-v0-5-fa532bb8519d": {
@@ -8276,7 +8276,7 @@
     "images": [
       "images/001-1_el1BFE8ImVEackH13RyyWw.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-12-20-announcing-the-jupyterhub-helm-chart-v0-5"
   },
   "https://blog.jupyter.org/congratulations-to-the-ligo-and-virgo-collaborations-from-project-jupyter-5923247be019": {
@@ -8299,7 +8299,7 @@
     "images": [
       "images/001-1_rEqQDVObK1cWHet6MUR8-w.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-11-13-congratulations-to-the-ligo-and-virgo-collaborations-from-project-jupyter"
   },
   "https://blog.jupyter.org/enjoy-jupytercon-2017-on-youtube-670e5ee606a8": {
@@ -8323,7 +8323,7 @@
       "youtube"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-11-24-enjoy-jupytercon-2017-on-youtube"
   },
   "https://blog.jupyter.org/jupytercon-2018-call-for-proposal-87986014ee0b": {
@@ -8350,7 +8350,7 @@
       "images/002-1_eBDo76BnRMrk-OHLzlSd6g.jpeg",
       "images/003-1_geuYDAU8htqwczKSJ2peCw.jpeg"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-01-18-jupytercon-2018-call-for-proposal"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-3-0-f2b08652279d": {
@@ -8372,7 +8372,7 @@
       "python"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2018-01-17-jupyter-notebook-5-3-0"
   },
   "https://blog.jupyter.org/the-continued-existence-of-the-emacs-ipython-notebook-54bd1c371d57": {
@@ -8417,7 +8417,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-11-28-public-notebooks-and-security"
   },
   "https://blog.jupyter.org/binder-2-0-a-tech-guide-2017-fd40515a3a84": {
@@ -8446,7 +8446,7 @@
       "images/004-1_TW7Gnwl-02cejzgs1nnX2Q.png",
       "images/005-1_EgMk1PYMl6ouIP_XQ5G5Fg.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-11-30-binder-2-0-a-tech-guide-2017"
   },
   "https://blog.jupyter.org/interactive-workflows-for-c-with-jupyter-fe9b54227d92": {
@@ -8486,7 +8486,7 @@
       "images/015-1_9cy5Mns_I0eScsmDBjvxDQ.png",
       "images/016-1_JwqhpMxMJppEepj7U4fV-g.png"
     ],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-11-29-interactive-workflows-for-c-with-jupyter"
   },
   "https://blog.jupyter.org/jupyterhub-0-8-19b00b75e3df": {
@@ -8507,7 +8507,7 @@
       "jupyterhub"
     ],
     "images": [],
-    "body_source": "page",
+    "body_source": "state",
     "dir": "posts/2017-10-03-jupyterhub-0-8"
   },
   "https://blog.jupyter.org/2015/02/13/post0": {

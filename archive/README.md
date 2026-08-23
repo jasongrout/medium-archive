@@ -12,6 +12,18 @@ Medium. It has two layers:
   `medium-archive convert` from `raw/` alone, with no network access. They
   can be deleted and regenerated at any time (`convert --clean`), and are the
   layer to change when adapting the archive to a new site generator.
+* `fixups/` (optional) holds **hand-written corrections** that `convert`
+  and `compare` apply to the in-memory copy of raw files, so defects
+  authored into the sources themselves — a broken href, a typo, a mangled
+  paragraph — are fixed reproducibly while `raw/` stays byte-for-byte as
+  fetched. `*.sub` files are reviewable single-line substitutions
+  (`file:` target, then `old:`/`new:` pairs; optional `count:` for the
+  exact number of occurrences expected, `old-regex:` for a regex, `#`
+  comments) — preferred, since raw HTML is often one enormous line that
+  makes a unified diff unreadable. `*.patch` files are unified patches
+  (targets named `<medium_id>/<file>`) for structural edits a
+  substitution cannot express. A fixup that no longer applies aborts the
+  run rather than being skipped. Back them up with `raw/`.
 
 ## Layout
 
@@ -67,6 +79,8 @@ raw/
                                 content_html). Only ~10 recent posts have one.
     images.json               {source_url: filename} for images/
     images/<filename>         full-resolution images referenced by the post
+fixups/*.sub, *.patch         optional hand-written corrections, applied to
+                                raw files in memory by convert and compare
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
 redirects.csv                 original_path, medium_id, original_url,
@@ -91,12 +105,13 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `original_url`  | canonical Medium URL of the post |
 | `original_path` | path component of `original_url`; what an old inbound link carries |
 | `medium_id`     | Medium's hex post id; Medium also resolves `/p/<id>` |
-| `slug`          | `original_path` with the id suffix removed |
+| `slug`          | `original_path` with the id suffix removed, percent-decoded |
+| `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
 | `description`   | the subtitle (from the account export) or Medium's summary text |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
 | `images`        | relative paths of images used by the body |
-| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML) or `ghost` (Ghost page from a Wayback capture) |
+| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML), `ghost` (Ghost page from a Wayback capture) or `state` (reconstructed from a shell page's embedded editor state) |
 
 ## Redirects
 
@@ -116,13 +131,19 @@ too.
 * Medium boilerplate ("was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, author header) is stripped in `convert`.
   It is still present in `raw/page.html`.
-* Body source preference is `export` > `feed` > `page` (override with
-  `convert --prefer-page`). Export bodies are the Medium editor's own HTML
-  and convert most faithfully; `page` posts may have leftover chrome, so
-  review them. The export contributes the exact first-publish timestamp and
-  the untruncated subtitle; tags, the updated date and the publication
-  canonical URL still come from the page, so fetching remains worthwhile
-  even when an account export is available.
+* Body source preference is `export` > `feed` > `state` > `page`
+  (override with `convert --prefer-page`). Export bodies are the Medium
+  editor's own HTML and convert most faithfully; `state` is the same
+  content as stored by the editor, read from the page's embedded state,
+  and keeps what the rendered HTML destroys (the full text span of a
+  link containing a code fragment, iframe embeds an un-hydrated capture
+  drops); `page` is the rendered HTML, used only when the capture has no
+  embedded state. The export contributes the exact first-publish
+  timestamp and the untruncated subtitle; tags, the updated date and the
+  publication canonical URL still come from the page, so fetching
+  remains worthwhile even when an account export is available.
+  `compare --state` verifies the state conversion against the export the
+  same way plain `compare` verifies the page conversion.
 * Posts flagged in `raw/missing.json` are gone from Medium (deleted or
   unpublished); each entry's `wayback_url` points at its web.archive.org
   captures for manual recovery. An entry with `same_slug_archived` was
@@ -139,6 +160,12 @@ too.
   `convert --prefer-ghost` converts from the Ghost source instead -- at
   the cost of any edits made on Medium after the migration. Attached Ghost
   images are stored alongside the Medium ones with a `g` filename prefix.
+* Medium sometimes serves a post page as its bare application shell --
+  no server-rendered article at all. Even such captures convert: the
+  embedded editor state carries the full paragraph list, title,
+  timestamps, author and tags. Their images were never fetched, though,
+  so those bodies keep remote miro.medium.com URLs (`lint` reports each
+  one) until the post is re-fetched.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.
 * Image filenames are `<NNN>-<original basename>`; the same asset served
@@ -149,4 +176,5 @@ too.
     medium-archive fetch https://blog.jupyter.org --out medium_export              # incremental; add new posts
     medium-archive compare --out medium_export                   # verify page vs export conversion
     medium-archive convert --clean --out medium_export           # rebuild posts/ from raw/
+    medium-archive lint --out medium_export                      # check for conversion defects
     medium-archive stats --out medium_export                     # summarize the archive

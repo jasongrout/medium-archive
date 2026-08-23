@@ -1,0 +1,8 @@
+# Authored typo (ros-jupyter): the hero caption opens with a kicker
+# sentence and is missing the space after its period. Present in both
+# copies inside page.html -- the rendered figcaption and Medium's
+# stored paragraph text -- hence count: 2.
+file: b7e82b5e1202/page.html
+count: 2
+old: as cloud robotics is taking off.A PR2 robot in the browser
+new: as cloud robotics is taking off. A PR2 robot in the browser

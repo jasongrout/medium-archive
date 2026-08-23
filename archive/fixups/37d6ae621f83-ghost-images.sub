@@ -1,0 +1,15 @@
+# Medium's Ghost migration dropped all five feature screenshots/GIFs;
+# re-add them from the Ghost original, each before the paragraph that
+# follows it there.
+
+file: 37d6ae621f83/export.html
+old: g">selected cells</strong> together.</p>
+new: g">selected cells</strong> together.</p><figure name="gfx21" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2015/12/4-1-multi-merge.gif"></figure>
+old: amiliar with the keyboard shortcuts.</p>
+new: amiliar with the keyboard shortcuts.</p><figure name="gfx22" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2015/12/4-1-command-palette.gif"></figure>
+old: is new feature from the Kernel Menu:</p>
+new: is new feature from the Kernel Menu:</p><figure name="gfx23" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2015/10/Screen-Shot-2015-10-23-at-10-42-08.png"></figure>
+old: get="_blank">on GitHub</a> or below:</p>
+new: get="_blank">on GitHub</a> or below:</p><figure name="gfx24" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2015/10/Screen-Shot-2015-10-23-at-14-23-32.png"></figure>
+old: F</code> key to bring up the dialog.</p>
+new: F</code> key to bring up the dialog.</p><figure name="gfx25" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2015/12/4-1-snr.gif"></figure>
