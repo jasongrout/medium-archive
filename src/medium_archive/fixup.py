@@ -13,8 +13,8 @@ bytes:
       # why this fix exists
       file: <medium_id>/<name>
       count: 2
-      old: in the field.Her story
-      new: in the field. Her story
+      old: one sentence.The next
+      new: one sentence. The next
 
   `file:` names the target (sticky for the pairs that follow); `old:` /
   `new:` is one literal, single-line substitution (`old-regex:` instead

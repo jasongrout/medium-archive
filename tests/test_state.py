@@ -27,7 +27,7 @@ def make_state(paragraphs, **post_extra):
             "latestPublishedAt": 1577621750482,
             "creator": {"__ref": "User:u1"},
             "previewContent": {"subtitle": "The subtitle."},
-            "tags": [{"__ref": "Tag:jupyter"}, {"__ref": "Tag:dashboards"}],
+            "tags": [{"__ref": "Tag:travel"}, {"__ref": "Tag:recipes"}],
             'content({"postMeteringOptions":null})': {
                 "bodyModel": {"paragraphs": refs},
             },
@@ -59,7 +59,7 @@ def test_metadata_from_state():
     assert info["date"] == "2019-12-29T12:11:11Z"
     assert info["updated"] == "2019-12-29T12:15:50Z"
     assert info["description"] == "The subtitle."
-    assert info["tags"] == ["jupyter", "dashboards"]
+    assert info["tags"] == ["travel", "recipes"]
 
 
 def test_leading_title_heading_is_dropped():
@@ -73,13 +73,13 @@ def test_paragraph_types_render():
         para(0, "H4", "Section"),
         para(1, "P", "Prose."),
         para(2, "ULI", "one"), para(3, "ULI", "two"),
-        para(4, "PRE", "pip install voila\nvoila nb.ipynb"),
+        para(4, "PRE", "pip install mytool\nmytool run"),
         para(5, "BQ", "A quote."),
     ]))
     # H4 renders one level up (###), matching the rendered page, where
     # the h1 is the title
     assert md == ("### Section\n\nProse.\n\n- one\n- two\n\n"
-                  "```\npip install voila\nvoila nb.ipynb\n```\n\n"
+                  "```\npip install mytool\nmytool run\n```\n\n"
                   "> A quote.\n")
 
 
@@ -93,15 +93,15 @@ def test_markups_apply_on_utf16_offsets():
 
 
 def test_overlapping_markups_never_split_a_link():
-    # CODE covers "voila", the A covers "voila docs": the link must stay
-    # one link, and the code toggling happens inside it
-    p = para(0, "P", "see voila docs now")
+    # CODE covers "widget", the A covers "widget docs": the link must
+    # stay one link, and the code toggling happens inside it
+    p = para(0, "P", "see widget docs now")
     p["markups"] = [
-        {"type": "A", "start": 4, "end": 14, "href": "https://x.example"},
-        {"type": "CODE", "start": 4, "end": 9},
+        {"type": "A", "start": 4, "end": 15, "href": "https://x.example"},
+        {"type": "CODE", "start": 4, "end": 10},
     ]
     md = md_of_state(make_state([p]))
-    assert md == "see [`voila` docs](https://x.example) now\n"
+    assert md == "see [`widget` docs](https://x.example) now\n"
 
 
 def test_title_after_hero_image_is_dropped():

@@ -159,8 +159,8 @@ def test_iframe_embed_link_text_has_no_brackets():
 def test_slug_of_percent_decodes():
     # Medium percent-encodes non-ASCII slugs, but its sitemap serves some
     # of the same URLs decoded; one post must get one slug either way
-    assert slug_of("https://blog.example.com/and-voil%C3%A0-0123456789ab") \
-        == slug_of("https://blog.example.com/and-voilà-0123456789ab") == "and-voilà"
+    assert slug_of("https://blog.example.com/caf%C3%A9-menu-0123456789ab") \
+        == slug_of("https://blog.example.com/café-menu-0123456789ab") == "café-menu"
 
 
 def test_byline_avatar_on_custom_subdomain_is_stripped():

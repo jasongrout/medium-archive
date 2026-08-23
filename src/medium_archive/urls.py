@@ -23,7 +23,7 @@ def resolve_canonical(fetched: str, declared: str | None) -> tuple[str, str | No
     declared = canonical_url(urljoin(fetched, declared or fetched))
     f, d = urlparse(fetched), urlparse(declared)
     # percent-decode before comparing: Medium serves the same slug both
-    # encoded (voil%C3%A0) and decoded (voilà) depending on the source
+    # encoded (caf%C3%A9) and decoded (café) depending on the source
     if (f.netloc, unquote(f.path)) == (d.netloc, unquote(d.path)):
         return declared, None
     return fetched, declared
