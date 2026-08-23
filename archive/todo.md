@@ -1,5 +1,20 @@
 # Archive notes and remaining work
 
+## 0. MyST site
+
+`medium-archive myst --out .` builds the browsable site in `site/`
+(gitignored, like `posts/` — both regenerate from `raw/` + `fixups/`);
+`site.json` holds the hand-written site title, description and
+landing-page intro. Render with `myst start` or `myst build --html`
+inside `site/` (`npm install -g mystmd`; the first build downloads the
+book-theme template). Last full validation: `myst build --html` renders
+all 333 pages with built-in full-text search; the only warnings are
+~57 links to in-page anchors that never survived the original Medium
+conversion (old footnote anchors, also dead in `posts/`), one h3→h5
+heading jump published that way in 2015, and Medium-hosted images on
+any post whose images were never fetched (none currently — `lint` is
+clean).
+
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and
 `compare` / `compare --state` / `compare --ghost` results are explained

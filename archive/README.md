@@ -12,6 +12,15 @@ Medium. It has two layers:
   `medium-archive convert` from `raw/` alone, with no network access. They
   can be deleted and regenerated at any time (`convert --clean`), and are the
   layer to change when adapting the archive to a new site generator.
+* `site/` (optional) is a **MyST site** derived from the converted posts by
+  `medium-archive myst`: one page per post, a chronological landing page, a
+  year-grouped table of contents, links between posts of the publication
+  rewritten to site pages, and a `site/redirects.csv` mapping every old
+  inbound path to its page URL. Regenerate it any time (`convert` then
+  `myst`); render it with `myst start` or `myst build --html` inside
+  `site/` (https://mystmd.org). Site-wide text lives in a hand-written
+  `site.json` (title, description, landing-page intro), versioned with the
+  archive.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
@@ -89,6 +98,17 @@ posts/
   <YYYY-MM-DD>-<slug>/        one directory per converted post
     index.md                  front matter + Markdown body
     images/<filename>         images copied from raw/, referenced relatively
+site.json                     optional hand-written site text used by `myst`:
+                                title, description, intro (landing page)
+site/                         optional MyST site built by `medium-archive
+                                myst` from posts/ + posts.json:
+  myst.yml                    project config and year-grouped table of contents
+  index.md                    landing page: intro + chronological post list
+  posts/<YYYY-MM-DD>-<slug>/
+    <page>.md                 the post, MyST front matter + rewritten body;
+                                the filename is the page's URL slug
+    images/<filename>         hard links to the images in posts/
+  redirects.csv               old inbound path -> new page URL
 ```
 
 ## Front matter (posts/*/index.md)
@@ -167,7 +187,12 @@ too.
   so those bodies keep remote miro.medium.com URLs (`lint` reports each
   one) until the post is re-fetched.
 * Links inside bodies that point at other posts in this publication still
-  point at Medium; rewrite them using `redirects.csv` when migrating.
+  point at Medium; rewrite them using `redirects.csv` when migrating (the
+  `myst` step already does this for the MyST site in `site/`).
+* In `site/` pages, `@handle` mentions and `$` signs are backslash-escaped
+  so MyST does not parse them as citations or math; links to in-page
+  anchors that never survived the Medium conversion (old footnote anchors)
+  stay as they are in `posts/` and are reported by `myst build`.
 * Image filenames are `<NNN>-<original basename>`; the same asset served
   from `miro.medium.com` and `cdn-images-1.medium.com` is stored once.
 
@@ -178,3 +203,4 @@ too.
     medium-archive convert --clean --out ../blog_export           # rebuild posts/ from raw/
     medium-archive lint --out ../blog_export                      # check for conversion defects
     medium-archive stats --out ../blog_export                     # summarize the archive
+    medium-archive myst --out ../blog_export                      # rebuild site/ from posts/
