@@ -131,13 +131,19 @@ too.
 * Medium boilerplate ("was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, author header) is stripped in `convert`.
   It is still present in `raw/page.html`.
-* Body source preference is `export` > `feed` > `page` (override with
-  `convert --prefer-page`). Export bodies are the Medium editor's own HTML
-  and convert most faithfully; `page` posts may have leftover chrome, so
-  review them. The export contributes the exact first-publish timestamp and
-  the untruncated subtitle; tags, the updated date and the publication
-  canonical URL still come from the page, so fetching remains worthwhile
-  even when an account export is available.
+* Body source preference is `export` > `feed` > `state` > `page`
+  (override with `convert --prefer-page`). Export bodies are the Medium
+  editor's own HTML and convert most faithfully; `state` is the same
+  content as stored by the editor, read from the page's embedded state,
+  and keeps what the rendered HTML destroys (the full text span of a
+  link containing a code fragment, iframe embeds an un-hydrated capture
+  drops); `page` is the rendered HTML, used only when the capture has no
+  embedded state. The export contributes the exact first-publish
+  timestamp and the untruncated subtitle; tags, the updated date and the
+  publication canonical URL still come from the page, so fetching
+  remains worthwhile even when an account export is available.
+  `compare --state` verifies the state conversion against the export the
+  same way plain `compare` verifies the page conversion.
 * Posts flagged in `raw/missing.json` are gone from Medium (deleted or
   unpublished); each entry's `wayback_url` points at its web.archive.org
   captures for manual recovery. An entry with `same_slug_archived` was
@@ -155,12 +161,11 @@ too.
   the cost of any edits made on Medium after the migration. Attached Ghost
   images are stored alongside the Medium ones with a `g` filename prefix.
 * Medium sometimes serves a post page as its bare application shell --
-  no server-rendered article at all. Posts whose only capture is such a
-  shell (`body_source: state`) are reconstructed from the page's embedded
-  editor state, which carries the full paragraph list, title, timestamps,
-  author and tags; only the images were never fetched, so their bodies
-  keep remote miro.medium.com URLs (`lint` reports each one) until the
-  post is re-fetched.
+  no server-rendered article at all. Even such captures convert: the
+  embedded editor state carries the full paragraph list, title,
+  timestamps, author and tags. Their images were never fetched, though,
+  so those bodies keep remote miro.medium.com URLs (`lint` reports each
+  one) until the post is re-fetched.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.
 * Image filenames are `<NNN>-<original basename>`; the same asset served

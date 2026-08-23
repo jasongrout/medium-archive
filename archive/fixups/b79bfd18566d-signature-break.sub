@@ -2,9 +2,10 @@
 # ('Sincerely, <br />' then the team name); Medium's importer turned it
 # into the same doubled break it uses for wrapped source lines, which
 # convert collapses to a space for Ghost-migrated posts. Make it a
-# single break in every Medium-side copy (export, the page's rendered
-# DOM, and the page's stored paragraph text) so the signature keeps its
-# own line whichever body source converts.
+# single break in the export and the page's rendered DOM, so the
+# signature keeps its own line whichever body source converts. The
+# page's stored editor-state copy is left untouched: its markup
+# offsets index into the stored text, so editing it would skew them.
 file: b79bfd18566d/export.html
 old: Sincerely,<br><br>
 new: Sincerely,<br>
@@ -12,5 +13,3 @@ new: Sincerely,<br>
 file: b79bfd18566d/page.html
 old: Sincerely,<br/><br/>
 new: Sincerely,<br/>
-old: "text":"Sincerely,\n\nThe JupyterHub Team
-new: "text":"Sincerely,\nThe JupyterHub Team

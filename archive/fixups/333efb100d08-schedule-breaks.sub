@@ -3,9 +3,11 @@
 # link); Medium's importer turned them into the same doubled breaks
 # it uses for wrapped source lines, which convert collapses to
 # spaces for Ghost-migrated posts. Make each a single break in every
-# Medium-side copy (export, the page's rendered DOM, and the page's
-# stored paragraph text) so titles, speakers and sponsors keep their
-# lines whichever body source converts.
+# Medium-side copy (the export and the page's rendered DOM) so
+# titles, speakers and sponsors keep their lines whichever body
+# source converts. The page's stored editor-state copy is left
+# untouched: its markup offsets index into the stored text, so
+# editing it would skew them.
 
 file: 333efb100d08/export.html
 old: rent and future state of Project Jupyter<br><br>
@@ -58,29 +60,3 @@ old: http://www.meetup.com/PyDataNYC/</a>)<br/><br/>
 new: http://www.meetup.com/PyDataNYC/</a>)<br/>
 old: http://www.meetup.com/nycpython/</a>)<br/><br/>
 new: http://www.meetup.com/nycpython/</a>)<br/>
-
-# the same breaks in the page's stored paragraph text
-old: rent and future state of Project Jupyter\n\n
-new: rent and future state of Project Jupyter\n
-old: for Transparent, Reproducible Journalism\n\n
-new: for Transparent, Reproducible Journalism\n
-old: Jupyter Incubator: What’s Cooking?\n\n
-new: Jupyter Incubator: What’s Cooking?\n
-old: Changing Education with Jupyter\n\n
-new: Changing Education with Jupyter\n
-old: Thebe: Jupyter Outside Notebooks\n\n
-new: Thebe: Jupyter Outside Notebooks\n
-old: omputable Content with Jupyter Notebooks\n\n
-new: omputable Content with Jupyter Notebooks\n
-old: Deploying Jupyter at NSLS-II\n\n
-new: Deploying Jupyter at NSLS-II\n
-old: The bqplot visualization package\n\n
-new: The bqplot visualization package\n
-old: cing computation with Jupyter and Binder\n\n
-new: cing computation with Jupyter and Binder\n
-old: atascicon.com\u002F)\n\nNYC PyData Meetup
-new: atascicon.com\u002F)\nNYC PyData Meetup
-old: PyDataNYC\u002F)\n\nNYC Python Meetup
-new: PyDataNYC\u002F)\nNYC Python Meetup
-old: nycpython\u002F)\n\nNumFOCUS
-new: nycpython\u002F)\nNumFOCUS
