@@ -13,7 +13,7 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse, urlsplit
 
 from bs4 import BeautifulSoup
-from markdownify import markdownify as html_to_md
+from markdownify import MarkdownConverter
 
 from .dates import parse_date
 from .export import export_body, parse_export
@@ -23,10 +23,26 @@ from .images import image_source
 from .pages import (extract_metadata, feed_body, ghost_body, ghost_metadata,
                     is_ghost_page, page_body)
 from .readme import write_readme
-from .urls import canonical_url, medium_id, slug_of
+from .urls import canonical_url, medium_id, resolve_canonical, slug_of
 
 EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
               "updated": None, "description": "", "tags": []}
+
+
+class _Converter(MarkdownConverter):
+    """markdownify, with each code fence sized to its content: a <pre>
+    whose text itself contains ``` lines (a post showing Markdown) would
+    close a three-backtick fence early, spilling the rest of the block --
+    and everything after it -- into broken structure."""
+
+    def convert_pre(self, el, text, parent_tags):
+        md = super().convert_pre(el, text, parent_tags)
+        runs = re.findall(r"`{3,}", text)
+        if not md or not runs:
+            return md
+        fence = "`" * (max(map(len, runs)) + 1)
+        start, end = md.index("```"), md.rindex("```")
+        return md[:start] + fence + md[start + 3:end] + fence + md[end + 3:]
 
 
 def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | None = None):
@@ -90,7 +106,8 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
             # Markdown link syntax
             a["href"] = urljoin(base_url, href).replace(" ", "%20")
 
-    markdown = html_to_md(str(body), heading_style="ATX", bullets="-", strip=["span"])
+    markdown = _Converter(heading_style="ATX", bullets="-",
+                          strip=["span"]).convert(str(body))
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered
     # page serves plain spaces. Normalize so output is stable across sources.
     markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
@@ -143,6 +160,8 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         if soup is None and exp["canonical_url"]:
             info["url"] = exp["canonical_url"]
 
+    info["url"], external_canonical = resolve_canonical(url, info["url"])
+
     img_map = {}
     if (raw / "images.json").exists():
         img_map = json.loads(read_raw(raw / "images.json", fixups))
@@ -172,7 +191,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     if len(markdown) < 200:
         print(f"  warning: body is only {len(markdown)} chars; check selectors", file=sys.stderr)
 
-    canon = canonical_url(info["url"])
+    canon = info["url"]                 # already resolved and canonicalized
     ghost_url = gmeta.get("original_url")
     front = {
         "title": info["title"],
@@ -184,6 +203,9 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         "original_path": urlparse(canon).path,
         "medium_id": medium_id(canon),
         "slug": slug_of(canon),
+        # a canonical URL the post declared that names a different page (a
+        # gist it was imported from, a pre-migration slug); provenance only
+        "canonical_url": external_canonical,
         # the post's URL on the blog's Ghost incarnation, when import-ghost
         # attached a capture; old inbound links may carry this path too
         "ghost_url": ghost_url if ghost_url != canon else None,

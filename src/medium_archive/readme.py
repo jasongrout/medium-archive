@@ -106,6 +106,7 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `original_path` | path component of `original_url`; what an old inbound link carries |
 | `medium_id`     | Medium's hex post id; Medium also resolves `/p/<id>` |
 | `slug`          | `original_path` with the id suffix removed |
+| `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
 | `description`   | the subtitle (from the account export) or Medium's summary text |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
