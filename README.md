@@ -77,6 +77,27 @@ It works in independent steps:
   `content/`. Render with `hugo server`, `zola serve`, or `pelican -l`
   respectively; for search on Hugo or Pelican, run
   [Pagefind](https://pagefind.app) over the build output.
+
+  The `hugo` step can also target a real theme, named in `site.json`:
+
+  ```json
+  "hugo": {"theme": "dream",
+           "theme_repo": "https://github.com/g1eny0ung/hugo-theme-dream",
+           "avatar": "avatar.png",            // archive-relative, optional
+           "params": {"motto": "..."}}        // extra/override params
+  ```
+
+  The exporter then emits the theme's config instead of its own layouts;
+  clone the theme once into `<out>/site-hugo/themes/<name>` (regeneration
+  preserves `themes/`, and the exporter prints the clone command while it
+  is missing). The [Dream theme](https://hugo-theme-dream.g1en.site)
+  (Hugo ≥ 0.158) gets first-class support: each post's first still image
+  of sane size becomes its summary-card cover (Dream webp-encodes covers,
+  so animated gifs and 25-megapixel screenshots are passed over), authors
+  get per-post bylines with profile links, Dream's built-in search page
+  and archives timeline are enabled, an Authors nav item points at the
+  author taxonomy, `siteStartYear` is derived from the oldest post, and
+  the `avatar` image is copied into the site for the header.
 * **`lint`** scans the converted posts for conversion-defect signatures —
   leftover Medium chrome, unclosed code fences, images referenced but
   missing on disk, remote Medium CDN images. It exits non-zero when a

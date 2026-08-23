@@ -41,7 +41,8 @@ def archive(tmp_path):
     make_post(tmp_path, manifest, "second-post", "bbb222bbb222",
               "2021-03-01T10:00:00Z",
               "An image:\n\n![pic](images/001-pic.png)\n\n"
-              "```\n![fenced](images/lit.png)\n```\n")
+              "```\n![fenced](images/lit.png)\n```\n",
+              images=["images/001-pic.png"])
     (second / "images").mkdir()
     (second / "images" / "001-pic.png").write_bytes(b"PNG")
     (tmp_path / "posts.json").write_text(json.dumps(manifest))
@@ -71,6 +72,50 @@ def test_hugo_site(archive):
     assert (site / "layouts/_default/single.html").exists()
     assert "Welcome." in (site / "content/_index.md").read_text()
     assert (site / "redirects.csv").read_text().count("/posts/first-post/") == 3
+
+
+def test_hugo_dream_theme(archive):
+    (archive / "logo.png").write_bytes(b"IMG")
+    (archive / "site.json").write_text(json.dumps(
+        {"title": "Example Blog",
+         "hugo": {"theme": "dream", "theme_repo": "https://example.org/d.git",
+                  "avatar": "logo.png", "params": {"motto": "hello"}}}))
+    site = hugo.build_site(archive)
+    config = (site / "hugo.toml").read_text()
+    assert 'theme = "dream"' in config
+    assert 'headerTitle = "Example Blog"' in config and "rss = true" in config
+    assert "siteStartYear = 2020" in config
+    assert 'authors = { href = "/authors", icon = "people", title = "Authors" }' in config
+    assert 'motto = "hello"' in config          # user params merge last
+    assert 'avatar = "img/avatar.png"' in config
+    assert (site / "static/img/avatar.png").read_bytes() == b"IMG"
+    # the theme brings its own layouts; Dream's extra pages are created
+    assert not (site / "layouts").exists()
+    assert (site / "content/search/_index.md").exists()
+    assert "Archives" in (site / "content/posts/_index.md").read_text()
+    front = json.loads((site / "content/posts/second-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert front["cover"] == "images/001-pic.png"
+    assert front["images"] == ["images/001-pic.png"]
+    assert front["author"] == "Ada Lovelace"
+    assert front["authorlink"] == "https://medium.com/@ada"
+
+
+def test_cover_skips_gifs_and_huge_stills(tmp_path):
+    import struct
+    images = tmp_path / "images"
+    images.mkdir()
+    png = lambda w, h: (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+                        + struct.pack(">II", w, h) + b"\x00" * 8)
+    (images / "big.png").write_bytes(png(7532, 3464))
+    (images / "small.png").write_bytes(png(800, 600))
+    (images / "anim.gif").write_bytes(b"GIF89a" + struct.pack("<HH", 400, 300))
+    assert hugo.image_size(images / "big.png") == (7532, 3464)
+    assert hugo.image_size(images / "anim.gif") == (400, 300)
+    post = {"images": ["images/anim.gif", "images/big.png", "images/small.png"]}
+    assert hugo.pick_cover(post, tmp_path) == "images/small.png"
+    assert hugo.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
+    assert hugo.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
 
 
 def test_zola_site(archive):

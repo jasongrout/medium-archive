@@ -77,6 +77,19 @@ clean `lint` run, and the offline test suite):
   relies on its built-in theme, with colocated images rewritten to
   `{attach}` links. Each validated with a real generator build over
   the full archive (hugo 0.152.2, zola 0.21.0, pelican 4.12.0).
+- **Hugo theme support (Dream)** — site.json's `hugo` section can name
+  a real theme (`theme`, `theme_repo`, optional `avatar` and `params`);
+  the exporter then emits that theme's config instead of its own
+  layouts and keeps `site-hugo/themes/` across regenerations. Dream
+  (hugo-theme-dream, Hugo ≥ 0.158) gets first-class treatment: covers
+  for the masonry cards from each post's first still image of sane
+  size (animated gifs and >12 MP stills are passed over — Dream
+  webp-encodes covers at original size), per-post bylines with
+  profile links, the built-in search page and /posts archives
+  timeline, an Authors nav item, siteStartYear from the oldest post,
+  and an avatar copied into the site. Validated against the full
+  archive with Hugo 0.158: all pages, covers, search, tag/author
+  pages and feeds render (screenshots checked via headless Chromium).
 
 ## Remaining
 
