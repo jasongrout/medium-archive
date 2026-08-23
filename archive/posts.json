@@ -2553,29 +2553,6 @@
     "body_source": "page",
     "dir": "posts/2023-10-23-plug-your-application-into-the-jupyter-world"
   },
-  "https://blog.jupyter.org/voilà-0-5-0-homecoming-66f2465aa86f": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/voilà-0-5-0-homecoming-66f2465aa86f",
-    "original_path": "/voilà-0-5-0-homecoming-66f2465aa86f",
-    "medium_id": "66f2465aa86f",
-    "slug": "voilà-0-5-0-homecoming",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "dashboard",
-      "jupyter",
-      "notebook",
-      "voilà"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-voilà-0-5-0-homecoming"
-  },
   "https://blog.jupyter.org/generative-ai-in-jupyter-3f7174824862": {
     "title": "Generative AI in Jupyter",
     "author": "Jason Weill",
@@ -3128,28 +3105,6 @@
     "body_source": "page",
     "dir": "posts/2023-03-09-updating-defaults-on-mybinder-org"
   },
-  "https://blog.jupyter.org/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15",
-    "original_path": "/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15",
-    "medium_id": "b713edadf15",
-    "slug": "online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collabo",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "collaboration",
-      "community",
-      "jupyterhub"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collabo"
-  },
   "https://blog.jupyter.org/improving-the-accessibility-of-jupyter-6c695db518d3": {
     "title": "Improving the accessibility of Jupyter",
     "author": "QuantStack",
@@ -3458,28 +3413,6 @@
     ],
     "body_source": "export",
     "dir": "posts/2017-07-14-jupytercon-nyc-august-22nd-25th"
-  },
-  "https://blog.jupyter.org/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490",
-    "original_path": "/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490",
-    "medium_id": "87d659583490",
-    "slug": "voil%C3%A0-is-now-an-official-jupyter-subproject",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "dashboard",
-      "jupyter",
-      "visualization"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-voil%C3%A0-is-now-an-official-jupyter-subproject"
   },
   "https://blog.jupyter.org/elyra-reaches-1-0-0-41039dc06405": {
     "title": "Elyra reaches 1.0.0",
@@ -4877,28 +4810,6 @@
     "body_source": "page",
     "dir": "posts/2021-12-14-jupyter-games"
   },
-  "https://blog.jupyter.org/need-for-speed-voilà-edition-a9e1300ab3b2": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/need-for-speed-voilà-edition-a9e1300ab3b2",
-    "original_path": "/need-for-speed-voilà-edition-a9e1300ab3b2",
-    "medium_id": "a9e1300ab3b2",
-    "slug": "need-for-speed-voilà-edition",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "dashboard",
-      "jupyter",
-      "voila"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-need-for-speed-voilà-edition"
-  },
   "https://blog.jupyter.org/jupyterhub-2-0-7a038715e96d": {
     "title": "JupyterHub 2.0",
     "author": "Min RK",
@@ -5526,29 +5437,6 @@
     ],
     "body_source": "page",
     "dir": "posts/2021-01-05-jupyterlab-3-0-is-out"
-  },
-  "https://blog.jupyter.org/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa",
-    "original_path": "/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa",
-    "medium_id": "f6e2e41ab3fa",
-    "slug": "jupyterlite-jupyter-️-webassembly-️-python",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "data-science",
-      "jupyter",
-      "python",
-      "webassembly"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-jupyterlite-jupyter-️-webassembly-️-python"
   },
   "https://blog.jupyter.org/how-we-made-jupyter-notebooks-collaborative-with-yjs-b8dff6a9d8af": {
     "title": "How we made Jupyter Notebooks collaborative with Yjs",
@@ -6180,28 +6068,6 @@
     ],
     "body_source": "page",
     "dir": "posts/2019-04-06-devops-intelligence"
-  },
-  "https://blog.jupyter.org/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130",
-    "original_path": "/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130",
-    "medium_id": "a2ce7ef99130",
-    "slug": "a-gallery-of-voil%C3%A0-examples",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "data-science",
-      "jupyter",
-      "voila"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-a-gallery-of-voil%C3%A0-examples"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-2-0-9c5b3ea672f": {
     "title": "Jupyter Notebook 5.2.0",
@@ -7059,30 +6925,6 @@
     "body_source": "page",
     "dir": "posts/2019-11-26-the-jupyterhub-and-binder-contributor-in-residence"
   },
-  "https://blog.jupyter.org/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f",
-    "original_path": "/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f",
-    "medium_id": "435f67d10b4f",
-    "slug": "a-slideshow-template-for-voil%C3%A0-apps",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "dashboard",
-      "data-science",
-      "jupyter",
-      "slideshow",
-      "voila"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-a-slideshow-template-for-voil%C3%A0-apps"
-  },
   "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-26a8417e5b6a": {
     "title": "Jupyter Community Workshops: Call for Proposals",
     "author": "Ana Ruvalcaba",
@@ -7265,28 +7107,6 @@
     ],
     "body_source": "page",
     "dir": "posts/2019-02-19-jupyter-community-workshop-dashboarding-with-project-jupyter"
-  },
-  "https://blog.jupyter.org/and-voil%C3%A0-f6a2c08a4a93": {
-    "title": "",
-    "author": "",
-    "author_url": null,
-    "date": "",
-    "updated": null,
-    "original_url": "https://blog.jupyter.org/and-voil%C3%A0-f6a2c08a4a93",
-    "original_path": "/and-voil%C3%A0-f6a2c08a4a93",
-    "medium_id": "f6a2c08a4a93",
-    "slug": "and-voil%C3%A0",
-    "canonical_url": null,
-    "ghost_url": null,
-    "description": "",
-    "tags": [
-      "dashboards",
-      "data-science",
-      "jupyter"
-    ],
-    "images": [],
-    "body_source": "page",
-    "dir": "posts/undated-and-voil%C3%A0"
   },
   "https://blog.jupyter.org/jupyter-community-workshop-south-america-d8e482652952": {
     "title": "Jupyter Community Workshop: South America",

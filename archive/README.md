@@ -12,6 +12,12 @@ Medium. It has two layers:
   `medium-archive convert` from `raw/` alone, with no network access. They
   can be deleted and regenerated at any time (`convert --clean`), and are the
   layer to change when adapting the archive to a new site generator.
+* `fixups/*.patch` (optional) are **hand-written corrections**: unified
+  patches (targets named `<medium_id>/<file>`, `#` comments allowed) that
+  `convert` and `compare` apply to the in-memory copy of raw files, so
+  defects authored into the sources themselves — a broken href, a mangled
+  paragraph — are fixed reproducibly while `raw/` stays byte-for-byte as
+  fetched. Back them up with `raw/`.
 
 ## Layout
 
@@ -67,6 +73,8 @@ raw/
                                 content_html). Only ~10 recent posts have one.
     images.json               {source_url: filename} for images/
     images/<filename>         full-resolution images referenced by the post
+fixups/*.patch                optional hand-written corrections, applied to
+                                raw files in memory by convert and compare
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
 redirects.csv                 original_path, medium_id, original_url,
@@ -91,7 +99,8 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `original_url`  | canonical Medium URL of the post |
 | `original_path` | path component of `original_url`; what an old inbound link carries |
 | `medium_id`     | Medium's hex post id; Medium also resolves `/p/<id>` |
-| `slug`          | `original_path` with the id suffix removed |
+| `slug`          | `original_path` with the id suffix removed, percent-decoded |
+| `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
 | `description`   | the subtitle (from the account export) or Medium's summary text |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
@@ -149,4 +158,5 @@ too.
     medium-archive fetch https://blog.jupyter.org --out medium_export              # incremental; add new posts
     medium-archive compare --out medium_export                   # verify page vs export conversion
     medium-archive convert --clean --out medium_export           # rebuild posts/ from raw/
+    medium-archive lint --out medium_export                      # check for conversion defects
     medium-archive stats --out medium_export                     # summarize the archive
