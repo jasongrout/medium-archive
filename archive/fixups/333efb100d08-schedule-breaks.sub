@@ -1,0 +1,86 @@
+# The Ghost original of this schedule post uses explicit line breaks
+# ('Talk title <br />' before each speaker, and one per sponsor
+# link); Medium's importer turned them into the same doubled breaks
+# it uses for wrapped source lines, which convert collapses to
+# spaces for Ghost-migrated posts. Make each a single break in every
+# Medium-side copy (export, the page's rendered DOM, and the page's
+# stored paragraph text) so titles, speakers and sponsors keep their
+# lines whichever body source converts.
+
+file: 333efb100d08/export.html
+old: rent and future state of Project Jupyter<br><br>
+new: rent and future state of Project Jupyter<br>
+old: for Transparent, Reproducible Journalism<br><br>
+new: for Transparent, Reproducible Journalism<br>
+old: Jupyter Incubator: What’s Cooking?<br><br>
+new: Jupyter Incubator: What’s Cooking?<br>
+old: Changing Education with Jupyter<br><br>
+new: Changing Education with Jupyter<br>
+old: Thebe: Jupyter Outside Notebooks<br><br>
+new: Thebe: Jupyter Outside Notebooks<br>
+old: omputable Content with Jupyter Notebooks<br><br>
+new: omputable Content with Jupyter Notebooks<br>
+old: Deploying Jupyter at NSLS-II<br><br>
+new: Deploying Jupyter at NSLS-II<br>
+old: The bqplot visualization package<br><br>
+new: The bqplot visualization package<br>
+old: cing computation with Jupyter and Binder<br><br>
+new: cing computation with Jupyter and Binder<br>
+old: opendatascicon.com/</a>)<br><br>
+new: opendatascicon.com/</a>)<br>
+old: meetup.com/PyDataNYC/</a>)<br><br>
+new: meetup.com/PyDataNYC/</a>)<br>
+old: meetup.com/nycpython/</a>)<br><br>
+new: meetup.com/nycpython/</a>)<br>
+
+file: 333efb100d08/page.html
+old: rent and future state of Project Jupyter<br/><br/>
+new: rent and future state of Project Jupyter<br/>
+old: for Transparent, Reproducible Journalism<br/><br/>
+new: for Transparent, Reproducible Journalism<br/>
+old: Jupyter Incubator: What’s Cooking?<br/><br/>
+new: Jupyter Incubator: What’s Cooking?<br/>
+old: Changing Education with Jupyter<br/><br/>
+new: Changing Education with Jupyter<br/>
+old: Thebe: Jupyter Outside Notebooks<br/><br/>
+new: Thebe: Jupyter Outside Notebooks<br/>
+old: omputable Content with Jupyter Notebooks<br/><br/>
+new: omputable Content with Jupyter Notebooks<br/>
+old: Deploying Jupyter at NSLS-II<br/><br/>
+new: Deploying Jupyter at NSLS-II<br/>
+old: The bqplot visualization package<br/><br/>
+new: The bqplot visualization package<br/>
+old: cing computation with Jupyter and Binder<br/><br/>
+new: cing computation with Jupyter and Binder<br/>
+old: http://opendatascicon.com/</a>)<br/><br/>
+new: http://opendatascicon.com/</a>)<br/>
+old: http://www.meetup.com/PyDataNYC/</a>)<br/><br/>
+new: http://www.meetup.com/PyDataNYC/</a>)<br/>
+old: http://www.meetup.com/nycpython/</a>)<br/><br/>
+new: http://www.meetup.com/nycpython/</a>)<br/>
+
+# the same breaks in the page's stored paragraph text
+old: rent and future state of Project Jupyter\n\n
+new: rent and future state of Project Jupyter\n
+old: for Transparent, Reproducible Journalism\n\n
+new: for Transparent, Reproducible Journalism\n
+old: Jupyter Incubator: What’s Cooking?\n\n
+new: Jupyter Incubator: What’s Cooking?\n
+old: Changing Education with Jupyter\n\n
+new: Changing Education with Jupyter\n
+old: Thebe: Jupyter Outside Notebooks\n\n
+new: Thebe: Jupyter Outside Notebooks\n
+old: omputable Content with Jupyter Notebooks\n\n
+new: omputable Content with Jupyter Notebooks\n
+old: Deploying Jupyter at NSLS-II\n\n
+new: Deploying Jupyter at NSLS-II\n
+old: The bqplot visualization package\n\n
+new: The bqplot visualization package\n
+old: cing computation with Jupyter and Binder\n\n
+new: cing computation with Jupyter and Binder\n
+old: atascicon.com\u002F)\n\nNYC PyData Meetup
+new: atascicon.com\u002F)\nNYC PyData Meetup
+old: PyDataNYC\u002F)\n\nNYC Python Meetup
+new: PyDataNYC\u002F)\nNYC Python Meetup
+old: nycpython\u002F)\n\nNumFOCUS
+new: nycpython\u002F)\nNumFOCUS

@@ -1,0 +1,16 @@
+# The Ghost original signs off with an explicit line break
+# ('Sincerely, <br />' then the team name); Medium's importer turned it
+# into the same doubled break it uses for wrapped source lines, which
+# convert collapses to a space for Ghost-migrated posts. Make it a
+# single break in every Medium-side copy (export, the page's rendered
+# DOM, and the page's stored paragraph text) so the signature keeps its
+# own line whichever body source converts.
+file: b79bfd18566d/export.html
+old: Sincerely,<br><br>
+new: Sincerely,<br>
+
+file: b79bfd18566d/page.html
+old: Sincerely,<br/><br/>
+new: Sincerely,<br/>
+old: "text":"Sincerely,\n\nThe JupyterHub Team
+new: "text":"Sincerely,\nThe JupyterHub Team

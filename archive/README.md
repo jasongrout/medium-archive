@@ -12,12 +12,18 @@ Medium. It has two layers:
   `medium-archive convert` from `raw/` alone, with no network access. They
   can be deleted and regenerated at any time (`convert --clean`), and are the
   layer to change when adapting the archive to a new site generator.
-* `fixups/*.patch` (optional) are **hand-written corrections**: unified
-  patches (targets named `<medium_id>/<file>`, `#` comments allowed) that
-  `convert` and `compare` apply to the in-memory copy of raw files, so
-  defects authored into the sources themselves — a broken href, a mangled
+* `fixups/` (optional) holds **hand-written corrections** that `convert`
+  and `compare` apply to the in-memory copy of raw files, so defects
+  authored into the sources themselves — a broken href, a typo, a mangled
   paragraph — are fixed reproducibly while `raw/` stays byte-for-byte as
-  fetched. Back them up with `raw/`.
+  fetched. `*.sub` files are reviewable single-line substitutions
+  (`file:` target, then `old:`/`new:` pairs; optional `count:` for the
+  exact number of occurrences expected, `old-regex:` for a regex, `#`
+  comments) — preferred, since raw HTML is often one enormous line that
+  makes a unified diff unreadable. `*.patch` files are unified patches
+  (targets named `<medium_id>/<file>`) for structural edits a
+  substitution cannot express. A fixup that no longer applies aborts the
+  run rather than being skipped. Back them up with `raw/`.
 
 ## Layout
 
@@ -73,7 +79,7 @@ raw/
                                 content_html). Only ~10 recent posts have one.
     images.json               {source_url: filename} for images/
     images/<filename>         full-resolution images referenced by the post
-fixups/*.patch                optional hand-written corrections, applied to
+fixups/*.sub, *.patch         optional hand-written corrections, applied to
                                 raw files in memory by convert and compare
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
