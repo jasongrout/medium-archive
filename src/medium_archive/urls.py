@@ -22,7 +22,9 @@ def resolve_canonical(fetched: str, declared: str | None) -> tuple[str, str | No
     fetched = canonical_url(fetched)
     declared = canonical_url(urljoin(fetched, declared or fetched))
     f, d = urlparse(fetched), urlparse(declared)
-    if (f.netloc, f.path) == (d.netloc, d.path):
+    # percent-decode before comparing: Medium serves the same slug both
+    # encoded (caf%C3%A9) and decoded (café) depending on the source
+    if (f.netloc, unquote(f.path)) == (d.netloc, unquote(d.path)):
         return declared, None
     return fetched, declared
 
@@ -42,7 +44,10 @@ def medium_id(url: str) -> str | None:
 
 
 def slug_of(url: str) -> str:
-    last = urlparse(url).path.strip("/").split("/")[-1]
+    """Last path segment, id suffix removed, percent-decoded: Medium URLs
+    percent-encode non-ASCII slugs, but their sitemap serves some of the
+    same URLs decoded, so decoding keeps one post one slug either way."""
+    last = unquote(urlparse(url).path).strip("/").split("/")[-1]
     return POST_ID_RE.sub("", last)[:80] or "post"
 
 

@@ -47,6 +47,11 @@ It works in independent steps:
   It never touches the network, so it can be re-run freely while tuning the
   conversion (selectors, Markdown style, output layout) without hitting
   Medium again.
+* **`lint`** scans the converted posts for conversion-defect signatures —
+  leftover Medium chrome, unclosed code fences, images referenced but
+  missing on disk, remote Medium CDN images. It exits non-zero when a
+  defect is found, so regressions surface on every convert instead of
+  waiting for a reader.
 * **`stats`** summarizes the converted archive: posts per year, provenance
   (how each post was discovered — feed, sitemap, Wayback, Ghost era — which
   sources were recovered for it, and which one each body was converted
@@ -82,6 +87,7 @@ medium-archive import-export medium-export.zip
 medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
 medium-archive convert                                      # raw -> posts/
+medium-archive lint                                         # check for conversion defects
 medium-archive stats                                        # summarize the archive
 medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 ```
@@ -156,6 +162,7 @@ longer lists — work through the steps in order:
 
    ```sh
    medium-archive convert --out myblog
+   medium-archive lint --out myblog
    medium-archive stats --out myblog
    ```
 
@@ -187,6 +194,22 @@ longer lists — work through the steps in order:
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become
   links and need manual replacement.
+* Every Medium page carries its post twice: rendered into the visible
+  HTML, and as data in its embedded editor state
+  (`window.__APOLLO_STATE__`) — the ordered paragraph list with markup
+  spans, image ids, code blocks, plus title, timestamps, author and
+  tags. `convert` prefers the state (`body_source: state`) over the
+  rendered HTML: it has no chrome to strip and keeps what the renderer
+  destroys — the full text span of a link containing a code fragment,
+  bold on code, and iframe embeds that an un-hydrated capture drops
+  entirely. It also survives when Medium serves the bare application
+  shell (no server-rendered article, page title just "Medium"), which is
+  how shell-only captures convert at all — though a shell's images were
+  never fetched, so its body keeps remote URLs until re-fetched.
+  `compare --state` verifies the state conversion against account
+  exports, like plain `compare` does for the page conversion; the
+  rendered page remains the fallback and is available with
+  `convert --prefer-page`.
 * Medium rate-limits and may serve a bot wall. A 429 is not retried —
   fetch reports it (with the server's `Retry-After` hint, when sent) and
   moves on; raise `--delay` and re-run to resume.
@@ -201,9 +224,11 @@ src/medium_archive/
   ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
   compare.py     the compare step: verify page vs export conversion agreement
+  lint.py        the lint step: scan converted posts for defect signatures
   stats.py       the stats step: summarize the converted archive
   discovery.py   find post URLs via the sitemap tree, RSS feed, and Wayback Machine
   pages.py       post page parsing: metadata extraction, body cleanup
+  state.py       convert a post from the page's embedded editor state
   images.py      image source extraction and filenames
   net.py         HTTP session and retrying GET
   dates.py       date parsing and the --start/--end window check

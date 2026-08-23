@@ -9,6 +9,7 @@
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in <out>/posts/, plus posts.json and redirects.csv
+    lint           scan converted posts for conversion-defect signatures
     stats          summarize the converted archive
 
 Only `fetch` (and `all`) touches the network; the other steps can be re-run
@@ -67,12 +68,15 @@ Notes:
   * Medium's "was originally published in ... on Medium" footer and stat
     tracking pixels are removed. Embedded gists/iframes become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
-  * Fixups: unified patches in <out>/fixups/*.patch (targets named
-    <medium_id>/<file>, '#' comment lines welcome) are applied to the
-    in-memory raw sources by convert and compare, so authored defects --
-    a broken href in a capture, a mangled paragraph in an export -- can
-    be corrected reproducibly without editing the archived bytes. A hunk
-    that no longer applies aborts the run rather than being skipped.
+  * Fixups: files in <out>/fixups/ are applied to the in-memory raw
+    sources by convert and compare, so authored defects -- a broken href
+    in a capture, a typo, a mangled paragraph in an export -- can be
+    corrected reproducibly without editing the archived bytes. *.sub
+    files hold reviewable single-line substitutions (file: target, then
+    old:/new: pairs, optional count:, old-regex: for regexes; '#'
+    comments); *.patch files hold unified patches for structural edits
+    (targets named <medium_id>/<file>). A substitution or hunk that no
+    longer applies aborts the run rather than being skipped.
   * The archive layout is documented in the README.md written into <out>/.
 Progress is written to stderr.
 """
@@ -85,6 +89,7 @@ from urllib.parse import urlparse
 
 from .compare import cmd_compare
 from .convert import cmd_convert
+from .lint import cmd_lint
 from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
@@ -146,10 +151,11 @@ def add_fetch_args(p):
 
 def add_convert_args(p):
     p.add_argument("--prefer-page", action="store_true",
-                   help="always convert the page body; by default the RSS "
-                        "<content:encoded> body is used when feed_item.json is present, "
-                        "since it is cleaner HTML with proper code blocks and "
-                        "full-resolution images")
+                   help="always convert the rendered page body; by default the "
+                        "account export, the RSS <content:encoded> body, or the "
+                        "page's embedded editor state (in that order) is "
+                        "preferred -- all three are cleaner sources than the "
+                        "rendered HTML")
     p.add_argument("--prefer-ghost", action="store_true",
                    help="when a post has an attached Ghost capture (ghost.html "
                         "from import-ghost), convert its body from that instead "
@@ -218,6 +224,10 @@ def main():
     cmp_p.add_argument("--only", action="append", metavar="URL",
                        help="compare just this post (repeatable; default: every post "
                             "that has both page.html and export.html)")
+    cmp_p.add_argument("--state", action="store_true",
+                       help="instead: verify the embedded-editor-state conversion "
+                            "(the default body source for Medium pages) against "
+                            "the account export, for every post that has both")
     cmp_p.add_argument("--ghost", action="store_true",
                        help="instead: diff each attached Ghost capture against the "
                             "post's Medium conversion, with Medium's mechanical "
@@ -225,6 +235,10 @@ def main():
                             "image renames, line wrapping) normalized away. "
                             "Informational (exit 0) -- what it reports is dropped "
                             "or edited content, to guide convert --prefer-ghost")
+    parser("lint", help="scan <out>/posts/ for conversion-defect signatures "
+                         "(leftover Medium chrome, unclosed code fences, "
+                         "missing image files, remote CDN images); exits "
+                         "non-zero if any are found")
     stats_p = parser("stats", help="summarize the converted archive "
                                    "(posts, provenance, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
@@ -244,5 +258,7 @@ def main():
         cmd_convert(args)
     if args.command == "compare":
         cmd_compare(args)
+    if args.command == "lint":
+        cmd_lint(args)
     if args.command == "stats":
         cmd_stats(args)

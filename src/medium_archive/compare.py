@@ -24,6 +24,7 @@ from .export import export_body, parse_export
 from .fetch import read_index
 from .fixup import load_fixups, read_raw
 from .pages import extract_metadata, ghost_body, page_body
+from .state import apollo_post_state, state_body
 from .urls import canonical_url
 
 
@@ -166,8 +167,9 @@ def compare_ghost(args):
             soup = BeautifulSoup(read_raw(raw / "page.html", fixups),
                                  "html.parser")
             info = extract_metadata(soup, url)
-            medium_md, medium_src = to_markdown(page_body(soup, info["tags"]),
-                                                info["url"], img_map, raw)[0], "page"
+            medium_md, medium_src = to_markdown(
+                page_body(soup, info["tags"], info["title"]),
+                info["url"], img_map, raw)[0], "page"
         else:
             skipped += 1
             continue
@@ -199,7 +201,8 @@ def cmd_compare(args):
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
     fixups = load_fixups(args.out)
 
-    identical, differing, no_export, no_page, missing = 0, [], 0, 0, 0
+    use_state = getattr(args, "state", False)
+    identical, differing, no_export, no_page, no_state, missing = 0, [], 0, 0, 0, 0
     for url in targets:
         entry = index.get(url)
         raw = raw_dir / entry["medium_id"] if entry else None
@@ -216,25 +219,38 @@ def cmd_compare(args):
         img_map = {}
         if (raw / "images.json").exists():
             img_map = json.loads(read_raw(raw / "images.json", fixups))
-        soup = BeautifulSoup(read_raw(raw / "page.html", fixups), "html.parser")
+        page_text = read_raw(raw / "page.html", fixups)
+        soup = BeautifulSoup(page_text, "html.parser")
         info = extract_metadata(soup, url)
-        page_md, _ = to_markdown(page_body(soup, info["tags"]), info["url"], img_map, raw)
+        if use_state:
+            state = apollo_post_state(page_text, entry["medium_id"])
+            if state is None:
+                no_state += 1
+                continue
+            a_md, _ = to_markdown(state_body(state, entry["medium_id"],
+                                             info["title"]),
+                                  info["url"], img_map, raw)
+            a_label = "a: state conversion, b: export conversion"
+        else:
+            a_md, _ = to_markdown(page_body(soup, info["tags"], info["title"]),
+                                  info["url"], img_map, raw)
+            a_label = "a: page conversion, b: export conversion"
         exp = parse_export(read_raw(raw / "export.html", fixups))
         export_md, _ = to_markdown(export_body(exp["soup"]), info["url"], img_map, raw)
 
-        page_lines = comparable_lines(page_md)
+        a_lines = comparable_lines(a_md)
         export_lines = comparable_lines(export_md)
-        if page_lines == export_lines:
+        if a_lines == export_lines:
             identical += 1
             continue
         differing.append(url)
-        print_patch(entry.get("title", url), url,
-                    "a: page conversion, b: export conversion",
-                    page_lines, export_lines)
+        print_patch(entry.get("title", url), url, a_label,
+                    a_lines, export_lines)
 
     print(f"compare done: {identical} identical, {len(differing)} differ"
           + (f", {no_export} without export.html" if no_export else "")
           + (f", {no_page} without page.html" if no_page else "")
+          + (f", {no_state} without embedded state" if no_state else "")
           + (f", {missing} not in raw/" if missing else ""), file=sys.stderr)
     if differing:
         sys.exit(1)
