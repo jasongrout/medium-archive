@@ -2572,7 +2572,15 @@
       "notebook",
       "voilà"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_Oqkkz64NWqTFoS45sfprGQ.png",
+      "images/002-1_W1dHdjWC0CYoLjCWXXxU2w.png",
+      "images/003-1_WWRmwTs5v_U8HL27JzY7Uw.png",
+      "images/004-1_Yp5wC6yCRbCNejKtKZV8Ww.png",
+      "images/005-0_x5BSQzmN_DVAFLc5.png",
+      "images/006-0_jOsGiBpJ5Qt2t15C.png",
+      "images/007-1_uSLpGo9pf1l4HIaxPFYysg.png"
+    ],
     "body_source": "state",
     "dir": "posts/2023-09-25-voilà-0-5-0-homecoming"
   },
@@ -3146,7 +3154,9 @@
       "community",
       "jupyterhub"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_9GSBPtjxJNpvUXCFcaL9ng.jpeg"
+    ],
     "body_source": "state",
     "dir": "posts/2023-02-27-online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collabo"
   },
@@ -3477,7 +3487,11 @@
       "jupyter",
       "visualization"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_mp59BtUkz046smQek2-BFA.gif",
+      "images/002-1_P447LmtfAnhIcCol6q6FBw.png",
+      "images/003-1_ZrMs1GjNdEYhsbqese6xVA.png"
+    ],
     "body_source": "state",
     "dir": "posts/2019-12-29-voilà-is-now-an-official-jupyter-subproject"
   },
@@ -4895,7 +4909,11 @@
       "jupyter",
       "voila"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_gSWxQGu60SG5DdH8MIzCjw.png",
+      "images/002-1_djVMI5ujhEq6xVbYJNzuuA.gif",
+      "images/003-1_Gwq82pb0qAInlPUJm_-JYA.gif"
+    ],
     "body_source": "state",
     "dir": "posts/2021-12-10-need-for-speed-voilà-edition"
   },
@@ -5546,7 +5564,25 @@
       "python",
       "webassembly"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_CMvcTaLSAD5A-WHCtnIFwA.png",
+      "images/002-1_bR--bXsuiMIDz-D_V4BfLw.png",
+      "images/003-1_B1Se7Fe1JXBt2a1NjwRmxg.png",
+      "images/004-1_HwMx3Fd6iICkWjjvUCtvwA.gif",
+      "images/005-1_usFUmvzRo6v8TuRFQhK0uw.png",
+      "images/006-1_2WBnuwRGkASGVNYUGjyPHg.gif",
+      "images/007-1_SRr162bkckWsmoSMxVd2uQ.gif",
+      "images/008-1_w7Y4wRz9h2OFMgm5MfdD0A.gif",
+      "images/009-1_c1DIbxS6bZ7bHDcOTEIJfg.gif",
+      "images/010-1_5XFdmBdQWeONbRD3nuQe0A.png",
+      "images/011-1_kPYtSDP3aE5_M5AmDT-Uvw.gif",
+      "images/012-1_69CnccBrufVEEU0wqE_f7Q.gif",
+      "images/013-1_f7viaaS4SYTBpjA6DTPsDQ.png",
+      "images/014-1_mMmSo4GPx7rpxbMpyf-VAA.jpeg",
+      "images/015-1_LL_UkItjshAzsEEDB4cI2A.png",
+      "images/001-1_CMvcTaLSAD5A-WHCtnIFwA.png",
+      "images/016-1_UY4k_mgLml9uvyo_EKMdFA.png"
+    ],
     "body_source": "state",
     "dir": "posts/2021-07-13-jupyterlite-jupyter-️-webassembly-️-python"
   },
@@ -6199,7 +6235,13 @@
       "jupyter",
       "voila"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_w-xt2hmqBRHfjZl6ljZyxQ.png",
+      "images/002-1_8uW288G8hxihn-PkSJMCrQ.png",
+      "images/003-1_6WMGnuNAAToGvOooOvvmLg.gif",
+      "images/004-1_ZBnVhXXLOglYNLCyvf_Wdw.png",
+      "images/005-1_F0IS2B1XS6NCxp0Eh7linQ.png"
+    ],
     "body_source": "state",
     "dir": "posts/2019-07-09-a-gallery-of-voilà-examples"
   },
@@ -7079,7 +7121,13 @@
       "slideshow",
       "voila"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_JLepfTuigc_h1Gfy768BWg.png",
+      "images/002-1_rQ6byMkg3MIOpOS0dvWOig.png",
+      "images/003-1_x-8g5Ux5j4wPmwI5TYSWkw.gif",
+      "images/004-1_Pg6UNndYe0TIfRIeXy3RvA.gif",
+      "images/005-1_ZrMs1GjNdEYhsbqese6xVA.png"
+    ],
     "body_source": "state",
     "dir": "posts/2019-10-29-a-slideshow-template-for-voilà-apps"
   },
@@ -7284,7 +7332,19 @@
       "data-science",
       "jupyter"
     ],
-    "images": [],
+    "images": [
+      "images/001-1_c1xwFRqy99o8nLVxDSqNZg.png",
+      "images/002-1_imDFJcYj8k-apbrvIK9ZVQ.gif",
+      "images/003-1_ce142q3rm3TgJZVNEgGWcw.gif",
+      "images/004-1_KZj7rmVqAHmY1b-P-QMPLw.png",
+      "images/005-1_iBz5dUYHT5N9dbymPKTGCg.gif",
+      "images/006-1_e3k8ZgJoCp0Pm-yZ5Xr0Xg.gif",
+      "images/007-1_os2ABw7hEnfd1Dq5pOrTDg.gif",
+      "images/008-1_grVVSeKyw7bXYU7fZmHgQQ.gif",
+      "images/009-1_HtXNf1rq26u9ss8L-Oo6VQ.gif",
+      "images/010-1_6LggiPlUoCSkP2A1aHp_3w.jpeg",
+      "images/011-1_F0IS2B1XS6NCxp0Eh7linQ.png"
+    ],
     "body_source": "state",
     "dir": "posts/2019-06-11-and-voilà"
   },
