@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Jupyter Notebook 5.0</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/cdn-cgi/apps/head/MuIIl4I_IVFkxldaVu1mdWee9as.js"></script><link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css?v=a12b9c2f30" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <link rel="canonical" href="http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/amp/" />
+    
+    <meta property="og:site_name" content="Project Jupyter" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Jupyter Notebook 5.0" />
+    <meta property="og:description" content="We are pleased to announce the release of Jupyter Notebook version 5.0. This is the first major release of the Jupyter Notebook since version 4.0 and the &quot;Big Split” of IPython and Jupyter. This release adds some long-awaited features, such as cell tagging, customizing keyboard shortcuts, copying &amp;amp;" />
+    <meta property="og:url" content="http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/" />
+    <meta property="article:published_time" content="2017-04-04T14:29:41.000Z" />
+    <meta property="article:modified_time" content="2017-04-04T15:57:29.000Z" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Jupyter Notebook 5.0" />
+    <meta name="twitter:description" content="We are pleased to announce the release of Jupyter Notebook version 5.0. This is the first major release of the Jupyter Notebook since version 4.0 and the &quot;Big Split” of IPython and Jupyter. This release adds some long-awaited features, such as cell tagging, customizing keyboard shortcuts, copying &amp;amp;" />
+    <meta name="twitter:url" content="http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Grant Nestor" />
+    <meta name="twitter:site" content="@ProjectJupyter" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Project Jupyter",
+        "logo": "http://blog.jupyter.org/content/images/2015/02/jupyter-sq-text.png"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Grant Nestor",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/95d21304ad08b822b69c6da2e63f4bca?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "http://blog.jupyter.org/author/grant/",
+        "sameAs": []
+    },
+    "headline": "Jupyter Notebook 5.0",
+    "url": "http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/",
+    "datePublished": "2017-04-04T14:29:41.000Z",
+    "dateModified": "2017-04-04T15:57:29.000Z",
+    "description": "We are pleased to announce the release of Jupyter Notebook version 5.0. This is the first major release of the Jupyter Notebook since version 4.0 and the &quot;Big Split” of IPython and Jupyter. This release adds some long-awaited features, such as cell tagging, customizing keyboard shortcuts, copying &amp;amp;",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://blog.jupyter.org"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11" />
+    <link rel="alternate" type="application/rss+xml" title="Project Jupyter" href="http://blog.jupyter.org/rss/" />
+    <style type="text/css">
+.hljs {
+    background: transparent;
+}
+
+p code {
+  background: transparent;
+  padding: 0px;
+  font-size: inherit;
+  vertical-align: inherit;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"/>
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://blog.jupyter.org/">Home</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://blog.jupyter.org/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="blog-logo" href="http://blog.jupyter.org"><img src="/content/images/2015/02/jupyter-sq-text.png" alt="Project Jupyter" /></a>
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Jupyter Notebook 5.0</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2017-04-04">04 April 2017</time> 
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>We are pleased to announce the release of Jupyter Notebook version 5.0. This is the first major release of the Jupyter Notebook since version 4.0 and the <a href="http://blog.jupyter.org/2015/04/15/the-big-split/">"Big Split</a>” of IPython and Jupyter. This release adds some long-awaited features, such as cell tagging, customizing keyboard shortcuts, copying &amp; pasting cells between notebooks, and a more attractive default style for tables. It also comes with many improvements and bug fixes. This release does not introduce any breaking API changes.</p>
+
+<p>You can install the new version of the notebook now using pip:</p>
+
+<pre><code>pip install --upgrade notebook 
+</code></pre>
+
+<p>Or conda (it may be a few days before packages are available):</p>
+
+<pre><code>conda upgrade notebook 
+</code></pre>
+
+<h3 id="whatsnew">What’s new</h3>
+
+<p>This release introduces some new features and many improvements and bug fixes, totaling about <a href="https://github.com/jupyter/notebook/pulls?q=is%3Apr+milestone%3A5.0+is%3Aclosed">133 closed issues</a>, <a href="https://github.com/jupyter/notebook/issues?q=is%3Aissue+milestone%3A5.0+is%3Aclosed">303 merged PRs</a>, and 9 months in the making. For complete list of changes, see the <a href="http://jupyter-notebook.readthedocs.io/en/latest/changelog.html#notebook-version-5-0">changelog</a>.</p>
+
+<h4 id="filesortinginthedashboard">File sorting in the dashboard</h4>
+
+<p>Files in the dashboard may now be sorted by last modified date or name.</p>
+
+<p><img src="https://d2mxuefqeaa7sj.cloudfront.net/s_FEEF9145D27F442B426F07B26BA57659E60FC66062EE130FE04473C1C94F7A2E_1490838061654_Screen+Shot+2017-03-29+at+6.40.43+PM.png" alt="file sort" /></p>
+
+<h4 id="editkeyboardshortcuts">Edit keyboard shortcuts</h4>
+
+<p>Since IPython 2.0, it has been possible to customize keyboard shortcuts, but it involved editing your <code>custom.js</code> or otherwise writing code against the notebook. It’s now possible to edit keyboard shortcuts using a dialog in the <em>Help</em> menu. We support both emacs-like (multiple keys at once) and vim-like (sequence of key) shortcuts. The available shortcuts are currently limited to <a href="http://jupyter-notebook.readthedocs.io/en/latest/examples/Notebook/Notebook%20Basics.html#Command-mode">Command mode</a>, but we invite contributors to add support for Edit mode! </p>
+
+<p><img src="https://d2mxuefqeaa7sj.cloudfront.net/s_FEEF9145D27F442B426F07B26BA57659E60FC66062EE130FE04473C1C94F7A2E_1490896670065_shortcut-editor.png" alt="keyboard shortcuts" /></p>
+
+<p><strong>Tip:</strong> You can also see keyboard shortcuts for commands in the command palette (<code>Ctrl-Shift-P</code> by default). </p>
+
+<h4 id="celltags">Cell tags</h4>
+
+<p>Cell tags are a lightweight way to customize the behavior of tools working with notebooks. We're building support for them into tools like <a href="http://nbconvert.readthedocs.io/en/latest/">nbconvert</a> and <a href="https://github.com/computationalmodelling/nbval">nbval</a>. To start using tags, select <em>Tags</em> in the <em>View / Cell Toolbar</em> menu in a notebook.</p>
+
+<p><img src="https://d2mxuefqeaa7sj.cloudfront.net/s_FEEF9145D27F442B426F07B26BA57659E60FC66062EE130FE04473C1C94F7A2E_1491241293482_cell-tags-toolbar.png" alt="cell tags" /></p>
+
+<h4 id="tablestyle">Table style</h4>
+
+<p>The new default table style is more compact and subtle and consistent with JupyterLab.</p>
+
+<p><strong>Before:</strong></p>
+
+<p><img src="https://d2mxuefqeaa7sj.cloudfront.net/s_FEEF9145D27F442B426F07B26BA57659E60FC66062EE130FE04473C1C94F7A2E_1490839002282_Screen+Shot+2017-03-29+at+6.55.56+PM.png" alt="table before" /></p>
+
+<p><strong>After:</strong></p>
+
+<p><img src="https://d2mxuefqeaa7sj.cloudfront.net/s_FEEF9145D27F442B426F07B26BA57659E60FC66062EE130FE04473C1C94F7A2E_1490838746002_Screen+Shot+2017-03-29+at+6.51.37+PM.png" alt="table after" /></p>
+
+<h3 id="credits">Credits</h3>
+
+<p>This release has been a team effort and we would like to thank the following 87 people who contributed:</p>
+
+<ul>
+<li>Min RK (<a href="https://github.com/minrk">minrk</a>)</li>
+<li>Thomas Kluyver (<a href="https://github.com/takluyver">takluyver</a>)</li>
+<li>M Pacer (<a href="https://github.com/mpacer">mpacer</a>)</li>
+<li>Matthias Bussonnier (<a href="https://github.com/Carreau">Carreau</a>)</li>
+<li>Grant Nestor (<a href="https://github.com/gnestor">gnestor</a>)</li>
+<li>Carol Willing (<a href="https://github.com/willingc">willingc</a>)</li>
+<li>Steven Silvester (<a href="https://github.com/blink1073">blink1073</a>)</li>
+<li>Matthias Geier (<a href="https://github.com/mgeier">mgeier</a>)</li>
+<li>Safia Abdalla (<a href="https://github.com/captainsafia">captainsafia</a>)</li>
+<li>Jason Grout (<a href="https://github.com/jasongrout">jasongrout</a>)</li>
+<li>Julien Rebetez (<a href="https://github.com/julienr">julienr</a>)</li>
+<li>Peter Parente (<a href="https://github.com/parente">parente</a>)</li>
+<li>Sylvain Corlay (<a href="https://github.com/SylvainCorlay">SylvainCorlay</a>)</li>
+<li>Jonathan Frederic (<a href="https://github.com/jdfreder">jdfreder</a>)</li>
+<li>Brian E. Granger (<a href="https://github.com/ellisonbg">ellisonbg</a>)</li>
+<li>jakirkham (<a href="https://github.com/jakirkham">jakirkham</a>)</li>
+<li>Andreas Mueller (<a href="https://github.com/amueller">amueller</a>)</li>
+<li>Yuvi Panda (<a href="https://github.com/yuvipanda">yuvipanda</a>)</li>
+<li>Nathan Daly (<a href="https://github.com/NHDaly">NHDaly</a>)</li>
+<li>Bernhard Liebl (<a href="https://github.com/poke1024">poke1024</a>)</li>
+<li>Rob Nagler (<a href="https://github.com/robnagler">robnagler</a>)</li>
+<li>Vidar Tonaas Fauske (<a href="https://github.com/vidartf">vidartf</a>)</li>
+<li>Adam Johnson (<a href="https://github.com/adamchainz">adamchainz</a>)</li>
+<li>Philipp A. (<a href="https://github.com/flying-sheep">flying-sheep</a>)</li>
+<li>Jonathan (<a href="https://github.com/vanillajonathan">vanillajonathan</a>)</li>
+<li>Paul Ivanov (<a href="https://github.com/ivanov">ivanov</a>)</li>
+<li>Daniel Krenn (<a href="https://github.com/dkrenn">dkrenn</a>)</li>
+<li>jakirkham (<a href="https://github.com/kikocorreoso">kikocorreoso</a>)</li>
+<li>Vivian Fang (<a href="https://github.com/vivi">vivi</a>)</li>
+<li>ebraminio (<a href="https://github.com/ebraminio">ebraminio</a>)</li>
+<li>Lorenzo Gasparini (<a href="https://github.com/joined">joined</a>)</li>
+<li>Kyle Kelley (<a href="https://github.com/rgbkrk">rgbkrk</a>)</li>
+<li>Nicholas Bollweg (<a href="https://github.com/bollwyvl">bollwyvl</a>)</li>
+<li>John Detlefs (<a href="https://github.com/jdetle">jdetle</a>)</li>
+<li>Samar Sultan (<a href="https://github.com/samarsultan">samarsultan</a>)</li>
+<li>Adam Eury (<a href="https://github.com/aleury">aleury</a>)</li>
+<li>Louise Davies (<a href="https://github.com/louise-davies">louise-davies</a>)</li>
+<li>tonycpsu (<a href="https://github.com/tonycpsu">tonycpsu</a>)</li>
+<li>John B Nelson (<a href="https://github.com/jbn">jbn</a>)</li>
+<li>Christoph Klein (<a href="https://github.com/ctk3b">ctk3b</a>)</li>
+<li>Himani Arora (<a href="https://github.com/himani1">himani1</a>)</li>
+<li>Carlos Cordoba (<a href="https://github.com/ccordoba12">ccordoba12</a>)</li>
+<li>Eric Dill (<a href="https://github.com/ericdill">ericdill</a>)</li>
+<li>Anelia Dimitrova (<a href="https://github.com/adimitrova">adimitrova</a>)</li>
+<li>Sergei Lebedev (<a href="https://github.com/superbobry">superbobry</a>)</li>
+<li>Jinesh Mehta (<a href="https://github.com/jinmehta13">jinmehta13</a>)</li>
+<li>niole (<a href="https://github.com/niole">niole</a>)</li>
+<li>Jan Schulz (<a href="https://github.com/janschulz">janschulz</a>)</li>
+<li>Doug Blank (<a href="https://github.com/dsblank">dsblank</a>)</li>
+<li>Jeremy Kun (<a href="https://github.com/j2kun">j2kun</a>)</li>
+<li>clarka34 (<a href="https://github.com/clarka34">clarka34</a>)</li>
+<li>Jaeho Shin (<a href="https://github.com/netj">netj</a>)</li>
+<li>Stuart Geiger (<a href="https://github.com/staeiou">staeiou</a>)</li>
+<li>vlimant (<a href="https://github.com/vlimant">vlimant</a>)</li>
+<li>Elliot Kirk (<a href="https://github.com/eskirk">eskirk</a>)</li>
+<li>Pierre (<a href="https://github.com/Fitz3012">Fitz3012</a>)</li>
+<li>Scott Sanderson (<a href="https://github.com/ssanderson">ssanderson</a>)</li>
+<li>Natalie Perna (<a href="https://github.com/natalieperna">natalieperna</a>)</li>
+<li>Dennis (<a href="https://github.com/pleabargain">pleabargain</a>)</li>
+<li>Dave Hirschfeld (<a href="https://github.com/dhirschfeld">dhirschfeld</a>)</li>
+<li>Paul Gowder (<a href="https://github.com/paultopia">paultopia</a>)</li>
+<li>Justin Tyberg (<a href="https://github.com/jtyberg">jtyberg</a>)</li>
+<li>Andrew Shaffer (<a href="https://github.com/ashaffer">ashaffer</a>)</li>
+<li>Yuval Langer (<a href="https://github.com/yuvallanger">yuvallanger</a>)</li>
+<li>Srinivas Reddy Thatiparthy (<a href="https://github.com/srinivasreddy">srinivasreddy</a>)</li>
+<li>Remi Rampin (<a href="https://github.com/remram44">remram44</a>)</li>
+<li>sri (<a href="https://github.com/varmas">varmas</a>)</li>
+<li>Frederik Nordahl Jul Sabroe (<a href="https://github.com/FrederikNS">FrederikNS</a>)</li>
+<li>Jessime (<a href="https://github.com/Jessime">Jessime</a>)</li>
+<li>John Emmons (<a href="https://github.com/JCEmmons">JCEmmons</a>)</li>
+<li>Laurent Duchesne (<a href="https://github.com/lduchesne">lduchesne</a>)</li>
+<li>alexandercbooth (<a href="https://github.com/alexandercbooth">alexandercbooth</a>)</li>
+<li>chchen (<a href="https://github.com/cc272309126">cc272309126</a>)</li>
+<li>Ryan Lovett (<a href="https://github.com/ryanlovett">ryanlovett</a>)</li>
+<li>Derek Sifford (<a href="https://github.com/dsifford">dsifford</a>)</li>
+<li>Bernie Randles (<a href="https://github.com/brandles">brandles</a>)</li>
+<li>Thomas Fors (<a href="https://github.com/tfors">tfors</a>)</li>
+<li>Pierre Gerold (<a href="https://github.com/parleur">parleur</a>)</li>
+<li>Livia Barazzetti (<a href="https://github.com/livia-b">livia-b</a>)</li>
+<li>VladMironov (<a href="https://github.com/VladMironov">VladMironov</a>)</li>
+<li>Diego Mesa (<a href="https://github.com/diego898">diego898</a>)</li>
+<li>maxalbert (<a href="https://github.com/maxalbert">maxalbert</a>)</li>
+<li>nvdv (<a href="https://github.com/nvdv">nvdv</a>)</li>
+<li>Isak Falk (<a href="https://github.com/IsakFalk">IsakFalk</a>)</li>
+<li>Steve Holden (<a href="https://github.com/steveholden">steveholden</a>)</li>
+<li>Maarten Breddels (<a href="https://github.com/maartenbreddels">maartenbreddels</a>)</li>
+<li>Bartosz Telenczuk (<a href="https://github.com/btel">btel</a>)</li>
+</ul>
+
+<p>We look forward to your feedback and contributions!</p>
+        </section>
+
+        <footer class="post-footer">
+
+
+            <figure class="author-image">
+                <a class="img" href="/author/grant/" style="background-image: url(//www.gravatar.com/avatar/95d21304ad08b822b69c6da2e63f4bca?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x)"><span class="hidden">Grant Nestor's Picture</span></a>
+            </figure>
+
+            <section class="author">
+                <h4><a href="/author/grant/">Grant Nestor</a></h4>
+
+                    <p>Read <a href="/author/grant/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=Jupyter%20Notebook%205.0&amp;url=http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0/"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story no-cover" href="/2017/04/19/release-of-ipython-6-0/">
+        <section class="post">
+            <h2>Release of IPython 6.0</h2>
+            <p>It is with great pleasure that today we released IPython 6.0 — almost a year after the 5.0&hellip;</p>
+        </section>
+    </a>
+    <a class="read-next-story prev no-cover" href="/2017/03/30/ibm-brings-jupyter-and-spark-to-the-mainframe/">
+        <section class="post">
+            <h2>IBM Brings Jupyter and Spark to the Mainframe</h2>
+            <p>For the past few years, Project Jupyter has been collaborating with IBM on a number of initiatives. Much of&hellip;</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://blog.jupyter.org">Project Jupyter</a> &copy; 2017</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-python.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52617120-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>
+try {
+  document.onreadystatechange = function(){ 
+    (document.getElementsByClassName('blog-logo')[0]||{}).href = 'https://jupyter.org';
+  }
+} catch (e) {
+  console.log('error changing the logo link to jupyter homapage')
+}
+</script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=a12b9c2f30"></script>
+    <script type="text/javascript" src="/assets/js/index.js?v=a12b9c2f30"></script>
+
+</body>
+</html>

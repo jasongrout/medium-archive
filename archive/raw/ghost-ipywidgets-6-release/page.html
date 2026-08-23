@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Release of ipywidgets 6.0</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/cdn-cgi/apps/head/MuIIl4I_IVFkxldaVu1mdWee9as.js"></script><link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=09db7f30e7" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="canonical" href="http://blog.jupyter.org/2017/03/01/ipywidgets-6-release/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    
+    <meta property="og:site_name" content="Project Jupyter" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Release of ipywidgets 6.0" />
+    <meta property="og:description" content="We are pleased to announce the release of ipywidgets 6.0, the Jupyter interactive widget library. Jupyter interactive widgets enable building simple GUIs in the Jupyter notebook. ipywidgets 6.0 is a major release of the project. In this release, we closed 197 issues and 309 pull requests with 732" />
+    <meta property="og:url" content="http://blog.jupyter.org/2017/03/01/ipywidgets-6-release/" />
+    <meta property="og:image" content="http://blog.jupyter.org/content/images/2017/08/squarelogo-greytext-orangebody-greymoons.png" />
+    <meta property="article:published_time" content="2017-03-01T15:44:27.000Z" />
+    <meta property="article:modified_time" content="2017-08-28T18:33:33.000Z" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Release of ipywidgets 6.0" />
+    <meta name="twitter:description" content="We are pleased to announce the release of ipywidgets 6.0, the Jupyter interactive widget library. Jupyter interactive widgets enable building simple GUIs in the Jupyter notebook. ipywidgets 6.0 is a major release of the project. In this release, we closed 197 issues and 309 pull requests with 732" />
+    <meta name="twitter:url" content="http://blog.jupyter.org/2017/03/01/ipywidgets-6-release/" />
+    <meta name="twitter:image" content="http://blog.jupyter.org/content/images/2017/08/squarelogo-greytext-orangebody-greymoons.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Sylvain Corlay" />
+    <meta name="twitter:site" content="@ProjectJupyter" />
+    <meta property="og:image:width" content="518" />
+    <meta property="og:image:height" content="600" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Project Jupyter",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://blog.jupyter.org/content/images/2015/02/jupyter-sq-text.png",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Sylvain Corlay",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/971399cd3d255dfffb7f1924f4595c05?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "http://blog.jupyter.org/author/sylvain-corlay/",
+        "sameAs": []
+    },
+    "headline": "Release of ipywidgets 6.0",
+    "url": "http://blog.jupyter.org/2017/03/01/ipywidgets-6-release/",
+    "datePublished": "2017-03-01T15:44:27.000Z",
+    "dateModified": "2017-08-28T18:33:33.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://blog.jupyter.org/content/images/2017/08/squarelogo-greytext-orangebody-greymoons.png",
+        "width": 518,
+        "height": 600
+    },
+    "description": "We are pleased to announce the release of ipywidgets 6.0, the Jupyter interactive widget library. Jupyter interactive widgets enable building simple GUIs in the Jupyter notebook. ipywidgets 6.0 is a major release of the project. In this release, we closed 197 issues and 309 pull requests with 732",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://blog.jupyter.org/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 1.7" />
+    <link rel="alternate" type="application/rss+xml" title="Project Jupyter" href="http://blog.jupyter.org/rss/" />
+    <style type="text/css">
+.hljs {
+    background: transparent;
+}
+
+p code {
+  background: transparent;
+  padding: 0px;
+  font-size: inherit;
+  vertical-align: inherit;
+}
+.site-header {
+    background-color: #ccc;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"/>
+
+</head>
+<body class="post-template">
+
+    <div class="site-wrapper">
+
+        
+
+<header class="site-header outer">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+                <a class="site-nav-logo" href="http://blog.jupyter.org"><img src="/content/images/2015/02/jupyter-sq-text.png" alt="Project Jupyter" /></a>
+            <ul class="nav">
+    <li class="nav-home" role="presentation"><a href="http://blog.jupyter.org/">Home</a></li>
+</ul>
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+                <a class="social-link social-link-tw" href="https://twitter.com/ProjectJupyter" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+</a>
+        </div>
+            <a class="rss-button" href="http://cloud.feedly.com/#subscription/feed/http://blog.jupyter.org/rss/" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+</a>
+    </div>
+</nav>
+    </div>
+</header>
+
+
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+
+        <article class="post-full post ">
+
+            <header class="post-full-header">
+                <section class="post-full-meta">
+                    <time class="post-full-meta-date" datetime="2017-03-01">1 March 2017</time>
+                </section>
+                <h1 class="post-full-title">Release of ipywidgets 6.0</h1>
+            </header>
+
+            <figure class="post-full-image" style="background-image: url(/content/images/2017/08/squarelogo-greytext-orangebody-greymoons.png)">
+            </figure>
+
+            <section class="post-full-content">
+                <div class="kg-card-markdown"><p>We are pleased to announce the release of ipywidgets 6.0, the Jupyter interactive widget library. Jupyter interactive widgets enable building simple GUIs in the Jupyter notebook.</p>
+<p>ipywidgets 6.0 is a major release of the project. In this release, we closed <a href="https://github.com/ipython/ipywidgets/issues?utf8=%E2%9C%93&amp;q=is%3Aissue%20is%3Aclosed%20milestone%3A6.0%20">197 issues</a> and <a href="https://github.com/ipython/ipywidgets/pulls?q=is%3Apr+milestone%3A6.0+is%3Aclosed">309 pull requests</a> with <a href="https://github.com/ipython/ipywidgets/compare/5.2.2...6.0.0">732 commits</a>.</p>
+<h3 id="installation">Installation</h3>
+<p>Using conda:</p>
+<pre><code class="language-bash">conda install ipywidgets -c conda-forge
+</code></pre>
+<p>Using pip:</p>
+<pre><code class="language-bash">pip install ipywidgets
+jupyter nbextension enable --py --sys-prefix widgetsnbextension
+</code></pre>
+<h3 id="whatsnewinipywidgets60">What's new in ipywidgets 6.0?</h3>
+<p><strong>Custom widget styling</strong></p>
+<p>In addition to the existing <code>Widget.layout</code> attribute, which enables the specification of layout-related css properties for the top-most DOM element of a widget, we added a new <code>Widget.style</code> attribute. This attribute enables custom styling of various widget types (such as <code>Button.style.button_color</code>).</p>
+<p>The top-level styling properties that were deprecated in ipywidgets 5.0 have been removed.</p>
+<p><strong>Using widgets outside of the notebook</strong></p>
+<p>Another change in 6.0 is the ability to render Jupyter interactive widgets outside of the notebook:</p>
+<ul>
+<li>Widgets can be rendered in Sphinx documentation, either with the <code>jupyter-sphinx</code> extension or the <code>nbsphinx</code> notebook converter.</li>
+<li>Widgets now <a href="http://nbviewer.jupyter.org/github/ipython/ipywidgets/blob/6.0.0/docs/source/examples/Widget%20List.ipynb">render on nbviewer</a>.</li>
+<li>Jupyter interactive widgets can be embedded into static web sites, such as <a href="http://jupyter.org/widgets">http://jupyter.org/widgets</a>.</li>
+</ul>
+<p>Custom widget libraries built upon ipywidgets 6.0 can also take advantage of these features.</p>
+<p>This feature required the formal specification of a mime type for Jupyter interactive widgets, which is now contained in the new <code>jupyter-widgets-schema</code> npm package.</p>
+<p><strong>Redesign of the core widgets</strong></p>
+<p>The widgets provided with the base Jupyter widget libraries have gone through a major re-design.</p>
+<p>We also migrated from the <code>less</code> CSS preprocessor to the use of css variables. In addition to the main benefits of adopting web standards, we take advantage of css variables defined in JupyterLab to style the interactive widgets consistent with the environment.</p>
+<p><strong>Migration to Typescript</strong></p>
+<p>The <code>jupyter-js-widgets</code> JavaScript package, which is the front-end component of ipywidgets, has been completely refactored and migrated to the Typescript programming language. We also adopted the <a href="http://phosphorjs.github.io/">PhosphorJS</a> JavaScript framework, which is at the foundation of the JupyterLab project, for better layout capability and integration with JupyterLab.</p>
+<h3 id="credits">Credits</h3>
+<p>This release has been a team effort of a large number of contributors. We would like to thank the following 31 people who contributed, and especially the 14 people who contributed for the first time in this release.</p>
+<p><strong>Contributors to this release (alphabetical order):</strong></p>
+<p>Afshin Darian (first contribution)<br>
+Adam Chainz (first contribution)<br>
+Benjamin Ragan-Kelley<br>
+Brian Granger<br>
+Cameron Oelsen (first contribution)<br>
+Carol Willing<br>
+Dave Willmer<br>
+denfromufa<br>
+Giles Weaver (first contribution)<br>
+Gino Bustelo<br>
+Grant Nestor (first contribution)<br>
+Jason Grout<br>
+Javier Pedemonte<br>
+Jeff (first contribution)<br>
+Jeroen Demeyer<br>
+Jonathan Frederic<br>
+Justin McCandless (first contribution)<br>
+Ludwig Schmidt-Hackenberg (first contribution)<br>
+Maarten Breddels (first contribution)<br>
+Martin Renou (first contribution)<br>
+Matthew Craig<br>
+Matthias Bussonnier<br>
+Michael Pacer (first contribution)<br>
+Oliver Evans (first contribution)<br>
+Paul Ivanov<br>
+Philipp Rudiger (first contribution)<br>
+Srinivas Kumar Sunkara (first contribution)<br>
+Steven Silvester<br>
+stonebig (first contribution)<br>
+Thomas Kluyver<br>
+Sylvain Corlay<br>
+Yoshiki Vázquez Baeza</p>
+</div>
+            </section>
+
+
+            <footer class="post-full-footer">
+
+                <section class="author-card">
+                        <img class="author-profile-image" src="//www.gravatar.com/avatar/971399cd3d255dfffb7f1924f4595c05?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Sylvain Corlay" />
+                    <section class="author-card-content">
+                        <h4 class="author-card-name"><a href="/author/sylvain-corlay/">Sylvain Corlay</a></h4>
+                            <p>Read <a href="/author/sylvain-corlay/">more posts</a> by this author.</p>
+                    </section>
+                </section>
+                <div class="post-full-footer-right">
+                    <a class="author-card-button" href="/author/sylvain-corlay/">Read More</a>
+                </div>
+
+            </footer>
+
+
+        </article>
+
+    </div>
+</main>
+
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+
+<script>console.error("The {{get}} helper is not available. The Public API flag must be enabled in labs if you wish to use the {{get}} helper. See https://help.ghost.org/hc/en-us/articles/115000301672-Public-API-Beta");</script>
+                <article class="post-card post no-image">
+    <div class="post-card-content">
+        <a class="post-card-content-link" href="/2017/03/30/ibm-brings-jupyter-and-spark-to-the-mainframe/">
+            <header class="post-card-header">
+                <h2 class="post-card-title">IBM Brings Jupyter and Spark to the Mainframe</h2>
+            </header>
+            <section class="post-card-excerpt">
+                <p>For the past few years, Project Jupyter has been collaborating with IBM on a number of initiatives. Much of this work has happened in the Jupyter Incubation Program, where IBM has been working</p>
+            </section>
+        </a>
+        <footer class="post-card-meta">
+                <img class="author-profile-image" src="//www.gravatar.com/avatar/cae6da8d1ad0014fe4ac1d1e5acec7a3?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Brian Granger" />
+            <span class="post-card-author"><a href="/author/brian/">Brian Granger</a></span>
+        </footer>
+    </div>
+</article>
+
+                <article class="post-card post no-image">
+    <div class="post-card-content">
+        <a class="post-card-content-link" href="/2017/03/01/nbviewer-and-githubs-rate-limit/">
+            <header class="post-card-header">
+                <h2 class="post-card-title">nbviewer and GitHub&#x27;s rate limit</h2>
+            </header>
+            <section class="post-card-excerpt">
+                <p>If you've been using nbviewer recently, you may have seen this message more often than you would like: It turns out that some overzealous SEO bots were eating up all of our resources.</p>
+            </section>
+        </a>
+        <footer class="post-card-meta">
+                <img class="author-profile-image" src="//www.gravatar.com/avatar/d5b897c37001627c2e3ad3c1e8a7e6fb?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Min RK" />
+            <span class="post-card-author"><a href="/author/min/">Min RK</a></span>
+        </footer>
+    </div>
+</article>
+
+        </div>
+    </div>
+</aside>
+
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="http://blog.jupyter.org">
+            <span>Project Jupyter</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">&mdash;</span>
+    <div class="floating-header-title">Release of ipywidgets 6.0</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
+</svg>
+</div>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=Release%20of%20ipywidgets%206.0&amp;url=http://blog.jupyter.org/2017/03/01/ipywidgets-6-release/"
+            onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.jupyter.org/2017/03/01/ipywidgets-6-release/"
+            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+        </a>
+    </div>
+    <progress class="progress" value="0">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+
+
+
+
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="http://blog.jupyter.org">Project Jupyter</a> &copy; 2017</section>
+                <nav class="site-footer-nav">
+                    <a href="http://blog.jupyter.org">Latest Posts</a>
+                    
+                    <a href="https://twitter.com/ProjectJupyter" target="_blank">Twitter</a>
+                    <a href="https://ghost.org" target="_blank">Ghost</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=09db7f30e7"></script>
+
+
+    <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script>
+
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-python.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52617120-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>
+try {
+  document.onreadystatechange = function(){ 
+    (document.getElementsByClassName('blog-logo')[0]||{}).href = 'https://jupyter.org';
+  }
+} catch (e) {
+  console.log('error changing the logo link to jupyter homapage')
+}
+</script>
+
+</body>
+</html>

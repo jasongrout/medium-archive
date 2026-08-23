@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Jupyter Notebook 4.1 release</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/cdn-cgi/apps/head/MuIIl4I_IVFkxldaVu1mdWee9as.js"></script><link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css?v=a12b9c2f30" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <link rel="canonical" href="http://blog.jupyter.org/2016/01/08/notebook-4-1-release/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="http://blog.jupyter.org/2016/01/08/notebook-4-1-release/amp/" />
+    
+    <meta property="og:site_name" content="Project Jupyter" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Jupyter Notebook 4.1 release" />
+    <meta property="og:description" content="We are excited to announce the release of the latest minor revision of the Jupyter Notebook, version 4.1.   As usual, you can update using pip: pip install notebook --upgrade   If you are using Anaconda, you will have to wait for conda to update their copy of the notebook.  Once" />
+    <meta property="og:url" content="http://blog.jupyter.org/2016/01/08/notebook-4-1-release/" />
+    <meta property="og:image" content="http://blog.jupyter.org/content/images/2015/10/Screen-Shot-2015-10-23-at-11-05-35.png" />
+    <meta property="article:published_time" content="2016-01-08T18:36:01.000Z" />
+    <meta property="article:modified_time" content="2016-01-11T21:22:18.000Z" />
+    <meta property="article:tag" content="announcements" />
+    <meta property="article:tag" content="notebook" />
+    <meta property="article:tag" content="release" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Jupyter Notebook 4.1 release" />
+    <meta name="twitter:description" content="We are excited to announce the release of the latest minor revision of the Jupyter Notebook, version 4.1.   As usual, you can update using pip: pip install notebook --upgrade   If you are using Anaconda, you will have to wait for conda to update their copy of the notebook.  Once" />
+    <meta name="twitter:url" content="http://blog.jupyter.org/2016/01/08/notebook-4-1-release/" />
+    <meta name="twitter:image" content="http://blog.jupyter.org/content/images/2015/10/Screen-Shot-2015-10-23-at-11-05-35.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Matthias Bussonnier" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="announcements, notebook, release" />
+    <meta name="twitter:site" content="@ProjectJupyter" />
+    <meta property="og:image:width" content="2228" />
+    <meta property="og:image:height" content="504" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Project Jupyter",
+        "logo": "http://blog.jupyter.org/content/images/2015/02/jupyter-sq-text.png"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Matthias Bussonnier",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/4d4ea6148fef59dff9fa0fc8c309496a?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "http://blog.jupyter.org/author/matthias/",
+        "sameAs": []
+    },
+    "headline": "Jupyter Notebook 4.1 release",
+    "url": "http://blog.jupyter.org/2016/01/08/notebook-4-1-release/",
+    "datePublished": "2016-01-08T18:36:01.000Z",
+    "dateModified": "2016-01-11T21:22:18.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://blog.jupyter.org/content/images/2015/10/Screen-Shot-2015-10-23-at-11-05-35.png",
+        "width": 2228,
+        "height": 504
+    },
+    "keywords": "announcements, notebook, release",
+    "description": "We are excited to announce the release of the latest minor revision of the Jupyter Notebook, version 4.1.   As usual, you can update using pip: pip install notebook --upgrade   If you are using Anaconda, you will have to wait for conda to update their copy of the notebook.  Once",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://blog.jupyter.org"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11" />
+    <link rel="alternate" type="application/rss+xml" title="Project Jupyter" href="http://blog.jupyter.org/rss/" />
+    <style type="text/css">
+.hljs {
+    background: transparent;
+}
+
+p code {
+  background: transparent;
+  padding: 0px;
+  font-size: inherit;
+  vertical-align: inherit;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"/>
+</head>
+<body class="post-template tag-announcements tag-notebook tag-release nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://blog.jupyter.org/">Home</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://blog.jupyter.org/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head " style="background-image: url(/content/images/2015/10/Screen-Shot-2015-10-23-at-11-05-35.png)">
+    <nav class="main-nav overlay clearfix">
+        <a class="blog-logo" href="http://blog.jupyter.org"><img src="/content/images/2015/02/jupyter-sq-text.png" alt="Project Jupyter" /></a>
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post tag-announcements tag-notebook tag-release">
+
+        <header class="post-header">
+            <h1 class="post-title">Notebook 4.1 release</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-01-08">08 January 2016</time>  on <a href="/tag/announcements/">announcements</a>, <a href="/tag/notebook/">notebook</a>, <a href="/tag/release/">release</a>
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>We are excited to announce the release of the latest minor revision of the Jupyter Notebook, version 4.1.  </p>
+
+<p>As usual, you can update using pip:</p>
+
+<pre><code class="language-bash">pip install notebook --upgrade  
+</code></pre>
+
+<p>If you are using Anaconda, you will have to wait for conda to update their copy of the notebook.  Once they do, you can run the following:  </p>
+
+<pre><code class="language-bash">conda upgrade notebook  
+</code></pre>
+
+<h2 id="thebigsplit">The big split</h2>
+
+<p>A little over four months ago we released version 4.0, the first release of Jupyter after <a href="http://blog.jupyter.org/2015/08/12/first-release-of-jupyter/">the Big Split</a>.  The transition from the monolitic IPython to the many pieces that we have today was not smooth, but it was well worth it. It will enable us to make many smaller releases of individual subprojects, rather than massive monolithic releases across the entire project. As a result, we are starting to ship smaller releases more often. Today's release is the notebook, the most visible project in the Jupyter organization.</p>
+
+<h2 id="anoverdueupdate">An overdue update</h2>
+
+<p>This minor release was almost four months in the making, much longer than the other Jupyter projects.  Usually we only include bug fixes in minor revisions, but in this releases we include a few new features. The addition of these new features meant more testing and design work for 4.1 than minor releases we've made in the past. In this blog post we will highlight some of the new features you can expect in this release!</p>
+
+<h3 id="multicellsselection">Multi-cells selection</h3>
+
+<p>Multi-cell selection is an often requested feature. The new version of the notebook includes the ability to select multiple cells and perform commands on them. Not all cell commands can be performed on multiple cells yet, but the basic API exists and can be used for extensions.  </p>
+
+<p>To select a contiguous block of cells while in command mode, press <code>Shift-J</code> or <code>Shift-K</code> (also <code>Shift-Down</code> or <code>Shift-Up</code>) to <strong>extend and shrink the selection</strong>.  Or you can hold <code>Shift</code> and left click on a cell to select a range of cell.  The <strong>selected cells</strong> can be visually distinguished from the unselected ones by their soft blue background.</p>
+
+<p>Many cell commands operate now on the <strong>selected cells</strong>. For example, merging cells (<code>Shift-M</code>) used to merge current with the cell below it. It still does that for a single selected cell, but now it also merges all <strong>selected cells</strong> together.</p>
+
+<p><img src="/content/images/2015/12/4-1-multi-merge.gif" alt="multiple selection demo" /></p>
+
+<p>Tell us what you think of multi-select, how you use it, and share the extensions you write which make use of it!</p>
+
+<h3 id="commandpalette">Command palette</h3>
+
+<p>Atom and Sublime Text users might be familiar with the <strong>Command Palette</strong>. As users of Atom and Sublime Text ourselves, we find this is a useful capability as it expands the number of commands that can be performed quickly and efficiently via the keyboard. Thus we have implemented a <strong>Command Palette</strong> which looks and behaves like the ones found in those editors. Now, using the shortcut <code>Cmd-Shift-P</code> (or <code>Ctrl-Shift-P</code> on Linux and Windows), you can bring up the <strong>Command Palette</strong>, which is a Spotlight-like dialog box that allows you to quickly search through all the commands available in the notebook and execute them. Regardless of whether the commands originated in the Menu, the Toolbar, or were only exposed through the notebook APIs, you can find them in the <strong>Command Palette</strong>. Additionally, the <strong>Command Palette</strong> will show you the keyboard shortcuts bound to the commands you use. This helps you to have a faster workflow as you become familiar with the keyboard shortcuts.</p>
+
+<p><img src="/content/images/2015/12/4-1-command-palette.gif" alt="Command palette in action with restart and run-all" /></p>
+
+<p>The <strong>Command Palette</strong> brings the notebook closer to your fingertips.  We hope it improves your experience both now and in future revisions where we plan to add fuzzy matching and other features.  If you'd like to help implement these features, stop by the <a href="https://github.com/jupyter/notebook">jupyter/notebook github repository</a>, we'd be excited to welcome you!</p>
+
+<h3 id="restartkernelandrunall">Restart kernel and run-all</h3>
+
+<p>One often requested feature is the ability to restart the kernel and run all cells at once. This is a simple way of making sure your notebook does what you think. Now you can access this new feature from the Kernel Menu:</p>
+
+<p><img src="/content/images/2015/10/Screen-Shot-2015-10-23-at-10-42-08.png" alt="restart and run all from the kernel menu" /></p>
+
+<p>In attempt to get this feature right, we took our time designing the UI and also tested alternatives using a third-party user testing system. You can view the results of the study <a href="https://github.com/jupyter/notebook/pull/465#issuecomment-143313927">on GitHub</a> or below:</p>
+
+<p><img src="/content/images/2015/10/Screen-Shot-2015-10-23-at-14-23-32.png" alt="results user testing a feature" /></p>
+
+<p>The option on the left leads to a faster completion of the restarting kernel task.</p>
+
+<p>We haven't added a keyboard shortcut, but just like the other notebook functions, you can bind your own keyboard shortcut using custom JavaScript. The various restart commands are also available in the <strong>Command Palette</strong>.</p>
+
+<h3 id="findandreplace">Find and Replace</h3>
+
+<p>The new <code>Find and Replace</code> dialog is found under the <code>Edit</code> menu of the notebook.  If you're in command mode, you can press the <code>F</code> key to bring up the dialog.</p>
+
+<p><img src="/content/images/2015/12/4-1-snr.gif" alt="find and replace" /></p>
+
+<p>The dialog displays a live preview of the find and replace action you specify. We have also added toggle buttons for case sensitivity, regular expressions, and the ability to only replace within selected cells.</p>
+
+<h2 id="enroutefor50">En route for 5.0</h2>
+
+<p>We hope you enjoy this new release and the accompanying features. As always, we welcome questions, feedback, contributions.</p>
+
+<p>We have already started the process of working on 5.0, in collaboration with developers from Continuum Analytics, Bloomberg, and IBM, who are all doing fantastic jobs. The comunity is growing and now is a perfect time for new contributors.  A few needed improvements have already been mentioned in this blog post, but many more can be found on our issue tracker on GitHub! </p>
+        </section>
+
+        <footer class="post-footer">
+
+
+            <figure class="author-image">
+                <a class="img" href="/author/matthias/" style="background-image: url(//www.gravatar.com/avatar/4d4ea6148fef59dff9fa0fc8c309496a?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x)"><span class="hidden">Matthias Bussonnier's Picture</span></a>
+            </figure>
+
+            <section class="author">
+                <h4><a href="/author/matthias/">Matthias Bussonnier</a></h4>
+
+                    <p>Read <a href="/author/matthias/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=Notebook%204.1%20release&amp;url=http://blog.jupyter.org/2016/01/08/notebook-4-1-release/"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.jupyter.org/2016/01/08/notebook-4-1-release/"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://blog.jupyter.org/2016/01/08/notebook-4-1-release/"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story " style="background-image: url(/content/images/2016/02/jupyterdays_boston.png)" href="/2016/02/16/jupyterdays-boston-2016/">
+        <section class="post">
+            <h2>JupyterDays Boston 2016</h2>
+            <p>We’re excited to announce our next event! Join us for JupyterDays Boston in Cambridge, MA on March 17-18,&hellip;</p>
+        </section>
+    </a>
+    <a class="read-next-story prev no-cover" href="/2015/12/22/hiring-project-manager/">
+        <section class="post">
+            <h2>We are hiring a Project Manager at UC Berkeley</h2>
+            <p>Project Jupyter is announcing the opening of a position for a full-time project manager, who will help us coordinate&hellip;</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://blog.jupyter.org">Project Jupyter</a> &copy; 2017</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-python.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52617120-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>
+try {
+  document.onreadystatechange = function(){ 
+    (document.getElementsByClassName('blog-logo')[0]||{}).href = 'https://jupyter.org';
+  }
+} catch (e) {
+  console.log('error changing the logo link to jupyter homapage')
+}
+</script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=a12b9c2f30"></script>
+    <script type="text/javascript" src="/assets/js/index.js?v=a12b9c2f30"></script>
+
+</body>
+</html>
