@@ -151,10 +151,11 @@ def add_fetch_args(p):
 
 def add_convert_args(p):
     p.add_argument("--prefer-page", action="store_true",
-                   help="always convert the page body; by default the RSS "
-                        "<content:encoded> body is used when feed_item.json is present, "
-                        "since it is cleaner HTML with proper code blocks and "
-                        "full-resolution images")
+                   help="always convert the rendered page body; by default the "
+                        "account export, the RSS <content:encoded> body, or the "
+                        "page's embedded editor state (in that order) is "
+                        "preferred -- all three are cleaner sources than the "
+                        "rendered HTML")
     p.add_argument("--prefer-ghost", action="store_true",
                    help="when a post has an attached Ghost capture (ghost.html "
                         "from import-ghost), convert its body from that instead "
@@ -223,6 +224,10 @@ def main():
     cmp_p.add_argument("--only", action="append", metavar="URL",
                        help="compare just this post (repeatable; default: every post "
                             "that has both page.html and export.html)")
+    cmp_p.add_argument("--state", action="store_true",
+                       help="instead: verify the embedded-editor-state conversion "
+                            "(the default body source for Medium pages) against "
+                            "the account export, for every post that has both")
     cmp_p.add_argument("--ghost", action="store_true",
                        help="instead: diff each attached Ghost capture against the "
                             "post's Medium conversion, with Medium's mechanical "

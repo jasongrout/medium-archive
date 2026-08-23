@@ -76,7 +76,9 @@ def test_paragraph_types_render():
         para(4, "PRE", "pip install voila\nvoila nb.ipynb"),
         para(5, "BQ", "A quote."),
     ]))
-    assert md == ("#### Section\n\nProse.\n\n- one\n- two\n\n"
+    # H4 renders one level up (###), matching the rendered page, where
+    # the h1 is the title
+    assert md == ("### Section\n\nProse.\n\n- one\n- two\n\n"
                   "```\npip install voila\nvoila nb.ipynb\n```\n\n"
                   "> A quote.\n")
 
@@ -100,6 +102,58 @@ def test_overlapping_markups_never_split_a_link():
     ]
     md = md_of_state(make_state([p]))
     assert md == "see [`voila` docs](https://x.example) now\n"
+
+
+def test_title_after_hero_image_is_dropped():
+    md = md_of_state(make_state([
+        para(0, "IMG", "", metadata={"id": "1*hero.png"}),
+        para(1, "H3", "My Post"),
+        para(2, "P", "Body text.")]))
+    assert md == "![](https://miro.medium.com/v2/1*hero.png)\n\nBody text.\n"
+
+
+def test_subtitle_heading_after_title_is_dropped():
+    md = md_of_state(make_state([
+        para(0, "H3", "My Post"),
+        para(1, "H4", "The subtitle."),
+        para(2, "P", "Body text.")]))
+    assert md == "Body text.\n"
+
+
+def test_section_boundaries_become_dividers():
+    state = make_state([para(0, "P", "One."), para(1, "P", "Two.")])
+    key = 'content({"postMeteringOptions":null})'
+    state[f"Post:{MID}"][key]["bodyModel"]["sections"] = [
+        {"startIndex": 0}, {"startIndex": 1}]
+    md = md_of_state(state)
+    assert md == "One.\n\n---\n\nTwo.\n"
+
+
+def test_iframe_embed_with_caption():
+    p = para(0, "IFRAME", "Watch the demo.",
+             iframe={"mediaResource": {"__ref": "MediaResource:m1"}})
+    state = make_state([p])
+    state["MediaResource:m1"] = {
+        "iframeSrc": "https://cdn.embedly.com/widgets/media.html"
+                     "?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2Fabc"
+                     "&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabc"}
+    md = md_of_state(state)
+    # the embedly wrapper unwraps to the canonical watch URL
+    assert "[embed: https://www.youtube.com/watch?v=abc]" in md
+    assert "*Watch the demo.*" in md
+
+
+def test_mixtape_card_becomes_a_link():
+    p = para(0, "MIXTAPE_EMBED", "Repo title\nDescription line\nsite.com",
+             mixtapeMetadata={"href": "https://github.com/x/y"})
+    md = md_of_state(make_state([p]))
+    assert md == "[Repo title](https://github.com/x/y)\n"
+
+
+def test_image_alt_text_is_kept():
+    p = para(0, "IMG", "", metadata={"id": "1*a.png", "alt": "A robot"})
+    md = md_of_state(make_state([p]))
+    assert md == "![A robot](https://miro.medium.com/v2/1*a.png)\n"
 
 
 def test_image_paragraph_with_caption_and_link():

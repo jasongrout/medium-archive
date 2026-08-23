@@ -177,11 +177,11 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         # embedded editor state -- recover from that.
         page_shell = (not ghost and soup.find("article") is None
                       and not parse_ld_json(soup) and not info["title"])
-        if page_shell:
+        if not ghost:
             state = apollo_post_state(page_text, raw.name)
-            if state is not None:
-                info.update(state_metadata(state, raw.name))
-                info["url"] = info["url"] or url
+        if page_shell and state is not None:
+            info.update(state_metadata(state, raw.name))
+            info["url"] = info["url"] or url
     else:
         info = {"url": url, **EMPTY_INFO}
 
@@ -238,14 +238,16 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
                                      or not (have_page or exp or have_feed
                                              or state is not None)):
         body, body_source = ghost_body(ghost_soup), "ghost"
-    elif have_page and (prefer_page or not (exp or have_feed)):
+    elif have_page and prefer_page:
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
     elif have_feed:
         body, body_source = feed_body(feed_item["content_html"]), "feed"
-    else:                              # shell page: its embedded editor state
+    elif state is not None:            # the page's embedded editor state
         body, body_source = state_body(state, raw.name, info["title"]), "state"
+    else:                              # a page without embedded state
+        body, body_source = page_body(soup, info["tags"], info["title"]), "page"
 
     # A post with a Ghost origin carries Medium's migration line-break
     # damage in its Medium-side sources; the Ghost capture itself doesn't.

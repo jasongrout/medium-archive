@@ -3,7 +3,7 @@
 Status from the 2026-08-23 session that regenerated `posts/` in the
 blog_export archive, audited all 333 conversions, and fixed the converter.
 Completed (code + fixups, validated by a full `convert --clean`, a clean
-`lint` run, and 57 passing tests):
+`lint` run, and 88 passing tests):
 
 - **Chrome-only shell guard** — a `page.html` that is Medium's empty app
   shell (no `<article>`, no JSON-LD, no title) is no longer converted into
@@ -49,10 +49,10 @@ Completed (code + fixups, validated by a full `convert --clean`, a clean
   cannot be reviewed. `fixups/*.sub` files now hold single-line
   `old:`/`new:` substitutions (optional exact `count:`, `old-regex:`
   for regexes) that fail loudly like patch hunks; `*.patch` remains for
-  structural edits. The archive's six newest fixups use it, covering
-  every Medium-side copy of the text (export, rendered page, and the
-  page's embedded editor state), so the fix holds whichever body source
-  converts.
+  structural edits. All 14 fixups in the archive use it, covering the
+  export and the rendered page DOM. The page's embedded editor-state
+  copy is deliberately left unpatched: its markup offsets index into
+  the stored text, so editing it would skew them.
 
 - **Shell posts recovered from the embedded editor state** — the 8 posts
   whose `page.html` is Medium's empty app shell (title "Medium", no
@@ -64,20 +64,33 @@ Completed (code + fixups, validated by a full `convert --clean`, a clean
   dates and titles (`2019-12-29-voilà-is-now-an-official-jupyter-
   subproject` instead of `undated-…`). A shell with no usable state
   still fails loudly.
+- **Embedded editor state is now the preferred Medium body source** —
+  every Medium page carries its post twice (rendered HTML + the editor
+  state in `window.__APOLLO_STATE__`); converting from the state
+  (`export` > `feed` > `state` > `page`) removes all chrome-stripping
+  risk and keeps what the renderer destroys: full link spans over code
+  fragments, bold on code, and the ~78 iframe embeds (talk videos,
+  tweets) that un-hydrated captures drop entirely — embeds now appear
+  in 25 posts instead of 1. Link-preview cards render as clean one-line
+  links instead of a heading nested inside link text. `compare --state`
+  gates it against the account exports: 39/50 identical, the 11 diffs
+  all explained (7 fixup-enriched exports, 4 where the state carries
+  more than the export — links on code, a tweet, post-export edits).
+  `convert --prefer-page` still selects the rendered HTML.
 - **Medium link telemetry stripped** — Medium's renderer appends a
   `source=post_page---…`-style query parameter to links it emits, on any
   host; `to_markdown` now drops it (the dash-run value pattern marks it
   as Medium's, so a site's own `source` parameter survives). Cleaned 35
   links across 22 posts.
 
-## 1. Fetch the 8 recovered posts' images (main remaining item)
+## 1. Fetch the 8 shell posts' images (main remaining item)
 
-The shell captures never hydrated their images, so the recovered posts
-(`body_source: state` in posts.json) keep remote `miro.medium.com` URLs
-— 52 of them, each listed as a `lint` warning. Re-fetch the posts from
-the live site (`fetch --urls FILE --force` with their URLs from
-`raw/index.json`) to pull the images and a rendered `page.html`. Needs
-network access, which the 2026-08-23 sessions did not have.
+The 8 shell captures never hydrated their images, so those posts keep
+remote `miro.medium.com` URLs — 52 of them, each listed as a `lint`
+warning (`lint` names the posts). Re-fetch the posts from the live site
+(`fetch --urls FILE --force` with their URLs from `raw/index.json`) to
+pull the images and a rendered `page.html`. Needs network access, which
+the 2026-08-23 sessions did not have.
 
 ## 2. Smaller observations (optional)
 

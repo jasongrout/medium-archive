@@ -194,13 +194,22 @@ longer lists — work through the steps in order:
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
   still present in the raw pages. Embedded gists and other iframes become
   links and need manual replacement.
-* Medium sometimes serves a post page as its bare application shell — no
-  server-rendered article, no JSON-LD, page title just "Medium". `convert`
-  recovers such posts from the page's embedded editor state
-  (`window.__APOLLO_STATE__`), which still carries the full paragraph
-  list, markups, title, timestamps, author and tags (`body_source:
-  state`). Only the images are lost to the shell: they were never
-  fetched, so the body keeps remote URLs until the post is re-fetched.
+* Every Medium page carries its post twice: rendered into the visible
+  HTML, and as data in its embedded editor state
+  (`window.__APOLLO_STATE__`) — the ordered paragraph list with markup
+  spans, image ids, code blocks, plus title, timestamps, author and
+  tags. `convert` prefers the state (`body_source: state`) over the
+  rendered HTML: it has no chrome to strip and keeps what the renderer
+  destroys — the full text span of a link containing a code fragment,
+  bold on code, and iframe embeds that an un-hydrated capture drops
+  entirely. It also survives when Medium serves the bare application
+  shell (no server-rendered article, page title just "Medium"), which is
+  how shell-only captures convert at all — though a shell's images were
+  never fetched, so its body keeps remote URLs until re-fetched.
+  `compare --state` verifies the state conversion against account
+  exports, like plain `compare` does for the page conversion; the
+  rendered page remains the fallback and is available with
+  `convert --prefer-page`.
 * Medium rate-limits and may serve a bot wall. A 429 is not retried —
   fetch reports it (with the server's `Retry-After` hint, when sent) and
   moves on; raise `--delay` and re-run to resume.
@@ -219,6 +228,7 @@ src/medium_archive/
   stats.py       the stats step: summarize the converted archive
   discovery.py   find post URLs via the sitemap tree, RSS feed, and Wayback Machine
   pages.py       post page parsing: metadata extraction, body cleanup
+  state.py       convert a post from the page's embedded editor state
   images.py      image source extraction and filenames
   net.py         HTTP session and retrying GET
   dates.py       date parsing and the --start/--end window check
