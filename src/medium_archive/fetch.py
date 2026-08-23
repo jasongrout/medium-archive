@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 from .dates import in_window, parse_date
 from .discovery import discover, fetch_feed
 from .images import collect_image_urls, safe_filename
+from .state import state_image_urls
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
@@ -115,8 +116,12 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
     img_map = {}
     if images:
         img_dir = dest / "images"
+        srcs = collect_image_urls(r.text, feed_item)
+        # a shell capture renders no <img> tags; its editor state still names the images
+        srcs += [u for u in state_image_urls(r.text, medium_id(url) or "")
+                 if u not in srcs]
         by_basename = {}   # the same asset appears as miro.medium.com/v2/<id> and cdn-images-1.medium.com/<id>
-        for i, src in enumerate(collect_image_urls(r.text, feed_item), start=1):
+        for i, src in enumerate(srcs, start=1):
             base = Path(urlsplit(src).path).name
             if base in by_basename:
                 img_map[src] = by_basename[base]

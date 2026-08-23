@@ -62,6 +62,24 @@ def _paragraphs(state, post) -> list:
     return []
 
 
+def state_image_urls(text: str, medium_id: str) -> list:
+    """Image URLs referenced by the embedded editor state's paragraphs,
+    in order of appearance. On a shell capture the rendered body has no
+    <img> tags, so this is the only image source the page offers."""
+    state = apollo_post_state(text, medium_id)
+    if not state:
+        return []
+    post = state.get(f"Post:{medium_id}") or {}
+    urls = []
+    for p in _paragraphs(state, post):
+        img_id = (p.get("metadata") or {}).get("id")
+        if p.get("type") == "IMG" and img_id:
+            url = IMG_BASE + img_id
+            if url not in urls:
+                urls.append(url)
+    return urls
+
+
 def state_metadata(state: dict, medium_id: str) -> dict:
     """Front-matter fields from the state; same shape as extract_metadata."""
     post = state[f"Post:{medium_id}"]
