@@ -150,6 +150,22 @@ def ghost_body(soup):
     return body
 
 
+def collapse_br_pairs(node):
+    """Undo Medium's Ghost-migration line-break damage: the importer turned
+    each wrapped source line of the original post into a <br><br> pair
+    mid-paragraph, so a pair stands for the space of a line wrap. Only for
+    posts with a Ghost origin -- in posts authored in Medium's own editor a
+    <br><br> is an intentional paragraph break. Inside <pre> a pair is a
+    blank code line, and a lone <br> anywhere is a genuine soft break."""
+    for br in node.find_all("br"):
+        if br.parent is None:           # second of a pair, already removed
+            continue
+        nxt = br.next_sibling
+        if getattr(nxt, "name", None) == "br" and br.find_parent("pre") is None:
+            nxt.extract()
+            br.replace_with(" ")
+
+
 def strip_medium_footer(node):
     """Remove the '<hr><p>... was originally published in ... on Medium ...</p>'
     boilerplate Medium appends to feed bodies (and the preceding <hr>)."""
@@ -201,7 +217,10 @@ def page_body(soup, tags=()):
         for t in article.select(sel):
             t.decompose()
     # Author header block: holds profile links, no paragraphs or figures.
-    for a in article.select('a[href*="/@"], a[rel*="author"]'):
+    # Authors with a custom subdomain (name.medium.com) have no /@ in the
+    # href, but every byline link carries a source=post_page---byline tag.
+    for a in article.select('a[href*="/@"], a[rel*="author"], '
+                            'a[href*="source=post_page---byline"]'):
         header = a.find_parent("div")
         if header and not header.find("p") and not header.find("figure"):
             header.decompose()

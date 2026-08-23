@@ -9,6 +9,7 @@
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in <out>/posts/, plus posts.json and redirects.csv
+    lint           scan converted posts for conversion-defect signatures
     stats          summarize the converted archive
 
 Only `fetch` (and `all`) touches the network; the other steps can be re-run
@@ -85,6 +86,7 @@ from urllib.parse import urlparse
 
 from .compare import cmd_compare
 from .convert import cmd_convert
+from .lint import cmd_lint
 from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
@@ -225,6 +227,10 @@ def main():
                             "image renames, line wrapping) normalized away. "
                             "Informational (exit 0) -- what it reports is dropped "
                             "or edited content, to guide convert --prefer-ghost")
+    parser("lint", help="scan <out>/posts/ for conversion-defect signatures "
+                         "(leftover Medium chrome, unclosed code fences, "
+                         "missing image files, remote CDN images); exits "
+                         "non-zero if any are found")
     stats_p = parser("stats", help="summarize the converted archive "
                                    "(posts, provenance, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
@@ -244,5 +250,7 @@ def main():
         cmd_convert(args)
     if args.command == "compare":
         cmd_compare(args)
+    if args.command == "lint":
+        cmd_lint(args)
     if args.command == "stats":
         cmd_stats(args)

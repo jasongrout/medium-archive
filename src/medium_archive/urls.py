@@ -42,7 +42,10 @@ def medium_id(url: str) -> str | None:
 
 
 def slug_of(url: str) -> str:
-    last = urlparse(url).path.strip("/").split("/")[-1]
+    """Last path segment, id suffix removed, percent-decoded: Medium URLs
+    percent-encode non-ASCII slugs, but their sitemap serves some of the
+    same URLs decoded, so decoding keeps one post one slug either way."""
+    last = unquote(urlparse(url).path).strip("/").split("/")[-1]
     return POST_ID_RE.sub("", last)[:80] or "post"
 
 

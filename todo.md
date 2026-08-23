@@ -1,66 +1,68 @@
 # Remaining work: conversion-quality follow-ups
 
-Status from the 2026-08-22 session that audited `medium_export/posts/` and
-fixed the converter. Completed (code + fixups, all validated by a full
-`convert --clean`, 42 tests passing):
+Status from the 2026-08-23 session that regenerated `posts/` in the
+blog_export archive, audited all 333 conversions, and fixed the converter.
+Completed (code + fixups, validated by a full `convert --clean`, a clean
+`lint` run, and 57 passing tests):
 
-- **Nested code fences** — `to_markdown` now sizes each fence to its
-  content (`_Converter` in `src/medium_archive/convert.py`); the nb-cli
-  post no longer swallows ~110 lines of prose into a runaway code block.
-- **Declared canonical URLs** — `resolve_canonical` in
-  `src/medium_archive/urls.py`: identity (original_url/slug/medium_id,
-  redirects, link base) always comes from the fetched URL; a canonical
-  naming a different page (gist/Notion import, Ghost-era bare slug) is
-  recorded in new front-matter field `canonical_url` instead. Fixes the
-  gist-poisoned links in authoring-custom-jupyter-widgets and wrong
-  identity on ~31 posts.
-- **Ghost-only images restored** via `medium_export/fixups/*.patch` for 6
-  export-sourced posts Medium's migration stripped: notebook-4-1-release
-  (5), nbviewer-and-githubs-rate-limit (5), jupyterlab-the-next-generation
-  (2), release-of-ipython-5-0, new-funding-for-jupyter,
-  security-release-jupyter-notebook-4-3-1 (also converts its two
-  prose-in-`<pre>` paragraphs back to `<p>`, matching the Ghost original).
-- **npmjs link** — fixup for the gist-resolved `gist.github.com/npmjs.com`
-  href in authoring-custom-jupyter-widgets.
+- **Chrome-only shell guard** — a `page.html` that is Medium's empty app
+  shell (no `<article>`, no JSON-LD, no title) is no longer converted into
+  a post of nav links: `convert_post` raises and the post is reported
+  FAILED (`page_shell` in `src/medium_archive/convert.py`). The 8
+  `undated-*` posts now fail cleanly instead of producing chrome (see
+  below for recovering them).
+- **Byline avatars stripped** — authors with a custom subdomain
+  (`name.medium.com`) have no `/@` in the byline href, so their avatar
+  block leaked into 28 converted bodies as a remote `miro.medium.com`
+  image; `page_body` now also strips on `source=post_page---byline`
+  (`src/medium_archive/pages.py`).
+- **Embed links** — iframes now render as `[embed: url](url)` instead of
+  the double-bracket `[[embed: url]](url)`.
+- **Slug percent-decoding** — `slug_of` percent-decodes, so post dir names
+  no longer mix `…voil%C3%A0…` and `…voilà…` forms.
+- **Ghost-migration line breaks** — Medium's importer turned every wrapped
+  source line of a migrated Ghost post into a `<br><br>` pair
+  mid-paragraph; for posts with a Ghost origin (a `ghost.json` attached)
+  these pairs now collapse to the space the wrap stood for
+  (`collapse_br_pairs` in `pages.py`), fixing 8 posts' broken paragraph
+  flow. Posts authored in Medium's own editor keep `<br><br>` as the
+  intentional paragraph break it is there. Two fixups in the archive
+  (`b79bfd18566d-signature-break`, `333efb100d08-schedule-breaks`) restore
+  breaks the originals marked explicitly (`<br />`), which the migration
+  made indistinguishable from wrap damage.
+- **`lint` subcommand** — the audit heuristics are now
+  `medium-archive lint`: leftover Medium chrome, unclosed fences, missing
+  image files, remote Medium CDN images; exits non-zero on defects so
+  regressions surface on every convert (`src/medium_archive/lint.py`).
 
 ## 1. Recover the 8 empty `undated-*` posts (main remaining item)
 
-These converted posts contain only Medium nav chrome — their `page.html`
-captures are Medium's empty shell (title "Medium", no article markup):
+These posts' `page.html` captures are Medium's empty shell (title
+"Medium", no article markup), so `convert` now reports them FAILED and
+they are absent from `posts/`, `posts.json` and `redirects.csv`:
 
-- undated-a-gallery-of-voil%C3%A0-examples (a2ce7ef99130)
-- undated-a-slideshow-template-for-voil%C3%A0-apps (435f67d10b4f)
-- undated-and-voil%C3%A0 (f6a2c08a4a93)
-- undated-jupyterlite-jupyter-️-webassembly-️-python
+- undated-a-gallery-of-voilà-examples (a2ce7ef99130)
+- undated-a-slideshow-template-for-voilà-apps (435f67d10b4f)
+- undated-and-voilà (f6a2c08a4a93)
+- undated-jupyterlite-jupyter-️-webassembly-️-python (f6e2e41ab3fa)
 - undated-need-for-speed-voilà-edition (a9e1300ab3b2)
-- undated-online-collaboration-café-launch-… 
-- undated-voil%C3%A0-is-now-an-official-jupyter-subproject (87d659583490)
+- undated-online-collaboration-café-launch-… (b713edadf15)
+- undated-voilà-is-now-an-official-jupyter-subproject (87d659583490)
 - undated-voilà-0-5-0-homecoming (66f2465aa86f)
 
-Plan:
-- Re-fetch each `page.html` from the live site or the Wayback Machine
-  (`fetch --urls FILE --force` with the 8 URLs from `raw/index.json`, or
-  recover by hand into `raw/<id>/page.html`). Needs network.
-- Add a chrome-only guard to `convert_post`: a page.html with no
-  `<article>`/JSON-LD/title should not be converted as a body — raise
-  (so the post is reported FAILED) instead of writing nav links. The
-  existing `len(markdown) < 200` warning misses these because the nav
-  links are long.
+Plan: re-fetch each `page.html` from the live site or the Wayback Machine
+(`fetch --urls FILE --force` with the 8 URLs from `raw/index.json`, or
+recover by hand into `raw/<id>/page.html`). Needs network access, which
+the 2026-08-23 session did not have.
 
-## 2. Smaller cleanups (optional)
+## 2. Smaller observations (optional)
 
-- `[[embed: https://…]](…)` double-bracket rendering of iframe embeds
-  (`to_markdown` builds an `<a>` whose text starts with `[`; seen in
-  2016-07-15-jupyterlab post). Drop the brackets from the link text.
-- Post directory names mix percent-encoding and unicode
-  (`…voil%C3%A0…` vs `…voilà…`): consider percent-decoding in
-  `slug_of` so dir names are consistent.
-- The audit heuristics (unclosed fences, prose-like pre blocks, image
-  counts vs raw captures, off-host links) could become a `lint`
-  subcommand so regressions surface on every convert.
-
-## Notes
-
-- Pre-fix snapshot of all 333 index.md files (for diffing) is in the
-  session scratchpad under `before/`; it does not survive reboots.
-- `posts.json` and `redirects.csv` were regenerated by the full convert.
+- The grant-narrative post (2b5fb94c3c58) and a few other 2015-era posts
+  have list items split mid-sentence and some wrong link targets
+  (footnote hrefs attached to the wrong anchors). The damage is identical
+  in the Ghost capture and the Medium sources — it was published that way
+  in 2015 — so the archive is faithful; fixups could hand-correct the
+  worst of it if desired.
+- `compare --ghost` still reports 8 posts whose Ghost original differs
+  (dropped images already restored by fixups; remaining diffs are
+  hard-wrap normalization and Medium-era edits).

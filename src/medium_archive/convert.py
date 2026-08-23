@@ -20,8 +20,9 @@ from .export import export_body, parse_export
 from .fetch import archive_base, read_index
 from .fixup import load_fixups, read_raw
 from .images import image_source
-from .pages import (extract_metadata, feed_body, ghost_body, ghost_metadata,
-                    is_ghost_page, page_body)
+from .pages import (collapse_br_pairs, extract_metadata, feed_body,
+                    ghost_body, ghost_metadata, is_ghost_page, page_body,
+                    parse_ld_json)
 from .readme import write_readme
 from .urls import canonical_url, medium_id, resolve_canonical, slug_of
 
@@ -89,7 +90,7 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
 
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
-        iframe.replace_with(doc.new_tag("a", href=src, string=f"[embed: {src}]"))
+        iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
 
     # Medium's editor emits things like <strong> </strong> between runs;
     # markdownify drops whitespace-only emphasis, losing the space.
@@ -119,11 +120,17 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
                  prefer_ghost: bool = False, fixups: dict = None) -> dict:
     soup = None
-    ghost = False
+    ghost = page_shell = False
     if (raw / "page.html").exists():
         soup = BeautifulSoup(read_raw(raw / "page.html", fixups), "html.parser")
         ghost = is_ghost_page(soup)   # a Ghost capture saved by import-ghost
         info = ghost_metadata(soup, url) if ghost else extract_metadata(soup, url)
+        # Medium sometimes serves an empty app shell -- nav chrome with no
+        # article markup, JSON-LD or title. Converting it would produce a
+        # post of nav links, and it is long enough to slip past the short-
+        # body warning; it is not a body source at all.
+        page_shell = (not ghost and soup.find("article") is None
+                      and not parse_ld_json(soup) and not info["title"])
     else:
         info = {"url": url, **EMPTY_INFO}
 
@@ -167,19 +174,28 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         img_map = json.loads(read_raw(raw / "images.json", fixups))
 
     have_feed = bool(feed_item and feed_item.get("content_html"))
-    if soup is None and exp is None and ghost_soup is None and not have_feed:
-        raise RuntimeError("no page.html, export.html, ghost.html or feed body to convert")
+    have_page = soup is not None and not page_shell
+    if not have_page and exp is None and ghost_soup is None and not have_feed:
+        raise RuntimeError(
+            "page.html is Medium's empty app shell (no article); re-fetch it"
+            if page_shell else
+            "no page.html, export.html, ghost.html or feed body to convert")
     if ghost:                          # page.html is itself a Ghost capture
         body, body_source = ghost_body(soup), "ghost"
     elif ghost_soup is not None and (prefer_ghost
-                                     or not (soup is not None or exp or have_feed)):
+                                     or not (have_page or exp or have_feed)):
         body, body_source = ghost_body(ghost_soup), "ghost"
-    elif soup is not None and (prefer_page or not (exp or have_feed)):
+    elif have_page and (prefer_page or not (exp or have_feed)):
         body, body_source = page_body(soup, info["tags"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
     else:
         body, body_source = feed_body(feed_item["content_html"]), "feed"
+
+    # A post with a Ghost origin carries Medium's migration line-break
+    # damage in its Medium-side sources; the Ghost capture itself doesn't.
+    if gmeta and body_source != "ghost":
+        collapse_br_pairs(body)
 
     out_dir = posts_root / f"{(info['date'] or '')[:10] or 'undated'}-{slug_of(url)}"
     shutil.rmtree(out_dir, ignore_errors=True)
