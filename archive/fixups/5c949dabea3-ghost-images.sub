@@ -1,0 +1,8 @@
+# Medium's Ghost migration dropped both JupyterLab screenshots;
+# re-add them from the Ghost original.
+
+file: 5c949dabea3/export.html
+old: eeping the file manager on the left:</p>
+new: eeping the file manager on the left:</p><figure name="gfx07" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2016/07/jlab-screenshot-nb-con-term-2.png"></figure>
+old: e console, producing inline figures:</p>
+new: e console, producing inline figures:</p><figure name="gfx08" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2016/07/jlab-screenshot-console-editor-2.png"></figure>

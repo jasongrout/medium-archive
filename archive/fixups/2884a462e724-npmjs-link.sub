@@ -1,0 +1,6 @@
+# The story was imported from a gist, which resolved the author's
+# schemeless 'npmjs.com' link against gist.github.com; point it at
+# the npm registry it meant.
+file: 2884a462e724/page.html
+old: href="https://gist.github.com/npmjs.com"
+new: href="https://www.npmjs.com"

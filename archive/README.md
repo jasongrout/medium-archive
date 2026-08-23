@@ -111,7 +111,7 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `description`   | the subtitle (from the account export) or Medium's summary text |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
 | `images`        | relative paths of images used by the body |
-| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML) or `ghost` (Ghost page from a Wayback capture) |
+| `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML), `ghost` (Ghost page from a Wayback capture) or `state` (reconstructed from a shell page's embedded editor state) |
 
 ## Redirects
 
@@ -154,6 +154,13 @@ too.
   `convert --prefer-ghost` converts from the Ghost source instead -- at
   the cost of any edits made on Medium after the migration. Attached Ghost
   images are stored alongside the Medium ones with a `g` filename prefix.
+* Medium sometimes serves a post page as its bare application shell --
+  no server-rendered article at all. Posts whose only capture is such a
+  shell (`body_source: state`) are reconstructed from the page's embedded
+  editor state, which carries the full paragraph list, title, timestamps,
+  author and tags; only the images were never fetched, so their bodies
+  keep remote miro.medium.com URLs (`lint` reports each one) until the
+  post is re-fetched.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating.
 * Image filenames are `<NNN>-<original basename>`; the same asset served
