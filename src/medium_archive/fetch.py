@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from .dates import in_window, parse_date
 from .discovery import discover, fetch_feed
 from .images import collect_image_urls, safe_filename
-from .state import state_image_urls
+from .state import state_image_urls, state_media_resources
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
@@ -102,9 +102,60 @@ def looks_gone(html: str) -> bool:
     return "ld+json" not in html and "PAGE NOT FOUND" in html
 
 
+MEDIA_URL = "https://medium.com/media/{id}?format=json"
+GIST_API_URL = "https://api.github.com/gists/{id}"
+
+
+def fetch_media(session, page_text: str, mid: str, dest: Path,
+                delay: float) -> int:
+    """Archive the media resources the page's embedded state leaves
+    unresolved (an empty iframeSrc -- gist embeds, mostly; their content
+    exists nowhere in the page itself): the medium.com/media payload
+    that names the embed's target into dest/media/<id>.json, and for a
+    gist also its files, from the GitHub API, into <id>.gist.json.
+    Incremental -- files already on disk are not re-fetched, so a
+    re-run of fetch backfills posts archived before this existed.
+    Returns the number of files written."""
+    n = 0
+    for res_id in state_media_resources(page_text, mid):
+        media_path = dest / "media" / f"{res_id}.json"
+        payload = None
+        if media_path.exists():
+            try:
+                payload = json.loads(media_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                pass                     # unreadable: re-fetch it
+        if payload is None:
+            try:
+                r = fetch(session, MEDIA_URL.format(id=res_id))
+                # the JSON sits behind Medium's anti-hijacking prefix
+                # (`])}while(1);</x>`)
+                payload = json.loads(r.text[r.text.index("{"):])
+            except Exception as e:
+                print(f"  media resource failed {res_id}: {e}", file=sys.stderr)
+                continue
+            media_path.parent.mkdir(parents=True, exist_ok=True)
+            media_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                                  encoding="utf-8")
+            n += 1
+            time.sleep(delay / 4)
+        gist = ((payload.get("payload") or {}).get("value") or {}).get("gist") or {}
+        gist_path = dest / "media" / f"{res_id}.gist.json"
+        if gist.get("gistId") and not gist_path.exists():
+            try:
+                r = fetch(session, GIST_API_URL.format(id=gist["gistId"]))
+                gist_path.write_text(r.text, encoding="utf-8")
+                n += 1
+                time.sleep(delay / 4)
+            except Exception as e:
+                print(f"  gist failed {gist['gistId']}: {e}", file=sys.stderr)
+    return n
+
+
 def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
-    """Save page.html, feed_item.json, images/ and images.json into dest."""
+    """Save page.html, feed_item.json, media/, images/ and images.json
+    into dest."""
     r = fetch(session, url)
     if looks_gone(r.text):
         raise PostGone("soft-404")
@@ -112,6 +163,7 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
     (dest / "page.html").write_text(r.text, encoding="utf-8")
     if feed_item:
         (dest / "feed_item.json").write_text(json.dumps(feed_item, indent=2, ensure_ascii=False))
+    media_count = fetch_media(session, r.text, medium_id(url) or "", dest, delay)
 
     img_map = {}
     if images:
@@ -143,7 +195,8 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
         (dest / "images.json").write_text(json.dumps(img_map, indent=2))
 
     info = extract_metadata(BeautifulSoup(r.text, "html.parser"), url)
-    return {"published": info["date"], "title": info["title"], "image_count": len(img_map)}
+    return {"published": info["date"], "title": info["title"],
+            "image_count": len(img_map), "media_count": media_count}
 
 
 def cmd_fetch(args):
@@ -197,7 +250,7 @@ def cmd_fetch(args):
         del missing[url]
         write_missing(raw_dir, missing)
 
-    fetched = 0
+    fetched = media_files = 0
     for n, (url, approx, source) in enumerate(entries, 1):
         if args.limit and fetched >= args.limit:
             print(f"reached --limit {args.limit}", file=sys.stderr)
@@ -208,6 +261,17 @@ def cmd_fetch(args):
         alias = by_id.get(pid)
         already = url in skip or (alias is not None and (raw_dir / pid / "page.html").exists())
         if already and not args.force:
+            # posts archived before embed media was fetched: backfill
+            # raw/<id>/media/ without re-fetching the post itself
+            page = raw_dir / pid / "page.html"
+            if page.exists():
+                got = fetch_media(session, page.read_text(encoding="utf-8"),
+                                  pid, raw_dir / pid, args.delay)
+                if got:
+                    media_files += got
+                    print(f"[{n}/{len(entries)}] {url}\n"
+                          f"  archived {got} embed media file(s) for the "
+                          f"already-fetched post", file=sys.stderr)
             continue
         variant_of = None if source == "file" else mangled_alias(url)
         if variant_of:
@@ -225,6 +289,7 @@ def cmd_fetch(args):
                 print(f"  skipped: published {info['published']} is outside window", file=sys.stderr)
                 shutil.rmtree(tmp, ignore_errors=True)
                 continue
+            media_files += info.get("media_count", 0)
             if dest.exists():
                 if (dest / "export.html").exists():   # not fetch's to lose
                     shutil.copy2(dest / "export.html", tmp / "export.html")
@@ -284,6 +349,8 @@ def cmd_fetch(args):
         time.sleep(args.delay)
     write_readme(args.out, args.base)
     summary = f"fetch done: {fetched} new, {len(index)} total in {raw_dir}"
+    if media_files:
+        summary += f"; {media_files} embed media file(s) archived"
     if missing:
         summary += f"; {len(missing)} posts gone from Medium -> {raw_dir / 'missing.json'}"
     print(summary, file=sys.stderr)

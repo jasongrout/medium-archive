@@ -1,6 +1,6 @@
 """ghost_comparable_blocks normalization, mainly fenced-code handling."""
 
-from medium_archive.compare import ghost_comparable_blocks
+from medium_archive.compare import comparable_lines, ghost_comparable_blocks
 
 
 def test_fence_hard_breaks_equal_plain_newlines():
@@ -36,3 +36,14 @@ def test_hard_break_splits_prose():
 
 def test_unterminated_fence_reaches_end():
     assert ghost_comparable_blocks("text\n\n```\ncode\n") == ["text", "``` code"]
+
+
+def test_fence_language_is_not_a_page_export_difference():
+    # only the state conversion knows fence languages (codeBlockMetadata)
+    assert comparable_lines("```python\nx = 1\n```\n") == \
+        comparable_lines("```\nx = 1\n```\n")
+
+
+def test_fence_language_is_not_a_ghost_difference():
+    assert ghost_comparable_blocks("```js\ncode\n```\n") == \
+        ghost_comparable_blocks("```\ncode\n```\n")

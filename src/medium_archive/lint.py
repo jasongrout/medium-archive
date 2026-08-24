@@ -28,6 +28,11 @@ MEDIUM_CDN_RE = re.compile(
 
 IMAGE_RE = re.compile(r"!\[[^\]]*\]\((images/[^)]+)\)")
 
+# convert's placeholder for an embed whose content was never archived
+# (a gist embed with no raw/<id>/media/ files); markdownify may escape
+# the bracket
+MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
+
 FENCE_RE = re.compile(r"^`{3,}")
 
 
@@ -61,6 +66,9 @@ def lint_post(post_dir: Path) -> tuple[list, list]:
     for line, fenced in prose_lines(body):
         if not fenced and CHROME_RE.search(line):
             errors.append(f"Medium chrome in body: {line.strip()[:80]!r}")
+        if not fenced and MISSING_EMBED_RE.search(line):
+            errors.append(f"embed content not archived: {line.strip()[:80]!r} "
+                          "(re-run fetch to archive its media)")
         if not fenced:
             m = MEDIUM_CDN_RE.search(line)
             if m:

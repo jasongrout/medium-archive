@@ -80,6 +80,30 @@ def state_image_urls(text: str, medium_id: str) -> list:
     return urls
 
 
+def state_media_resources(text: str, medium_id: str) -> dict:
+    """Media resources of IFRAME paragraphs whose iframeSrc is empty --
+    the embeds the state itself cannot resolve (gists, mostly; every
+    other embed type goes through embedly and names its target in
+    iframeSrc). Keyed by resource id, valued with the resource title
+    (for a gist, its filename). fetch archives these ids via
+    medium.com/media/<id>; without that, the embed's content exists
+    nowhere in the page."""
+    if not re.search(r'"iframeSrc"\s*:\s*""', text):
+        return {}
+    state = apollo_post_state(text, medium_id)
+    if not state:
+        return {}
+    post = state.get(f"Post:{medium_id}") or {}
+    out = {}
+    for p in _paragraphs(state, post):
+        if p.get("type") != "IFRAME":
+            continue
+        media = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
+        if media.get("id") and not media.get("iframeSrc"):
+            out.setdefault(media["id"], media.get("title") or "")
+    return out
+
+
 def state_metadata(state: dict, medium_id: str) -> dict:
     """Front-matter fields from the state; same shape as extract_metadata."""
     post = state[f"Post:{medium_id}"]
@@ -116,9 +140,28 @@ def _unit_to_char(text: str):
     return lambda off: m[min(max(off, 0), len(m) - 1)]
 
 
-def _rich_text(text: str, markups: list) -> str:
+def _markup_href(state, mu) -> str | None:
+    """An A markup's link target. A user-mention markup carries no href,
+    only the userId; the state's User entry names the profile."""
+    if mu.get("href"):
+        return mu["href"]
+    user = (state or {}).get(f"User:{mu.get('userId')}") or {}
+    username = user.get("username")
+    return f"https://medium.com/@{username}" if username else None
+
+
+def _rich_text(text: str, markups: list, state: dict | None = None) -> str:
     """Paragraph text with its markups applied, as escaped HTML."""
     markups = [mu for mu in markups or [] if mu.get("type") in MARKUP_TAGS]
+    resolved = []
+    for mu in markups:
+        if mu["type"] == "A":
+            href = _markup_href(state, mu)
+            if href is None:        # unresolvable mention: keep plain text
+                continue
+            mu = {**mu, "href": href}
+        resolved.append(mu)
+    markups = resolved
     if not markups:
         return escape(text)
     to_char = _unit_to_char(text)
@@ -149,10 +192,10 @@ def _rich_text(text: str, markups: list) -> str:
     return text_html
 
 
-def _figure(p) -> str:
+def _figure(state, p) -> str:
     meta = p.get("metadata") or {}
     img_id = meta.get("id")
-    caption = _rich_text(p.get("text") or "", p.get("markups"))
+    caption = _rich_text(p.get("text") or "", p.get("markups"), state)
     inner = ""
     if img_id:
         alt = f' alt="{escape(meta["alt"], quote=True)}"' if meta.get("alt") else ""
@@ -176,13 +219,57 @@ def _iframe_src(state, p) -> str:
     return src
 
 
-def _iframe(state, p) -> str:
+def _iframe(state, p, media: dict | None = None) -> str:
     src = _iframe_src(state, p)
-    caption = _rich_text(p.get("text") or "", p.get("markups"))
-    inner = f'<iframe src="{escape(src, quote=True)}"></iframe>' if src else ""
+    caption = _rich_text(p.get("text") or "", p.get("markups"), state)
+    if not src:
+        res = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
+        return _media_embed(res, media or {}, caption)
+    inner = f'<iframe src="{escape(src, quote=True)}"></iframe>'
     if caption.strip():
         inner += f"<figcaption>{caption}</figcaption>"
-    return f"<figure>{inner}</figure>" if inner else ""
+    return f"<figure>{inner}</figure>"
+
+
+def gist_code_blocks(files: dict) -> str:
+    """A gist's files (the GitHub API's `files` mapping) as <pre><code>
+    blocks ready for to_markdown, each fence carrying the file's
+    language."""
+    blocks = []
+    for f in files.values():
+        lang = (f.get("language") or "").lower()
+        cls = f' class="language-{escape(lang, quote=True)}"' if lang else ""
+        blocks.append(f"<pre><code{cls}>{escape(f.get('content') or '')}"
+                      "</code></pre>")
+    return "".join(blocks)
+
+
+def _media_embed(res: dict, media: dict, caption: str) -> str:
+    """An embed whose state names no target (iframeSrc empty -- a gist,
+    usually). With its media resource archived (fetch saves raw/media/),
+    inline the gist's files as code blocks, or fall back to whatever URL
+    the media payload names; otherwise emit a visible
+    [missing embed: ...] placeholder that lint flags -- the one thing
+    this must never do is drop the embed silently."""
+    entry = media.get(res.get("id") or "") or {}
+    files = (entry.get("gist") or {}).get("files") or {}
+    if files:
+        inner = gist_code_blocks(files)
+        if caption.strip():
+            inner += f"<figcaption>{caption}</figcaption>"
+        return f"<figure>{inner}</figure>"
+    value = entry.get("value") or {}
+    src = value.get("iframeSrc") or value.get("href") or ""
+    if src:
+        inner = f'<iframe src="{escape(src, quote=True)}"></iframe>'
+        if caption.strip():
+            inner += f"<figcaption>{caption}</figcaption>"
+        return f"<figure>{inner}</figure>"
+    title = res.get("title") or ""
+    out = f"<p>{escape(f'[missing embed: {title}]' if title else '[missing embed]')}</p>"
+    if caption.strip():
+        out += f"<figure><figcaption>{caption}</figcaption></figure>"
+    return out
 
 
 def _mixtape(p) -> str:
@@ -237,9 +324,22 @@ def _section_breaks(post: dict) -> set:
     return set()
 
 
-def state_body(state: dict, medium_id: str, title: str = ""):
+def _code_lang(p) -> str:
+    """The code block's language, when Medium highlighted it: AUTO is
+    Medium's own detection, EXPLICIT the author's choice, DISABLED means
+    highlighting was turned off (render a bare fence)."""
+    meta = p.get("codeBlockMetadata") or {}
+    if meta.get("mode") == "DISABLED":
+        return ""
+    return (meta.get("lang") or "").lower()
+
+
+def state_body(state: dict, medium_id: str, title: str = "",
+               media: dict | None = None):
     """The post body reconstructed from the state's paragraph list, as a
-    soup ready for to_markdown; mirrors what Medium would have rendered."""
+    soup ready for to_markdown; mirrors what Medium would have rendered.
+    `media` maps media resource ids to their archived payloads
+    (convert.load_media), for embeds the state leaves unresolved."""
     post = state[f"Post:{medium_id}"]
     parts, list_tag = [], None
 
@@ -259,7 +359,7 @@ def state_body(state: dict, medium_id: str, title: str = ""):
             close_list()
             parts.append("<hr>")
         ptype = p.get("type") or "P"
-        rich = lambda: _rich_text(p.get("text") or "", p.get("markups"))
+        rich = lambda: _rich_text(p.get("text") or "", p.get("markups"), state)
         if ptype in ("ULI", "OLI"):
             tag = "ul" if ptype == "ULI" else "ol"
             if list_tag != tag:
@@ -272,13 +372,17 @@ def state_body(state: dict, medium_id: str, title: str = ""):
         if ptype in HEADINGS:
             parts.append(f"<{HEADINGS[ptype]}>{rich()}</{HEADINGS[ptype]}>")
         elif ptype == "IMG":
-            parts.append(_figure(p))
+            parts.append(_figure(state, p))
         elif ptype == "PRE":
-            parts.append(f"<pre>{escape(p.get('text') or '')}</pre>")
+            lang = _code_lang(p)
+            code = escape(p.get("text") or "")
+            parts.append(
+                f'<pre><code class="language-{escape(lang, quote=True)}">'
+                f"{code}</code></pre>" if lang else f"<pre>{code}</pre>")
         elif ptype in ("BQ", "PQ"):
             parts.append(f"<blockquote>{rich()}</blockquote>")
         elif ptype == "IFRAME":
-            parts.append(_iframe(state, p))
+            parts.append(_iframe(state, p, media))
         elif ptype == "MIXTAPE_EMBED":
             parts.append(_mixtape(p))
         else:                                   # P and anything unknown
