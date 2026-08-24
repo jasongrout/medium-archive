@@ -87,7 +87,16 @@ It works in independent steps:
   and a render hook, Pelican through Pillow (`pip install pillow`, or
   the `covers` extra): covers at export time, body variants encoded
   after each build by a plugin embedded in the generated config,
-  mtime-cached so rebuilds only touch changed images. All three render
+  mtime-cached so rebuilds only touch changed images. All four sites
+  carry display copies of the images, not the archival originals:
+  anything past a size cap is resized down as it is placed — stills to
+  a 1600 px longest edge through Pillow, animated gifs (which get no
+  srcset variants and dominate the built sites byte-wise) to 1104 px
+  through gifsicle when it is installed — built once into
+  `<out>/.image-cache/` and hard-linked into every site. `raw/` and
+  `posts/` keep full resolution; `site.json` tunes or disables the
+  caps (`"images": {"still_max_edge": N, "animated_max_edge": N}`,
+  0 = off). All three render
   every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
   redirect stub that works on any static host — `hugo` and `zola`
   through their `aliases` front matter, `pelican` through a small
