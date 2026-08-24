@@ -42,8 +42,8 @@ Medium. It has two layers:
   section (first-class support for Dream, hugo-theme-dream,
   Hugo >= 0.158); clone the theme once into site-hugo/themes/ --
   regeneration preserves it. This archive's site.json uses the built-in
-  card theme, with `avatar.png` (the Jupyter logo mark, cropped from an
-  archived post image) in the header.
+  card theme, with `avatar.svg` (the official Jupyter logo mark from
+  https://github.com/jupyter/design, BSD-licensed) in the header.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
