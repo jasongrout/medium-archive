@@ -89,7 +89,12 @@ It works in independent steps:
   plugin embedded in the generated config that turns the exported
   `redirects.csv` into the same stub pages after each build. Tag *and*
   author pages come with per-term RSS/Atom feeds on all three
-  (`pelican`'s from Pelican's own tag/author machinery). `zola` keeps a
+  (`pelican`'s from Pelican's own tag/author machinery); every feed
+  carries the 20 most recent posts with their full content — like the
+  publication's original Medium feed — with feed URLs absolutized
+  against `base_url` and responsive `srcset` markup stripped, since a
+  feed announces new posts while the site itself is the archive.
+  `zola` keeps a
   smaller
   list-style theme with its generator's built-in search index wired to
   a search box. Any of the generated themes can be replaced by a real

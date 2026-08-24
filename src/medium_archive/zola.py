@@ -29,6 +29,8 @@ title = {title}
 description = {description}
 generate_feeds = true
 feed_filenames = ["atom.xml"]
+# a feed announces new posts; the site itself is the archive
+feed_limit = 20
 build_search_index = true
 
 taxonomies = [

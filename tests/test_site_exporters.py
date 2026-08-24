@@ -69,6 +69,10 @@ def test_hugo_site(archive):
     config = (site / "hugo.toml").read_text()
     assert 'baseURL = "https://blog.example.org/"' in config
     assert 'author = "authors"' in config
+    # full-content feed, capped: announce new posts, don't ship the archive
+    assert "[services.rss]\nlimit = 20" in config
+    rss = (site / "layouts/_default/rss.xml").read_text()
+    assert "content:encoded" in rss and "srcset" in rss
     assert (site / "layouts/_default/single.html").exists()
     assert "Welcome." in (site / "content/_index.md").read_text()
     assert (site / "redirects.csv").read_text().count("/posts/first-post/") == 3
@@ -89,8 +93,11 @@ def test_hugo_dream_theme(archive):
     assert 'motto = "hello"' in config          # user params merge last
     assert 'avatar = "img/avatar.png"' in config
     assert (site / "static/img/avatar.png").read_bytes() == b"IMG"
-    # the theme brings its own layouts; Dream's extra pages are created
-    assert not (site / "layouts").exists()
+    # the theme brings its own layouts -- except the feed override, which
+    # is content policy, not styling; Dream's extra pages are created
+    layouts = [str(p.relative_to(site)) for p in (site / "layouts").rglob("*")
+               if p.is_file()]
+    assert layouts == ["layouts/_default/rss.xml"]
     assert (site / "content/search/_index.md").exists()
     assert "Archives" in (site / "content/posts/_index.md").read_text()
     front = json.loads((site / "content/posts/second-post/index.md")
@@ -129,6 +136,7 @@ def test_zola_site(archive):
     config = (site / "config.toml").read_text()
     assert 'base_url = "https://blog.example.org"' in config   # no trailing /
     assert "build_search_index = true" in config
+    assert "feed_limit = 20" in config
     assert '{ name = "authors", feed = true }' in config
     assert (site / "templates/page.html").exists()
     assert (site / "content/posts/_index.md").read_text().count("sort_by")
@@ -153,6 +161,7 @@ def test_pelican_site(archive):
     config = (site / "pelicanconf.py").read_text()
     assert 'SITENAME = "Example Blog"' in config
     assert 'ARTICLE_URL = "posts/{slug}/"' in config
+    assert "FEED_MAX_ITEMS = 20" in config
     assert 'THEME = "theme"' in config
     assert '"search.html": "search/index.html"' in config
     assert "_LazyImages" in config           # body images load lazily

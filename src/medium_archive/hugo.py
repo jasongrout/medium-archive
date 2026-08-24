@@ -49,6 +49,10 @@ locale = {locale}
 [pagination]
 pagerSize = 24
 
+# a feed announces new posts; the site itself is the archive
+[services.rss]
+limit = 20
+
 [taxonomies]
 tag = "tags"
 author = "authors"
@@ -175,6 +179,45 @@ window.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 {{ end }}
+"""
+
+# Full-content feeds, like the publication's original Medium feed:
+# summary in <description>, complete body in <content:encoded>, capped by
+# services.rss.limit. Feed readers resolve relative URLs unreliably, so
+# root-relative src/href become absolute against baseURL, and the
+# responsive srcset/sizes attributes (meaningless in a feed) are
+# stripped. Written for site and per-term feeds alike, and also when a
+# real theme is configured -- feed policy is content policy, not styling.
+RSS = """\
+{{- $pages := site.RegularPages -}}
+{{- if not .IsHome }}{{ $pages = .Pages }}{{ end -}}
+{{- with site.Config.Services.RSS.Limit -}}
+{{- if ge . 1 }}{{ $pages = $pages | first . }}{{ end -}}
+{{- end -}}
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>{{ site.Params.description }}</description>
+    <generator>Hugo</generator>
+    {{ with index $pages 0 }}<lastBuildDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</lastBuildDate>{{ end }}
+    <atom:link href="{{ .Permalink }}index.xml" rel="self" type="application/rss+xml" />
+    {{ range $pages }}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+      {{ with .Params.author }}<dc:creator>{{ . }}</dc:creator>{{ end }}
+      <guid>{{ .Permalink }}</guid>
+      <description>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }}</description>
+      {{- /* absolutize root-relative URLs against baseURL and the gif/svg
+             passthroughs' page-relative images/ against this post's URL */}}
+      <content:encoded>{{ .Content | replaceRE ` (srcset|sizes)="[^"]*"` "" | replaceRE `(src|href)="(/[^"]*)"` (printf `$1="%s$2"` (strings.TrimSuffix "/" site.BaseURL)) | replaceRE `(src|href)="(images/[^"]*)"` (printf `$1="%s$2"` .Permalink) | html }}</content:encoded>
+    </item>
+    {{ end }}
+  </channel>
+</rss>
 """
 
 # Body images: serve responsive, lazily-loaded variants (webp encodes of
@@ -398,6 +441,9 @@ def build_site(out):
             path = site / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text, encoding="utf-8")
+    rss = site / "layouts" / "_default" / "rss.xml"
+    rss.parent.mkdir(parents=True, exist_ok=True)
+    rss.write_text(RSS, encoding="utf-8")
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     if theme and not (site / "themes" / theme).is_dir():

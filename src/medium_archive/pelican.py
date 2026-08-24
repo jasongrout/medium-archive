@@ -65,6 +65,8 @@ CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = {avatar}
 
 FEED_ALL_ATOM = "feeds/all.atom.xml"
+FEED_MAX_ITEMS = 20             # a feed announces new posts; the site
+                                # itself is the archive
 CATEGORY_FEED_ATOM = None
 TAG_FEED_ATOM = "feeds/tag-{{slug}}.atom.xml"
 AUTHOR_FEED_ATOM = "feeds/author-{{slug}}.atom.xml"
