@@ -9,12 +9,12 @@
 # only in the runner's workspace), and each generator builds its site.
 # Nothing derived is committed.
 #
-# Note on size: the exporters currently place full-resolution images
-# into every site, so the four previews together are ~3.3 GB -- above
-# GitHub Pages' documented 1 GB site limit, though within the 10 GB
-# artifact limit. Capping image sizes at export time is a pending
-# medium-archive change (see its todo.md); once that lands, this
-# deployment shrinks to a fraction of the limit.
+# Note on size: the exporters place capped display copies of the
+# images (originals stay in raw/ and posts/), which puts each built
+# site around 0.7 GB and the four previews together around 2.7 GB.
+# That is above GitHub Pages' documented 1 GB site limit -- observed
+# to deploy fine (the hard limit is the 10 GB artifact) -- and the
+# eventual single-site deployment fits comfortably within it.
 #
 # One-time setup: the configure-pages step below enables Pages for the
 # repository (source: GitHub Actions) if it is not enabled yet.
