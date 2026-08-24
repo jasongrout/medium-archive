@@ -228,7 +228,8 @@ RSS = """\
 {{- with site.Config.Services.RSS.Limit -}}
 {{- if ge . 1 }}{{ $pages = $pages | first . }}{{ end -}}
 {{- end -}}
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+{{- /* a literal <?xml would be HTML-escaped by the template engine */ -}}
+{{ printf "<?xml version=\\"1.0\\" encoding=\\"utf-8\\" standalone=\\"yes\\"?>" | safeHTML }}
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>

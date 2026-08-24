@@ -73,6 +73,10 @@ def test_hugo_site(archive):
     assert "[services.rss]\nlimit = 20" in config
     rss = (site / "layouts/_default/rss.xml").read_text()
     assert "content:encoded" in rss and "srcset" in rss
+    # a literal <?xml gets HTML-escaped by Hugo's template engine,
+    # producing an invalid feed; it must go through safeHTML
+    assert 'printf "<?xml' in rss and "safeHTML" in rss
+    assert not rss.lstrip("{}-% \n").startswith("<?xml")
     assert (site / "layouts/_default/single.html").exists()
     # a year-grouped archives timeline, like the pelican theme's
     assert (site / "layouts/_default/archives.html").exists()
