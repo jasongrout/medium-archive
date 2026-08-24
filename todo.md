@@ -91,7 +91,11 @@ clean `lint` run, and the offline test suite):
   when Pillow is installed (the `covers` extra) and lazy-loads body
   images through a Markdown extension embedded in its generated
   config, with heading ids enabled so search results anchor to
-  sections. Covers are chosen by sniffing dimensions from image
+  sections. Pelican gets redirect-stub parity too: a plugin embedded
+  in its generated config renders the exported redirects.csv into
+  meta-refresh stub pages after each build (676 on the reference
+  archive, matching Hugo's alias count), since Pelican has no aliases
+  feature of its own. Covers are chosen by sniffing dimensions from image
   headers (no image library needed for that path). Relatedly,
   `convert` now renames images fetched from extensionless URLs
   (stored as `.bin` in raw/) to the extension their bytes call for, so

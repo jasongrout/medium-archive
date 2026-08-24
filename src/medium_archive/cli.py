@@ -268,7 +268,10 @@ def main():
                            "(site-wide and per tag/author), lazily-loaded "
                            "body images, a /search/ page wired to Pagefind "
                            "(run `pagefind --site output` after `pelican`), "
-                           "and a redirect map. Render with `pelican -l` "
+                           "and redirect stubs at every old inbound path "
+                           "(a plugin embedded in the generated config "
+                           "renders redirects.csv into the same stub pages "
+                           "Hugo emits for aliases). Render with `pelican -l` "
                            "inside <out>/site-pelican/ "
                            "(https://getpelican.com; `pip install pelican "
                            "markdown pillow`)")

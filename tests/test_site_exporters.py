@@ -163,6 +163,9 @@ def test_pelican_site(archive):
         assert (site / f"theme/templates/{tpl}.html").exists(), tpl
     assert "card-grid" in (site / "theme/static/css/style.css").read_text()
     assert (site / "redirects.csv").exists()
+    # the embedded plugin turns redirects.csv into redirect stubs
+    assert "PLUGINS = [_RedirectStubs]" in config
+    assert "signals.finalized" in config and "redirects.csv" in config
 
 
 def test_build_output_survives_regeneration(archive):

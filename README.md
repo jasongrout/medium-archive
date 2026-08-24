@@ -77,11 +77,15 @@ It works in independent steps:
   responsive, lazily-loaded webp variants for body images natively;
   Pelican gets 640×360 cover thumbnails at export time (`pip install
   pillow`, or the `covers` extra) and lazily-loaded body images via a
-  Markdown extension embedded in the generated config. `hugo` and
-  `zola` additionally render every old inbound path as an `aliases`
-  redirect stub that works on any static host, and both have tag *and*
-  author taxonomy pages with per-term RSS/Atom feeds (`pelican`'s come
-  from Pelican's own tag/author machinery). `zola` keeps a smaller
+  Markdown extension embedded in the generated config. All three render
+  every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
+  redirect stub that works on any static host — `hugo` and `zola`
+  through their `aliases` front matter, `pelican` through a small
+  plugin embedded in the generated config that turns the exported
+  `redirects.csv` into the same stub pages after each build. Tag *and*
+  author pages come with per-term RSS/Atom feeds on all three
+  (`pelican`'s from Pelican's own tag/author machinery). `zola` keeps a
+  smaller
   list-style theme with its generator's built-in search index wired to
   a search box. Any of the generated themes can be replaced by a real
   one without touching `content/`. Render with `hugo server`,

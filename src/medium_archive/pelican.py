@@ -18,8 +18,13 @@ indexes, an archives timeline, and a /search/ page wired to Pagefind
 (run `pagefind --site output` after `pelican` for full-text search with
 highlighted, in-context excerpts). Card covers are 640x360 thumbnails
 generated at export time when Pillow is installed (`pip install
-pillow`); without it, cards use the full-size image. Pelican has no
-alias mechanism, so old inbound paths live in redirects.csv.
+pillow`); without it, cards use the full-size image.
+
+Pelican has no built-in equivalent of Hugo's and Zola's aliases, so the
+generated config embeds a small plugin: after each build it reads the
+exported redirects.csv and writes a meta-refresh redirect stub at every
+old inbound path (Medium slug+id, /p/<id>, Ghost-era) -- the same stub
+pages Hugo renders for aliases, working on any static host.
 """
 
 import json
@@ -88,6 +93,54 @@ MARKDOWN = {{
     "output_format": "html5",
 }}
 """
+
+# Appended to the config verbatim (not .format()ed): a plugin that gives
+# Pelican the redirect stubs Hugo and Zola render for aliases.
+REDIRECT_PLUGIN = '''
+
+STUB = """<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>{target}</title>
+<link rel="canonical" href="{target}">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url={target}">
+</head><body><a href="{target}">{target}</a></body></html>
+"""
+
+
+def _write_redirect_stubs(pelican_obj):
+    # Pelican has no aliases feature, so after each build this writes a
+    # meta-refresh stub at every old inbound path from redirects.csv --
+    # the exporter's map of Medium slug+id, /p/<id> and Ghost-era paths
+    # to the pages this site serves. Works on any static host.
+    import csv
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(here, "redirects.csv"), newline="",
+              encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    written = 0
+    for row in rows:
+        parts = [p for p in row["old_path"].split("/") if p]
+        stub = os.path.join(pelican_obj.output_path, *parts, "index.html")
+        if os.path.exists(stub):        # never clobber a real page
+            continue
+        os.makedirs(os.path.dirname(stub), exist_ok=True)
+        with open(stub, "w", encoding="utf-8") as fh:
+            fh.write(STUB.format(target=SITEURL + row["new_path"]))
+        written += 1
+    print(f"redirect stubs: {written} written from redirects.csv")
+
+
+class _RedirectStubs:
+    @staticmethod
+    def register():
+        from pelican import signals
+        signals.finalized.connect(_write_redirect_stubs)
+
+
+PLUGINS = [_RedirectStubs]
+'''
 
 BASE = """\
 <!DOCTYPE html>
@@ -339,7 +392,7 @@ def build_site(out):
                                ensure_ascii=False),
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
         avatar=json.dumps(avatar_setting),
-    ), encoding="utf-8")
+    ) + REDIRECT_PLUGIN, encoding="utf-8")
 
     from .hugo import CSS as CARD_CSS      # hugo and pelican share the look
     for rel, text in {"theme/templates/base.html": BASE,
