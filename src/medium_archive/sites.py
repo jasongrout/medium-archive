@@ -327,20 +327,25 @@ class ImagePlacer:
             with Image.open(src) as im:
                 if getattr(im, "n_frames", 1) > 1:
                     return False           # animated: not ours to flatten
+                # Medium archives hold the odd mislabeled file (a PNG
+                # under a .jpeg name); re-encode what the bytes are,
+                # not what the name says -- the filename stays as the
+                # pages reference it, and browsers sniff content anyway.
+                fmt = im.format
                 icc = im.info.get("icc_profile")
                 if im.mode == "P":
                     im = im.convert(
                         "RGBA" if "transparency" in im.info else "RGB")
                 im.thumbnail((cap, cap), Image.Resampling.LANCZOS)
                 kwargs = {"icc_profile": icc} if icc else {}
-                if src.suffix.lower() in (".jpg", ".jpeg"):
+                if fmt == "JPEG":
                     kwargs |= {"quality": 85, "optimize": True,
                                "progressive": True}
-                elif src.suffix.lower() == ".webp":
+                elif fmt == "WEBP":
                     kwargs |= {"quality": 85, "method": 4}
                 else:
                     kwargs |= {"optimize": True}
-                im.save(tmp, **kwargs)
+                im.save(tmp, format=fmt, **kwargs)
         except Exception as e:
             self._note(f"resize failed on {src.name} ({e}); "
                        "placed at full size")
