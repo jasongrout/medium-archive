@@ -42,9 +42,12 @@ Last full validation, all four against all 333 posts:
   elasticlunr index). The 53 dead in-page anchors are reported as
   warnings (`link_checker.internal_level = "warn"` in the generated
   config).
-- Pelican has no alias mechanism, so its old-URL redirects live only
-  in `site-pelican/redirects.csv`; the build's only warnings are
-  cosmetic empty-image-alt ones (Medium images rarely carry alt text).
+- The pelican build writes 676 redirect stubs (matching the hugo
+  count) via a plugin embedded in its generated config — Pelican has
+  no aliases feature of its own, so the plugin renders
+  `site-pelican/redirects.csv` into meta-refresh stub pages after each
+  build. The build's only warnings are cosmetic empty-image-alt ones
+  (Medium images rarely carry alt text).
 
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and

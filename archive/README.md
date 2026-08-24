@@ -28,8 +28,10 @@ Medium. It has two layers:
   images (thumbnailed covers; responsive or lazily-loaded body images),
   and a /search/ page wired to Pagefind (`pagefind --site public|output`
   after building: full-text search with highlighted in-context
-  excerpts). hugo/zola add per-term feeds and redirect-stub aliases for
-  old paths; zola keeps a list theme with its built-in search box.
+  excerpts). All three render redirect stubs at every old inbound path
+  (hugo/zola via aliases, pelican via a plugin embedded in its
+  generated config) and add per-term feeds; zola keeps a list theme
+  with its built-in search box.
   Render with `hugo server`, `zola serve`, or `pelican -l`. The hugo
   step can instead target a real theme named in site.json's hugo
   section (first-class support for Dream, hugo-theme-dream,
