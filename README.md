@@ -6,9 +6,11 @@ support migrating a blog off Medium.
 It works in independent steps:
 
 * **`fetch`** pulls raw material from Medium — each post's page HTML, its RSS
-  feed item, and full-resolution images, unmodified — into `<out>/raw/`.
-  Fetching is incremental and resumable, so it can be interrupted and re-run,
-  and re-running later picks up only new posts.
+  feed item, full-resolution images, and the media behind gist embeds (the
+  gist's files, via medium.com/media and the GitHub gists API), unmodified —
+  into `<out>/raw/`. Fetching is incremental and resumable, so it can be
+  interrupted and re-run; re-running later picks up only new posts, and
+  backfills embed media for posts archived before it was collected.
 * **`import-export`** (optional) merges a Medium account export — the zip
   from medium.com → Settings → Download your information — into `<out>/raw/`,
   matched to fetched posts by Medium id. An export holds everything its
@@ -113,9 +115,9 @@ It works in independent steps:
   the `avatar` image is copied into the site for the header.
 * **`lint`** scans the converted posts for conversion-defect signatures —
   leftover Medium chrome, unclosed code fences, images referenced but
-  missing on disk, remote Medium CDN images. It exits non-zero when a
-  defect is found, so regressions surface on every convert instead of
-  waiting for a reader.
+  missing on disk, remote Medium CDN images, embeds whose media was never
+  archived. It exits non-zero when a defect is found, so regressions
+  surface on every convert instead of waiting for a reader.
 * **`stats`** summarizes the converted archive: posts per year, provenance
   (how each post was discovered — feed, sitemap, Wayback, Ghost era — which
   sources were recovered for it, and which one each body was converted
@@ -260,8 +262,17 @@ longer lists — work through the steps in order:
   flagged posts and unflags any that reappear.
 * Medium boilerplate — the "was originally published on Medium" footer,
   stat tracking pixels, clap/share UI — is stripped during `convert`; it is
-  still present in the raw pages. Embedded gists and other iframes become
-  links and need manual replacement.
+  still present in the raw pages. Embedded iframes become links and need
+  manual replacement — except gist embeds, whose files `fetch` archives
+  into `raw/<id>/media/` and `convert` inlines as code fences (a gist's
+  content exists nowhere in the page itself; Medium's state names only an
+  opaque media resource id). A gist embed whose media is not yet archived
+  converts to a link to the gist (export and Ghost bodies, which name it)
+  or a `[missing embed: <name>]` placeholder (the state, which doesn't);
+  `lint` flags the placeholders until a `fetch` re-run backfills the media.
+  Code fences carry the language Medium recorded for the block
+  (`codeBlockMetadata`), and user mentions resolve to the author's Medium
+  profile.
 * Every Medium page carries its post twice: rendered into the visible
   HTML, and as data in its embedded editor state
   (`window.__APOLLO_STATE__`) — the ordered paragraph list with markup

@@ -24,7 +24,8 @@ from .images import image_source, sniff_image_ext
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json)
-from .state import apollo_post_state, state_body, state_metadata
+from .state import (apollo_post_state, gist_code_blocks, state_body,
+                    state_metadata)
 from .readme import write_readme
 from .urls import canonical_url, medium_id, resolve_canonical, slug_of
 
@@ -33,19 +34,31 @@ EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
 
 
 class _Converter(MarkdownConverter):
-    """markdownify, with each code fence sized to its content: a <pre>
-    whose text itself contains ``` lines (a post showing Markdown) would
-    close a three-backtick fence early, spilling the rest of the block --
-    and everything after it -- into broken structure."""
+    """markdownify, with two code-fence tweaks. Each fence is sized to
+    its content: a <pre> whose text itself contains ``` lines (a post
+    showing Markdown) would close a three-backtick fence early, spilling
+    the rest of the block -- and everything after it -- into broken
+    structure. And the opening fence carries the block's language when a
+    nested <code class="language-..."> names one (the editor state's
+    codeBlockMetadata, gist files, Ghost highlighting classes)."""
 
     def convert_pre(self, el, text, parent_tags):
         md = super().convert_pre(el, text, parent_tags)
-        runs = re.findall(r"`{3,}", text)
-        if not md or not runs:
+        if not md:
             return md
-        fence = "`" * (max(map(len, runs)) + 1)
-        start, end = md.index("```"), md.rindex("```")
-        return md[:start] + fence + md[start + 3:end] + fence + md[end + 3:]
+        runs = re.findall(r"`{3,}", text)
+        if runs:
+            fence = "`" * (max(map(len, runs)) + 1)
+            start, end = md.index("```"), md.rindex("```")
+            md = md[:start] + fence + md[start + 3:end] + fence + md[end + 3:]
+        code = el.find("code")
+        lang = next((c[len("language-"):]
+                     for c in (code.get("class") if code else None) or ()
+                     if c.startswith("language-")), "")
+        if lang:
+            m = re.match(r"\s*`{3,}", md)
+            md = md[:m.end()] + lang + md[m.end():]
+        return md
 
 
 def _strip_tracking(url: str) -> str:
@@ -61,11 +74,31 @@ def _strip_tracking(url: str) -> str:
     return urlunsplit(parts._replace(query=urlencode(q)))
 
 
-def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | None = None):
+GIST_SRC_RE = re.compile(
+    r"https?://gist\.github\.com/(?:[^/\s]+/)?([0-9a-f]+)(?:\.js)?(?:\?.*)?$")
+
+
+def _archived_gist_files(media: dict, gist_id: str) -> dict | None:
+    """The archived files of gist `gist_id`, from whichever media
+    resource entry holds them (media entries are keyed by Medium's
+    resource id, not the gist id)."""
+    for entry in media.values():
+        gist = entry.get("gist") or {}
+        if gist.get("files") and gist_id in (
+                gist.get("id"),
+                ((entry.get("value") or {}).get("gist") or {}).get("gistId")):
+            return gist["files"]
+    return None
+
+
+def to_markdown(body, base_url: str, img_map: dict, raw: Path,
+                out_dir: Path | None = None, media: dict | None = None):
     """Rewrite images, iframes and links in a body and render it to
     Markdown; shared by convert and compare. With out_dir, referenced
     images are copied into out_dir/images/; without, mapped filenames are
-    still used but nothing is written. Returns (markdown, used_images)."""
+    still used but nothing is written. `media` (convert.load_media) lets
+    gist embeds inline their archived files. Returns
+    (markdown, used_images)."""
     doc = BeautifulSoup("", "html.parser")        # owner for new_tag()
     # the same asset appears under miro.medium.com and cdn-images-1.medium.com
     by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
@@ -121,6 +154,23 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
                 em.append(child.extract())
             cap.append(em)
 
+    # Export and Ghost bodies embed gists as <script src=".../<id>.js">
+    # tags, which would otherwise convert to nothing at all. Inline the
+    # gist's archived files (raw/media/), else keep a link to the gist --
+    # never drop the embed silently.
+    for script in body.find_all("script"):
+        m = GIST_SRC_RE.match(script.get("src") or "")
+        if not m:
+            continue
+        files = _archived_gist_files(media or {}, m.group(1))
+        if files:
+            script.replace_with(BeautifulSoup(gist_code_blocks(files),
+                                              "html.parser"))
+        else:
+            url = m.string[:m.end(1)]           # the gist's page URL
+            script.replace_with(doc.new_tag("a", href=url,
+                                            string=f"embed: {url}"))
+
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
         iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
@@ -163,6 +213,28 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
     # reads as more front matter to some Markdown tooling.
     markdown = re.sub(r"^(?:-{3,}\n+)+", "", markdown)
     return markdown, used_images
+
+
+def load_media(raw: Path, fixups: dict = None) -> dict:
+    """Archived embed media resources (raw/media/, saved by fetch for
+    embeds the page state leaves unresolved): {resource_id: {"value":
+    the medium.com/media payload's value, "gist": the GitHub gist API
+    response with the gist's files}}, either part absent when not
+    archived."""
+    media_dir = raw / "media"
+    if not media_dir.is_dir():
+        return {}
+    media = {}
+    for p in sorted(media_dir.glob("*.json")):
+        if p.name.endswith(".gist.json"):
+            continue
+        payload = json.loads(read_raw(p, fixups))
+        entry = {"value": (payload.get("payload") or {}).get("value") or {}}
+        gist_file = p.with_name(f"{p.stem}.gist.json")
+        if gist_file.exists():
+            entry["gist"] = json.loads(read_raw(gist_file, fixups))
+        media[p.stem] = entry
+    return media
 
 
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
@@ -229,6 +301,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     img_map = {}
     if (raw / "images.json").exists():
         img_map = json.loads(read_raw(raw / "images.json", fixups))
+    media = load_media(raw, fixups)
 
     have_feed = bool(feed_item and feed_item.get("content_html"))
     have_page = soup is not None and not page_shell
@@ -251,7 +324,8 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     elif have_feed:
         body, body_source = feed_body(feed_item["content_html"]), "feed"
     elif state is not None:            # the page's embedded editor state
-        body, body_source = state_body(state, raw.name, info["title"]), "state"
+        body = state_body(state, raw.name, info["title"], media)
+        body_source = "state"
     else:                              # a page without embedded state
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
 
@@ -264,7 +338,8 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     shutil.rmtree(out_dir, ignore_errors=True)
     out_dir.mkdir(parents=True)
 
-    markdown, used_images = to_markdown(body, info["url"], img_map, raw, out_dir)
+    markdown, used_images = to_markdown(body, info["url"], img_map, raw,
+                                        out_dir, media)
     if "Continue reading on" in markdown and len(markdown) < 2000:
         print("  warning: body looks truncated", file=sys.stderr)
     if len(markdown) < 200:

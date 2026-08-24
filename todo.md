@@ -116,8 +116,44 @@ clean `lint` run, and the offline test suite):
   archive with Hugo 0.158: all pages, covers, search, tag/author
   pages and feeds render (screenshots checked via headless Chromium).
 
+From the 2026-08 review of other Medium-to-Markdown tools (medium-2-md,
+mediumexporter — the latter's media-resource handling exposed a silent
+data loss here):
+
+- **Gist embeds recovered instead of silently dropped** — a gist embed's
+  media resource has an empty `iframeSrc` (gists are the one embed type
+  not routed through embedly), so its content exists nowhere in the
+  page: the state conversion emitted nothing at all, and export/Ghost
+  bodies carry it as a `<script src="…gist.github.com/….js">` tag that
+  also converted to nothing. Now `fetch` archives the media payload
+  (`medium.com/media/<id>?format=json`, mediumexporter's trick) and the
+  gist's files (GitHub gists API) into `raw/<id>/media/`, incrementally
+  — a re-run backfills posts archived before this existed — and
+  `convert` inlines the files as language-tagged fences from any body
+  source. Without archived media the embed becomes an
+  `[embed: <gist url>]` link (export/Ghost, which name the gist) or a
+  `[missing embed: <name>]` placeholder (the state, which doesn't),
+  and `lint` flags the placeholders.
+- **Code fences carry languages** — the state's `codeBlockMetadata`
+  records the language Medium highlighted (author-set or auto-detected;
+  DISABLED stays bare), and gist files and Ghost `language-*` classes
+  provide it too; `to_markdown` now emits it on the opening fence.
+  `compare` drops fence info strings, since only some sources know them.
+- **User mentions resolve** — mention markups carry a `userId` and no
+  href and rendered as empty links; the state's own `User:` entry names
+  the profile (`https://medium.com/@username`). Unresolvable mentions
+  stay plain text.
+
 ## Remaining
 
-Nothing pending in the tool itself. Archive-specific follow-ups (posts
-whose images still need fetching, hand-correction candidates) live in
-each archive's own notes, alongside its `fixups/`.
+- Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
+  gist embeds, then `convert` + `lint` (the placeholders the 2026-08
+  audit archive currently flags: 26 embeds across 7 posts). The
+  medium.com/media endpoint and the anti-hijacking-prefix parsing were
+  implemented against mediumexporter's usage and canned tests only —
+  the development sandbox could not reach medium.com — so verify the
+  first live run's output.
+
+Archive-specific follow-ups (posts whose images still need fetching,
+hand-correction candidates) live in each archive's own notes, alongside
+its `fixups/`.

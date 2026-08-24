@@ -240,3 +240,26 @@ def test_bin_image_gets_sniffed_extension(tmp_path):
                            {"https://miro.medium.com/y": "002-y.bin"},
                            tmp_path, tmp_path / "out2")
     assert used == ["images/002-y.bin"]
+
+GIST_SCRIPT = ('<figure><script src="https://gist.github.com/ann/'
+               'abcdef0123456789abcdef0123456789.js"></script></figure>')
+
+
+def test_gist_script_becomes_a_link_when_not_archived():
+    # export/ghost bodies embed gists as script tags; a script converts
+    # to nothing, so keep at least a link to the gist
+    md = md_of(GIST_SCRIPT)
+    assert md == ("[embed: https://gist.github.com/ann/"
+                  "abcdef0123456789abcdef0123456789]"
+                  "(https://gist.github.com/ann/"
+                  "abcdef0123456789abcdef0123456789)\n")
+
+
+def test_gist_script_inlines_archived_files():
+    body = BeautifulSoup(f"<article>{GIST_SCRIPT}</article>", "html.parser")
+    media = {"m1": {"value": {}, "gist": {
+        "id": "abcdef0123456789abcdef0123456789",
+        "files": {"a.py": {"language": "Python", "content": "x = 1"}}}}}
+    markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert "```python\nx = 1\n```" in markdown
+    assert "gist.github.com" not in markdown
