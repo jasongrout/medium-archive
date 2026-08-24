@@ -198,7 +198,8 @@ def main():
                  help="merge a Medium account export into <out>/raw/")
     imp.add_argument("export_path", type=Path, metavar="ZIP_OR_DIR",
                      help="the export zip from medium.com Settings -> Download your "
-                          "information, or an unzipped copy / its posts/ directory")
+                          "information, a zip of just its posts/ folder, or an "
+                          "unzipped copy / its posts/ directory")
     imp.add_argument("--all", action="store_true",
                      help="also import export posts that do not match a post already "
                           "in the archive, e.g. unlisted posts or posts from other "
