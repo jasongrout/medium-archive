@@ -1,8 +1,7 @@
 # Build previews of the archive's four generated sites and publish them
 # to GitHub Pages under /hugo/, /pelican/, /zola/ and /myst/, with a
 # landing page linking the four -- so the generators can be compared on
-# identical content before one is chosen. Pull requests run the same
-# build as validation, without publishing.
+# identical content before one is chosen.
 #
 # Everything is regenerated from raw/ + fixups/ on each run: `convert`
 # rebuilds posts/, each site exporter rebuilds its site directory with
@@ -25,8 +24,6 @@ name: Preview sites
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -34,10 +31,9 @@ permissions:
   pages: write
   id-token: write
 
-# Previews: the latest run wins. Grouped per ref so a PR's validation
-# run never cancels a deployment from main.
+# Previews: the latest run wins.
 concurrency:
-  group: pages-${{ github.ref }}
+  group: pages
   cancel-in-progress: true
 
 env:
@@ -134,11 +130,7 @@ jobs:
         with:
           path: _site
 
-  # Pull request runs stop after build: the full pipeline is validated
-  # and the artifact (1-day retention) is inspectable from the run page,
-  # but only pushes to main (and manual runs) publish to Pages.
   deploy:
-    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:
