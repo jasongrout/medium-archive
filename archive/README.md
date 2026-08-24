@@ -31,8 +31,10 @@ Medium. It has two layers:
   after building: full-text search with highlighted in-context
   excerpts). All three render redirect stubs at every old inbound path
   (hugo/zola via aliases, pelican via a plugin embedded in its
-  generated config) and add per-term feeds; zola keeps a list theme
-  with its built-in search box.
+  generated config) and add per-term feeds; every feed carries the 20
+  most recent posts with their full content, like the publication's
+  original Medium feed. zola keeps a list theme with its built-in
+  search box.
   Render with `hugo server`, `zola serve`, or `pelican -l`. The hugo
   step can instead target a real theme named in site.json's hugo
   section (first-class support for Dream, hugo-theme-dream,
