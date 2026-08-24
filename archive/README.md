@@ -256,55 +256,38 @@ too.
 
 ## Building the sites
 
-The exporter steps above only write site sources; each generator
-renders its own site, and Pagefind then builds the search index for
-the hugo and pelican sites. Tools: Hugo extended >= 0.158
-(https://gohugo.io), Pelican with Pillow (`pip install pelican
-markdown pillow`), Zola (https://www.getzola.org), mystmd
-(`npm install -g mystmd`), Pagefind (`npm install -g pagefind`).
+Tools: Hugo extended >= 0.158, `pip install pelican markdown pillow`,
+Zola, `npm install -g mystmd pagefind`.
 
-Re-run the generator after every exporter re-run: theme assets and
-templates only reach the served output through the generator build.
-Before a production build, set base_url in site.json to the real
-domain -- it is baked into absolute feed URLs and redirect stubs.
+Before deploying, set `base_url` in `site.json` to the site's real
+domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
+exporter step: feed URLs, redirect stubs, and other absolute links are
+built from it.
 
 hugo (preferred):
 
     medium-archive hugo --out ../blog_export
     cd ../blog_export/site-hugo
-    hugo                          # -> public/; the first run encodes the
-                                  #   image variants (~2 min), later runs
-                                  #   reuse the resources/ cache
-    pagefind --site public        # build the search index
-    python -m http.server -d public   # preview with working search
-                                  # (`hugo server` is fine for theme work,
-                                  #   but serves from memory, without the
-                                  #   pagefind/ index that lives in public/)
+    hugo
+    pagefind --site public
+    python -m http.server -d public
 
 pelican (preferred):
 
-    pip install pelican markdown pillow
     medium-archive pelican --out ../blog_export
     cd ../blog_export/site-pelican
-    pelican                       # -> output/; the first run encodes the
-                                  #   image variants (~2.5 min), later
-                                  #   runs reuse them
-    pagefind --site output        # build the search index
-    pelican -l                    # serve output/ at :8000; search works,
-                                  #   it serves from disk
+    pelican
+    pagefind --site output
+    pelican -l
 
 zola:
 
     medium-archive zola --out ../blog_export
     cd ../blog_export/site-zola
-    zola serve                    # or: zola build -> public/;
-                                  #   search is built in
+    zola serve
 
 myst:
 
-    npm install -g mystmd
     medium-archive myst --out ../blog_export
     cd ../blog_export/site
-    myst start                    # or: myst build --html -> _build/html/;
-                                  #   the first build downloads the
-                                  #   book-theme template
+    myst start
