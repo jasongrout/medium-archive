@@ -600,7 +600,7 @@
       "images/003-1_lijkfmv6G5n96sO2vRzB5Q.png",
       "images/004-1_wW76DvGMkq2l_Xvr0JO_vw.png",
       "images/005-0_vKMU4QiLD406Ac9c.png",
-      "images/006-0_GSE92ExuZWmjQHtA.bin",
+      "images/006-0_GSE92ExuZWmjQHtA.png",
       "images/007-1_CkZpwkmEKNiXm_XsiBRACQ.png"
     ],
     "body_source": "state",
@@ -1068,19 +1068,19 @@
       "webassembly"
     ],
     "images": [
-      "images/001-0_WCAlh5DEa7IT27u3.bin",
-      "images/002-0_XLTuIN3E7_64kPcO.bin",
+      "images/001-0_WCAlh5DEa7IT27u3.png",
+      "images/002-0_XLTuIN3E7_64kPcO.png",
       "images/003-1_gNg6NzVjE9nwIF9PSdt-jA.png",
-      "images/004-0_j7LvIkaUDbSD0urz.bin",
-      "images/005-0_icsXc3d2vC5OTF1K.bin",
-      "images/006-0_OrN0HWXlcMjemfj6.bin",
-      "images/007-0_O4xsKujuUwCvMVSq.bin",
-      "images/008-0_7E9I9OxKKGqDK_Og.bin",
-      "images/009-0_jbBM7zjHznUTxDmp.bin",
-      "images/010-0_Y0RXrB1PrRoP7fQ3.bin",
-      "images/011-0_PyE8StfrE9f5s7g8.bin",
-      "images/012-0_cmTseJsCeHr02SRp.bin",
-      "images/013-0_-sOa-yVDMKuTdJ6R.bin",
+      "images/004-0_j7LvIkaUDbSD0urz.png",
+      "images/005-0_icsXc3d2vC5OTF1K.png",
+      "images/006-0_OrN0HWXlcMjemfj6.png",
+      "images/007-0_O4xsKujuUwCvMVSq.png",
+      "images/008-0_7E9I9OxKKGqDK_Og.png",
+      "images/009-0_jbBM7zjHznUTxDmp.png",
+      "images/010-0_Y0RXrB1PrRoP7fQ3.png",
+      "images/011-0_PyE8StfrE9f5s7g8.png",
+      "images/012-0_cmTseJsCeHr02SRp.png",
+      "images/013-0_-sOa-yVDMKuTdJ6R.gif",
       "images/014-1_TxNBjy8ovN1LbrQ1UYejAQ.gif",
       "images/015-1_uJRTSmvJ8OgZbDLliI5BkQ.png",
       "images/016-1_w-SeiUeAmHPcMeIY84tb0w.png"
@@ -1229,11 +1229,11 @@
     ],
     "images": [
       "images/001-1_y4YmV8C0L1CkE1Q5JRJLkg.png",
-      "images/002-0_9D50aOr7jhxFnjzo.bin",
-      "images/003-0_qOr5KTmon-fiZ37l.bin",
-      "images/004-0_-531naCHla3pK14Q.bin",
-      "images/005-0_vk6bu54D0C7y4k9b.bin",
-      "images/006-0_SKvqpunHcz3i2mBG.bin",
+      "images/002-0_9D50aOr7jhxFnjzo.png",
+      "images/003-0_qOr5KTmon-fiZ37l.png",
+      "images/004-0_-531naCHla3pK14Q.png",
+      "images/005-0_vk6bu54D0C7y4k9b.png",
+      "images/006-0_SKvqpunHcz3i2mBG.png",
       "images/007-1_9VQSZHRow-lBASg0wxfklg.png"
     ],
     "body_source": "state",
@@ -1456,7 +1456,7 @@
       "images/002-1_DmBkGvfYG37OR0UueGpdag.png",
       "images/003-1_4LK5G7er7fRNtT4gbUoWWw.png",
       "images/004-0_lIAP4xLgMI8KptQn.png",
-      "images/005-0_RPV4uLZ7SYZ0_KwH.bin",
+      "images/005-0_RPV4uLZ7SYZ0_KwH.png",
       "images/006-1_ne6lm0Wifp81ZLEIB6fxiQ.png"
     ],
     "body_source": "state",
@@ -1602,10 +1602,10 @@
       "jupyterlab"
     ],
     "images": [
-      "images/001-0_ylz6jx3MOOD7NqFb.bin",
-      "images/002-0_vi_Hia43dNGLxQxD.bin",
-      "images/003-0_sZAliNNu3C2wamFo.bin",
-      "images/004-0_6FYCiWSCRcxPNeVP.bin"
+      "images/001-0_ylz6jx3MOOD7NqFb.png",
+      "images/002-0_vi_Hia43dNGLxQxD.png",
+      "images/003-0_sZAliNNu3C2wamFo.png",
+      "images/004-0_6FYCiWSCRcxPNeVP.png"
     ],
     "body_source": "state",
     "dir": "posts/2024-12-05-jupyterlab-4-3-and-notebook-7-3-are-available"
@@ -1762,10 +1762,10 @@
     ],
     "images": [
       "images/001-1_B-klBKQToGuUZtwb3xOKCQ.png",
-      "images/002-0_lsbq37wgQCiEuXyc.bin",
-      "images/003-0_BsaDtYKDTbciUFgt.bin",
-      "images/004-0_KCYQDm_sq-YRTzhb.bin",
-      "images/005-0_4q0M7_QjVtXcrItA.bin",
+      "images/002-0_lsbq37wgQCiEuXyc.png",
+      "images/003-0_BsaDtYKDTbciUFgt.png",
+      "images/004-0_KCYQDm_sq-YRTzhb.png",
+      "images/005-0_4q0M7_QjVtXcrItA.png",
       "images/006-1_KVMcn3qI6S79S9N8nKIy1Q.png"
     ],
     "body_source": "state",
@@ -1792,7 +1792,7 @@
       "open-source"
     ],
     "images": [
-      "images/001-0_psjWHR7z2EmlvZlF.bin"
+      "images/001-0_psjWHR7z2EmlvZlF.png"
     ],
     "body_source": "state",
     "dir": "posts/2024-09-04-announcing-the-2023-jupyter-distinguished-contributor-award-recipients"
@@ -1919,10 +1919,10 @@
       "jupyter"
     ],
     "images": [
-      "images/001-0_9xQd6YxFsBDFPyxw.bin",
-      "images/002-0_bNrtqVrcwR1dpX9O.bin",
-      "images/003-0_wKlCImr0LtGDpeDz.bin",
-      "images/004-0_U5H7uyoSLf0pZm6q.bin"
+      "images/001-0_9xQd6YxFsBDFPyxw.gif",
+      "images/002-0_bNrtqVrcwR1dpX9O.gif",
+      "images/003-0_wKlCImr0LtGDpeDz.gif",
+      "images/004-0_U5H7uyoSLf0pZm6q.gif"
     ],
     "body_source": "state",
     "dir": "posts/2024-08-22-ipydatagrid-is-now-part-of-project-jupyter"
@@ -2217,12 +2217,12 @@
       "jupyterlab"
     ],
     "images": [
-      "images/001-0_PpZ4a6IMZOkvxz7W.bin",
-      "images/002-0_xMRyjiyaizpZ33vE.bin",
-      "images/003-0_9RAGHslzMNiejAyi.bin",
-      "images/004-0_LvMrjrwtXoQas0KA.bin",
-      "images/005-0_xFUeQMS4Ul12H5JG.bin",
-      "images/006-0_XIIHUorBt2_HPYIh.bin"
+      "images/001-0_PpZ4a6IMZOkvxz7W.png",
+      "images/002-0_xMRyjiyaizpZ33vE.png",
+      "images/003-0_9RAGHslzMNiejAyi.png",
+      "images/004-0_LvMrjrwtXoQas0KA.png",
+      "images/005-0_xFUeQMS4Ul12H5JG.png",
+      "images/006-0_XIIHUorBt2_HPYIh.png"
     ],
     "body_source": "export",
     "dir": "posts/2024-02-26-jupyterlab-4-1-and-notebook-7-1-are-here"
@@ -2247,7 +2247,7 @@
       "scientific-computing"
     ],
     "images": [
-      "images/001-0_4FQGtOrs8XWEQ75G.bin"
+      "images/001-0_4FQGtOrs8XWEQ75G.png"
     ],
     "body_source": "state",
     "dir": "posts/2024-02-22-curvenote-joins-the-mybinder-org-federation"
@@ -2425,7 +2425,7 @@
     ],
     "images": [
       "images/001-0_GlGLIwzCCqvYGXHl.png",
-      "images/002-0_xWK6Xmc2k-zKuM3x.bin"
+      "images/002-0_xWK6Xmc2k-zKuM3x.png"
     ],
     "body_source": "export",
     "dir": "posts/2024-01-10-jupyter-media-strategy-social-media-update"
@@ -2496,10 +2496,10 @@
     ],
     "images": [
       "images/001-1_Tjh9IaZrdJhTQzxyIOgI8Q.png",
-      "images/002-0_pW-uDn20xeFuu6ce.bin",
-      "images/003-0_26EQ9I6L6MnwIaND.bin",
-      "images/004-0_uwgSS42KAo1EkCvF.bin",
-      "images/005-0_K5TYc8RPlRPBKcdU.bin",
+      "images/002-0_pW-uDn20xeFuu6ce.gif",
+      "images/003-0_26EQ9I6L6MnwIaND.png",
+      "images/004-0_uwgSS42KAo1EkCvF.gif",
+      "images/005-0_K5TYc8RPlRPBKcdU.png",
       "images/006-0_FA4jYIdu6lJ4-U4p.jpg",
       "images/007-0_TOhdhVrxFO17XsXl.jpg"
     ],
@@ -2605,25 +2605,25 @@
       "python"
     ],
     "images": [
-      "images/001-0_LKAfjrw26xlrAJ-s.bin",
-      "images/002-0_SBrRAW0NdUWIcj3B.bin",
-      "images/003-0_ppPDPJyDZ5vjprCP.bin",
-      "images/004-0_lWJIaPn8REBWHPHV.bin",
-      "images/005-0_1AQQ9XR-JQ2oqZ10.bin",
-      "images/006-0_Ln2poeiOXHq2mlkw.bin",
-      "images/007-0_jdpMEQCErUeEtzO_.bin",
-      "images/008-0_PxPcfM_mb_ZfsfRi.bin",
-      "images/009-0_fXKXFT2dq2P4yK4B.bin",
-      "images/010-0_J1CWCz_eo5_vJWu0.bin",
-      "images/011-0_T8EepY5jfigS67Yn.bin",
-      "images/012-0_jPgHUMJegDgaQUNt.bin",
-      "images/013-0_su7ZC4EpVmK2FRxg.bin",
-      "images/014-0_4fix_RU095C7PqZB.bin",
+      "images/001-0_LKAfjrw26xlrAJ-s.png",
+      "images/002-0_SBrRAW0NdUWIcj3B.png",
+      "images/003-0_ppPDPJyDZ5vjprCP.png",
+      "images/004-0_lWJIaPn8REBWHPHV.png",
+      "images/005-0_1AQQ9XR-JQ2oqZ10.png",
+      "images/006-0_Ln2poeiOXHq2mlkw.png",
+      "images/007-0_jdpMEQCErUeEtzO_.png",
+      "images/008-0_PxPcfM_mb_ZfsfRi.png",
+      "images/009-0_fXKXFT2dq2P4yK4B.png",
+      "images/010-0_J1CWCz_eo5_vJWu0.png",
+      "images/011-0_T8EepY5jfigS67Yn.png",
+      "images/012-0_jPgHUMJegDgaQUNt.png",
+      "images/013-0_su7ZC4EpVmK2FRxg.png",
+      "images/014-0_4fix_RU095C7PqZB.png",
       "images/015-1_WC29kYZhf40VeGfM7muopg.png",
-      "images/016-0_zMXhUHT0SrteMJDo.bin",
-      "images/017-0_wDtguQqxfEHtzgzR.bin",
-      "images/018-0_hfX4LQ_08sjeDoKE.bin",
-      "images/019-0_65ivwhUugkG0UUR8.bin"
+      "images/016-0_zMXhUHT0SrteMJDo.png",
+      "images/017-0_wDtguQqxfEHtzgzR.jpg",
+      "images/018-0_hfX4LQ_08sjeDoKE.jpg",
+      "images/019-0_65ivwhUugkG0UUR8.jpg"
     ],
     "body_source": "state",
     "dir": "posts/2023-08-02-generative-ai-in-jupyter"
@@ -2650,7 +2650,7 @@
     ],
     "images": [
       "images/001-1_ZG76hcKdS3-4PppQ6lSnuQ.png",
-      "images/002-0__t2MDU659mlYEvxD.bin"
+      "images/002-0__t2MDU659mlYEvxD.png"
     ],
     "body_source": "state",
     "dir": "posts/2023-08-02-desktop-gis-software-in-the-cloud-with-jupyterhub"
@@ -2756,10 +2756,10 @@
     ],
     "images": [
       "images/001-1_VCG-57YX8IrfTyeby3Ybjg.gif",
-      "images/002-0_k0vqkYqq7F0MaF7q.bin",
+      "images/002-0_k0vqkYqq7F0MaF7q.png",
       "images/003-1_vSfRgAQN2UnfDlYmhjruSg.gif",
-      "images/004-0_W8GArznb6ZRmcxQ9.bin",
-      "images/005-0_be82R4Wuyn-zpc_7.bin",
+      "images/004-0_W8GArznb6ZRmcxQ9.png",
+      "images/005-0_be82R4Wuyn-zpc_7.png",
       "images/006-1_KIB7LU5YpN90zEh0-Czilg.gif",
       "images/007-1_OsSPlHcgfeF8ehIPGtFmpw.gif",
       "images/008-1_0vn1t-SlN8LvAKLrVAiHoA.gif",
@@ -2830,7 +2830,7 @@
       "themes"
     ],
     "images": [
-      "images/001-0_vj7tjopuS2GvZg3N.bin",
+      "images/001-0_vj7tjopuS2GvZg3N.png",
       "images/002-0_5OLBiA8tmTbD1Nan.png",
       "images/003-0_vD9AcycD3qSCAJgu.png"
     ],
@@ -3180,8 +3180,8 @@
       "notebook"
     ],
     "images": [
-      "images/001-0_-v-lL8LJ8DIqlgXb.bin",
-      "images/002-0_7imwXY7uST5QSNfi.bin"
+      "images/001-0_-v-lL8LJ8DIqlgXb.png",
+      "images/002-0_7imwXY7uST5QSNfi.png"
     ],
     "body_source": "state",
     "dir": "posts/2023-02-24-improving-the-accessibility-of-jupyter"
@@ -3383,15 +3383,15 @@
       "octave"
     ],
     "images": [
-      "images/001-0__HZJpXD-awr4mPDG.bin",
-      "images/002-0__YEF9gl4rxnapBiz.bin",
-      "images/003-0_0tfvTOYDrjvK6SyO.bin",
-      "images/004-0_ZT86_erLnKUyRvP4.bin",
-      "images/005-0_015CLZOO-yfxSRSe.bin",
-      "images/006-0_U-Nxc_9FqhxARiGF.bin",
-      "images/007-0_oshl__rdb1-OtfCM.bin",
-      "images/008-0_zQcXBUjgbwqY0IHG.bin",
-      "images/009-0_SDB4IuVwEGuk2yz1.bin",
+      "images/001-0__HZJpXD-awr4mPDG.png",
+      "images/002-0__YEF9gl4rxnapBiz.png",
+      "images/003-0_0tfvTOYDrjvK6SyO.png",
+      "images/004-0_ZT86_erLnKUyRvP4.png",
+      "images/005-0_015CLZOO-yfxSRSe.png",
+      "images/006-0_U-Nxc_9FqhxARiGF.png",
+      "images/007-0_oshl__rdb1-OtfCM.png",
+      "images/008-0_zQcXBUjgbwqY0IHG.png",
+      "images/009-0_SDB4IuVwEGuk2yz1.png",
       "images/010-1_h3ZtdyQicGecxGFPkc3tYQ.jpeg",
       "images/011-1_vUpNORkYEpszm-vTZoSXwg.jpeg"
     ],
@@ -3999,10 +3999,10 @@
     ],
     "images": [
       "images/001-1_EZX55-XLmck_LfFfV3KeaA.png",
-      "images/002-0_pEgLswpTd_LWmMsi.bin",
-      "images/003-0_68j3WUTV1hUtR4wC.bin",
-      "images/004-0_y7zl2IRtKoeyYp5e.bin",
-      "images/005-0_P3blJAk0ZNg4obBV.bin",
+      "images/002-0_pEgLswpTd_LWmMsi.png",
+      "images/003-0_68j3WUTV1hUtR4wC.png",
+      "images/004-0_y7zl2IRtKoeyYp5e.png",
+      "images/005-0_P3blJAk0ZNg4obBV.png",
       "images/006-1_OwFstCVzAGZX3EiQejEWog.png"
     ],
     "body_source": "state",
@@ -4293,10 +4293,10 @@
       "visual-programming"
     ],
     "images": [
-      "images/001-0_yEQ8djozBKDLcCxZ.bin",
-      "images/002-0_69P-HcYWrtriGmS-.bin",
-      "images/003-0_KSNrd_DXpVWHkvPC.bin",
-      "images/004-0_Z2TP8VlU-j14Taxo.bin"
+      "images/001-0_yEQ8djozBKDLcCxZ.png",
+      "images/002-0_69P-HcYWrtriGmS-.gif",
+      "images/003-0_KSNrd_DXpVWHkvPC.gif",
+      "images/004-0_Z2TP8VlU-j14Taxo.png"
     ],
     "body_source": "state",
     "dir": "posts/2022-07-29-visual-programming-in-jupyterlab-with-blockly"
@@ -4512,8 +4512,8 @@
     ],
     "images": [
       "images/001-1_GuHCAz6LEpCel7Mxg3csfQ.jpeg",
-      "images/002-0_HUVKNECmXfmpSkla.bin",
-      "images/003-0_hMVNa7sCovpibf7o.bin"
+      "images/002-0_HUVKNECmXfmpSkla.jpg",
+      "images/003-0_hMVNa7sCovpibf7o.jpg"
     ],
     "body_source": "state",
     "dir": "posts/2018-12-06-jupyter-hackathon-series-in-hawaii"
@@ -5165,7 +5165,7 @@
       "images/003-0_OtsvahHJvfEvcziO.gif",
       "images/004-1_Fh9khuZcEG98Fz1F-AZ83A.png",
       "images/005-1_7psFVJ14ekqdgi7n3ZwS-Q.gif",
-      "images/006-0_eDvRenHayEmKFjfN.bin",
+      "images/006-0_eDvRenHayEmKFjfN.gif",
       "images/007-1_DqBf2bE3M7ynUy-Kv0qIbA.gif",
       "images/008-1_xbhgaimjN9YclTKtIQojGQ.png"
     ],
@@ -5483,7 +5483,7 @@
       "typescript"
     ],
     "images": [
-      "images/001-0_lnZS93JgKwZAZD1m.bin",
+      "images/001-0_lnZS93JgKwZAZD1m.jpg",
       "images/002-1_cEy6OgSDz854q4Z0VJ59aQ.jpeg"
     ],
     "body_source": "state",
@@ -5601,7 +5601,7 @@
     "description": "How we made Jupyter Notebooks collaborative with Yjs Collaborative editing — à la Google Docs — is a feature that you still rarely find in applications. One of the few good things that came out …",
     "tags": [],
     "images": [
-      "images/001-0_HvwrxmA_sBtU0SaO.bin",
+      "images/001-0_HvwrxmA_sBtU0SaO.gif",
       "images/002-1_BBSKYgAom2NJoQLvOwyJLg.gif"
     ],
     "body_source": "state",
@@ -5794,8 +5794,8 @@
       "open-source"
     ],
     "images": [
-      "images/001-0_6hQJEAS34fJRY65r.bin",
-      "images/002-0_WUb7phui0cNKOuL8.bin"
+      "images/001-0_6hQJEAS34fJRY65r.png",
+      "images/002-0_WUb7phui0cNKOuL8.png"
     ],
     "body_source": "state",
     "dir": "posts/2021-03-11-lessons-learned-from-jupyters-contributor-in-residence-pilot"
@@ -6003,7 +6003,7 @@
       "surveys"
     ],
     "images": [
-      "images/001-0_S4dN8Xv6KHGnEh1U.bin"
+      "images/001-0_S4dN8Xv6KHGnEh1U.png"
     ],
     "body_source": "state",
     "dir": "posts/2020-12-14-survey-jupyterlab-and-beyond"
@@ -6562,7 +6562,7 @@
       "images/002-1_SmsFWNwWDW9-8jtDOa6_RQ.png",
       "images/003-1_VOlTcY7mi7kIKT22Kc2_bw.png",
       "images/004-1_ofmEc1YhrAqvCs3FXhuI2g.png",
-      "images/005-0_cCp6QLc_60xWGsAN.bin",
+      "images/005-0_cCp6QLc_60xWGsAN.png",
       "images/006-1_Esr4Ec_RKwqx2la7G9eDFg.png",
       "images/007-1_HPOqGuk9hRBV2WCl5QATIg.png",
       "images/008-1_c1JTc_WrA5t1oUgnvvtcKA.png",
@@ -7250,11 +7250,11 @@
       "xeus"
     ],
     "images": [
-      "images/001-0_h6rfGRuTgOkwonN9.bin",
-      "images/002-0_Q2jOwO75XQvNuqaR.bin",
-      "images/003-0_7eozUxbipal_WV0c.bin",
-      "images/004-0_kJeaW70rAkyeYh5l.bin",
-      "images/005-0_o8XXbdwfzxiC8Nmj.bin"
+      "images/001-0_h6rfGRuTgOkwonN9.jpg",
+      "images/002-0_Q2jOwO75XQvNuqaR.png",
+      "images/003-0_7eozUxbipal_WV0c.png",
+      "images/004-0_kJeaW70rAkyeYh5l.jpg",
+      "images/005-0_o8XXbdwfzxiC8Nmj.gif"
     ],
     "body_source": "state",
     "dir": "posts/2019-07-16-building-a-calculator-jupyter-kernel"
@@ -7995,7 +7995,7 @@
       "reproducibility"
     ],
     "images": [
-      "images/001-0_bxsg6Ki5hqSN64yo.bin",
+      "images/001-0_bxsg6Ki5hqSN64yo.png",
       "images/002-1_kNk_CB4cP4xv2epHxCKXFw.png"
     ],
     "body_source": "state",
@@ -8232,7 +8232,7 @@
     ],
     "images": [
       "images/001-1_-St-4RrS2ECywj_K1h_TDg.png",
-      "images/002-0_6qBidoOcMQHZuZt2.bin",
+      "images/002-0_6qBidoOcMQHZuZt2.png",
       "images/003-1_cZJ19W0a1ZcO9S6hhJQW_g.png"
     ],
     "body_source": "state",
@@ -8258,7 +8258,7 @@
       "writing"
     ],
     "images": [
-      "images/001-0_SQhbgeWA5hO5_nt7.bin"
+      "images/001-0_SQhbgeWA5hO5_nt7.png"
     ],
     "body_source": "state",
     "dir": "posts/2018-02-26-a-diagram-editor-for-jupyterlab"
