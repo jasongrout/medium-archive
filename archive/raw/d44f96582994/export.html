@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Simplifying and speeding up Binder builds with BuildKit</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Simplifying and speeding up Binder builds with BuildKit</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+The Binder Project allows users to build reproducible, sharable environments for interactive computing. To accomplish this, Binder uses a…
+</section>
+<section data-field="body" class="e-content">
+<section name="5529" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="f8c0" id="f8c0" class="graf graf--h3 graf--leading graf--title">Simplifying and speeding up Binder builds with BuildKit</h3><p name="94de" id="94de" class="graf graf--p graf-after--h3">The <a href="http://mybinder.org" data-href="http://mybinder.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Binder Project</a> allows users to build reproducible, sharable environments for interactive computing. To accomplish this, Binder uses a tool called <a href="https://repo2docker.readthedocs.io/" data-href="https://repo2docker.readthedocs.io/" class="markup--anchor markup--p-anchor" rel="nofollow noopener" target="_blank">repo2docker</a> to generate an executable Docker image using the <a href="https://repo2docker.readthedocs.io/en/latest/specification.html" data-href="https://repo2docker.readthedocs.io/en/latest/specification.html" class="markup--anchor markup--p-anchor" rel="nofollow noopener" target="_blank">Reproducible Execution Environment Specification</a>.</p><figure name="78cd" id="78cd" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*NOEeFGGHdpGZMHSq5ykl9A.png" data-width="2166" data-height="666" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*NOEeFGGHdpGZMHSq5ykl9A.png"></figure><p name="a2dd" id="a2dd" class="graf graf--p graf-after--figure">The first time a repository is launched on Binder, repo2docker must build the reproducible environment for it. This process can take a long time because of all the dependencies that need to be installed and turned into the image. As a result, Binder launches can feel slow and clunky, which is a poor UX for workflows that are designed around quick interactive sessions.</p><p name="a790" id="a790" class="graf graf--p graf-after--p">repo2docker was built several years ago, and followed patterns that were commonplace at the time. However, in the past few years the Docker community has made significant advances in optimizing the image building process. One-such improvement is the creation of <a href="https://docs.docker.com/build/buildkit/" data-href="https://docs.docker.com/build/buildkit/" class="markup--anchor markup--p-anchor" rel="nofollow noopener" target="_blank">BuildKit</a>, a replacement for Docker’s historical build system that is much more sophisticated. However, repo2docker hasn’t leveraged these improvements because it was still using the original Docker Build system.</p><p name="2ebf" id="2ebf" class="graf graf--p graf-after--p">So, we’ve decided to spend a few cycles modernizing repo2docker’s image building logic by using the more modern <a href="https://docs.docker.com/build/buildkit/" data-href="https://docs.docker.com/build/buildkit/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">BuildKit API</a> (via ‘docker buildx build’). This allows for optimizations like build parallelization, better build caching, and supporting some <code class="markup--code markup--p-code">Dockerfile</code> features that Binder didn&#39;t support earlier (particularly, <code class="markup--code markup--p-code">COPY --chown</code>). It also lays a foundation for significantly simplifying the repo2docker build infrastructure and leveraging more of BuildKit&#39;s parallelization functionality. For example, we&#39;d like to <a href="https://docs.docker.com/build/builders/drivers/kubernetes/" data-href="https://docs.docker.com/build/builders/drivers/kubernetes/" class="markup--anchor markup--p-anchor" rel="nofollow noopener" target="_blank">leverage BuildKit&#39;s Kubernetes driver</a> which distributes builds much more efficiently and in parallel.</p><p name="add4" id="add4" class="graf graf--p graf-after--p">Authors of Binder repositories won’t need to take any action¹, and they’ll simply notice that mybinder.org (and any other community-run BinderHub instance) will be a bit snappier at building images.</p><p name="1011" id="1011" class="graf graf--p graf-after--p">If you’d like to learn more about the changes that enabled this, <a href="https://github.com/jupyterhub/mybinder.org-deploy/pull/3225" data-href="https://github.com/jupyterhub/mybinder.org-deploy/pull/3225" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">check out this mybinder.org pull request</a> which has links to the repo2docker pull requests that added this functionality. We’re excited keep improving Binder, and are hopeful that this makes the experience of using mybinder.org and community Binders a little bit better.</p><h3 name="800f" id="800f" class="graf graf--h3 graf-after--p">Authors and acknowledgements</h3><p name="fa98" id="fa98" class="graf graf--p graf-after--h3"><a href="http://github.com/yuvipanda" data-href="http://github.com/yuvipanda" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Yuvi Panda</a> is a co-founder and the Technical Lead at <a href="http://2i2c.org" data-href="http://2i2c.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">2i2c</a>. He is passionate about building participatory open infrastructure for scientific &amp; educational use cases. He is a Project Jupyter team member primarily focused on infrastructure related projects (JupyterHub, Binder, etc). He also wrote most of the code for this `docker buildx` transition, and shepherded it through to deployment on mybinder.org as well. He is ex-Wikimedia and ex-GNOME. Let’s eliminate accidental complexities wherever we find them.</p><p name="4422" id="4422" class="graf graf--p graf-after--p"><a href="https://chrisholdgraf.com" data-href="https://chrisholdgraf.com" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Chris Holdgraf</a> is a co-founder and the Executive Director of <a href="http://2i2c.org" data-href="http://2i2c.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">2i2c</a>. He is on the Executive Council of Project Jupyter, and co-leads the <a href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html#jupyterhub-team" data-href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html#jupyterhub-team" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterHub and Binder team</a> as well as the <a href="https://compass.jupyterbook.org" data-href="https://compass.jupyterbook.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Jupyter Book team</a>). He was previously a post-doctoral researcher in the Department of Statistics at <a href="https://www.berkeley.edu/" data-href="https://www.berkeley.edu/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">UC Berkeley</a>, and a Community Architect with the <a href="https://data.berkeley.edu/" data-href="https://data.berkeley.edu/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Division of Data Science</a> at Berkeley. He’s interested in using open infrastructure to support interactive computing workflows in research and education.</p><p name="05c6" id="05c6" class="graf graf--p graf-after--p">Many thanks to <a href="https://github.com/minrk" data-href="https://github.com/minrk" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">@minrk</a>, <a href="https://github.com/manics" data-href="https://github.com/manics" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">@manics</a>, and <a href="https://github.com/consideRatio" data-href="https://github.com/consideRatio" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">@consideRatio</a> for their help reviewing and shaping this work.</p><h3 name="4a59" id="4a59" class="graf graf--h3 graf-after--p">Footnotes</h3><p name="e03f" id="e03f" class="graf graf--p graf-after--h3 graf--trailing">¹ Unless they were relying on undocumented implementation details of the old builder — in particular, the presence of a <code class="markup--code markup--p-code">/.dockerenv</code> file to detect if you are running in repo2docker <a href="https://github.com/scikit-learn/scikit-learn/pull/30835" data-href="https://github.com/scikit-learn/scikit-learn/pull/30835" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">scikit-learn/scikit-learn#30835</a> has an example.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@choldgraf" class="p-author h-card">Chris Holdgraf</a> on <a href="https://medium.com/p/d44f96582994"><time class="dt-published" datetime="2025-03-03T14:05:29.171Z">March 3, 2025</time></a>.</p><p><a href="https://medium.com/@choldgraf/simplifying-and-speeding-up-binder-builds-with-buildkit-d44f96582994" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 23, 2026.</p></footer></article></body></html>

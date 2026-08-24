@@ -151,7 +151,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:06:31+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/exploring-petabytes-of-the-night-sky-jupyter-notebooks-at-noirlabs-astro-data-lab-science-ae012dfd4723": {
     "medium_id": "ae012dfd4723",
@@ -360,7 +362,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:07:27+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/gnu-octave-meets-jupyterlite-compute-anywhere-anytime-8b033afbbcdc": {
     "medium_id": "8b033afbbcdc",
@@ -380,7 +384,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:07:32+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/jupyter-community-workshops-are-back-3cca15d02975": {
     "medium_id": "3cca15d02975",
@@ -534,7 +540,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:08:33+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/building-ai-agents-for-jupyterlab-using-notebook-intelligence-0515d4c41a61": {
     "medium_id": "0515d4c41a61",
@@ -1160,7 +1168,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:11:58+00:00",
     "images": 6,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/introducing-learn-python-with-jupyter-11214f152159": {
     "medium_id": "11214f152159",
@@ -1642,7 +1652,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:14:06+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/jupytercon-nyc-august-2017-8e21f649d83e": {
     "medium_id": "8e21f649d83e",
@@ -2001,7 +2013,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:15:50+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/diving-into-leadership-to-build-push-button-code-df2a075c9914": {
     "medium_id": "df2a075c9914",
@@ -2580,7 +2594,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:19:09+00:00",
     "images": 6,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/jupyterlab-ros-3dc9dab7f421": {
     "medium_id": "3dc9dab7f421",
@@ -2600,7 +2616,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:19:18+00:00",
     "images": 5,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/anima-anandkumar-274f2619c90d": {
     "medium_id": "274f2619c90d",
@@ -2943,7 +2961,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:21:10+00:00",
     "images": 2,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/ipython-7-0-async-repl-a35ce050f7f7": {
     "medium_id": "a35ce050f7f7",
@@ -3264,7 +3284,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:22:17+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/congratulations-to-the-ligo-and-virgo-collaborations-from-project-jupyter-5923247be019": {
     "medium_id": "5923247be019",
@@ -3339,7 +3361,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:22:33+00:00",
     "images": 5,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-24T21:49:59+00:00"
   },
   "https://blog.jupyter.org/interactive-workflows-for-c-with-jupyter-fe9b54227d92": {
     "medium_id": "fe9b54227d92",
