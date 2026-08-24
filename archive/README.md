@@ -25,7 +25,8 @@ Medium. It has two layers:
   rewriting, and `site.json`) into `site-hugo/`, `site-zola/` and
   `site-pelican/`. hugo and pelican share a self-contained card-grid
   blog theme -- cover-image cards, tag/author card listings, optimized
-  images (thumbnailed covers; responsive or lazily-loaded body images),
+  images on both (640x360 cover thumbnails; responsive, lazily-loaded
+  webp srcset variants for still body images),
   and a /search/ page wired to Pagefind (`pagefind --site public|output`
   after building: full-text search with highlighted in-context
   excerpts). All three render redirect stubs at every old inbound path

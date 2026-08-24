@@ -8836,5 +8836,37 @@
     "images": [],
     "body_source": "ghost",
     "dir": "posts/2017-05-31-release-of-ipython-5-4-6-1-and-rlipython-2"
+  },
+  "https://blog.jupyter.org/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0": {
+    "title": "JupyterGIS 0.16: New visualization capabilities, collaborative Story Maps, and more",
+    "author": "Martin Renou",
+    "author_url": "https://medium.com/@martinRenou",
+    "date": "2026-08-24T16:09:39Z",
+    "updated": "2026-08-24T16:09:39Z",
+    "original_url": "https://blog.jupyter.org/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0",
+    "original_path": "/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0",
+    "medium_id": "03e6b78bacc0",
+    "slug": "jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "JupyterGIS 0.16: New visualization capabilities, collaborative Story Maps, and more Read this article in Notebook.link, as a live story-map …",
+    "tags": [
+      "gis",
+      "jupyter-notebook",
+      "jupytergis",
+      "jupyterlab",
+      "jupyterlite"
+    ],
+    "images": [
+      "images/001-1_gyuKfOzFSbmRhH9LVBTJiA.gif",
+      "images/002-1_yLMypnIGkeKXrR1BfXgvHg.gif",
+      "images/003-1_1eO0MShCVn71uIhAkC61ZA.gif",
+      "images/004-1_L5MrEnxXuvIkT5rVl0dahw.png",
+      "images/005-1_3AGsNcwe384V1P4-ZkzcYw.png",
+      "images/006-1_GsxLjpQu33wvCx8KZxBUWA.png",
+      "images/007-1_SU9Ll713eVozkjVQNQNmMA.png"
+    ],
+    "body_source": "feed",
+    "dir": "posts/2026-08-24-jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more"
   }
 }
