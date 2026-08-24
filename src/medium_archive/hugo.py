@@ -288,7 +288,7 @@ a:hover { text-decoration: underline; }
                     flex-wrap: wrap; gap: .5rem; padding-top: .9rem; padding-bottom: .9rem; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
-.site-title img { width: 2rem; height: 2rem; border-radius: 50%; }
+.site-title img { height: 2.1rem; width: auto; }
 .site-header nav a { margin-left: 1.25rem; color: #444; font-weight: 500; }
 .site-header nav a:hover { color: var(--accent-dark); }
 
