@@ -159,6 +159,25 @@ data loss here):
 
 ## Remaining
 
+- **Cap image sizes in the generated sites.** The site exporters
+  currently hard-link every original image from `posts/` into each
+  site, so full-resolution sources dominate the built output — on the
+  reference archive ~800 MB of a ~850 MB site, duplicated per
+  generator (animated gifs alone are ~600 MB, and the themes' own
+  srcset ladders top out at 1104 px, so pixels beyond ~2× the 736 px
+  body column are never displayed). Standardize on a sufficiently
+  large maximum edge (e.g. ~1600 px for stills, less for animated
+  gifs) and resize the copies placed into `site*/` at export time —
+  in the shared image-placement path in `sites.py` — leaving `raw/`
+  and `posts/` at full resolution. Stills are a straightforward
+  Pillow resize; animated gifs want gifsicle (`--resize-fit` with
+  `-O3`/`--lossy`) when available — Pillow's frame-wise gif handling
+  is lossy on disposal/transparency and gifsicle compresses far
+  better, but note `-O3 --lossy` took minutes on a single 22 MB gif
+  in testing, so measure and maybe settle for `-O1`. Resize once into
+  a shared cache keyed by content+cap so the four exporters don't
+  each redo the work.
+
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
   gist embeds, then `convert` + `lint` (the placeholders the 2026-08
   audit archive currently flags: 26 embeds across 7 posts). The
