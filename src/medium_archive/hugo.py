@@ -177,18 +177,19 @@ ARCHIVES = """\
 SEARCH = """\
 {{ define "main" }}
 <h1 class="page-title">Search</h1>
-<link rel="stylesheet" href="{{ "pagefind/pagefind-ui.css" | relURL }}">
-<div id="search"></div>
-<script src="{{ "pagefind/pagefind-ui.js" | relURL }}"></script>
+{{- /* Pagefind's Component UI (its recommended integration since 1.5);
+       the elements find the index bundle at /pagefind/ on their own */}}
+<link rel="stylesheet" href="{{ "pagefind/pagefind-component-ui.css" | relURL }}">
+<script type="module" src="{{ "pagefind/pagefind-component-ui.js" | relURL }}"></script>
+<div id="search">
+<pagefind-searchbox show-sub-results autofocus placeholder="Search the archive"></pagefind-searchbox>
+</div>
 <script>
-window.addEventListener("DOMContentLoaded", function () {
-  if (typeof PagefindUI === "undefined") {
+window.addEventListener("load", function () {
+  if (!customElements.get("pagefind-searchbox")) {
     document.getElementById("search").textContent =
       "Search index not built yet: run `pagefind --site public` after `hugo`.";
-    return;
   }
-  new PagefindUI({ element: "#search", pageSize: 10, showSubResults: true,
-                   showImages: false });
 });
 </script>
 {{ end }}

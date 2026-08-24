@@ -53,8 +53,23 @@ THEME = "theme"
 ARTICLE_PATHS = ["posts"]
 STATIC_PATHS = ["posts"]        # colocated images, placed via {{attach}}
 PAGE_PATHS = []
+# directory-style URLs throughout, matching the hugo build's scheme
 ARTICLE_URL = "posts/{{slug}}/"
 ARTICLE_SAVE_AS = "posts/{{slug}}/index.html"
+TAG_URL = "tags/{{slug}}/"
+TAG_SAVE_AS = "tags/{{slug}}/index.html"
+TAGS_URL = "tags/"
+TAGS_SAVE_AS = "tags/index.html"
+AUTHOR_URL = "authors/{{slug}}/"
+AUTHOR_SAVE_AS = "authors/{{slug}}/index.html"
+AUTHORS_URL = "authors/"
+AUTHORS_SAVE_AS = "authors/index.html"
+ARCHIVES_URL = "archives/"
+ARCHIVES_SAVE_AS = "archives/index.html"
+PAGINATION_PATTERNS = (
+    (1, "{{url}}", "{{save_as}}"),
+    (2, "{{base_name}}/page/{{number}}/", "{{base_name}}/page/{{number}}/index.html"),
+)
 DEFAULT_PAGINATION = 24
 DEFAULT_CATEGORY = "posts"
 SLUGIFY_SOURCE = "basename"     # slugs are explicit in each article anyway
@@ -257,9 +272,9 @@ BASE = """\
 <a class="site-title" href="{{ SITEURL }}/">{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}</a>
 <nav>
 <a href="{{ SITEURL }}/">Blog</a>
-<a href="{{ SITEURL }}/tags.html">Tags</a>
-<a href="{{ SITEURL }}/authors.html">Authors</a>
-<a href="{{ SITEURL }}/archives.html">Archives</a>
+<a href="{{ SITEURL }}/tags/">Tags</a>
+<a href="{{ SITEURL }}/authors/">Authors</a>
+<a href="{{ SITEURL }}/archives/">Archives</a>
 <a href="{{ SITEURL }}/search/">Search</a>
 <a href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}">RSS</a>
 </nav>
@@ -380,18 +395,19 @@ SEARCH = """\
 {% block title %}Search · {{ SITENAME }}{% endblock %}
 {% block content %}
 <h1 class="page-title">Search</h1>
-<link rel="stylesheet" href="{{ SITEURL }}/pagefind/pagefind-ui.css">
-<div id="search"></div>
-<script src="{{ SITEURL }}/pagefind/pagefind-ui.js"></script>
+{# Pagefind's Component UI (its recommended integration since 1.5); the
+   elements find the index bundle at /pagefind/ on their own #}
+<link rel="stylesheet" href="{{ SITEURL }}/pagefind/pagefind-component-ui.css">
+<script type="module" src="{{ SITEURL }}/pagefind/pagefind-component-ui.js"></script>
+<div id="search">
+<pagefind-searchbox show-sub-results autofocus placeholder="Search the archive"></pagefind-searchbox>
+</div>
 <script>
-window.addEventListener("DOMContentLoaded", function () {
-  if (typeof PagefindUI === "undefined") {
+window.addEventListener("load", function () {
+  if (!customElements.get("pagefind-searchbox")) {
     document.getElementById("search").textContent =
       "Search index not built yet: run `pagefind --site output` after `pelican`.";
-    return;
   }
-  new PagefindUI({ element: "#search", pageSize: 10, showSubResults: true,
-                   showImages: false });
 });
 </script>
 {% endblock %}
