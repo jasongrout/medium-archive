@@ -3,3 +3,4 @@ site
 site-hugo
 site-zola
 site-pelican
+.image-cache

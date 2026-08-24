@@ -70,12 +70,24 @@ jobs:
           "medium-archive[covers] @ git+https://github.com/jasongrout/medium-archive"
           pelican markdown
 
-      - name: Install Hugo (extended), Zola, MyST and Pagefind
+      - name: Install Hugo (extended), Zola, MyST, Pagefind and gifsicle
         run: |
+          sudo apt-get install -y gifsicle
           curl -sSL "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz" | sudo tar -xz -C /usr/local/bin hugo
           curl -sSL "https://github.com/getzola/zola/releases/download/v${ZOLA_VERSION}/zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz" | sudo tar -xz -C /usr/local/bin zola
           npm install -g "mystmd@${MYSTMD_VERSION}" "pagefind@${PAGEFIND_VERSION}"
           hugo version && zola --version && myst --version && pagefind --version
+
+      # The exporters place resized display copies of oversized images,
+      # built once into .image-cache/ (content-addressed, so a restored
+      # cache stays valid across checkouts). The big animated-gif
+      # re-encodes take ~15 min cold; cached, they cost nothing.
+      - name: Restore the display-copy image cache
+        uses: actions/cache@v4
+        with:
+          path: .image-cache
+          key: image-cache-${{ hashFiles('posts.json') }}
+          restore-keys: image-cache-
 
       - name: Rebuild posts/ from raw/
         run: medium-archive convert --out .
