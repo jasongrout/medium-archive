@@ -1,5 +1,61 @@
 # Archive notes and remaining work
 
+## 0. Site builds (MyST, Hugo, Zola, Pelican)
+
+**The hugo and pelican sites are the preferred targets** — they carry
+the full feature set (card theme, Pagefind search with highlighted
+in-context results and shareable ?q= links, optimized images, redirect
+stubs at every old inbound path, archives timeline, capped
+full-content feeds). The myst and zola sites remain as simpler
+alternates.
+
+`medium-archive myst|hugo|zola|pelican --out .` builds a browsable site
+in `site/`, `site-hugo/`, `site-zola/`, or `site-pelican/` (all
+gitignored, like `posts/` — everything regenerates from `raw/` +
+`fixups/`); `site.json` holds the hand-written site title, description,
+landing-page intro, and (for hugo/zola) the base_url baked into
+absolute links and redirect stubs. The four exporters share page URLs
+and link rewriting, so the generators can be compared on identical
+content, then the keepers kept and the rest ignored.
+
+Last full validation, all four against all 333 posts:
+
+- **myst** (`myst build --html`, mystmd 1.10.1): all pages render, with
+  built-in full-text search. The only warnings are ~57 links to
+  in-page anchors that never survived the original Medium conversion
+  (old footnote anchors, also dead in `posts/`) and one h3→h5 heading
+  jump published that way in 2015.
+- **hugo** (hugo 0.158.0, built-in card theme): a PyTorch-blog-style
+  card grid — cover-image cards with tag links, excerpt and byline,
+  paginated at 24 — plus tag/author card listings, per-term RSS, alias
+  redirect stubs for old Medium slug+id, `/p/<id>` and Ghost-era
+  paths, and the Jupyter avatar in the header. Images optimized
+  natively: 640×360 cover thumbnails and responsive lazily-loaded webp
+  variants for body images (~2100 processed images, ~2 min build).
+  `pagefind --site public` after `hugo` gives /search/ — a results
+  page with highlighted in-context excerpts and per-section
+  sub-results. All verified in headless Chromium. (site.json can
+  instead target the Dream theme; that support remains.)
+- **pelican, card theme** (pelican 4.12.0): the same card-grid look
+  from the exporter's own Pelican theme — cover cards (640×360 JPEG
+  thumbnails generated at export when Pillow is installed, ~16 KB
+  each), tag/author card listings, chip indexes, archives timeline,
+  site and per-tag/author Atom feeds, lazily-loaded body images
+  (Markdown extension in the generated config), heading ids for search
+  anchors, and the same Pagefind /search/ page (`pagefind --site
+  output`). Verified in headless Chromium.
+- **zola** (zola 0.21.0): 333 pages in ~2 s, taxonomy pages and
+  per-term Atom feeds, aliases, and a working search box (built-in
+  elasticlunr index). The 53 dead in-page anchors are reported as
+  warnings (`link_checker.internal_level = "warn"` in the generated
+  config).
+- The pelican build writes 676 redirect stubs (matching the hugo
+  count) via a plugin embedded in its generated config — Pelican has
+  no aliases feature of its own, so the plugin renders
+  `site-pelican/redirects.csv` into meta-refresh stub pages after each
+  build. The build's only warnings are cosmetic empty-image-alt ones
+  (Medium images rarely carry alt text).
+
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and
 `compare` / `compare --state` / `compare --ghost` results are explained
