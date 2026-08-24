@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Landing page for the GitHub Pages preview deployment; copied to the
+     site root by the preview workflow. The four links are relative, so
+     the page works wherever the deployment is mounted. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jupyter Blog archive — site previews</title>
+<meta name="description" content="Previews of the archived Jupyter Blog rendered by four static site generators on identical content.">
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a2e; --muted: #5c6270;
+    --card: #f6f7f9; --border: #e2e5ea; --accent: #f37726;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161c; --fg: #e8eaf0; --muted: #9aa1af;
+      --card: #1d2028; --border: #2c303b; --accent: #f37726;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+  header { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.5rem; }
+  header img { width: 3rem; height: 3rem; }
+  h1 { font-size: 1.6rem; margin: 0; }
+  .lede { color: var(--muted); margin: 0.5rem 0 2rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; padding: 0; margin: 0; list-style: none; }
+  .card {
+    display: block; padding: 1.1rem 1.25rem; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card h2 { font-size: 1.1rem; margin: 0 0 0.3rem; }
+  .card h2 .flag {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--accent); margin-left: 0.5rem;
+  }
+  .card p { margin: 0; font-size: 0.92rem; color: var(--muted); }
+  footer { margin-top: 2.5rem; font-size: 0.85rem; color: var(--muted); }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="avatar.svg" alt="">
+    <h1>Jupyter Blog archive — site previews</h1>
+  </header>
+  <p class="lede">The same archive of blog.jupyter.org, rendered by four
+  static site generators on identical content (same posts, page URLs,
+  and link rewriting), to compare before choosing one.</p>
+  <ul class="cards">
+    <li><a class="card" href="hugo/">
+      <h2>Hugo<span class="flag">preferred</span></h2>
+      <p>Card-grid theme, Pagefind full-text search, optimized images,
+      redirect stubs, per-tag/author feeds.</p>
+    </a></li>
+    <li><a class="card" href="pelican/">
+      <h2>Pelican<span class="flag">preferred</span></h2>
+      <p>The same card theme and feature set as the Hugo site, built by
+      Pelican.</p>
+    </a></li>
+    <li><a class="card" href="zola/">
+      <h2>Zola</h2>
+      <p>Simpler list theme with Zola's built-in search index; taxonomy
+      pages, feeds, and redirect stubs.</p>
+    </a></li>
+    <li><a class="card" href="myst/">
+      <h2>MyST</h2>
+      <p>MyST (mystmd) book-style site with built-in search; the
+      simplest alternate.</p>
+    </a></li>
+  </ul>
+  <footer>Regenerated from the archive's <code>raw/</code> sources by the
+  <a href="https://github.com/jasongrout/blog_export/blob/main/.github/workflows/preview.yml">preview workflow</a>
+  using <a href="https://github.com/jasongrout/medium-archive">medium-archive</a>.</footer>
+</main>
+</body>
+</html>
