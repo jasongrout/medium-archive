@@ -216,6 +216,31 @@ def test_external_canonical_does_not_leak_into_link_base():
     assert "https://blog.example.com/other-post-abcdef123456" in markdown
 
 
+def test_bin_image_gets_sniffed_extension(tmp_path):
+    # an image fetched from an extensionless URL is stored as .bin in
+    # raw/; its derived copy carries the extension its bytes call for
+    (tmp_path / "images").mkdir()
+    (tmp_path / "out").mkdir()
+    (tmp_path / "out2").mkdir()
+    (tmp_path / "images" / "001-x.bin").write_bytes(
+        b"\x89PNG\r\n\x1a\n" + b"\x00" * 24)
+    body = BeautifulSoup('<div><img src="https://miro.medium.com/x"></div>',
+                         "html.parser")
+    md, used = to_markdown(body, "https://blog.example.com",
+                           {"https://miro.medium.com/x": "001-x.bin"},
+                           tmp_path, tmp_path / "out")
+    assert "images/001-x.png" in md
+    assert used == ["images/001-x.png"]
+    assert (tmp_path / "out" / "images" / "001-x.png").exists()
+    # unrecognized bytes keep the .bin name rather than lying
+    (tmp_path / "images" / "002-y.bin").write_bytes(b"not an image")
+    body = BeautifulSoup('<div><img src="https://miro.medium.com/y"></div>',
+                         "html.parser")
+    md, used = to_markdown(body, "https://blog.example.com",
+                           {"https://miro.medium.com/y": "002-y.bin"},
+                           tmp_path, tmp_path / "out2")
+    assert used == ["images/002-y.bin"]
+
 GIST_SCRIPT = ('<figure><script src="https://gist.github.com/ann/'
                'abcdef0123456789abcdef0123456789.js"></script></figure>')
 

@@ -53,6 +53,82 @@ clean `lint` run, and the offline test suite):
   editor-state copy: its markup offsets index into the stored text, so
   editing it would skew them.
 
+- **`myst` subcommand** — builds a MyST (mystmd) site in `<out>/site/`
+  from the converted posts, so a browsable blog reproduces offline from
+  `raw/` + `fixups/` (`convert` then `myst`). One page per post with its
+  filename as the URL slug (date-prefixed only when several posts share a
+  slug), year-grouped TOC, chronological landing page, in-publication
+  links rewritten to site pages, MyST-hostile prose escaped (`@handle`
+  would parse as a citation, paired `$` as math), and a site-level
+  `redirects.csv` from every old inbound path (slug+id, `/p/<id>`,
+  Ghost-era) to its page URL. Site-wide text comes from a hand-written
+  `<out>/site.json`. Validated with a full `myst build --html` over the
+  real archive: 333/333 pages, no warnings beyond pre-existing dead
+  in-page anchors from the Medium era (`src/medium_archive/myst.py`).
+- **`hugo`, `zola`, `pelican` subcommands** — the same site for those
+  generators (`site-hugo/`, `site-zola/`, `site-pelican/`), sharing
+  page URLs, link rewriting, `site.json`, and per-site redirect maps
+  through `src/medium_archive/sites.py`, so generators can be compared
+  on identical content. Hugo and Zola get tag+author taxonomy pages
+  with per-term feeds, old inbound paths as alias redirect stubs, and
+  a minimal self-contained theme; Zola's templates wire its built-in
+  search index to a working search box (and its link checker is set to
+  warn, not fail, on the Medium-era dead in-page anchors); Pelican
+  relies on its built-in theme, with colocated images rewritten to
+  `{attach}` links. Each validated with a real generator build over
+  the full archive (hugo 0.152.2, zola 0.21.0, pelican 4.12.0).
+- **Card-grid blog theme for hugo and pelican, with Pagefind search
+  and image optimization** — both exporters now ship the same
+  self-contained card theme (in the vein of pytorch.org/blog):
+  paginated cover-card home, tag/author card listings, chip indexes,
+  and a /search/ page wired to Pagefind, which serves full-text search
+  as a results page with highlighted in-context excerpts and
+  per-section sub-results (`pagefind --site public|output` after
+  building). Hugo optimizes images natively — 640×360 cover thumbnails
+  via `.Fill`, responsive lazily-loaded webp variants for body images
+  via a render hook (gif/svg/non-image resources pass through) —
+  while pelican generates 640×360 JPEG cover thumbnails at export time
+  when Pillow is installed (the `covers` extra) and lazy-loads body
+  images through a Markdown extension embedded in its generated
+  config, with heading ids enabled so search results anchor to
+  sections. Pelican gets redirect-stub parity too: a plugin embedded
+  in its generated config renders the exported redirects.csv into
+  meta-refresh stub pages after each build (matching Hugo's alias
+  count row-for-row), since Pelican has no aliases feature of its own.
+  The same embedded plugin brings body-image parity with Hugo's render
+  hook: after each build it rewrites every still body image to
+  lazily-loaded webp srcset variants (480/736/1104, never upscaled,
+  real width/height, same sizes hint), encoding from and mtime-caching
+  against the content-side originals — Pelican freshens output copies
+  every build, which would defeat a cache keyed on them. On the
+  reference archive: 1854 variants on the first build (~2.5 min, the
+  same codec cost as Hugo's first build), 0 re-encoded and ~20 s on
+  rebuilds. Chosen over the pelican-image-process plugin after reading
+  its source: that plugin only processes class-annotated images (the
+  annotation would have to come from this exporter anyway), flattens
+  animated gifs, emits fixed-name srcset descriptors regardless of
+  actual image size, and adds bs4+lxml (AGPL) to the site's build
+  requirements. Covers are chosen by sniffing dimensions from image
+  headers (no image library needed for that path). Relatedly,
+  `convert` now renames images fetched from extensionless URLs
+  (stored as `.bin` in raw/) to the extension their bytes call for, so
+  every derived layer gets typed image names — 103 such files in the
+  reference archive. Both sites validated end-to-end in headless
+  Chromium, including search-with-highlights.
+- **Hugo theme support (Dream)** — site.json's `hugo` section can name
+  a real theme (`theme`, `theme_repo`, optional `avatar` and `params`);
+  the exporter then emits that theme's config instead of its own
+  layouts and keeps `site-hugo/themes/` across regenerations. Dream
+  (hugo-theme-dream, Hugo ≥ 0.158) gets first-class treatment: covers
+  for the masonry cards from each post's first still image of sane
+  size (animated gifs and >12 MP stills are passed over — Dream
+  webp-encodes covers at original size), per-post bylines with
+  profile links, the built-in search page and /posts archives
+  timeline, an Authors nav item, siteStartYear from the oldest post,
+  and an avatar copied into the site. Validated against the full
+  archive with Hugo 0.158: all pages, covers, search, tag/author
+  pages and feeds render (screenshots checked via headless Chromium).
+
 From the 2026-08 review of other Medium-to-Markdown tools (medium-2-md,
 mediumexporter — the latter's media-resource handling exposed a silent
 data loss here):

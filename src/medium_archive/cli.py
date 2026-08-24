@@ -9,6 +9,11 @@
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in <out>/posts/, plus posts.json and redirects.csv
+    myst           build a MyST (mystmd) site in <out>/site/ from the
+                   converted posts, ready for `myst start` / `myst build`
+    hugo           build a Hugo site in <out>/site-hugo/
+    zola           build a Zola site in <out>/site-zola/
+    pelican        build a Pelican site in <out>/site-pelican/
     lint           scan converted posts for conversion-defect signatures
     stats          summarize the converted archive
 
@@ -32,6 +37,8 @@ Examples:
     medium-archive import-ghost https://blog.example.com/     # Ghost captures
     medium-archive compare                                      # page vs export check
     medium-archive convert                                      # raw -> posts/
+    medium-archive myst                                         # posts/ -> site/
+    medium-archive hugo                                         # posts/ -> site-hugo/
     medium-archive stats                                        # summarize the archive
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
@@ -90,6 +97,10 @@ from urllib.parse import urlparse
 from .compare import cmd_compare
 from .convert import cmd_convert
 from .lint import cmd_lint
+from .hugo import cmd_hugo
+from .myst import cmd_myst
+from .pelican import cmd_pelican
+from .zola import cmd_zola
 from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
@@ -216,6 +227,56 @@ def main():
                        help="skip image downloads (convert will keep the "
                             "original, likely dead, URLs)")
     add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
+    parser("myst", help="build a MyST (mystmd) site in <out>/site/ from the "
+                        "converted posts: one page per post, a chronological "
+                        "landing page, a year-grouped table of contents, "
+                        "in-publication links rewritten to site pages, and a "
+                        "redirect map from old inbound paths to page URLs. "
+                        "Rebuilt from scratch each run; site-wide text (title, "
+                        "description, landing-page intro) comes from an "
+                        "optional hand-written <out>/site.json. Render with "
+                        "`myst start` or `myst build --html` inside <out>/site/ "
+                        "(https://mystmd.org)")
+    parser("hugo", help="build a Hugo site in <out>/site-hugo/ from the "
+                        "converted posts: a self-contained card-grid blog "
+                        "theme (cover-image cards, paginated home, "
+                        "tag/author card listings with per-term RSS), old "
+                        "inbound paths as aliases (static redirect stubs), "
+                        "optimized images (thumbnailed covers; responsive, "
+                        "lazily-loaded body images), a /search/ page wired "
+                        "to Pagefind (run `pagefind --site public` after "
+                        "`hugo` for full-text search with highlighted "
+                        "in-context excerpts), and a redirect map. Or name "
+                        "a real theme in site.json's hugo section -- the "
+                        "Dream theme (hugo-theme-dream, Hugo >= 0.158) "
+                        "gets first-class support. Render with "
+                        "`hugo server` inside <out>/site-hugo/ "
+                        "(https://gohugo.io)")
+    parser("zola", help="build a Zola site in <out>/site-zola/ from the "
+                        "converted posts: taxonomy pages and per-term Atom "
+                        "feeds for tags and authors, a site feed, a working "
+                        "full-text search box, aliases for old inbound "
+                        "paths, a small self-contained set of templates, "
+                        "and a redirect map. Render with `zola serve` "
+                        "inside <out>/site-zola/ (https://www.getzola.org)")
+    parser("pelican", help="build a Pelican site in <out>/site-pelican/ "
+                           "from the converted posts, with the same "
+                           "card-grid theme as the hugo step: cover-image "
+                           "cards (640x360 thumbnails when pillow is "
+                           "installed), tag/author card listings, chip "
+                           "indexes, an archives timeline, Atom feeds "
+                           "(site-wide and per tag/author), responsive "
+                           "lazily-loaded body images (webp srcset "
+                           "variants, encoded after each build like the "
+                           "hugo render hook), a /search/ page wired to Pagefind "
+                           "(run `pagefind --site output` after `pelican`), "
+                           "and redirect stubs at every old inbound path "
+                           "(a plugin embedded in the generated config "
+                           "renders redirects.csv into the same stub pages "
+                           "Hugo emits for aliases). Render with `pelican -l` "
+                           "inside <out>/site-pelican/ "
+                           "(https://getpelican.com; `pip install pelican "
+                           "markdown pillow`)")
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
                         "offline; differences print as a unified patch on stdout "
@@ -256,6 +317,14 @@ def main():
         cmd_import_ghost(args)
     if args.command in ("convert", "all"):
         cmd_convert(args)
+    if args.command == "myst":
+        cmd_myst(args)
+    if args.command == "hugo":
+        cmd_hugo(args)
+    if args.command == "zola":
+        cmd_zola(args)
+    if args.command == "pelican":
+        cmd_pelican(args)
     if args.command == "compare":
         cmd_compare(args)
     if args.command == "lint":
