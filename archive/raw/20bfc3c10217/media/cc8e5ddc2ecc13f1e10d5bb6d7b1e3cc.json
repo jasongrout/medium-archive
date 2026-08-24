@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "cc8e5ddc2ecc13f1e10d5bb6d7b1e3cc",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/krassowski/d2bca5272c2499fad68b4f9d7276992b",
+      "domain": "gist.github.com",
+      "title": "Example Mermaid diagram for Jupyter",
+      "description": "Example Mermaid diagram for Jupyter. GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fassets%2Fgist-og-image-54fd7dc0713e.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "krassowski",
+      "gist": {
+        "gistId": "d2bca5272c2499fad68b4f9d7276992b",
+        "githubUsername": "krassowski",
+        "gistScriptUrl": "https://gist.github.com/krassowski/d2bca5272c2499fad68b4f9d7276992b.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

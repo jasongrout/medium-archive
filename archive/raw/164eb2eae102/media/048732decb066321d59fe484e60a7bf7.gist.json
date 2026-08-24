@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/e532168b14c28a38286a4448c6dd4d78",
+  "forks_url": "https://api.github.com/gists/e532168b14c28a38286a4448c6dd4d78/forks",
+  "commits_url": "https://api.github.com/gists/e532168b14c28a38286a4448c6dd4d78/commits",
+  "id": "e532168b14c28a38286a4448c6dd4d78",
+  "node_id": "G_kwDOAXRfEtoAIGU1MzIxNjhiMTRjMjhhMzgyODZhNDQ0OGM2ZGQ0ZDc4",
+  "git_pull_url": "https://gist.github.com/e532168b14c28a38286a4448c6dd4d78.git",
+  "git_push_url": "https://gist.github.com/e532168b14c28a38286a4448c6dd4d78.git",
+  "html_url": "https://gist.github.com/manzt/e532168b14c28a38286a4448c6dd4d78",
+  "files": {
+    "anywidget_cell_2.py": {
+      "filename": "anywidget_cell_2.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/manzt/e532168b14c28a38286a4448c6dd4d78/raw/913d34f410077c01814ee5c57822ec959642e5f4/anywidget_cell_2.py",
+      "size": 222,
+      "truncated": false,
+      "content": "chart_widget = ChartWidget(spec=(points & bars).to_json())\n\n# Prints updates log console (JupyterLab: View > Show Log Console)\nchart_widget.observe(lambda selection: print(selection.new), names=[\"selection\"])\n\nchart_widget",
+      "encoding": "utf-8"
+    }
+  },
+  "public": false,
+  "created_at": "2023-07-11T01:59:02Z",
+  "updated_at": "2023-07-11T01:59:02Z",
+  "description": "anywidget blog: cell 2",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/e532168b14c28a38286a4448c6dd4d78/comments",
+  "owner": {
+    "login": "manzt",
+    "id": 24403730,
+    "node_id": "MDQ6VXNlcjI0NDAzNzMw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24403730?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/manzt",
+    "html_url": "https://github.com/manzt",
+    "followers_url": "https://api.github.com/users/manzt/followers",
+    "following_url": "https://api.github.com/users/manzt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/manzt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/manzt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/manzt/subscriptions",
+    "organizations_url": "https://api.github.com/users/manzt/orgs",
+    "repos_url": "https://api.github.com/users/manzt/repos",
+    "events_url": "https://api.github.com/users/manzt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/manzt/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "manzt",
+        "id": 24403730,
+        "node_id": "MDQ6VXNlcjI0NDAzNzMw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/24403730?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/manzt",
+        "html_url": "https://github.com/manzt",
+        "followers_url": "https://api.github.com/users/manzt/followers",
+        "following_url": "https://api.github.com/users/manzt/following{/other_user}",
+        "gists_url": "https://api.github.com/users/manzt/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/manzt/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/manzt/subscriptions",
+        "organizations_url": "https://api.github.com/users/manzt/orgs",
+        "repos_url": "https://api.github.com/users/manzt/repos",
+        "events_url": "https://api.github.com/users/manzt/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/manzt/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "ec3ad84a63cb4ddb772a26b5fe3c174191aa4172",
+      "committed_at": "2023-07-11T01:59:02Z",
+      "change_status": {
+        "total": 6,
+        "additions": 6,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/e532168b14c28a38286a4448c6dd4d78/ec3ad84a63cb4ddb772a26b5fe3c174191aa4172"
+    }
+  ],
+  "truncated": false
+}

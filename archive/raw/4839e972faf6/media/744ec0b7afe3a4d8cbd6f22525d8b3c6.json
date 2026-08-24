@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "744ec0b7afe3a4d8cbd6f22525d8b3c6",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/GeorgianaElena/2f439d690f2b864f10ea4bb7da2c2e22",
+      "domain": "gist.github.com",
+      "title": "jupyterhub_config.py",
+      "description": "GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Favatars3.githubusercontent.com%2Fu%2F7579677%3Fs%3D400%26v%3D4&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 400,
+      "thumbnailHeight": 400,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "GeorgianaElena",
+      "gist": {
+        "gistId": "2f439d690f2b864f10ea4bb7da2c2e22",
+        "githubUsername": "GeorgianaElena",
+        "gistScriptUrl": "https://gist.github.com/GeorgianaElena/2f439d690f2b864f10ea4bb7da2c2e22.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}
