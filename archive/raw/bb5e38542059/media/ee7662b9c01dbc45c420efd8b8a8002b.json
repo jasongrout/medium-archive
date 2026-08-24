@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "ee7662b9c01dbc45c420efd8b8a8002b",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/henchc/c5664b562bd8370916c05cb841ae3464",
+      "domain": "gist.github.com",
+      "title": "henchbot_blogpost_1.py",
+      "description": "GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Fgists%2Fgist-og-image.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "henchc",
+      "gist": {
+        "gistId": "c5664b562bd8370916c05cb841ae3464",
+        "githubUsername": "henchc",
+        "gistScriptUrl": "https://gist.github.com/henchc/c5664b562bd8370916c05cb841ae3464.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/07c8537794d00a3382f86d3bddf5de4e",
+  "forks_url": "https://api.github.com/gists/07c8537794d00a3382f86d3bddf5de4e/forks",
+  "commits_url": "https://api.github.com/gists/07c8537794d00a3382f86d3bddf5de4e/commits",
+  "id": "07c8537794d00a3382f86d3bddf5de4e",
+  "node_id": "MDQ6R2lzdDA3Yzg1Mzc3OTRkMDBhMzM4MmY4NmQzYmRkZjVkZTRl",
+  "git_pull_url": "https://gist.github.com/07c8537794d00a3382f86d3bddf5de4e.git",
+  "git_push_url": "https://gist.github.com/07c8537794d00a3382f86d3bddf5de4e.git",
+  "html_url": "https://gist.github.com/gouarin/07c8537794d00a3382f86d3bddf5de4e",
+  "files": {
+    "ssh-nodes.conf": {
+      "filename": "ssh-nodes.conf",
+      "type": "text/plain",
+      "language": null,
+      "raw_url": "https://gist.githubusercontent.com/gouarin/07c8537794d00a3382f86d3bddf5de4e/raw/2500a3744902a30f66184c9a58471be4e7ccd372/ssh-nodes.conf",
+      "size": 201,
+      "truncated": false,
+      "content": "Host 10.0.0.*\n    User centos\n    UserKnownHostsFile=/dev/null\n    StrictHostKeyChecking=no\n    ProxyCommand ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -W %h:%p centos@134.xx.xx.xx",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2018-10-08T17:26:59Z",
+  "updated_at": "2018-10-08T17:26:59Z",
+  "description": "ssh-nodes.conf",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/07c8537794d00a3382f86d3bddf5de4e/comments",
+  "owner": {
+    "login": "gouarin",
+    "id": 7510549,
+    "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gouarin",
+    "html_url": "https://github.com/gouarin",
+    "followers_url": "https://api.github.com/users/gouarin/followers",
+    "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+    "organizations_url": "https://api.github.com/users/gouarin/orgs",
+    "repos_url": "https://api.github.com/users/gouarin/repos",
+    "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gouarin/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "gouarin",
+        "id": 7510549,
+        "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/gouarin",
+        "html_url": "https://github.com/gouarin",
+        "followers_url": "https://api.github.com/users/gouarin/followers",
+        "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+        "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+        "organizations_url": "https://api.github.com/users/gouarin/orgs",
+        "repos_url": "https://api.github.com/users/gouarin/repos",
+        "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/gouarin/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "e6a67b2cb2dc7d35adc40b5d29d317ef47f921e2",
+      "committed_at": "2018-10-08T17:26:59Z",
+      "change_status": {
+        "total": 5,
+        "additions": 5,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/07c8537794d00a3382f86d3bddf5de4e/e6a67b2cb2dc7d35adc40b5d29d317ef47f921e2"
+    }
+  ],
+  "truncated": false
+}

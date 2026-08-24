@@ -1,0 +1,119 @@
+{
+  "url": "https://api.github.com/gists/0ad0527e1ee0bdea171cba76d11b2202",
+  "forks_url": "https://api.github.com/gists/0ad0527e1ee0bdea171cba76d11b2202/forks",
+  "commits_url": "https://api.github.com/gists/0ad0527e1ee0bdea171cba76d11b2202/commits",
+  "id": "0ad0527e1ee0bdea171cba76d11b2202",
+  "node_id": "MDQ6R2lzdDBhZDA1MjdlMWVlMGJkZWExNzFjYmE3NmQxMWIyMjAy",
+  "git_pull_url": "https://gist.github.com/0ad0527e1ee0bdea171cba76d11b2202.git",
+  "git_push_url": "https://gist.github.com/0ad0527e1ee0bdea171cba76d11b2202.git",
+  "html_url": "https://gist.github.com/gouarin/0ad0527e1ee0bdea171cba76d11b2202",
+  "files": {
+    "rc_file": {
+      "filename": "rc_file",
+      "type": "text/plain",
+      "language": "Shell",
+      "raw_url": "https://gist.githubusercontent.com/gouarin/0ad0527e1ee0bdea171cba76d11b2202/raw/8db09252c80970b4c29956bbc87c6ab2d3401bd3/rc_file",
+      "size": 705,
+      "truncated": false,
+      "content": "#!/usr/bin/env bash\n\nexport OS_AUTH_URL=https://keystone.xxxxxx:5000/v3\nexport OS_PROJECT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nexport OS_PROJECT_NAME=\"xxxxxxxx\"\nexport OS_USER_DOMAIN_NAME=\"xxxxxxxx\"\nif [ -z \"$OS_USER_DOMAIN_NAME\" ]; then unset OS_USER_DOMAIN_NAME; fi\n\n# unset v2.0 items in case set\nunset OS_TENANT_ID\nunset OS_TENANT_NAME\n\nexport OS_USERNAME=\"xxxxxxxx\"\nexport OS_REGION_NAME=\"xxxxxxxx\"\n# Don't leave a blank variable, unset it if it was empty\nif [ -z \"$OS_REGION_NAME\" ]; then unset OS_REGION_NAME; fi\n\nexport OS_INTERFACE=public\nexport OS_IDENTITY_API_VERSION=3\n\n# to be added\nexport OS_PASSWORD=\"xxxxxxxx\"\nexport OS_CLOUD=xxxxxxxx\nexport OS_CACERT=/home/loic/.certs/openstack_cacert.pem",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2018-10-08T10:08:28Z",
+  "updated_at": "2018-10-15T15:11:36Z",
+  "description": "rc_file",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/0ad0527e1ee0bdea171cba76d11b2202/comments",
+  "owner": {
+    "login": "gouarin",
+    "id": 7510549,
+    "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gouarin",
+    "html_url": "https://github.com/gouarin",
+    "followers_url": "https://api.github.com/users/gouarin/followers",
+    "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+    "organizations_url": "https://api.github.com/users/gouarin/orgs",
+    "repos_url": "https://api.github.com/users/gouarin/repos",
+    "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gouarin/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "gouarin",
+        "id": 7510549,
+        "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/gouarin",
+        "html_url": "https://github.com/gouarin",
+        "followers_url": "https://api.github.com/users/gouarin/followers",
+        "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+        "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+        "organizations_url": "https://api.github.com/users/gouarin/orgs",
+        "repos_url": "https://api.github.com/users/gouarin/repos",
+        "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/gouarin/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "effdf6209028da3c3428972846da23fa475fa381",
+      "committed_at": "2018-10-15T15:11:35Z",
+      "change_status": {
+        "total": 1,
+        "additions": 0,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/0ad0527e1ee0bdea171cba76d11b2202/effdf6209028da3c3428972846da23fa475fa381"
+    },
+    {
+      "user": {
+        "login": "gouarin",
+        "id": 7510549,
+        "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/gouarin",
+        "html_url": "https://github.com/gouarin",
+        "followers_url": "https://api.github.com/users/gouarin/followers",
+        "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+        "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+        "organizations_url": "https://api.github.com/users/gouarin/orgs",
+        "repos_url": "https://api.github.com/users/gouarin/repos",
+        "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/gouarin/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "c1b83c6a7bbcc22de1f33b43cd2c12ee7f50c8f9",
+      "committed_at": "2018-10-08T10:08:27Z",
+      "change_status": {
+        "total": 25,
+        "additions": 25,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/0ad0527e1ee0bdea171cba76d11b2202/c1b83c6a7bbcc22de1f33b43cd2c12ee7f50c8f9"
+    }
+  ],
+  "truncated": false
+}

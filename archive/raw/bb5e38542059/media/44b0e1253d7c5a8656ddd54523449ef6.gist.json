@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/511a613792993b43f9cc52c959f63c0d",
+  "forks_url": "https://api.github.com/gists/511a613792993b43f9cc52c959f63c0d/forks",
+  "commits_url": "https://api.github.com/gists/511a613792993b43f9cc52c959f63c0d/commits",
+  "id": "511a613792993b43f9cc52c959f63c0d",
+  "node_id": "MDQ6R2lzdDUxMWE2MTM3OTI5OTNiNDNmOWNjNTJjOTU5ZjYzYzBk",
+  "git_pull_url": "https://gist.github.com/511a613792993b43f9cc52c959f63c0d.git",
+  "git_push_url": "https://gist.github.com/511a613792993b43f9cc52c959f63c0d.git",
+  "html_url": "https://gist.github.com/henchc/511a613792993b43f9cc52c959f63c0d",
+  "files": {
+    "henchbot_blogpost_4.py": {
+      "filename": "henchbot_blogpost_4.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/henchc/511a613792993b43f9cc52c959f63c0d/raw/9c9a9530a1ec1afad2ebb50bc9d274ccade9ec64/henchbot_blogpost_4.py",
+      "size": 162,
+      "truncated": false,
+      "content": "url = \"https://hub.docker.com/v2/repositories/jupyter/repo2docker/tags/\"\nresp = requests.get(url)\nr2d_master = resp.json()['results'][0]['name']\nprint(r2d_master)",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-07-14T20:59:15Z",
+  "updated_at": "2019-07-14T20:59:15Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/511a613792993b43f9cc52c959f63c0d/comments",
+  "owner": {
+    "login": "henchc",
+    "id": 14077472,
+    "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/henchc",
+    "html_url": "https://github.com/henchc",
+    "followers_url": "https://api.github.com/users/henchc/followers",
+    "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+    "organizations_url": "https://api.github.com/users/henchc/orgs",
+    "repos_url": "https://api.github.com/users/henchc/repos",
+    "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/henchc/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "9dcaf30baa980f61b094b8cf0f52c16a20991ebc",
+      "committed_at": "2019-07-14T20:59:14Z",
+      "change_status": {
+        "total": 4,
+        "additions": 4,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/511a613792993b43f9cc52c959f63c0d/9dcaf30baa980f61b094b8cf0f52c16a20991ebc"
+    }
+  ],
+  "truncated": false
+}

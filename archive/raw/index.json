@@ -3514,5 +3514,15 @@
     "fetched_at": "2026-08-22T22:30:38+00:00",
     "images": 0,
     "in_feed": false
+  },
+  "https://blog.jupyter.org/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0": {
+    "medium_id": "03e6b78bacc0",
+    "title": "JupyterGIS 0.16: New visualization capabilities, collaborative Story Maps, and more",
+    "published": "2026-08-24T16:09:39Z",
+    "sitemap_date": "2026-08-24T16:09:41+00:00",
+    "found_via": "feed",
+    "fetched_at": "2026-08-24T19:43:13+00:00",
+    "images": 14,
+    "in_feed": true
   }
 }

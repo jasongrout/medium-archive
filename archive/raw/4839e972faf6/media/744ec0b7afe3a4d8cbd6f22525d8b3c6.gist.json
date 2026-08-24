@@ -1,0 +1,119 @@
+{
+  "url": "https://api.github.com/gists/2f439d690f2b864f10ea4bb7da2c2e22",
+  "forks_url": "https://api.github.com/gists/2f439d690f2b864f10ea4bb7da2c2e22/forks",
+  "commits_url": "https://api.github.com/gists/2f439d690f2b864f10ea4bb7da2c2e22/commits",
+  "id": "2f439d690f2b864f10ea4bb7da2c2e22",
+  "node_id": "MDQ6R2lzdDJmNDM5ZDY5MGYyYjg2NGYxMGVhNGJiN2RhMmMyZTIy",
+  "git_pull_url": "https://gist.github.com/2f439d690f2b864f10ea4bb7da2c2e22.git",
+  "git_push_url": "https://gist.github.com/2f439d690f2b864f10ea4bb7da2c2e22.git",
+  "html_url": "https://gist.github.com/GeorgianaElena/2f439d690f2b864f10ea4bb7da2c2e22",
+  "files": {
+    "jupyterhub_config.py": {
+      "filename": "jupyterhub_config.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/GeorgianaElena/2f439d690f2b864f10ea4bb7da2c2e22/raw/20c71b84cf7327871c555c06743194b00d2aa4d8/jupyterhub_config.py",
+      "size": 312,
+      "truncated": false,
+      "content": "from jupyterhub_traefik_proxy import TraefikEtcdlProxy\nc.JupyterHub.proxy_class = TraefikEtcdProxy\n# will configure JupyterHub to run with TraefikEtcdProxy\n\nfrom jupyterhub_traefik_proxy import TraefikTomlProxy\nc.JupyterHub.proxy_class = TraefikTomlProxy\n# will configure JupyterHub to run with TraefikTomlProxy\n",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-02-28T09:00:24Z",
+  "updated_at": "2019-02-28T09:02:38Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/2f439d690f2b864f10ea4bb7da2c2e22/comments",
+  "owner": {
+    "login": "GeorgianaElena",
+    "id": 7579677,
+    "node_id": "MDQ6VXNlcjc1Nzk2Nzc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7579677?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/GeorgianaElena",
+    "html_url": "https://github.com/GeorgianaElena",
+    "followers_url": "https://api.github.com/users/GeorgianaElena/followers",
+    "following_url": "https://api.github.com/users/GeorgianaElena/following{/other_user}",
+    "gists_url": "https://api.github.com/users/GeorgianaElena/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/GeorgianaElena/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/GeorgianaElena/subscriptions",
+    "organizations_url": "https://api.github.com/users/GeorgianaElena/orgs",
+    "repos_url": "https://api.github.com/users/GeorgianaElena/repos",
+    "events_url": "https://api.github.com/users/GeorgianaElena/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/GeorgianaElena/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "GeorgianaElena",
+        "id": 7579677,
+        "node_id": "MDQ6VXNlcjc1Nzk2Nzc=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7579677?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/GeorgianaElena",
+        "html_url": "https://github.com/GeorgianaElena",
+        "followers_url": "https://api.github.com/users/GeorgianaElena/followers",
+        "following_url": "https://api.github.com/users/GeorgianaElena/following{/other_user}",
+        "gists_url": "https://api.github.com/users/GeorgianaElena/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/GeorgianaElena/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/GeorgianaElena/subscriptions",
+        "organizations_url": "https://api.github.com/users/GeorgianaElena/orgs",
+        "repos_url": "https://api.github.com/users/GeorgianaElena/repos",
+        "events_url": "https://api.github.com/users/GeorgianaElena/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/GeorgianaElena/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "d664f9d8290c3cdcaa5f8b891e644d05fc31c5ce",
+      "committed_at": "2019-02-28T09:01:26Z",
+      "change_status": {
+        "total": 4,
+        "additions": 4,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/2f439d690f2b864f10ea4bb7da2c2e22/d664f9d8290c3cdcaa5f8b891e644d05fc31c5ce"
+    },
+    {
+      "user": {
+        "login": "GeorgianaElena",
+        "id": 7579677,
+        "node_id": "MDQ6VXNlcjc1Nzk2Nzc=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7579677?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/GeorgianaElena",
+        "html_url": "https://github.com/GeorgianaElena",
+        "followers_url": "https://api.github.com/users/GeorgianaElena/followers",
+        "following_url": "https://api.github.com/users/GeorgianaElena/following{/other_user}",
+        "gists_url": "https://api.github.com/users/GeorgianaElena/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/GeorgianaElena/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/GeorgianaElena/subscriptions",
+        "organizations_url": "https://api.github.com/users/GeorgianaElena/orgs",
+        "repos_url": "https://api.github.com/users/GeorgianaElena/repos",
+        "events_url": "https://api.github.com/users/GeorgianaElena/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/GeorgianaElena/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "998ba67342865f2d0179b858d02b1c277a52c7be",
+      "committed_at": "2019-02-28T09:00:24Z",
+      "change_status": {
+        "total": 3,
+        "additions": 3,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/2f439d690f2b864f10ea4bb7da2c2e22/998ba67342865f2d0179b858d02b1c277a52c7be"
+    }
+  ],
+  "truncated": false
+}

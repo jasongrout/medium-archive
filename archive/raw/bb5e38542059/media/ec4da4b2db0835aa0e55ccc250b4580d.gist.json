@@ -1,0 +1,119 @@
+{
+  "url": "https://api.github.com/gists/3b6dab453c60384f8f9f1a06ca4856d3",
+  "forks_url": "https://api.github.com/gists/3b6dab453c60384f8f9f1a06ca4856d3/forks",
+  "commits_url": "https://api.github.com/gists/3b6dab453c60384f8f9f1a06ca4856d3/commits",
+  "id": "3b6dab453c60384f8f9f1a06ca4856d3",
+  "node_id": "MDQ6R2lzdDNiNmRhYjQ1M2M2MDM4NGY4ZjlmMWEwNmNhNDg1NmQz",
+  "git_pull_url": "https://gist.github.com/3b6dab453c60384f8f9f1a06ca4856d3.git",
+  "git_push_url": "https://gist.github.com/3b6dab453c60384f8f9f1a06ca4856d3.git",
+  "html_url": "https://gist.github.com/henchc/3b6dab453c60384f8f9f1a06ca4856d3",
+  "files": {
+    "henchbot_blogpost_7.py": {
+      "filename": "henchbot_blogpost_7.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/henchc/3b6dab453c60384f8f9f1a06ca4856d3/raw/62c32ba60380ebf4aa17f3569b77bb2115ef02ae/henchbot_blogpost_7.py",
+      "size": 314,
+      "truncated": false,
+      "content": "import os\nTOKEN = os.environ.get('HENCHBOT_TOKEN')\nfor repo in ['binderhub', 'repo2docker']:\n    if commit_info[repo]['live'] != commit_info[repo]['latest']:\n        res = requests.post('https://api.github.com/repos/jupyterhub/mybinder.org-deploy/forks',\n\t\t\t    headers={'Authorization': 'token {}'.format(TOKEN)})",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-07-14T21:00:39Z",
+  "updated_at": "2019-07-14T21:18:23Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/3b6dab453c60384f8f9f1a06ca4856d3/comments",
+  "owner": {
+    "login": "henchc",
+    "id": 14077472,
+    "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/henchc",
+    "html_url": "https://github.com/henchc",
+    "followers_url": "https://api.github.com/users/henchc/followers",
+    "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+    "organizations_url": "https://api.github.com/users/henchc/orgs",
+    "repos_url": "https://api.github.com/users/henchc/repos",
+    "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/henchc/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "83d6c0c73a4e58b9f1d588cf2cf3b3290d20e457",
+      "committed_at": "2019-07-14T21:18:22Z",
+      "change_status": {
+        "total": 6,
+        "additions": 3,
+        "deletions": 3
+      },
+      "url": "https://api.github.com/gists/3b6dab453c60384f8f9f1a06ca4856d3/83d6c0c73a4e58b9f1d588cf2cf3b3290d20e457"
+    },
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "42800e0c7fa56d1eb55354ff69d6dd18416c6547",
+      "committed_at": "2019-07-14T21:00:38Z",
+      "change_status": {
+        "total": 6,
+        "additions": 6,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/3b6dab453c60384f8f9f1a06ca4856d3/42800e0c7fa56d1eb55354ff69d6dd18416c6547"
+    }
+  ],
+  "truncated": false
+}
