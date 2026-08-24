@@ -18,6 +18,20 @@ absolute links and redirect stubs. The four exporters share page URLs
 and link rewriting, so the generators can be compared on identical
 content, then the keepers kept and the rest ignored.
 
+**Previews:** the `.github/workflows/preview.yml` workflow rebuilds all
+four sites from `raw/` on every push to main (or on demand) and
+publishes them to GitHub Pages under `/hugo/`, `/pelican/`, `/zola/`
+and `/myst/`, behind a landing page (`.github/preview-index.html`)
+linking the four. Each exporter runs with `site.json`'s `base_url`
+pointed at its subpath (patched only in the runner's workspace), so
+baked-in absolute links land in the right place. Caveat: with
+full-resolution images copied into every site, the four previews total
+~3.3 GB — above GitHub Pages' documented 1 GB site limit (the deploy
+may still go through; the 10 GB artifact limit is the hard one).
+The fix is capping image sizes in the generated sites at export time —
+a planned medium-archive change, tracked in that repo's `todo.md` —
+after which the deployment drops to a fraction of the limit.
+
 Last full validation, all four against all 333 posts:
 
 - **myst** (`myst build --html`, mystmd 1.10.1): all pages render, with
