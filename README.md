@@ -66,7 +66,11 @@ It works in independent steps:
   those generators, into `<out>/site-hugo/`, `<out>/site-zola/` and
   `<out>/site-pelican/` — same page URLs (`/posts/<slug>/`), same link
   rewriting, same `site.json`, and a `redirects.csv` in each site — so
-  the generators can be compared on identical content. `hugo` and
+  the generators can be compared on identical content. The **hugo and
+  pelican sites are the preferred targets**: they carry the full
+  feature set described below (the card theme, Pagefind search, image
+  optimization, redirect stubs, capped full-content feeds); the myst
+  and zola sites are maintained as simpler alternates. `hugo` and
   `pelican` ship the same self-contained card-grid blog theme (in the
   vein of pytorch.org/blog): a paginated home of cover-image cards —
   each post's first still image of sane size, chosen by header-sniffing
