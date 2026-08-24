@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/e5a2f4c0a98f8383b236e3ae47aaa804",
+  "forks_url": "https://api.github.com/gists/e5a2f4c0a98f8383b236e3ae47aaa804/forks",
+  "commits_url": "https://api.github.com/gists/e5a2f4c0a98f8383b236e3ae47aaa804/commits",
+  "id": "e5a2f4c0a98f8383b236e3ae47aaa804",
+  "node_id": "G_kwDOAXRfEtoAIGU1YTJmNGMwYTk4ZjgzODNiMjM2ZTNhZTQ3YWFhODA0",
+  "git_pull_url": "https://gist.github.com/e5a2f4c0a98f8383b236e3ae47aaa804.git",
+  "git_push_url": "https://gist.github.com/e5a2f4c0a98f8383b236e3ae47aaa804.git",
+  "html_url": "https://gist.github.com/manzt/e5a2f4c0a98f8383b236e3ae47aaa804",
+  "files": {
+    "anywidget_cell_1.py": {
+      "filename": "anywidget_cell_1.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/manzt/e5a2f4c0a98f8383b236e3ae47aaa804/raw/99d42c3669c879793ad7d5980cdf8798f4233c8f/anywidget_cell_1.py",
+      "size": 612,
+      "truncated": false,
+      "content": "import anywidget\nimport traitlets\n\n\nclass ChartWidget(anywidget.AnyWidget):\n    _esm = \"\"\"\n    import embed from \"https://cdn.jsdelivr.net/npm/vega-embed@6/+esm\";\n    \n    export async function render({ model, el }) {\n        let spec = JSON.parse(model.get(\"spec\"));\n        let api = await embed(el, spec);\n        api.view.addSignalListener(spec.params[0].name, (_, update) => {\n            console.log(update);\n            model.set(\"selection\", update);\n            model.save_changes();\n        });\n    }\n    \"\"\"\n    spec = traitlets.Unicode().tag(sync=True)\n    selection = traitlets.Dict().tag(sync=True)",
+      "encoding": "utf-8"
+    }
+  },
+  "public": false,
+  "created_at": "2023-07-11T01:58:52Z",
+  "updated_at": "2023-07-11T01:58:52Z",
+  "description": "anywidget blog: cell 1",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/e5a2f4c0a98f8383b236e3ae47aaa804/comments",
+  "owner": {
+    "login": "manzt",
+    "id": 24403730,
+    "node_id": "MDQ6VXNlcjI0NDAzNzMw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24403730?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/manzt",
+    "html_url": "https://github.com/manzt",
+    "followers_url": "https://api.github.com/users/manzt/followers",
+    "following_url": "https://api.github.com/users/manzt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/manzt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/manzt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/manzt/subscriptions",
+    "organizations_url": "https://api.github.com/users/manzt/orgs",
+    "repos_url": "https://api.github.com/users/manzt/repos",
+    "events_url": "https://api.github.com/users/manzt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/manzt/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "manzt",
+        "id": 24403730,
+        "node_id": "MDQ6VXNlcjI0NDAzNzMw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/24403730?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/manzt",
+        "html_url": "https://github.com/manzt",
+        "followers_url": "https://api.github.com/users/manzt/followers",
+        "following_url": "https://api.github.com/users/manzt/following{/other_user}",
+        "gists_url": "https://api.github.com/users/manzt/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/manzt/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/manzt/subscriptions",
+        "organizations_url": "https://api.github.com/users/manzt/orgs",
+        "repos_url": "https://api.github.com/users/manzt/repos",
+        "events_url": "https://api.github.com/users/manzt/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/manzt/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "48462afc6eb0fb8a8ab605a13d5209ef65d431b9",
+      "committed_at": "2023-07-11T01:58:52Z",
+      "change_status": {
+        "total": 20,
+        "additions": 20,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/e5a2f4c0a98f8383b236e3ae47aaa804/48462afc6eb0fb8a8ab605a13d5209ef65d431b9"
+    }
+  ],
+  "truncated": false
+}

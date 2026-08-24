@@ -1,0 +1,119 @@
+{
+  "url": "https://api.github.com/gists/937335e0d8eadf2ea9d5c350ee3a7422",
+  "forks_url": "https://api.github.com/gists/937335e0d8eadf2ea9d5c350ee3a7422/forks",
+  "commits_url": "https://api.github.com/gists/937335e0d8eadf2ea9d5c350ee3a7422/commits",
+  "id": "937335e0d8eadf2ea9d5c350ee3a7422",
+  "node_id": "MDQ6R2lzdDkzNzMzNWUwZDhlYWRmMmVhOWQ1YzM1MGVlM2E3NDIy",
+  "git_pull_url": "https://gist.github.com/937335e0d8eadf2ea9d5c350ee3a7422.git",
+  "git_push_url": "https://gist.github.com/937335e0d8eadf2ea9d5c350ee3a7422.git",
+  "html_url": "https://gist.github.com/henchc/937335e0d8eadf2ea9d5c350ee3a7422",
+  "files": {
+    "henchbot_blogpost_13.py": {
+      "filename": "henchbot_blogpost_13.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/henchc/937335e0d8eadf2ea9d5c350ee3a7422/raw/e58a9f9239d01efd8f24fad2eb18e02dfb49c15f/henchbot_blogpost_13.py",
+      "size": 781,
+      "truncated": false,
+      "content": "        if repo == 'repo2docker':\n            compare_url = 'https://github.com/jupyter/repo2docker/compare/{}...{}'.format(\n                           commit_info['repo2docker']['live'], \n                           commit_info['repo2docker']['latest'])\n            body = '\\n'.join(['This is a repo2docker version bump. See the link below for a diff of new changes:\\n', compare_url + ' \\n'])\n\n        elif repo == 'binderhub':\n            compare_url = 'https://github.com/jupyterhub/binderhub/compare/{}...{}'.format(\n                           commit_info['binderhub']['live'], \n                           commit_info['binderhub']['latest'])\n            body = '\\n'.join(['This is a binderhub version bump. See the link below for a diff of new changes:\\n', compare_url + ' \\n'])",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-07-14T21:10:04Z",
+  "updated_at": "2019-07-14T21:21:30Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/937335e0d8eadf2ea9d5c350ee3a7422/comments",
+  "owner": {
+    "login": "henchc",
+    "id": 14077472,
+    "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/henchc",
+    "html_url": "https://github.com/henchc",
+    "followers_url": "https://api.github.com/users/henchc/followers",
+    "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+    "organizations_url": "https://api.github.com/users/henchc/orgs",
+    "repos_url": "https://api.github.com/users/henchc/repos",
+    "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/henchc/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "fbcd6603ca8d999e6fb57f7293778d8d3456df8b",
+      "committed_at": "2019-07-14T21:21:29Z",
+      "change_status": {
+        "total": 8,
+        "additions": 4,
+        "deletions": 4
+      },
+      "url": "https://api.github.com/gists/937335e0d8eadf2ea9d5c350ee3a7422/fbcd6603ca8d999e6fb57f7293778d8d3456df8b"
+    },
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "cda7f8cf8825f0cabdec2eb4bf3ede0954252dff",
+      "committed_at": "2019-07-14T21:10:03Z",
+      "change_status": {
+        "total": 11,
+        "additions": 11,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/937335e0d8eadf2ea9d5c350ee3a7422/cda7f8cf8825f0cabdec2eb4bf3ede0954252dff"
+    }
+  ],
+  "truncated": false
+}

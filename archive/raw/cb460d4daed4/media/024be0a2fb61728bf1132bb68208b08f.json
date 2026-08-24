@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "024be0a2fb61728bf1132bb68208b08f",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/JohanMabille/db10581c190128903169333ac208b8c2",
+      "domain": "gist.github.com",
+      "title": "kernel.diff",
+      "description": "Instantly share code, notes, and snippets. You can't perform that action at this time. You signed in with another tab or window. You signed out in another tab or window. Reload to refresh your session. Reload to refresh your session.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Fgists%2Fgist-og-image.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "JohanMabille",
+      "gist": {
+        "gistId": "db10581c190128903169333ac208b8c2",
+        "githubUsername": "JohanMabille",
+        "gistScriptUrl": "https://gist.github.com/JohanMabille/db10581c190128903169333ac208b8c2.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

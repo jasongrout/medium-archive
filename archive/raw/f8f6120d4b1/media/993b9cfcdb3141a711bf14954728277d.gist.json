@@ -1,0 +1,119 @@
+{
+  "url": "https://api.github.com/gists/17d9864ecd963e57155b7a5ee6ccad87",
+  "forks_url": "https://api.github.com/gists/17d9864ecd963e57155b7a5ee6ccad87/forks",
+  "commits_url": "https://api.github.com/gists/17d9864ecd963e57155b7a5ee6ccad87/commits",
+  "id": "17d9864ecd963e57155b7a5ee6ccad87",
+  "node_id": "MDQ6R2lzdDE3ZDk4NjRlY2Q5NjNlNTcxNTViN2E1ZWU2Y2NhZDg3",
+  "git_pull_url": "https://gist.github.com/17d9864ecd963e57155b7a5ee6ccad87.git",
+  "git_push_url": "https://gist.github.com/17d9864ecd963e57155b7a5ee6ccad87.git",
+  "html_url": "https://gist.github.com/gouarin/17d9864ecd963e57155b7a5ee6ccad87",
+  "files": {
+    "cluster.tf": {
+      "filename": "cluster.tf",
+      "type": "text/plain",
+      "language": "HCL",
+      "raw_url": "https://gist.githubusercontent.com/gouarin/17d9864ecd963e57155b7a5ee6ccad87/raw/adabffb67823dac20ad0c5cabc68ca4dd7ee4f8b/cluster.tf",
+      "size": 1279,
+      "truncated": false,
+      "content": "# your Kubernetes cluster name here\ncluster_name = \"jhub\"\n\n# SSH key to use for access to nodes\npublic_key_path = \"~/.ssh/id_rsa.pub\"\n\n# image to use for bastion, masters, standalone etcd instances, and nodes\nimage = \"CentOS-7-x86_64-GenericCloud-20180108.qcow2\"\n# user on the node (ex. core on Container Linux, ubuntu on Ubuntu, etc.)\nssh_user = \"centos\"\n\n# 0|1 bastion nodes\nnumber_of_bastions = 0\n# standalone etcds\nnumber_of_etcd = 0\n\n# masters\nnumber_of_k8s_masters = 1\nnumber_of_k8s_masters_no_etcd = 0\nnumber_of_k8s_masters_no_floating_ip = 0\nnumber_of_k8s_masters_no_floating_ip_no_etcd = 0\nflavor_k8s_master = \"5e879c45-e709-4671-a38b-45ed0573dc38\"\n\n# nodes\nnumber_of_k8s_nodes = 0\nnumber_of_k8s_nodes_no_floating_ip = 2\nflavor_k8s_node = \"5e879c45-e709-4671-a38b-45ed0573dc38\"\n\n# GlusterFS\n# either 0 or more than one\nnumber_of_gfs_nodes_no_floating_ip = 2\ngfs_volume_size_in_gb = 100\n# Container Linux does not support GlusterFS\nimage_gfs = \"CentOS-7-x86_64-GenericCloud-20180108.qcow2\"\n# May be different from other nodes\nssh_user_gfs = \"centos\"\nflavor_gfs_node = \"5e879c45-e709-4671-a38b-45ed0573dc38\"\n\n# networking\n#network_name = \"<network>\"\nexternal_net = \"6cd08271-...\"\n#subnet_cidr = \"<cidr>\"\nfloatingip_pool = \"public\"\n\ndns_nameservers = [\"8.8.8.8\", \"8.8.4.4\"]",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2018-10-08T09:43:55Z",
+  "updated_at": "2018-10-08T11:56:59Z",
+  "description": "cluster.tf",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/17d9864ecd963e57155b7a5ee6ccad87/comments",
+  "owner": {
+    "login": "gouarin",
+    "id": 7510549,
+    "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gouarin",
+    "html_url": "https://github.com/gouarin",
+    "followers_url": "https://api.github.com/users/gouarin/followers",
+    "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+    "organizations_url": "https://api.github.com/users/gouarin/orgs",
+    "repos_url": "https://api.github.com/users/gouarin/repos",
+    "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gouarin/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "gouarin",
+        "id": 7510549,
+        "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/gouarin",
+        "html_url": "https://github.com/gouarin",
+        "followers_url": "https://api.github.com/users/gouarin/followers",
+        "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+        "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+        "organizations_url": "https://api.github.com/users/gouarin/orgs",
+        "repos_url": "https://api.github.com/users/gouarin/repos",
+        "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/gouarin/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "f6b26735eca25a45ffa903e478d15508e0a4d593",
+      "committed_at": "2018-10-08T11:56:59Z",
+      "change_status": {
+        "total": 2,
+        "additions": 1,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/17d9864ecd963e57155b7a5ee6ccad87/f6b26735eca25a45ffa903e478d15508e0a4d593"
+    },
+    {
+      "user": {
+        "login": "gouarin",
+        "id": 7510549,
+        "node_id": "MDQ6VXNlcjc1MTA1NDk=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/7510549?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/gouarin",
+        "html_url": "https://github.com/gouarin",
+        "followers_url": "https://api.github.com/users/gouarin/followers",
+        "following_url": "https://api.github.com/users/gouarin/following{/other_user}",
+        "gists_url": "https://api.github.com/users/gouarin/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/gouarin/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/gouarin/subscriptions",
+        "organizations_url": "https://api.github.com/users/gouarin/orgs",
+        "repos_url": "https://api.github.com/users/gouarin/repos",
+        "events_url": "https://api.github.com/users/gouarin/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/gouarin/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "802f0cad85ccf770fa0c20f924773b8587ef874f",
+      "committed_at": "2018-10-08T09:43:54Z",
+      "change_status": {
+        "total": 45,
+        "additions": 45,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/17d9864ecd963e57155b7a5ee6ccad87/802f0cad85ccf770fa0c20f924773b8587ef874f"
+    }
+  ],
+  "truncated": false
+}

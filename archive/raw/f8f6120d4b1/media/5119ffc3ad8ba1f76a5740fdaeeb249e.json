@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "5119ffc3ad8ba1f76a5740fdaeeb249e",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/gouarin/07c8537794d00a3382f86d3bddf5de4e",
+      "domain": "gist.github.com",
+      "title": "ssh-nodes.conf",
+      "description": "ssh-nodes.conf. GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Favatars1.githubusercontent.com%2Fu%2F7510549%3Fs%3D400%26v%3D4&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 400,
+      "thumbnailHeight": 400,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "gouarin",
+      "gist": {
+        "gistId": "07c8537794d00a3382f86d3bddf5de4e",
+        "githubUsername": "gouarin",
+        "gistScriptUrl": "https://gist.github.com/gouarin/07c8537794d00a3382f86d3bddf5de4e.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}
