@@ -23,7 +23,9 @@ Medium. It has two layers:
   versioned with the archive. `medium-archive hugo`, `zola` and `pelican`
   build the same site for those generators (same page URLs, link
   rewriting, and `site.json`) into `site-hugo/`, `site-zola/` and
-  `site-pelican/`. hugo and pelican share a self-contained card-grid
+  `site-pelican/`. The hugo and pelican sites are the preferred
+  targets, carrying the full feature set; the myst and zola sites are
+  simpler alternates. hugo and pelican share a self-contained card-grid
   blog theme -- cover-image cards, tag/author card listings, optimized
   images on both (640x360 cover thumbnails; responsive, lazily-loaded
   webp srcset variants for still body images),

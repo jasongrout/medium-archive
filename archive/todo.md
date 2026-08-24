@@ -2,6 +2,13 @@
 
 ## 0. Site builds (MyST, Hugo, Zola, Pelican)
 
+**The hugo and pelican sites are the preferred targets** — they carry
+the full feature set (card theme, Pagefind search with highlighted
+in-context results and shareable ?q= links, optimized images, redirect
+stubs at every old inbound path, archives timeline, capped
+full-content feeds). The myst and zola sites remain as simpler
+alternates.
+
 `medium-archive myst|hugo|zola|pelican --out .` builds a browsable site
 in `site/`, `site-hugo/`, `site-zola/`, or `site-pelican/` (all
 gitignored, like `posts/` — everything regenerates from `raw/` +
