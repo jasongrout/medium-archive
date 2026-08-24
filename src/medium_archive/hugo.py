@@ -194,7 +194,22 @@ window.addEventListener("load", function () {
   if (!customElements.get("pagefind-input")) {
     document.getElementById("search").textContent =
       "Search index not built yet: run `pagefind --site public` after `hugo`.";
+    return;
   }
+  // shareable searches: mirror the query into ?q=, restore it on load
+  var input = document.querySelector("pagefind-input input");
+  if (!input) return;
+  var q = new URLSearchParams(location.search).get("q");
+  if (q) {
+    input.value = q;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  input.addEventListener("input", function () {
+    var url = new URL(location);
+    if (input.value) url.searchParams.set("q", input.value);
+    else url.searchParams.delete("q");
+    history.replaceState(null, "", url);
+  });
 });
 </script>
 {{ end }}
@@ -327,8 +342,26 @@ ul.pagination .active .page-link { background: var(--accent); color: #fff; }
                  margin-right: .6rem; }
 .archives a { color: var(--ink); }
 
+/* Pagefind's component CSS boosts every selector to ID-level specificity
+   (its :is(*, #\\#) prefix) so host styles lose by default; it leaves
+   !important to the host page as the intended override lever. Orange is
+   reserved for the highlighted matches; article titles are set off from
+   the per-section heading hits typographically -- large bold vs small
+   semibold, both in neutral ink. */
 #search { margin: 0 0 3rem; }
-#search mark { background: #ffd9a8; }
+#search mark { color: inherit; border-radius: 2px; padding: 0 .12em;
+               background: #fbd6bc !important;
+               background: color-mix(in srgb, var(--accent) 30%, white) !important; }
+#search .pf-result-title { margin-bottom: .2rem; }
+#search .pf-result-link { font-size: 1.25rem !important;
+                          font-weight: 700 !important;
+                          color: var(--ink) !important; }
+#search .pf-result-excerpt { color: #3a3a3a !important; }
+#search .pf-heading-link { font-size: .92rem !important;
+                           font-weight: 600 !important;
+                           color: var(--ink) !important; }
+#search .pf-heading-excerpt { color: var(--muted) !important;
+                              font-size: .9rem !important; }
 .site-footer { color: var(--muted); font-size: .85rem; padding-top: 1rem;
                padding-bottom: 2.5rem; }
 """

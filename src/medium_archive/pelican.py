@@ -412,7 +412,22 @@ window.addEventListener("load", function () {
   if (!customElements.get("pagefind-input")) {
     document.getElementById("search").textContent =
       "Search index not built yet: run `pagefind --site output` after `pelican`.";
+    return;
   }
+  // shareable searches: mirror the query into ?q=, restore it on load
+  var input = document.querySelector("pagefind-input input");
+  if (!input) return;
+  var q = new URLSearchParams(location.search).get("q");
+  if (q) {
+    input.value = q;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  input.addEventListener("input", function () {
+    var url = new URL(location);
+    if (input.value) url.searchParams.set("q", input.value);
+    else url.searchParams.delete("q");
+    history.replaceState(null, "", url);
+  });
 });
 </script>
 {% endblock %}
