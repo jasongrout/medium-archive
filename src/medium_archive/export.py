@@ -57,17 +57,24 @@ def export_body(soup):
 
 def iter_export_files(path: Path):
     """Yield (name, text) for post HTML files in an export zip, an unzipped
-    export directory, or a directory of post files."""
+    export directory, or a directory of post files. A zip may hold the full
+    export or just the posts: a full export keeps its post files under
+    posts/, so when no entry lives there, every HTML file in the zip is
+    treated as a post file (a zip of the posts folder's contents, or of a
+    renamed copy of it)."""
     if path.is_dir():
         posts = path / "posts" if (path / "posts").is_dir() else path
         for p in sorted(posts.glob("*.html")):
             yield p.name, p.read_text(encoding="utf-8", errors="replace")
     else:
         with zipfile.ZipFile(path) as zf:
-            for n in sorted(zf.namelist()):
-                p = Path(n)
-                if p.suffix == ".html" and p.parent.name == "posts":
-                    yield p.name, zf.read(n).decode("utf-8", errors="replace")
+            names = [n for n in zf.namelist()
+                     if Path(n).suffix == ".html"
+                     and "__MACOSX" not in Path(n).parts
+                     and not Path(n).name.startswith("._")]
+            posts = [n for n in names if Path(n).parent.name == "posts"] or names
+            for n in sorted(posts):
+                yield Path(n).name, zf.read(n).decode("utf-8", errors="replace")
 
 
 def post_id(meta: dict, filename: str) -> str | None:
