@@ -18,27 +18,33 @@ Last full validation, all four against all 333 posts:
   in-page anchors that never survived the original Medium conversion
   (old footnote anchors, also dead in `posts/`) and one h3→h5 heading
   jump published that way in 2015.
-- **hugo** (hugo 0.158.0, Dream theme): site.json targets
-  [Dream](https://github.com/g1eny0ung/hugo-theme-dream) (clone it into
-  `site-hugo/themes/dream`; the exporter prints the command while it is
-  missing — Dream needs Hugo ≥ 0.158). 1131 pages: masonry cards with
-  covers from each post's images (241 webp-encoded), per-post bylines,
-  Dream's built-in search, /posts archives timeline, tag+author pages
-  and feeds, an Authors nav item, the Jupyter avatar (`avatar.png`,
-  cropped from an archived post image), and 1000+ alias redirect stubs
-  for old Medium slug+id, `/p/<id>` and Ghost-era paths. Rendering
-  verified page-by-page in headless Chromium. Note: Dream loads
-  alpine/masonry/fuse from cdn.jsdelivr.net at view time.
+- **hugo** (hugo 0.158.0, built-in card theme): a PyTorch-blog-style
+  card grid — cover-image cards with tag links, excerpt and byline,
+  paginated at 24 — plus tag/author card listings, per-term RSS, alias
+  redirect stubs for old Medium slug+id, `/p/<id>` and Ghost-era
+  paths, and the Jupyter avatar in the header. Images optimized
+  natively: 640×360 cover thumbnails and responsive lazily-loaded webp
+  variants for body images (~2100 processed images, ~2 min build).
+  `pagefind --site public` after `hugo` gives /search/ — a results
+  page with highlighted in-context excerpts and per-section
+  sub-results. All verified in headless Chromium. (site.json can
+  instead target the Dream theme; that support remains.)
+- **pelican, card theme** (pelican 4.12.0): the same card-grid look
+  from the exporter's own Pelican theme — cover cards (640×360 JPEG
+  thumbnails generated at export when Pillow is installed, ~16 KB
+  each), tag/author card listings, chip indexes, archives timeline,
+  site and per-tag/author Atom feeds, lazily-loaded body images
+  (Markdown extension in the generated config), heading ids for search
+  anchors, and the same Pagefind /search/ page (`pagefind --site
+  output`). Verified in headless Chromium.
 - **zola** (zola 0.21.0): 333 pages in ~2 s, taxonomy pages and
   per-term Atom feeds, aliases, and a working search box (built-in
   elasticlunr index). The 53 dead in-page anchors are reported as
   warnings (`link_checker.internal_level = "warn"` in the generated
   config).
-- **pelican** (pelican 4.12.0): 333 articles with Pelican's built-in
-  theme, tag/author pages, site and per-tag/author Atom feeds; only
-  cosmetic empty-image-alt warnings (Medium images rarely carry alt
-  text). Search via Pagefind, redirects via each site's
-  `redirects.csv` (Pelican has no alias mechanism).
+- Pelican has no alias mechanism, so its old-URL redirects live only
+  in `site-pelican/redirects.csv`; the build's only warnings are
+  cosmetic empty-image-alt ones (Medium images rarely carry alt text).
 
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and

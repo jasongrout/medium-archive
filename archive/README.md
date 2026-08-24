@@ -23,16 +23,20 @@ Medium. It has two layers:
   versioned with the archive. `medium-archive hugo`, `zola` and `pelican`
   build the same site for those generators (same page URLs, link
   rewriting, and `site.json`) into `site-hugo/`, `site-zola/` and
-  `site-pelican/` -- hugo/zola add tag+author taxonomy pages, per-term
-  feeds and redirect-stub aliases for old paths, zola a working search
-  box; render with `hugo server`, `zola serve`, or `pelican -l`. The
-  hugo step can target a real theme named in site.json's hugo section
-  (first-class support for Dream, hugo-theme-dream, Hugo >= 0.158:
-  summary-card covers from each post's images, bylines, its search page
-  and archives timeline, a site avatar); clone the theme once into
-  site-hugo/themes/ -- regeneration preserves it. This archive's
-  site.json targets Dream, with `avatar.png` (the Jupyter logo mark,
-  cropped from an archived post image) as the site avatar.
+  `site-pelican/`. hugo and pelican share a self-contained card-grid
+  blog theme -- cover-image cards, tag/author card listings, optimized
+  images (thumbnailed covers; responsive or lazily-loaded body images),
+  and a /search/ page wired to Pagefind (`pagefind --site public|output`
+  after building: full-text search with highlighted in-context
+  excerpts). hugo/zola add per-term feeds and redirect-stub aliases for
+  old paths; zola keeps a list theme with its built-in search box.
+  Render with `hugo server`, `zola serve`, or `pelican -l`. The hugo
+  step can instead target a real theme named in site.json's hugo
+  section (first-class support for Dream, hugo-theme-dream,
+  Hugo >= 0.158); clone the theme once into site-hugo/themes/ --
+  regeneration preserves it. This archive's site.json uses the built-in
+  card theme, with `avatar.png` (the Jupyter logo mark, cropped from an
+  archived post image) in the header.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
@@ -213,6 +217,9 @@ too.
   stay as they are in `posts/` and are reported by `myst build`.
 * Image filenames are `<NNN>-<original basename>`; the same asset served
   from `miro.medium.com` and `cdn-images-1.medium.com` is stored once.
+  An image fetched from an extensionless URL is stored as `.bin` in
+  `raw/`; its copies in `posts/` (and the sites) carry the extension its
+  bytes call for.
 
 ## Regenerating
 
