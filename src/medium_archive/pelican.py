@@ -6,9 +6,13 @@ pelican markdown`).
 
 Each post becomes content/posts/<stem>/index.md with its images beside
 it; image references are rewritten to Pelican's `{attach}` form so the
-files publish next to the article at /posts/<stem>/, and body images
-load lazily (a small Markdown extension embedded in the generated
-config). Metadata uses Pelican's `Key: value` header format; tags and
+files publish next to the article at /posts/<stem>/. Body images load
+lazily (a small Markdown extension embedded in the generated config)
+and are served responsively: after each build the embedded plugin
+encodes webp variants of every still body image at the same widths as
+the hugo theme's render hook (480/736/1104, never upscaled,
+mtime-cached) and rewrites the article's img tags with srcset/sizes
+and real width/height. Metadata uses Pelican's `Key: value` header format; tags and
 authors are first-class in Pelican, so tag/author listing pages and
 Atom feeds (site-wide and per tag/author) come out of the box.
 
@@ -95,8 +99,9 @@ MARKDOWN = {{
 """
 
 # Appended to the config verbatim (not .format()ed): a plugin that gives
-# Pelican the redirect stubs Hugo and Zola render for aliases.
-REDIRECT_PLUGIN = '''
+# Pelican the redirect stubs Hugo and Zola render for aliases, and the
+# responsive body images the hugo theme's render hook produces.
+SITE_PLUGIN = '''
 
 STUB = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
@@ -132,14 +137,106 @@ def _write_redirect_stubs(pelican_obj):
     print(f"redirect stubs: {written} written from redirects.csv")
 
 
-class _RedirectStubs:
+# Responsive body images, like the hugo exporter's render hook: webp
+# variants at these widths (never upscaled), advertised via srcset with
+# this sizes hint, plus real width/height so the layout cannot shift.
+VARIANT_WIDTHS = (480, 736, 1104)
+SIZES_ATTR = "(max-width: 800px) 100vw, 736px"
+IMG_TAG_RE = None   # compiled on first use
+ARTICLE_IMG = r"/?posts/[^/]+/images/[^/]+\\.(?:png|jpe?g)"
+
+
+def _optimize_article_images(pelican_obj):
+    # Rewrite each article's still body images (the constrained pattern
+    # this exporter itself emits; gif/svg/webp pass through) to lazily
+    # loaded responsive variants. Variants are cached by mtime, so only
+    # new or changed images are re-encoded on later builds.
+    try:
+        from PIL import Image
+    except ImportError:
+        print("pillow not installed: body images keep their full-size "
+              "originals (pip install pillow and rebuild)")
+        return
+    import glob
+    import os
+    import re
+    tag_re = re.compile(r"<img\\b[^>]*>")
+    attr_re = re.compile(r\'([-\\w]+)="([^"]*)"\')
+    path_re = re.compile(ARTICLE_IMG + "$", re.I)
+    stats = {"variants": 0, "pages": 0}
+
+    here = os.path.dirname(os.path.abspath(__file__))
+
+    def rewrite(match):
+        tag = match.group(0)
+        attrs = dict(attr_re.findall(tag))
+        src = attrs.get("src", "")
+        path = src[len(SITEURL):] if SITEURL and src.startswith(SITEURL) else src
+        if "srcset" in attrs or not path_re.fullmatch(path):
+            return tag
+        parts = path.lstrip("/").split("/")
+        local = os.path.join(pelican_obj.output_path, *parts)
+        # encode from (and cache against) the content-side original:
+        # Pelican freshens the output copy's mtime on every build, which
+        # would defeat the cache
+        source = os.path.join(here, PATH, *parts)
+        if not os.path.exists(source):
+            source = local
+        try:
+            with Image.open(source) as im:
+                width, height = im.size
+                im.load()
+                if im.mode == "P":
+                    im = im.convert("RGBA")
+                elif im.mode not in ("RGB", "RGBA"):
+                    im = im.convert("RGB")
+                srcset = []
+                for vw in VARIANT_WIDTHS:
+                    if width < vw:
+                        continue
+                    variant = os.path.splitext(local)[0] + "-%d.webp" % vw
+                    if (not os.path.exists(variant) or
+                            os.path.getmtime(variant) < os.path.getmtime(source)):
+                        vh = max(1, round(height * vw / width))
+                        im.resize((vw, vh), Image.Resampling.LANCZOS).save(
+                            variant, "WEBP", quality=75)
+                        stats["variants"] += 1
+                    srcset.append("%s-%d.webp %dw"
+                                  % (os.path.splitext(src)[0], vw, vw))
+        except OSError:
+            return tag
+        extra = ""
+        if "width" not in attrs and "height" not in attrs:
+            extra += \' width="%d" height="%d"\' % (width, height)
+        if srcset:
+            extra += \' srcset="%s" sizes="%s"\' % (", ".join(srcset), SIZES_ATTR)
+        if not extra:
+            return tag
+        end = "/>" if tag.endswith("/>") else ">"
+        return tag[:-len(end)] + extra + end
+
+    for page in glob.glob(os.path.join(pelican_obj.output_path,
+                                       "posts", "*", "index.html")):
+        with open(page, encoding="utf-8") as fh:
+            html = fh.read()
+        rewritten = tag_re.sub(rewrite, html)
+        if rewritten != html:
+            with open(page, "w", encoding="utf-8") as fh:
+                fh.write(rewritten)
+            stats["pages"] += 1
+    print("responsive images: %(variants)d variants encoded, "
+          "%(pages)d pages rewritten" % stats)
+
+
+class _SitePlugins:
     @staticmethod
     def register():
         from pelican import signals
+        signals.finalized.connect(_optimize_article_images)
         signals.finalized.connect(_write_redirect_stubs)
 
 
-PLUGINS = [_RedirectStubs]
+PLUGINS = [_SitePlugins]
 '''
 
 BASE = """\
@@ -392,7 +489,7 @@ def build_site(out):
                                ensure_ascii=False),
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
         avatar=json.dumps(avatar_setting),
-    ) + REDIRECT_PLUGIN, encoding="utf-8")
+    ) + SITE_PLUGIN, encoding="utf-8")
 
     from .hugo import CSS as CARD_CSS      # hugo and pelican share the look
     for rel, text in {"theme/templates/base.html": BASE,

@@ -93,9 +93,22 @@ clean `lint` run, and the offline test suite):
   config, with heading ids enabled so search results anchor to
   sections. Pelican gets redirect-stub parity too: a plugin embedded
   in its generated config renders the exported redirects.csv into
-  meta-refresh stub pages after each build (676 on the reference
-  archive, matching Hugo's alias count), since Pelican has no aliases
-  feature of its own. Covers are chosen by sniffing dimensions from image
+  meta-refresh stub pages after each build (matching Hugo's alias
+  count row-for-row), since Pelican has no aliases feature of its own.
+  The same embedded plugin brings body-image parity with Hugo's render
+  hook: after each build it rewrites every still body image to
+  lazily-loaded webp srcset variants (480/736/1104, never upscaled,
+  real width/height, same sizes hint), encoding from and mtime-caching
+  against the content-side originals — Pelican freshens output copies
+  every build, which would defeat a cache keyed on them. On the
+  reference archive: 1854 variants on the first build (~2.5 min, the
+  same codec cost as Hugo's first build), 0 re-encoded and ~20 s on
+  rebuilds. Chosen over the pelican-image-process plugin after reading
+  its source: that plugin only processes class-annotated images (the
+  annotation would have to come from this exporter anyway), flattens
+  animated gifs, emits fixed-name srcset descriptors regardless of
+  actual image size, and adds bs4+lxml (AGPL) to the site's build
+  requirements. Covers are chosen by sniffing dimensions from image
   headers (no image library needed for that path). Relatedly,
   `convert` now renames images fetched from extensionless URLs
   (stored as `.bin` in raw/) to the extension their bytes call for, so

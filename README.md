@@ -75,11 +75,14 @@ It works in independent steps:
   wired to [Pagefind](https://pagefind.app) — run `pagefind --site
   public|output` after building for full-text search served as a results
   page with highlighted, in-context excerpts and per-section
-  sub-results. Images are optimized: Hugo thumbnails covers and emits
-  responsive, lazily-loaded webp variants for body images natively;
-  Pelican gets 640×360 cover thumbnails at export time (`pip install
-  pillow`, or the `covers` extra) and lazily-loaded body images via a
-  Markdown extension embedded in the generated config. All three render
+  sub-results. Images are optimized the same way on both: 640×360
+  cover thumbnails, and responsive, lazily-loaded webp variants
+  (480/736/1104 px `srcset`, never upscaled, with real width/height)
+  for still body images — Hugo natively through its image pipeline
+  and a render hook, Pelican through Pillow (`pip install pillow`, or
+  the `covers` extra): covers at export time, body variants encoded
+  after each build by a plugin embedded in the generated config,
+  mtime-cached so rebuilds only touch changed images. All three render
   every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
   redirect stub that works on any static host — `hugo` and `zola`
   through their `aliases` front matter, `pelican` through a small
