@@ -235,6 +235,23 @@ def build_site(out):
     return site
 
 
+CSS = """\
+body { max-width: 46rem; margin: 0 auto; padding: 0 1rem 4rem;
+       font: 1.05rem/1.6 system-ui, sans-serif; color: #222; }
+header nav { padding: 1rem 0; border-bottom: 1px solid #ddd; }
+header nav a { margin-right: 1rem; color: #555; text-decoration: none; }
+header nav a.site { font-weight: 700; color: #222; }
+a { color: #0a67a3; }
+img { max-width: 100%; height: auto; }
+pre { overflow-x: auto; padding: .8rem; background: #f6f6f6; }
+code { background: #f6f6f6; }
+blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid #ddd; color: #555; }
+.post-list { list-style: none; padding: 0; }
+.post-list time, .meta time { color: #777; font-variant-numeric: tabular-nums; }
+.meta, .tags { color: #777; }
+figcaption, em img + em { color: #777; }
+"""
+
 SEARCH_CSS = """\
 .search-box { position: relative; float: right; }
 .search-box input { font: inherit; padding: .1rem .4rem; }
@@ -247,7 +264,6 @@ SEARCH_CSS = """\
 
 
 def _css() -> str:
-    from .hugo import CSS      # the minimal themes share one stylesheet
     return CSS + SEARCH_CSS
 
 

@@ -77,6 +77,27 @@ clean `lint` run, and the offline test suite):
   relies on its built-in theme, with colocated images rewritten to
   `{attach}` links. Each validated with a real generator build over
   the full archive (hugo 0.152.2, zola 0.21.0, pelican 4.12.0).
+- **Card-grid blog theme for hugo and pelican, with Pagefind search
+  and image optimization** — both exporters now ship the same
+  self-contained card theme (in the vein of pytorch.org/blog):
+  paginated cover-card home, tag/author card listings, chip indexes,
+  and a /search/ page wired to Pagefind, which serves full-text search
+  as a results page with highlighted in-context excerpts and
+  per-section sub-results (`pagefind --site public|output` after
+  building). Hugo optimizes images natively — 640×360 cover thumbnails
+  via `.Fill`, responsive lazily-loaded webp variants for body images
+  via a render hook (gif/svg/non-image resources pass through) —
+  while pelican generates 640×360 JPEG cover thumbnails at export time
+  when Pillow is installed (the `covers` extra) and lazy-loads body
+  images through a Markdown extension embedded in its generated
+  config, with heading ids enabled so search results anchor to
+  sections. Covers are chosen by sniffing dimensions from image
+  headers (no image library needed for that path). Relatedly,
+  `convert` now renames images fetched from extensionless URLs
+  (stored as `.bin` in raw/) to the extension their bytes call for, so
+  every derived layer gets typed image names — 103 such files in the
+  reference archive. Both sites validated end-to-end in headless
+  Chromium, including search-with-highlights.
 - **Hugo theme support (Dream)** — site.json's `hugo` section can name
   a real theme (`theme`, `theme_repo`, optional `avatar` and `params`);
   the exporter then emits that theme's config instead of its own

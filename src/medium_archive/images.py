@@ -91,3 +91,23 @@ def collect_image_urls(page_html: str, feed_item: dict | None) -> list:
             if src and not is_tracking_pixel(src) and src not in urls:
                 urls.append(src)
     return urls
+
+
+def sniff_image_ext(path) -> str | None:
+    """The extension the file's magic bytes call for -- for images
+    fetched from an extensionless URL and stored as .bin, so the derived
+    layers can carry a usable name. None if unrecognized."""
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(12)
+    except OSError:
+        return None
+    if head[:8] == b"\x89PNG\r\n\x1a\n":
+        return ".png"
+    if head[:3] == b"GIF":
+        return ".gif"
+    if head[:2] == b"\xff\xd8":
+        return ".jpg"
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        return ".webp"
+    return None

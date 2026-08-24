@@ -20,7 +20,7 @@ from .dates import parse_date
 from .export import export_body, parse_export
 from .fetch import archive_base, read_index
 from .fixup import load_fixups, read_raw
-from .images import image_source
+from .images import image_source, sniff_image_ext
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json)
@@ -78,9 +78,15 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path, out_dir: Path | N
             continue
         fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
         if fname and (out_dir is None or (raw / "images" / fname).exists()):
+            src_file = raw / "images" / fname
+            # an image fetched from an extensionless URL was stored as
+            # .bin; the derived copy gets the extension its bytes call for
+            if fname.endswith(".bin") and src_file.exists():
+                fname = fname[:-len(".bin")] + (sniff_image_ext(src_file)
+                                                or ".bin")
             if out_dir is not None:
                 (out_dir / "images").mkdir(exist_ok=True)
-                shutil.copy2(raw / "images" / fname, out_dir / "images" / fname)
+                shutil.copy2(src_file, out_dir / "images" / fname)
             local = f"images/{fname}"
             used_images.append(local)
         else:

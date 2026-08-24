@@ -11,11 +11,15 @@ dependencies = [
     "lxml",
 ]
 
+[project.optional-dependencies]
+# card-cover thumbnails in the pelican exporter
+covers = ["pillow"]
+
 [project.scripts]
 medium-archive = "medium_archive.cli:main"
 
 [dependency-groups]
-dev = ["pytest"]
+dev = ["pytest", "pillow"]
 
 [build-system]
 requires = ["hatchling"]

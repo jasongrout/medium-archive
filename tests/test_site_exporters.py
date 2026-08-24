@@ -135,6 +135,10 @@ def test_zola_site(archive):
 
 
 def test_pelican_site(archive):
+    (archive / "logo.png").write_bytes(b"IMG")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["avatar"] = "logo.png"
+    (archive / "site.json").write_text(json.dumps(cfg))
     site = pelican.build_site(archive)
     text = (site / "content/posts/second-post/index.md").read_text()
     head = text.split("\n\n", 1)[0]
@@ -142,12 +146,22 @@ def test_pelican_site(archive):
     assert "Date: 2021-03-01 10:00" in head
     assert "Author: Ada Lovelace" in head
     assert "Tags: example" in head and "Slug: second-post" in head
+    assert "Cover: images/" in head          # summary-card cover
     # colocated images become {attach} links -- but not inside fences
     assert "]({attach}images/001-pic.png)" in text
     assert "![fenced](images/lit.png)" in text
     config = (site / "pelicanconf.py").read_text()
     assert 'SITENAME = "Example Blog"' in config
     assert 'ARTICLE_URL = "posts/{slug}/"' in config
+    assert 'THEME = "theme"' in config
+    assert '"search.html": "search/index.html"' in config
+    assert "_LazyImages" in config           # body images load lazily
+    assert 'AVATAR = "theme/img/avatar.png"' in config
+    assert (site / "theme/static/img/avatar.png").read_bytes() == b"IMG"
+    for tpl in ("base", "index", "article", "tag", "tags", "author",
+                "authors", "archives", "search", "macros", "pagination"):
+        assert (site / f"theme/templates/{tpl}.html").exists(), tpl
+    assert "card-grid" in (site / "theme/static/css/style.css").read_text()
     assert (site / "redirects.csv").exists()
 
 

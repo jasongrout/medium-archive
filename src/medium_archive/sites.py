@@ -17,12 +17,19 @@ import json
 import os
 import re
 import shutil
+import struct
 import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 from .lint import split_post
 from .urls import medium_id
+
+# Covers above this are skipped in favor of the post's next image: themes
+# and exporters thumbnail or encode each cover, and Medium archives carry
+# the odd 25-megapixel screenshot, which is slow to process (or, past an
+# encoder's memory, fails the build).
+MAX_COVER_PIXELS = 12_000_000
 
 P_PATH_RE = re.compile(r"^/p/([0-9a-f]{8,12})$")   # Medium's short post URL
 LINK_RE = re.compile(r"\]\((https?://[^)\s]+)\)")  # inline [text](url)
@@ -112,6 +119,45 @@ def rewrite_body(markdown: str, target_for, escape=None) -> str:
                 line = escape(line)
         out.append(line)
     return "\n".join(out)
+
+
+def image_size(path):
+    """(width, height) read from a PNG/GIF/JPEG header, or None."""
+    with open(path, "rb") as fh:
+        head = fh.read(24)
+        if head[:8] == b"\x89PNG\r\n\x1a\n":
+            return struct.unpack(">II", head[16:24])
+        if head[:3] == b"GIF":
+            return struct.unpack("<HH", head[6:10])
+        if head[:2] == b"\xff\xd8":              # JPEG: find an SOF marker
+            fh.seek(2)
+            while True:
+                marker = fh.read(2)
+                if len(marker) < 2 or marker[0] != 0xFF:
+                    return None
+                length = struct.unpack(">H", fh.read(2))[0]
+                if 0xC0 <= marker[1] <= 0xCF and marker[1] not in (0xC4, 0xC8, 0xCC):
+                    h, w = struct.unpack(">HH", fh.read(5)[1:])
+                    return w, h
+                fh.seek(length - 2, 1)
+    return None
+
+
+def pick_cover(post: dict, post_dir) -> str | None:
+    """The post's first still image of sane size, for its summary card:
+    an animated gif is busy in a card grid (and costs an animated encode
+    per build), an enormous still is slow or worse (see
+    MAX_COVER_PIXELS); an unreadable one is left to the generator."""
+    for image in post.get("images", ()):
+        if image.lower().endswith(".gif"):
+            continue
+        try:
+            size = image_size(post_dir / image)
+        except OSError:
+            continue
+        if size is None or size[0] * size[1] <= MAX_COVER_PIXELS:
+            return image
+    return None
 
 
 def link_or_copy(src: Path, dst: Path):

@@ -64,19 +64,28 @@ It works in independent steps:
   those generators, into `<out>/site-hugo/`, `<out>/site-zola/` and
   `<out>/site-pelican/` — same page URLs (`/posts/<slug>/`), same link
   rewriting, same `site.json`, and a `redirects.csv` in each site — so
-  the generators can be compared on identical content. Each plays to its
-  engine's strengths: `hugo` and `zola` get tag *and* author taxonomy
-  pages with per-term RSS/Atom feeds, plus every old inbound path as an
-  `aliases` entry, which renders into static redirect stubs that work on
-  any host; `zola` additionally wires the generator's built-in full-text
-  search index to a search box, so search works with no extra tooling;
-  `pelican` uses Pelican's built-in theme, tag/author pages and feeds
-  with nothing generated but content and a config. `hugo` and `zola`
-  ship a small self-contained theme (a few templates and one
-  stylesheet) that any real theme can replace without touching
-  `content/`. Render with `hugo server`, `zola serve`, or `pelican -l`
-  respectively; for search on Hugo or Pelican, run
-  [Pagefind](https://pagefind.app) over the build output.
+  the generators can be compared on identical content. `hugo` and
+  `pelican` ship the same self-contained card-grid blog theme (in the
+  vein of pytorch.org/blog): a paginated home of cover-image cards —
+  each post's first still image of sane size, chosen by header-sniffing
+  dimensions — tag links, excerpt and byline per card; article pages;
+  tag/author card listings with chip indexes; and a `/search/` page
+  wired to [Pagefind](https://pagefind.app) — run `pagefind --site
+  public|output` after building for full-text search served as a results
+  page with highlighted, in-context excerpts and per-section
+  sub-results. Images are optimized: Hugo thumbnails covers and emits
+  responsive, lazily-loaded webp variants for body images natively;
+  Pelican gets 640×360 cover thumbnails at export time (`pip install
+  pillow`, or the `covers` extra) and lazily-loaded body images via a
+  Markdown extension embedded in the generated config. `hugo` and
+  `zola` additionally render every old inbound path as an `aliases`
+  redirect stub that works on any static host, and both have tag *and*
+  author taxonomy pages with per-term RSS/Atom feeds (`pelican`'s come
+  from Pelican's own tag/author machinery). `zola` keeps a smaller
+  list-style theme with its generator's built-in search index wired to
+  a search box. Any of the generated themes can be replaced by a real
+  one without touching `content/`. Render with `hugo server`,
+  `zola serve`, or `pelican -l` respectively.
 
   The `hugo` step can also target a real theme, named in `site.json`:
 
