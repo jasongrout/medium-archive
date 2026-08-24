@@ -366,9 +366,12 @@ ARCHIVES = """\
 {% block title %}Archives · {{ SITENAME }}{% endblock %}
 {% block content %}
 <h1 class="page-title">Archives</h1>
+{% for year, year_articles in dates | groupby("date.year") | reverse %}
+<h2>{{ year }}</h2>
 <ul class="archives">
-{% for article in dates %}<li><time>{{ article.date.strftime("%Y-%m-%d") }}</time> <a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></li>
+{% for article in year_articles %}<li><time>{{ article.date.strftime("%Y-%m-%d") }}</time> <a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></li>
 {% endfor %}</ul>
+{% endfor %}
 {% endblock %}
 """
 
@@ -392,13 +395,6 @@ window.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 {% endblock %}
-"""
-
-ARCHIVES_CSS = """\
-.archives { list-style: none; padding: 0; margin: 1rem 0 3rem; }
-.archives time { color: var(--muted); font-variant-numeric: tabular-nums;
-                 margin-right: .6rem; }
-.archives a { color: var(--ink); }
 """
 
 IMAGE_RE = re.compile(r"\]\((images/[^)\s]+)\)")
@@ -505,7 +501,7 @@ def build_site(out):
                       "theme/templates/authors.html": AUTHORS,
                       "theme/templates/archives.html": ARCHIVES,
                       "theme/templates/search.html": SEARCH,
-                      "theme/static/css/style.css": CARD_CSS + ARCHIVES_CSS}.items():
+                      "theme/static/css/style.css": CARD_CSS}.items():
         path = site / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")

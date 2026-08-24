@@ -82,6 +82,7 @@ BASEOF = """\
 <a href="{{ "/" | relURL }}">Blog</a>
 <a href="{{ "/tags/" | relURL }}">Tags</a>
 <a href="{{ "/authors/" | relURL }}">Authors</a>
+<a href="{{ "/archives/" | relURL }}">Archives</a>
 <a href="{{ "/search/" | relURL }}">Search</a>
 <a href="{{ "/index.xml" | relURL }}">RSS</a>
 </nav>
@@ -158,6 +159,18 @@ TERMS = """\
 <p class="term-list">
 {{ range .Data.Terms.Alphabetical }}<a class="chip" href="{{ .Page.RelPermalink }}">{{ .Page.Title }} <span>{{ .Count }}</span></a>
 {{ end }}</p>
+{{ end }}
+"""
+
+ARCHIVES = """\
+{{ define "main" }}
+<h1 class="page-title">{{ .Title }}</h1>
+{{ range (where site.RegularPages "Type" "posts").GroupByDate "2006" }}
+<h2>{{ .Key }}</h2>
+<ul class="archives">
+{{ range .Pages }}<li><time>{{ .Date.Format "2006-01-02" }}</time> <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+{{ end }}</ul>
+{{ end }}
 {{ end }}
 """
 
@@ -303,6 +316,11 @@ ul.pagination .page-link { display: inline-block; padding: .35rem .8rem;
                            background: var(--card); border-radius: 6px; color: var(--ink); }
 ul.pagination .active .page-link { background: var(--accent); color: #fff; }
 
+.archives { list-style: none; padding: 0; margin: 1rem 0 2rem; }
+.archives time { color: var(--muted); font-variant-numeric: tabular-nums;
+                 margin-right: .6rem; }
+.archives a { color: var(--ink); }
+
 #search { margin: 0 0 3rem; }
 #search mark { background: #ffd9a8; }
 .site-footer { color: var(--muted); font-size: .85rem; padding-top: 1rem;
@@ -317,6 +335,7 @@ TEMPLATES = {
     "layouts/_default/list.html": LIST,
     "layouts/_default/taxonomy.html": LIST,
     "layouts/_default/terms.html": TERMS,
+    "layouts/_default/archives.html": ARCHIVES,
     "layouts/_default/search.html": SEARCH,
     "layouts/_default/_markup/render-image.html": RENDER_IMAGE,
     "static/css/style.css": CSS,
@@ -403,10 +422,14 @@ def build_site(out):
         (site / "content" / "search" / "_index.md").write_text("{}\n",
                                                                encoding="utf-8")
     elif not theme:
-        # the built-in theme's Pagefind search page (see SEARCH)
+        # the built-in theme's Pagefind search page (see SEARCH) and
+        # year-grouped archives timeline
         (site / "content" / "search.md").write_text(
             json.dumps({"title": "Search", "layout": "search",
                         "url": "/search/"}) + "\n", encoding="utf-8")
+        (site / "content" / "archives.md").write_text(
+            json.dumps({"title": "Archives", "layout": "archives",
+                        "url": "/archives/"}) + "\n", encoding="utf-8")
     pages = export_content(
         out, site, manifest, stems,
         lambda url, p: front_matter(url, p,

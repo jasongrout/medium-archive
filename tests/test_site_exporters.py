@@ -74,6 +74,9 @@ def test_hugo_site(archive):
     rss = (site / "layouts/_default/rss.xml").read_text()
     assert "content:encoded" in rss and "srcset" in rss
     assert (site / "layouts/_default/single.html").exists()
+    # a year-grouped archives timeline, like the pelican theme's
+    assert (site / "layouts/_default/archives.html").exists()
+    assert '"layout": "archives"' in (site / "content/archives.md").read_text()
     assert "Welcome." in (site / "content/_index.md").read_text()
     assert (site / "redirects.csv").read_text().count("/posts/first-post/") == 3
 
