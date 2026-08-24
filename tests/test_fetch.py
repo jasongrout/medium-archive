@@ -66,3 +66,65 @@ def test_looks_gone():
     assert not fetchmod.looks_gone('<script type="application/ld+json">{}</script><p>body</p>')
     # ...so even a body mentioning the phrase is not a false positive
     assert not fetchmod.looks_gone('<script type="application/ld+json">{}</script>PAGE NOT FOUND')
+
+
+def gist_page(mid):
+    """A page whose state has a gist embed: an IFRAME media resource
+    with an empty iframeSrc."""
+    state = {
+        f"Post:{mid}": {"id": mid, 'content({"a":1})': {"bodyModel": {
+            "paragraphs": [{"__ref": "Paragraph:p0"}]}}},
+        "Paragraph:p0": {"type": "IFRAME", "text": "", "markups": [],
+                         "iframe": {"mediaResource": {"__ref": "MediaResource:m1"}}},
+        "MediaResource:m1": {"id": "cafe01", "iframeSrc": "", "title": "a.py"},
+    }
+    return "<script>window.__APOLLO_STATE__ = " + json.dumps(state) + "</script>"
+
+
+def media_router(url):
+    if url == fetchmod.MEDIA_URL.format(id="cafe01"):
+        return FakeResp("])}while(1);</x>" + json.dumps(
+            {"payload": {"value": {"gist": {"gistId": "g123"}}}}))
+    if url == fetchmod.GIST_API_URL.format(id="g123"):
+        return FakeResp(json.dumps(
+            {"files": {"a.py": {"language": "Python", "content": "x = 1"}}}))
+    raise AssertionError(f"unexpected fetch: {url}")
+
+
+def test_fetch_media_archives_gist_embeds(tmp_path):
+    mid = "111122223333"
+    session = FakeSession(router=media_router)
+    dest = tmp_path / mid
+    assert fetchmod.fetch_media(session, gist_page(mid), mid, dest, 0) == 2
+    payload = json.loads((dest / "media" / "cafe01.json").read_text())
+    assert payload["payload"]["value"]["gist"]["gistId"] == "g123"
+    gist = json.loads((dest / "media" / "cafe01.gist.json").read_text())
+    assert gist["files"]["a.py"]["content"] == "x = 1"
+    # incremental: a second run touches neither endpoint again
+    assert fetchmod.fetch_media(session, gist_page(mid), mid, dest, 0) == 0
+    assert len(session.calls) == 2
+
+
+def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
+    # the post was archived before embed media existed; a re-run fetches
+    # just the media, without re-fetching the post
+    run_fetch(tmp_path, gone_now=True, monkeypatch=monkeypatch)
+    pid = "111122223333"
+    (tmp_path / "raw" / pid / "page.html").write_text(gist_page(pid))
+
+    monkeypatch.setattr(fetchmod, "discover",
+                        lambda session, base, raw_dir, wayback=True: (
+                            [(GOOD, None, "sitemap")], {}))
+    monkeypatch.setattr(fetchmod, "make_session",
+                        lambda: FakeSession(router=media_router))
+
+    def fail_fetch_post(*a, **kw):
+        raise AssertionError("archived post must not be re-fetched")
+
+    monkeypatch.setattr(fetchmod, "fetch_post", fail_fetch_post)
+    fetchmod.cmd_fetch(SimpleNamespace(
+        out=tmp_path, base=BASE, urls=None, no_wayback=False, start=None,
+        end=None, oldest_first=False, limit=0, existing=None, force=False,
+        delay=0, no_images=True))
+    assert (tmp_path / "raw" / pid / "media" / "cafe01.json").exists()
+    assert (tmp_path / "raw" / pid / "media" / "cafe01.gist.json").exists()

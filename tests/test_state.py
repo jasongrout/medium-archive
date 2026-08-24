@@ -199,3 +199,86 @@ def test_apollo_state_picks_the_blob_with_paragraphs():
             + json.dumps(full) + "</script>")
     state = apollo_post_state(html, MID)
     assert any(k.startswith("Paragraph:") for k in state)
+
+
+def test_code_fence_language_from_metadata():
+    md = md_of_state(make_state([
+        para(0, "PRE", "x = 1",
+             codeBlockMetadata={"mode": "EXPLICIT", "lang": "python"}),
+        para(1, "PRE", "y = 2",
+             codeBlockMetadata={"mode": "DISABLED", "lang": "python"}),
+        para(2, "PRE", "z = 3"),
+    ]))
+    assert "```python\nx = 1\n```" in md
+    # DISABLED means the author turned highlighting off; no metadata at
+    # all (older posts) is a bare fence too
+    assert "```\ny = 2\n```" in md
+    assert "```\nz = 3\n```" in md
+
+
+def test_mention_markup_resolves_to_profile():
+    # a user mention carries no href, only the userId; the state's User
+    # entry names the profile
+    p = para(0, "P", "by Ann Author today")
+    p["markups"] = [{"type": "A", "start": 3, "end": 13, "href": None,
+                     "anchorType": "USER", "userId": "u1"}]
+    md = md_of_state(make_state([p]))
+    assert md == "by [Ann Author](https://medium.com/@ann) today\n"
+
+
+def test_unresolvable_mention_stays_plain_text():
+    p = para(0, "P", "by Ann Author today")
+    p["markups"] = [{"type": "A", "start": 3, "end": 13, "href": None,
+                     "anchorType": "USER", "userId": "nobody"}]
+    md = md_of_state(make_state([p]))
+    assert md == "by Ann Author today\n"
+
+
+def gist_state(caption=""):
+    """A post with a gist embed: an IFRAME whose media resource has no
+    iframeSrc (gists are the embed type that doesn't go through embedly)."""
+    p = para(0, "IFRAME", caption,
+             iframe={"mediaResource": {"__ref": "MediaResource:m1"}})
+    state = make_state([p, para(1, "P", "After.")])
+    state["MediaResource:m1"] = {"id": "abc123", "iframeSrc": "",
+                                 "title": "tool.py"}
+    return state
+
+
+def test_gist_embed_inlines_archived_files():
+    media = {"abc123": {"value": {}, "gist": {"files": {
+        "tool.py": {"language": "Python", "content": "print(1)"}}}}}
+    body = state_body(gist_state(), MID, "My Post", media)
+    markdown, _ = to_markdown(body, URL, {}, None)
+    assert "```python\nprint(1)\n```" in markdown
+    assert "missing embed" not in markdown
+
+
+def test_unarchived_gist_embed_gets_placeholder():
+    # never silently dropped: without archived media the embed becomes a
+    # visible placeholder that lint flags
+    markdown, _ = to_markdown(state_body(gist_state(), MID, "My Post"),
+                              URL, {}, None)
+    assert "[missing embed: tool.py]" in markdown
+    assert "After." in markdown
+
+
+def test_media_payload_can_name_the_embed_target():
+    # a non-gist media resource: the archived payload's own iframeSrc
+    media = {"abc123": {"value": {"iframeSrc": "https://example.com/embed"}}}
+    body = state_body(gist_state(), MID, "My Post", media)
+    markdown, _ = to_markdown(body, URL, {}, None)
+    assert "[embed: https://example.com/embed]" in markdown
+
+
+def test_convert_post_inlines_gist_from_media(tmp_path):
+    raw = tmp_path / MID
+    (raw / "media").mkdir(parents=True)
+    (raw / "page.html").write_text(shell_html(gist_state()))
+    (raw / "media" / "abc123.json").write_text(json.dumps(
+        {"payload": {"value": {"gist": {"gistId": "g1"}}}}))
+    (raw / "media" / "abc123.gist.json").write_text(json.dumps(
+        {"files": {"tool.py": {"language": "Python", "content": "print(1)"}}}))
+    convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    out = (tmp_path / "posts" / "2019-12-29-my-post" / "index.md").read_text()
+    assert "```python\nprint(1)\n```" in out

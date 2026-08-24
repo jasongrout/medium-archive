@@ -19,7 +19,7 @@ from urllib.parse import unquote_plus
 
 from bs4 import BeautifulSoup
 
-from .convert import to_markdown
+from .convert import load_media, to_markdown
 from .export import export_body, parse_export
 from .fetch import read_index
 from .fixup import load_fixups, read_raw
@@ -28,11 +28,16 @@ from .state import apollo_post_state, state_body
 from .urls import canonical_url
 
 
+FENCE_INFO_RE = re.compile(r"^(`{3,})\S+")
+
+
 def comparable_lines(markdown: str) -> list:
-    """Lines that matter for agreement: blank-line layout is noise, and
-    the page and export sometimes encode the same URL differently
-    (%20 vs + vs a literal space)."""
-    return [unquote_plus(l.rstrip()) for l in markdown.splitlines() if l.strip()]
+    """Lines that matter for agreement: blank-line layout is noise, the
+    page and export sometimes encode the same URL differently (%20 vs +
+    vs a literal space), and only the state conversion knows code-fence
+    languages (codeBlockMetadata), so fence info strings are dropped."""
+    return [unquote_plus(FENCE_INFO_RE.sub(r"\1", l.rstrip()))
+            for l in markdown.splitlines() if l.strip()]
 
 
 # The differences Medium's importer introduces mechanically when a Ghost
@@ -86,6 +91,7 @@ def ghost_comparable_blocks(markdown: str) -> list:
     blocks = []
     for is_fence, segment in _fence_split(markdown):
         if is_fence:
+            segment = FENCE_INFO_RE.sub(r"\1", segment)   # drop the language
             block = " ".join(segment.split()).translate(TYPOGRAPHY)
             if block:
                 blocks.append(block)
@@ -155,21 +161,24 @@ def compare_ghost(args):
         img_map = {}
         if (raw / "images.json").exists():
             img_map = json.loads(read_raw(raw / "images.json", fixups))
+        media = load_media(raw, fixups)
 
         gsoup = BeautifulSoup(read_raw(raw / "ghost.html", fixups),
                               "html.parser")
-        ghost_md, _ = to_markdown(ghost_body(gsoup), url, img_map, raw)
+        ghost_md, _ = to_markdown(ghost_body(gsoup), url, img_map, raw,
+                                  media=media)
         if (raw / "export.html").exists():
             exp = parse_export(read_raw(raw / "export.html", fixups))
             medium_md, medium_src = to_markdown(export_body(exp["soup"]), url,
-                                                img_map, raw)[0], "export"
+                                                img_map, raw,
+                                                media=media)[0], "export"
         elif (raw / "page.html").exists():
             soup = BeautifulSoup(read_raw(raw / "page.html", fixups),
                                  "html.parser")
             info = extract_metadata(soup, url)
             medium_md, medium_src = to_markdown(
                 page_body(soup, info["tags"], info["title"]),
-                info["url"], img_map, raw)[0], "page"
+                info["url"], img_map, raw, media=media)[0], "page"
         else:
             skipped += 1
             continue
@@ -219,6 +228,7 @@ def cmd_compare(args):
         img_map = {}
         if (raw / "images.json").exists():
             img_map = json.loads(read_raw(raw / "images.json", fixups))
+        media = load_media(raw, fixups)
         page_text = read_raw(raw / "page.html", fixups)
         soup = BeautifulSoup(page_text, "html.parser")
         info = extract_metadata(soup, url)
@@ -228,15 +238,16 @@ def cmd_compare(args):
                 no_state += 1
                 continue
             a_md, _ = to_markdown(state_body(state, entry["medium_id"],
-                                             info["title"]),
-                                  info["url"], img_map, raw)
+                                             info["title"], media),
+                                  info["url"], img_map, raw, media=media)
             a_label = "a: state conversion, b: export conversion"
         else:
             a_md, _ = to_markdown(page_body(soup, info["tags"], info["title"]),
-                                  info["url"], img_map, raw)
+                                  info["url"], img_map, raw, media=media)
             a_label = "a: page conversion, b: export conversion"
         exp = parse_export(read_raw(raw / "export.html", fixups))
-        export_md, _ = to_markdown(export_body(exp["soup"]), info["url"], img_map, raw)
+        export_md, _ = to_markdown(export_body(exp["soup"]), info["url"],
+                                   img_map, raw, media=media)
 
         a_lines = comparable_lines(a_md)
         export_lines = comparable_lines(export_md)

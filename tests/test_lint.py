@@ -63,3 +63,19 @@ def test_short_body_and_empty_front_matter_warn(tmp_path):
     errors, warnings = lint_post(d)
     assert not errors
     assert len(warnings) == 3
+
+
+def test_missing_embed_placeholder_is_flagged(tmp_path):
+    d = write_post(tmp_path, "x\n" * 100 + "[missing embed: tool.py]\n")
+    errors, _ = lint_post(d)
+    assert any("embed" in e for e in errors)
+    # markdownify may escape the bracket
+    d = write_post(tmp_path, "x\n" * 100 + "\\[missing embed: tool.py]\n",
+                   name="2020-01-02-escaped")
+    errors, _ = lint_post(d)
+    assert any("embed" in e for e in errors)
+    # inside a code fence it is literal content
+    errors, _ = lint_post(write_post(
+        tmp_path, "x\n" * 100 + "```\n[missing embed: tool.py]\n```\n",
+        name="2020-01-03-fenced"))
+    assert not errors
