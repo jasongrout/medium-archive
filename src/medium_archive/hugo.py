@@ -188,6 +188,11 @@ def build_site(out):
             params["avatar"] = f"img/{dst.name}"
         else:
             print(f"avatar not found, skipped: {src}", file=sys.stderr)
+    # "announcement": a site-wide banner above the header -- an http(s)
+    # URL the theme fetches client-side (empty content hides the banner,
+    # like Sphinx themes' html announcement option), or literal HTML
+    if config.get("announcement"):
+        params["announcement"] = config["announcement"]
     params.update(hugo_config.get("params", {}))
     (site / "hugo.toml").write_text(fill_template(
         "hugo/hugo.toml.tmpl",

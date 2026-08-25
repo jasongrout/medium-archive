@@ -262,12 +262,40 @@ def test_theme_picker_and_dark_scheme(archive):
         assert 'localStorage.getItem("theme")' in stub_source
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
-    for name in ("theme-init", "theme-picker", "term-sort"):
+    for name in ("theme-init", "theme-picker", "term-sort", "announcement"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
-    # without an avatar the config must still be valid Python
-    # (json.dumps(None) would emit a NameError-raising `null`)
-    assert "AVATAR = None" in (pelican_site / "pelicanconf.py").read_text()
+    # without an avatar or announcement the config must still be valid
+    # Python (json.dumps(None) would emit a NameError-raising `null`)
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert "AVATAR = None" in config
+    assert "ANNOUNCEMENT = None" in config
+
+
+def test_announcement_banner(archive):
+    banner_url = "https://jupyter.org/assets/banner.html"
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["announcement"] = banner_url
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert f'announcement = "{banner_url}"' in (hugo_site / "hugo.toml").read_text()
+    assert f'ANNOUNCEMENT = "{banner_url}"' in (pelican_site / "pelicanconf.py").read_text()
+    for base in (hugo_site / "layouts/_default/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        text = base.read_text()
+        # the banner div sits above the header, emitted only when an
+        # announcement is configured; a URL source is fetched
+        # client-side, anything else is the banner HTML itself
+        assert 'class="announcement"' in text and "data-source" in text, base
+        assert text.index('class="announcement"') < text.index("site-header"), base
+        assert "fetch(source)" in text, base
+        # dismissal is remembered keyed by the banner's content, so a
+        # changed announcement clears it and shows again
+        assert 'localStorage.setItem("announcement-dismissed", html)' in text, base
+        assert "dismissed === html" in text, base
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert ".announcement" in css and ".announcement-close" in css
 
 
 def test_term_sort_control(archive):

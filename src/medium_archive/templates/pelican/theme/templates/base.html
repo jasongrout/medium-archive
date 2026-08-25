@@ -10,7 +10,9 @@
 <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
 </head>
 <body>
-<header class="site-header"><div class="wrap bar">
+{% if ANNOUNCEMENT %}<div class="announcement" data-source="{{ ANNOUNCEMENT|e }}" hidden></div>
+<!-- @include shared/announcement.html -->
+{% endif %}<header class="site-header"><div class="wrap bar">
 <a class="site-title" href="{{ SITEURL }}/">{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}</a>
 <nav>
 <a href="{{ SITEURL }}/">Blog</a>
