@@ -7,17 +7,22 @@ None of them touch the network; rendering is the site generator's job.
 
 Common to all of them: page URL slugs chosen from the Medium slug
 (date-prefixed only when several posts share one), links between posts of
-the publication rewritten from Medium URLs to site pages, images
-hard-linked from posts/, a redirect map from every old inbound path to
-its page URL, and site-wide text (title, description, landing-page
-intro, optional base_url) from a hand-written <out>/site.json.
+the publication rewritten from Medium URLs to site pages, images placed
+from posts/ (hard-linked as-is when small enough, resized display copies
+past the caps below -- see ImagePlacer), a redirect map from every old
+inbound path to its page URL, and site-wide text (title, description,
+landing-page intro, optional base_url) from a hand-written
+<out>/site.json.
 """
 
+import hashlib
 import json
 import os
 import re
 import shutil
 import struct
+import subprocess
+import tempfile
 import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -167,6 +172,187 @@ def link_or_copy(src: Path, dst: Path):
         shutil.copy2(src, dst)
 
 
+# Sites carry display copies of the archive's images, not the archival
+# originals -- raw/ and posts/ keep those at full resolution -- so
+# anything past these caps is resized down to them (longest edge) as it
+# is placed into a site. 1600 px keeps stills sharp past the card
+# themes' widest srcset variant (1104 px); animated gifs get no srcset
+# variants, render in the ~736 px body column, and dominate the built
+# sites byte-wise, so they are capped tighter. site.json overrides
+# either cap ("images": {"still_max_edge": N, "animated_max_edge": N},
+# 0 = leave that kind untouched).
+STILL_MAX_EDGE = 1600
+ANIMATED_MAX_EDGE = 1104
+STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
+
+
+class ImagePlacer:
+    """Place a post's images into a site: hard-link each unchanged when
+    it is within the caps (or nothing available can resize it), else
+    place a resized display copy. Copies are built once into
+    <out>/.image-cache/<caps>/ and hard-linked into every site that
+    wants them, so the four exporters (and re-runs) share the work.
+    Stills resize through Pillow, animated gifs through gifsicle; when
+    either is missing the affected images are placed unchanged, with a
+    note in the summary."""
+
+    def __init__(self, out: Path, config: dict):
+        images = config.get("images", {})
+        self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
+        self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
+        self.cache = out / ".image-cache" / f"{self.still_cap}-{self.gif_cap}"
+        self.gifsicle = shutil.which("gifsicle")
+        try:
+            from PIL import Image
+            self.pillow = Image
+        except ImportError:
+            self.pillow = None
+        self.resized = self.unchanged = 0
+        self.bytes_in = self.bytes_out = 0
+        self.notes = []
+
+    def place(self, src: Path, dst: Path):
+        copy = self._display_copy(src)
+        if copy is None:
+            self.unchanged += 1
+            link_or_copy(src, dst)
+        else:
+            self.resized += 1
+            self.bytes_in += src.stat().st_size
+            self.bytes_out += copy.stat().st_size
+            link_or_copy(copy, dst)
+
+    def warm(self, out: Path, manifest: dict):
+        """Build the display copies for every post image up front, in
+        parallel -- gifsicle runs and Pillow encodes hold no GIL, and
+        the big animated gifs take tens of seconds each, so this is
+        where a cold cache earns its build time back. place() then
+        just hard-links the results."""
+        from concurrent.futures import ThreadPoolExecutor
+        paths = [img for p in manifest.values()
+                 if (d := out / p["dir"] / "images").is_dir()
+                 for img in d.iterdir()]
+        with ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as pool:
+            for _ in pool.map(self._display_copy, paths):
+                pass
+
+    def report(self):
+        if self.resized:
+            mb = 1e6
+            print(f"display-copy images: {self.resized} resized "
+                  f"({self.bytes_in / mb:.0f} MB -> "
+                  f"{self.bytes_out / mb:.0f} MB), "
+                  f"{self.unchanged} within caps", file=sys.stderr)
+        for note in self.notes:
+            print(note, file=sys.stderr)
+
+    def _note(self, text: str):
+        if text not in self.notes:
+            self.notes.append(text)
+
+    def _display_copy(self, src: Path):
+        """The cached resized copy for src, built on first sight; None
+        when src should be placed as it is. Cache entries are named by
+        source content hash, so reuse survives regeneration and fresh
+        checkouts (mtimes carry no meaning there) and identical images
+        shared between posts resize once."""
+        ext = src.suffix.lower()
+        if ext == ".gif":
+            cap, build = self.gif_cap, self._resize_gif
+            if cap and not self.gifsicle:
+                self._note("gifsicle not installed: animated gifs keep "
+                           "their full size")
+                return None
+        elif ext in STILL_EXTS:
+            cap, build = self.still_cap, self._resize_still
+            if cap and not self.pillow:
+                self._note("pillow not installed: still images keep "
+                           "their full size")
+                return None
+        else:
+            return None                    # svg and friends pass through
+        size = self._probe(src)
+        if not cap or size is None or max(size) <= cap:
+            return None
+        digest = hashlib.sha256(src.read_bytes()).hexdigest()[:16]
+        cached = self.cache / f"{digest}{ext}"
+        if not cached.exists():
+            self.cache.mkdir(parents=True, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=self.cache, suffix=ext)
+            os.close(fd)
+            if not build(src, tmp, cap):
+                os.remove(tmp)
+                return None
+            if os.path.getsize(tmp) >= src.stat().st_size:
+                os.remove(tmp)             # the resize did not pay off
+                link_or_copy(src, cached)  # cache the verdict all the same
+            else:
+                os.replace(tmp, cached)
+        return cached if cached.stat().st_size < src.stat().st_size else None
+
+    def _probe(self, src: Path):
+        """(width, height), by header sniff or Pillow, else None."""
+        try:
+            size = image_size(src)
+        except OSError:
+            return None
+        if size is None and self.pillow:
+            try:
+                with self.pillow.open(src) as im:
+                    size = im.size
+            except Exception:
+                return None
+        return size
+
+    def _resize_gif(self, src: Path, tmp: str, cap: int) -> bool:
+        # -O2 re-optimizes frames after the resize (2/3 the bytes of a
+        # bare resize on the reference archive); --lossy measured slower
+        # for no further gain, and --no-conserve-memory avoids a slow
+        # low-memory mode that huge gifs otherwise trip.
+        run = subprocess.run(
+            [self.gifsicle, "--no-conserve-memory", "-O2",
+             "--resize-fit", f"{cap}x{cap}", str(src), "-o", tmp],
+            capture_output=True, text=True)
+        if run.returncode or not os.path.getsize(tmp):
+            detail = (run.stderr or "").strip().splitlines()
+            self._note(f"gifsicle failed on {src.name}"
+                       + (f": {detail[-1]}" if detail else "")
+                       + "; placed at full size")
+            return False
+        return True
+
+    def _resize_still(self, src: Path, tmp: str, cap: int) -> bool:
+        Image = self.pillow
+        try:
+            with Image.open(src) as im:
+                if getattr(im, "n_frames", 1) > 1:
+                    return False           # animated: not ours to flatten
+                # Medium archives hold the odd mislabeled file (a PNG
+                # under a .jpeg name); re-encode what the bytes are,
+                # not what the name says -- the filename stays as the
+                # pages reference it, and browsers sniff content anyway.
+                fmt = im.format
+                icc = im.info.get("icc_profile")
+                if im.mode == "P":
+                    im = im.convert(
+                        "RGBA" if "transparency" in im.info else "RGB")
+                im.thumbnail((cap, cap), Image.Resampling.LANCZOS)
+                kwargs = {"icc_profile": icc} if icc else {}
+                if fmt == "JPEG":
+                    kwargs |= {"quality": 85, "optimize": True,
+                               "progressive": True}
+                elif fmt == "WEBP":
+                    kwargs |= {"quality": 85, "method": 4}
+                else:
+                    kwargs |= {"optimize": True}
+                im.save(tmp, format=fmt, **kwargs)
+        except Exception as e:
+            self._note(f"resize failed on {src.name} ({e}); "
+                       "placed at full size")
+            return False
+        return True
+
+
 def by_year(manifest: dict) -> list:
     """[(year, [(url, post), newest first]), newest year first]."""
     posts = sorted(manifest.items(),
@@ -228,13 +414,15 @@ def read_post_body(src: Path):
 
 
 def export_content(out: Path, site: Path, manifest: dict, stems: dict,
-                   front_matter, escape=None) -> int:
+                   front_matter, escape=None, placer=None) -> int:
     """The shared page loop for the /posts/<stem>/ exporters (hugo, zola,
     pelican): one content/posts/<stem>/index.md per post -- front matter
     from front_matter(url, post), body with in-publication links rewritten
-    to /posts/<stem>/ -- plus the post's images beside it. Returns the
-    page count."""
+    to /posts/<stem>/ -- plus the post's images beside it (through
+    placer, when given -- see ImagePlacer). Returns the page count."""
     links = LinkMap(manifest, stems)
+    if placer:
+        placer.warm(out, manifest)
 
     def target_for(url):
         hit = links.page_for(url)
@@ -258,7 +446,10 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
         images = out / p["dir"] / "images"
         if images.is_dir():
             (page_dir / "images").mkdir()
+            place = placer.place if placer else link_or_copy
             for img in sorted(images.iterdir()):
-                link_or_copy(img, page_dir / "images" / img.name)
+                place(img, page_dir / "images" / img.name)
         pages += 1
+    if placer:
+        placer.report()
     return pages

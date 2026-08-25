@@ -195,3 +195,72 @@ def test_build_output_survives_regeneration(archive):
         (site / kept / "index.html").write_text("built")
         module.build_site(archive)
         assert (site / kept / "index.html").read_text() == "built"
+
+
+def make_image_post(tmp_path, still_bytes=None, gif_bytes=None):
+    """An archive whose one post carries real images: a large noisy PNG
+    (resizable), a small PNG (within caps), and junk bytes with a .png
+    name (unreadable; must pass through)."""
+    import os
+
+    from PIL import Image
+
+    manifest = {}
+    images = ["images/big.png", "images/small.png", "images/junk.png"]
+    if gif_bytes:
+        images.append("images/anim.gif")
+    make_post(tmp_path, manifest, "picture-post", "ccc333ccc333",
+              "2022-06-01T10:00:00Z", "![big](images/big.png)\n",
+              images=images)
+    img_dir = tmp_path / "posts/2022-06-01-picture-post/images"
+    img_dir.mkdir()
+
+    def noise(w, h):
+        return Image.frombytes("RGB", (w, h), os.urandom(w * h * 3))
+
+    noise(2000, 1200).save(img_dir / "big.png")
+    noise(200, 100).save(img_dir / "small.png")
+    (img_dir / "junk.png").write_bytes(b"PNG")
+    if gif_bytes:
+        frames = [noise(1600, 1200).convert("P") for _ in range(3)]
+        frames[0].save(img_dir / "anim.gif", save_all=True,
+                       append_images=frames[1:], duration=100, loop=0)
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (tmp_path / "site.json").write_text(json.dumps({"title": "Pics"}))
+    return img_dir
+
+
+def test_images_capped_into_display_copies(tmp_path):
+    from PIL import Image
+
+    src = make_image_post(tmp_path)
+    site = zola.build_site(tmp_path)
+    placed = site / "content/posts/picture-post/images"
+    with Image.open(placed / "big.png") as im:
+        assert max(im.size) == 1600
+    assert (placed / "big.png").stat().st_size < (src / "big.png").stat().st_size
+    # within the cap and unreadable files pass through as hard links
+    assert (placed / "small.png").stat().st_ino == (src / "small.png").stat().st_ino
+    assert (placed / "junk.png").read_bytes() == b"PNG"
+    # the display copy is built once and shared across exporters
+    hugo_site = hugo.build_site(tmp_path)
+    assert (hugo_site / "content/posts/picture-post/images/big.png"
+            ).stat().st_ino == (placed / "big.png").stat().st_ino
+    # caps are configurable, 0 turns one off
+    (tmp_path / "site.json").write_text(json.dumps(
+        {"title": "Pics", "images": {"still_max_edge": 0}}))
+    site = zola.build_site(tmp_path)
+    assert (placed / "big.png").stat().st_ino == (src / "big.png").stat().st_ino
+
+
+@pytest.mark.skipif(not __import__("shutil").which("gifsicle"),
+                    reason="gifsicle not installed")
+def test_animated_gifs_capped_via_gifsicle(tmp_path):
+    from PIL import Image
+
+    src = make_image_post(tmp_path, gif_bytes=True)
+    site = zola.build_site(tmp_path)
+    placed = site / "content/posts/picture-post/images/anim.gif"
+    with Image.open(placed) as im:
+        assert max(im.size) == 1104 and im.n_frames == 3
+    assert placed.stat().st_size < (src / "anim.gif").stat().st_size

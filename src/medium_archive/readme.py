@@ -37,7 +37,15 @@ Medium. It has two layers:
   webp srcset variants for still body images),
   and a /search/ page wired to Pagefind (`pagefind --site public|output`
   after building: full-text search with highlighted in-context
-  excerpts). All three render redirect stubs at every old inbound path
+  excerpts). All four sites carry display copies of the images, not
+  the archival originals: anything past a size cap is resized as it is
+  placed (stills to a 1600 px longest edge via Pillow, animated gifs
+  to 1104 px via gifsicle when installed), built once into
+  `.image-cache/` and hard-linked into every site; `raw/` and `posts/`
+  keep full resolution, and `site.json` tunes or disables the caps
+  (`"images": {{"still_max_edge": N, "animated_max_edge": N}}`,
+  0 = off).
+  All three render redirect stubs at every old inbound path
   (hugo/zola via aliases, pelican via a plugin embedded in its
   generated config) and add per-term feeds; every feed carries the 20
   most recent posts with their full content, like the publication's
@@ -261,6 +269,7 @@ too.
 ## Building the sites
 
 Tools: Hugo extended >= 0.158, `pip install pelican markdown pillow`,
+gifsicle (optional: animated-gif display copies keep full size without it),
 Zola, `npm install -g mystmd pagefind`.
 
 Before deploying, set `base_url` in `site.json` to the site's real

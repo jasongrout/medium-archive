@@ -27,7 +27,7 @@ import re
 import sys
 from pathlib import Path
 
-from .sites import (LinkMap, by_year, clean_site, link_or_copy,
+from .sites import (ImagePlacer, LinkMap, by_year, clean_site,
                     load_site_inputs, page_stems, read_post_body,
                     rewrite_body as _rewrite, write_redirects_csv)
 
@@ -141,6 +141,8 @@ def build_site(out: Path) -> Path:
     clean_site(site, keep=("_build",))
     (site / "posts").mkdir(parents=True)
 
+    placer = ImagePlacer(out, config)
+    placer.warm(out, manifest)
     pages = 0
     for url, p in manifest.items():
         body = read_post_body(out / p["dir"])
@@ -157,9 +159,10 @@ def build_site(out: Path) -> Path:
         if images.is_dir():
             (page_dir / "images").mkdir()
             for img in sorted(images.iterdir()):
-                link_or_copy(img, page_dir / "images" / img.name)
+                placer.place(img, page_dir / "images" / img.name)
         pages += 1
 
+    placer.report()
     write_landing(site, manifest, stems, config)
     write_myst_yml(site, manifest, stems, config)
     write_redirects_csv(site, manifest, stems, lambda stem: f"/{stem}")
