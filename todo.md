@@ -251,8 +251,9 @@ data loss here):
   4000 px is finally scaled. `place()` returns the path it wrote and
   the exporters retarget their pages' `images/<name>` references, so
   a changed format follows through to the markdown; the hugo render
-  hook and pelican plugin skip the variant ladder for png (and now
-  wrap every body image in a link to the file itself). `site.json`
+  hook and pelican plugin skip the variant ladder for png and webp,
+  which also hands click-to-zoom (#26) a full-resolution `src` to open
+  rather than a 1600 px resample. `site.json`
   can keep line art in its own PNG (`"images": {"lossless_line_art":
   false}`), and the cache directory carries a scheme tag so copies
   written by the old scheme are ignored rather than misread.

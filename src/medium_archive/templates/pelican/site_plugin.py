@@ -122,11 +122,10 @@ def _optimize_article_images(pelican_obj):
             extra += ' width="%d" height="%d"' % (width, height)
         if srcset:
             extra += ' srcset="%s" sizes="%s"' % (", ".join(srcset), SIZES_ATTR)
+        if not extra:
+            return tag
         end = "/>" if tag.endswith("/>") else ">"
-        tag = tag[:-len(end)] + extra + end
-        # the file itself is one click away, for a reader who wants the
-        # full resolution of a chart or screenshot the column narrows
-        return '<a class="image-link" href="%s">%s</a>' % (src, tag)
+        return tag[:-len(end)] + extra + end
 
     for page in glob.glob(os.path.join(pelican_obj.output_path,
                                        "posts", "*", "index.html")):

@@ -14,7 +14,7 @@
 {{- end -}}
 {{- end -}}
 {{- end -}}
-<a class="image-link" href="{{ $img.RelPermalink }}"><img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ $alt }}"></a>
+<img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ $alt }}">
 {{- else -}}
 <img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy">
 {{- end -}}

@@ -131,9 +131,9 @@ It works in independent steps:
   for photographic body images: Hugo natively through its image
   pipeline and a render hook, Pelican by a plugin embedded in the
   generated config after each build, mtime-cached so rebuilds only
-  touch changed images; every body image also links to the file
-  itself, so a chart the column narrows is one click from full
-  resolution. All four sites carry display copies of the images, not
+  touch changed images; line art and animated gifs are left out of the
+  ladder, and carry real width/height so click-to-zoom can measure
+  them. All four sites carry display copies of the images, not
   the archival originals. Line art — the charts, screenshots and
   diagrams most of the archive's PNGs are — keeps every pixel at its
   own resolution as lossless webp (~60% smaller than the source PNG,
