@@ -120,14 +120,23 @@ def build_site(out):
     if have_pillow:
         bake_cover_thumbnails(out, site, manifest, stems, covers)
 
+    import shutil
     avatar = config.get("avatar")
     avatar_setting = None
     if avatar and (out / avatar).is_file():
         dst = site / "theme" / "static" / "img" / ("avatar" + (out / avatar).suffix)
         dst.parent.mkdir(parents=True, exist_ok=True)
-        import shutil
         shutil.copy2(out / avatar, dst)
         avatar_setting = f"theme/img/{dst.name}"
+
+    # the tab icon, shipped through the theme's static dir like the avatar
+    favicon = config.get("favicon")
+    favicon_setting = None
+    if favicon and (out / favicon).is_file():
+        dst = site / "theme" / "static" / ("favicon" + (out / favicon).suffix)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(out / favicon, dst)
+        favicon_setting = f"theme/{dst.name}"
 
     (site / "pelicanconf.py").write_text(fill_template(
         "pelican/pelicanconf.py.tmpl",
@@ -137,6 +146,7 @@ def build_site(out):
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
         # json for the string cases; None must render as Python's None
         avatar=json.dumps(avatar_setting) if avatar_setting else "None",
+        favicon=json.dumps(favicon_setting) if favicon_setting else "None",
         # a site-wide banner above the header -- an http(s) URL the theme
         # fetches client-side (empty content hides the banner, like Sphinx
         # themes' html announcement option), or literal HTML

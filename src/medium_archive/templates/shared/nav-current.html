@@ -1,0 +1,15 @@
+<script>
+(function () {
+  var links = document.querySelectorAll(".site-header nav a");
+  var best = null, bestLen = -1;
+  for (var i = 0; i < links.length; i++) {
+    var path = new URL(links[i].href).pathname;
+    if (path.charAt(path.length - 1) !== "/") continue;  // the feed link
+    if (location.pathname.indexOf(path) === 0 && path.length > bestLen) {
+      best = links[i];
+      bestLen = path.length;
+    }
+  }
+  if (best) best.setAttribute("aria-current", "page");
+})();
+</script>

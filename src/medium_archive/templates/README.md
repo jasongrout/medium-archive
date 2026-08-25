@@ -41,6 +41,12 @@ These embed verbatim in both engines' pages, so they must carry no
   the choice persists per browser, like the theme picker's. The wiring
   waits for DOMContentLoaded because the chip list follows the control
   in the page.
+- `nav-current.html` — marks the header nav link whose path is the
+  longest prefix of the current page's with `aria-current="page"`
+  (which `card.css` paints in the accent, like jupyter.org's navbar):
+  the home link catches post and pagination pages, `/tags/` catches
+  every tag page, and so on. The feed link (no trailing slash) never
+  matches.
 - `announcement.html` — the site-wide announcement banner. The base
   templates emit the `.announcement` div (above the header, hidden)
   only when site.json sets `"announcement"`; the script fills it from
@@ -48,13 +54,16 @@ These embed verbatim in both engines' pages, so they must carry no
   many sites can share one live banner file (how Jupyter projects use
   Sphinx's `announcement` option with jupyter.org/assets/banner.html;
   empty content keeps the banner hidden), anything else is the banner
-  HTML itself. Dismissal persists per browser keyed by the banner's
-  content, so a changed announcement shows again.
+  HTML itself. The last fetch's content is cached per browser and
+  rendered synchronously on the next page, so navigating the site
+  doesn't shift the layout when the banner arrives; the live fetch
+  corrects a changed announcement after the fact. Dismissal persists
+  per browser keyed by the banner's content, so a changed announcement
+  shows again.
 - `dark-palette.css` — included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
-  system scheme with no stored choice. `--accent-dark` doubles as the
-  link color, so dark mode lightens it to keep contrast against the
-  dark cards.
+  system scheme with no stored choice. `--accent` doubles as the link
+  color and stays the same in both palettes.
 - `card.css` — the card-grid look, written as both the hugo theme's and
   the pelican theme's stylesheet.
 

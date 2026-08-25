@@ -98,7 +98,10 @@ It works in independent steps:
   each post's first still image of sane size, chosen by header-sniffing
   dimensions — tag links, excerpt and byline per card; article pages;
   tag/author card listings with chip indexes sortable by name or by
-  post count; an optional site-wide announcement banner above the
+  post count; an optional header logo and browser-tab icon
+  (`site.json`'s `"avatar"` and `"favicon"`: archive-relative image
+  paths, copied into the site so it stays self-contained); an optional
+  site-wide announcement banner above the
   header (`site.json`'s `"announcement"`: an http(s) URL fetched
   client-side — the mechanism behind Sphinx's `announcement` theme
   option, so a file like `https://jupyter.org/assets/banner.html` can

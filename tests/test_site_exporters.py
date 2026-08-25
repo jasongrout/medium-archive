@@ -53,6 +53,10 @@ def archive(tmp_path):
 
 
 def test_hugo_site(archive):
+    (archive / "icon.svg").write_bytes(b"SVG")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["favicon"] = "icon.svg"
+    (archive / "site.json").write_text(json.dumps(cfg))
     site = hugo.build_site(archive)
     page = site / "content/posts/second-post/index.md"
     front = json.loads(page.read_text().split("\n\n", 1)[0])
@@ -69,6 +73,10 @@ def test_hugo_site(archive):
     config = (site / "hugo.toml").read_text()
     assert 'baseURL = "https://blog.example.org/"' in config
     assert 'author = "authors"' in config
+    # the tab icon lands at the site root, under its canonical name
+    assert 'favicon = "favicon.svg"' in config
+    assert (site / "static/favicon.svg").read_bytes() == b"SVG"
+    assert 'rel="icon"' in (site / "layouts/_default/baseof.html").read_text()
     # full-content feed, capped: announce new posts, don't ship the archive
     assert "[services.rss]\nlimit = 20" in config
     rss = (site / "layouts/_default/rss.xml").read_text()
@@ -199,8 +207,10 @@ def test_zola_site(archive):
 
 def test_pelican_site(archive):
     (archive / "logo.png").write_bytes(b"IMG")
+    (archive / "icon.svg").write_bytes(b"SVG")
     cfg = json.loads((archive / "site.json").read_text())
     cfg["avatar"] = "logo.png"
+    cfg["favicon"] = "icon.svg"
     (archive / "site.json").write_text(json.dumps(cfg))
     site = pelican.build_site(archive)
     text = (site / "content/posts/second-post/index.md").read_text()
@@ -222,6 +232,9 @@ def test_pelican_site(archive):
     assert "_LazyImages" in config           # body images load lazily
     assert 'AVATAR = "theme/img/avatar.png"' in config
     assert (site / "theme/static/img/avatar.png").read_bytes() == b"IMG"
+    assert 'FAVICON = "theme/favicon.svg"' in config
+    assert (site / "theme/static/favicon.svg").read_bytes() == b"SVG"
+    assert 'rel="icon"' in (site / "theme/templates/base.html").read_text()
     for tpl in ("base", "index", "article", "tag", "tags", "author",
                 "authors", "archives", "search", "macros", "pagination"):
         assert (site / f"theme/templates/{tpl}.html").exists(), tpl
@@ -262,13 +275,15 @@ def test_theme_picker_and_dark_scheme(archive):
         assert 'localStorage.getItem("theme")' in stub_source
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
-    for name in ("theme-init", "theme-picker", "term-sort", "announcement"):
+    for name in ("theme-init", "theme-picker", "term-sort", "announcement",
+                 "nav-current"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
     # Python (json.dumps(None) would emit a NameError-raising `null`)
     config = (pelican_site / "pelicanconf.py").read_text()
     assert "AVATAR = None" in config
+    assert "FAVICON = None" in config
     assert "ANNOUNCEMENT = None" in config
 
 
@@ -293,9 +308,28 @@ def test_announcement_banner(archive):
         # dismissal is remembered keyed by the banner's content, so a
         # changed announcement clears it and shows again
         assert 'localStorage.setItem("announcement-dismissed", html)' in text, base
-        assert "dismissed === html" in text, base
+        assert 'localStorage.getItem("announcement-dismissed") === html' in text, base
+        # the last fetch's content is cached and rendered synchronously,
+        # so navigating the site doesn't shift the layout when the
+        # banner arrives
+        assert 'localStorage.setItem("announcement-cache"' in text, base
+        assert text.index("announcement-cache") < text.index("fetch(source)"), base
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".announcement" in css and ".announcement-close" in css
+
+
+def test_nav_current_highlight(archive):
+    # the nav link whose path prefixes the current page's gets
+    # aria-current, which the stylesheet paints in the accent
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for base in (hugo_site / "layouts/_default/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        text = base.read_text()
+        assert 'setAttribute("aria-current", "page")' in text, base
+        # the script follows the nav it marks
+        assert text.index("</header>") < text.index("aria-current"), base
+    assert 'a[aria-current="page"]' in (hugo_site / "static/css/style.css").read_text()
 
 
 def test_term_sort_control(archive):

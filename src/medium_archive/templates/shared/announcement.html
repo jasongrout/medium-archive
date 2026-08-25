@@ -2,12 +2,20 @@
 (function () {
   var banner = document.querySelector(".announcement");
   var source = banner.getAttribute("data-source");
-  function show(html) {
-    html = html.trim();
-    if (!html) return;
-    var dismissed = null;
-    try { dismissed = localStorage.getItem("announcement-dismissed"); } catch (e) {}
-    if (dismissed === html) return;
+  var shown = null;
+  function dismissed(html) {
+    try { return localStorage.getItem("announcement-dismissed") === html; }
+    catch (e) { return false; }
+  }
+  function render(html) {
+    html = (html || "").trim();
+    if (html === shown) return;
+    if (!html || dismissed(html)) {
+      banner.hidden = true;
+      banner.innerHTML = "";
+      shown = null;
+      return;
+    }
     banner.innerHTML = html;
     var close = document.createElement("button");
     close.type = "button";
@@ -20,12 +28,27 @@
     });
     banner.appendChild(close);
     banner.hidden = false;
+    shown = html;
   }
   if (/^https?:\/\//i.test(source)) {
+    // The last fetch's content renders synchronously (this script runs
+    // before the header is parsed), so navigating the site doesn't jerk
+    // the page when the banner arrives; the live fetch then corrects
+    // the rare case of an announcement that changed since.
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem("announcement-cache")); }
+    catch (e) {}
+    if (cached && cached.src === source) render(cached.html);
     fetch(source).then(function (r) { return r.ok ? r.text() : ""; })
-      .then(show, function () {});
+      .then(function (html) {
+        try {
+          localStorage.setItem("announcement-cache",
+                               JSON.stringify({src: source, html: html}));
+        } catch (e) {}
+        render(html);
+      }, function () {});
   } else {
-    show(source);
+    render(source);
   }
 })();
 </script>

@@ -215,6 +215,20 @@ data loss here):
   the development sandbox could not reach medium.com — so verify the
   first live run's output.
 
+- Link contrast in the card theme: links use `--accent` (#f37626,
+  Jupyter Orange) directly, which is 2.8:1 against the light palette's
+  white cards — below WCAG AA's 4.5:1 for normal-size text, let alone
+  AAA's 7:1 (jupyter.org makes the same trade-off with its orange
+  links; a deliberate choice, revisited and kept in the 2026-08
+  restyle — dark-mode links pass AA at 6.6:1). The text grays are
+  held to AAA: `--muted` was raised in that restyle (#6a6a6a→#525252
+  light, #9b9791→#aeaaa4 dark) so every text token clears 7:1 on both
+  the page background and the cards. If AA (or AAA) links ever
+  matter, reintroduce a link shade token per palette, picked to clear
+  the chosen threshold (#b45110 clears AA in light; #f58d47 clears
+  AAA in dark), rather than darkening `--accent` itself, which also
+  paints the banner and other fills.
+
 Archive-specific follow-ups (posts whose images still need fetching,
 hand-correction candidates) live in each archive's own notes, alongside
 its `fixups/`.

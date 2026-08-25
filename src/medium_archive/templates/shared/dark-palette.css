@@ -1,4 +1,6 @@
-  --accent-dark: #f08b4b; --ink: #e8e6e3; --soft: #c9c6c2; --muted: #9b9791;
+  /* text grays clear WCAG AAA (7:1) on both the page background and
+     the dark cards */
+  --ink: #e8e6e3; --soft: #c9c6c2; --muted: #aeaaa4;
   --bg: #131313; --card: #1e1e1e; --line: #333333; --code-bg: #2a2a2a;
   --mark: #7a4114; --error-bg: #2a1a1a; --error-line: #5c2828;
   --error-ink: #f87171; --error-soft: #ef4444; color-scheme: dark;
