@@ -27,6 +27,7 @@ from .pages import (collapse_br_pairs, extract_metadata, feed_body,
 from .state import (apollo_post_state, gist_code_blocks, state_body,
                     state_metadata)
 from .readme import write_readme
+from .tags import load_tag_map
 from .urls import canonical_url, medium_id, resolve_canonical, slug_of
 
 EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
@@ -238,7 +239,8 @@ def load_media(raw: Path, fixups: dict = None) -> dict:
 
 
 def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
-                 prefer_ghost: bool = False, fixups: dict = None) -> dict:
+                 prefer_ghost: bool = False, fixups: dict = None,
+                 tag_map=None) -> dict:
     soup = None
     state = None
     ghost = page_shell = False
@@ -364,7 +366,11 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         # attached a capture; old inbound links may carry this path too
         "ghost_url": ghost_url if ghost_url != canon else None,
         "description": info["description"],
-        "tags": sorted(set(info["tags"])),
+        # tags.json cleanup applies only here, at output: body extraction
+        # above needs the original tags to recognize the page's tag-link
+        # chrome, and raw/ keeps them untouched
+        "tags": (tag_map.apply(info["tags"]) if tag_map
+                 else sorted(set(info["tags"]))),
         "images": used_images,
         "body_source": body_source,
     }
@@ -408,6 +414,11 @@ def cmd_convert(args):
     if fixups:
         print(f"fixups: patching {len(fixups)} raw file(s) in memory "
               f"from {args.out / 'fixups'}", file=sys.stderr)
+    tag_map = load_tag_map(args.out)
+    if tag_map:
+        print(f"tags: dropping {len(tag_map.drop)} and renaming "
+              f"{len(tag_map.rename)} tag(s) per {tag_map.path}",
+              file=sys.stderr)
     ok = 0
     for n, url in enumerate(targets, 1):
         entry = index.get(url)
@@ -419,7 +430,7 @@ def cmd_convert(args):
         try:
             manifest[url] = convert_post(url, raw, posts_root, args.prefer_page,
                                          getattr(args, "prefer_ghost", False),
-                                         fixups)
+                                         fixups, tag_map)
             ok += 1
         except Exception as e:
             print(f"  FAILED: {e}", file=sys.stderr)
@@ -429,3 +440,11 @@ def cmd_convert(args):
     if not (args.out / "README.md").exists():
         write_readme(args.out, args.base or archive_base(args.out) or "(unknown publication)")
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
+    # A tags.json entry that matched no post is stale config -- fail
+    # loudly, like a fixup that no longer applies. Only a complete run
+    # can tell (--only sees a subset; a failed post's tags go unseen).
+    if tag_map and not args.only and ok == len(targets):
+        unused = tag_map.unused()
+        if unused:
+            sys.exit(f"{tag_map.path}: no post carries: {', '.join(unused)} "
+                     "(remove the stale entries, or fix their spelling)")
