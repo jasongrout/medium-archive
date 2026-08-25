@@ -1,0 +1,69 @@
+<dialog class="zoom-dialog" aria-label="Zoomed image">
+<img alt="">
+<p class="zoom-caption" hidden></p>
+</dialog>
+<script>
+(function () {
+  function init() {
+    var article = document.querySelector(".post");
+    var dialog = document.querySelector(".zoom-dialog");
+    if (!article || !dialog || !dialog.showModal) return;
+    var full = dialog.querySelector("img");
+    var caption = dialog.querySelector(".zoom-caption");
+    var images = Array.prototype.filter.call(
+      article.querySelectorAll("img"), function (img) {
+        return !img.closest("a");
+      });
+    var opened = 0;
+    function source(img) {
+      return parseInt(img.getAttribute("width"), 10) || img.naturalWidth;
+    }
+    function mark(img) {
+      var zoomable = source(img) > img.clientWidth + 4;
+      img.classList.toggle("zoomable", zoomable);
+      if (zoomable) {
+        img.tabIndex = 0;
+        img.setAttribute("role", "button");
+        img.setAttribute("aria-label",
+          (img.alt ? img.alt + ": " : "") + "view full size");
+      } else {
+        img.removeAttribute("tabindex");
+        img.removeAttribute("role");
+        img.removeAttribute("aria-label");
+      }
+    }
+    function zoom(img) {
+      if (!img.classList.contains("zoomable")) return;
+      full.src = img.src;
+      full.alt = img.alt;
+      caption.textContent = img.alt;
+      caption.hidden = !img.alt;
+      opened = window.scrollY;
+      dialog.showModal();
+    }
+    images.forEach(function (img) {
+      mark(img);
+      img.addEventListener("load", function () { mark(img); });
+      img.addEventListener("click", function () { zoom(img); });
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          zoom(img);
+        }
+      });
+    });
+    dialog.addEventListener("click", function () { dialog.close(); });
+    window.addEventListener("scroll", function () {
+      if (dialog.open && Math.abs(window.scrollY - opened) > 4) dialog.close();
+    }, { passive: true });
+    var timer;
+    window.addEventListener("resize", function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { images.forEach(mark); }, 150);
+    });
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>

@@ -20,7 +20,9 @@ The exporter writes its own theme, from the package's templates/pelican/
 and templates/shared/ files -- the card-grid blog shared with
 the hugo step, light and dark palettes and the header's
 light/dark/system picker included: paginated home of cover-image
-cards, article pages, tag/author card listings, chip indexes
+cards, article pages (with click-to-zoom body images: an image whose
+original holds more detail than the column shows opens full size in a
+modal, like Medium's), tag/author card listings, chip indexes
 (sortable by name or by post count), an
 archives timeline, and a /search/ page wired to Pagefind
 (run `pagefind --site output` after `pelican` for full-text search with
