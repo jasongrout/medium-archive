@@ -38,7 +38,9 @@ Medium. It has two layers:
   simpler alternates. hugo and pelican share a self-contained card-grid
   blog theme -- cover-image cards, tag/author card listings, optimized
   images on both (640x360 cover thumbnails; responsive, lazily-loaded
-  webp srcset variants for still body images),
+  webp srcset variants for still body images; click-to-zoom, so an
+  image with more detail than the column shows opens full size in a
+  modal, like Medium's),
   and a /search/ page wired to Pagefind (`pagefind --site public|output`
   after building: full-text search with highlighted in-context
   excerpts). Both can show a site-wide announcement banner above the
