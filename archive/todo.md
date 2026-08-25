@@ -15,7 +15,7 @@ would ship. `site-zola/`, if one was ever built here, is stale output
 and can be deleted.
 
 `medium-archive myst|hugo|pelican --out .` builds a browsable site
-in `site/`, `site-hugo/`, or `site-pelican/` (all
+in `site-myst/`, `site-hugo/`, or `site-pelican/` (all
 gitignored, like `posts/` — everything regenerates from `raw/` +
 `fixups/`); `site.json` holds the hand-written site title, description,
 landing-page intro, and (for hugo) the base_url baked into
@@ -44,7 +44,7 @@ Last full validation, all three against all 333 posts:
   334 posts as cards, 255 with 640×360 cover thumbnails, via the
   myst-listing plugin plus a generated companion transform that makes
   local covers work; the chronological list moved to `/archive`).
-  `site/redirects.csv` now targets the URLs mystmd actually serves
+  `site-myst/redirects.csv` now targets the URLs mystmd actually serves
   (slugs capped at 50 chars, unicode folded, collisions numbered) —
   previously 84 of 334 targets pointed at over-long slugs mystmd
   truncates. The only warnings are ~57 links to
