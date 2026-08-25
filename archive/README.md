@@ -12,6 +12,13 @@ Medium. It has two layers:
   `medium-archive convert` from `raw/` alone, with no network access. They
   can be deleted and regenerated at any time (`convert --clean`), and are the
   layer to change when adapting the archive to a new site generator.
+  When the archive lives in version control, `posts.json` and
+  `redirects.csv` are still worth committing despite being derived: they
+  are small and diffable, so a change to `fixups/` or `tags.json` shows
+  its effect on every post right in their diff, and `redirects.csv` is
+  the contract the new site's redirects are built from. The bulky derived
+  trees (`posts/` and the site directories) are better left ignored and
+  regenerated.
 * `site/` (optional) is a **MyST site** derived from the converted posts by
   `medium-archive myst`: one page per post, a chronological landing page, a
   year-grouped table of contents, links between posts of the publication
