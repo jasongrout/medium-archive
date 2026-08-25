@@ -109,8 +109,12 @@ def test_hugo_dream_theme(archive):
     assert "Archives" in (site / "content/posts/_index.md").read_text()
     front = json.loads((site / "content/posts/second-post/index.md")
                        .read_text().split("\n\n", 1)[0])
-    assert front["cover"] == "images/001-pic.png"
-    assert front["images"] == ["images/001-pic.png"]
+    # the baked card cover doubles as Dream's card and og:image; junk
+    # bytes defeat Pillow and are copied in unchanged
+    assert front["cover"] == "images/cover.jpg"
+    assert front["images"] == ["images/cover.jpg"]
+    assert (site / "content/posts/second-post/images/cover.jpg"
+            ).read_bytes() == b"PNG"
     assert front["author"] == "Ada Lovelace"
     assert front["authorlink"] == "https://medium.com/@ada"
 
@@ -130,6 +134,50 @@ def test_cover_skips_gifs_and_huge_stills(tmp_path):
     assert hugo.pick_cover(post, tmp_path) == "images/small.png"
     assert hugo.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
     assert hugo.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
+
+
+def test_cover_thumbnails_crop_or_letterbox(tmp_path):
+    from PIL import Image
+
+    from medium_archive import sites
+
+    def thumb(im, name):
+        src, dst = tmp_path / name, tmp_path / (name + ".jpg")
+        im.save(src)
+        assert sites.make_cover_thumbnail(src, dst)
+        out = Image.open(dst)
+        assert out.size == (640, 360)
+        return out
+
+    # near-16:9: center-cropped, filling the frame edge to edge
+    out = thumb(Image.new("RGB", (800, 450), (160, 20, 20)), "photo.png")
+    assert out.getpixel((3, 3))[0] > 100
+
+    # a wide wordmark on white keeps its full width, letterboxed on the
+    # border's color instead of cropped
+    logo = Image.new("RGB", (1400, 200), "white")
+    logo.paste(Image.new("RGB", (1360, 160), "black"), (20, 20))
+    out = thumb(logo, "wordmark.png")
+    assert all(c > 200 for c in out.getpixel((320, 10)))    # white band
+    assert all(c < 60 for c in out.getpixel((320, 180)))    # content kept...
+    assert all(c < 60 for c in out.getpixel((15, 180)))     # ...edge to edge
+
+    # a small square logo is centered at no more than 2x, not blown up
+    # to fill; transparency composites onto white, not black
+    sq = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+    sq.paste(Image.new("RGBA", (60, 60, ), (0, 0, 0, 255)), (20, 20))
+    out = thumb(sq, "logo.png")
+    assert all(c < 60 for c in out.getpixel((320, 180)))    # 2x: 120px wide
+    assert all(c > 200 for c in out.getpixel((320, 70)))    # its own margin
+    assert all(c > 200 for c in out.getpixel((100, 180)))   # canvas margin
+
+    # no uniform border to extend: the frame fills with a blurred
+    # cover-crop of the image itself, never flat bars
+    import os
+    noisy = Image.frombytes("RGB", (300, 900), os.urandom(300 * 900 * 3))
+    out = thumb(noisy, "tall.png")
+    corners = {out.getpixel(p) for p in ((3, 3), (636, 3), (3, 356))}
+    assert len(corners) > 1
 
 
 def test_zola_site(archive):

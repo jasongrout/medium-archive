@@ -81,13 +81,18 @@ It works in independent steps:
   public|output` after building for full-text search served as a results
   page with highlighted, in-context excerpts and per-section
   sub-results. Images are optimized the same way on both: 640×360
-  cover thumbnails, and responsive, lazily-loaded webp variants
+  cover thumbnails baked at export time through Pillow (`pip install
+  pillow`, or the `covers` extra) — center-cropped when the source is
+  near 16:9, letterboxed when far from it, so a wide wordmark or a
+  square logo keeps its content instead of losing it to the crop
+  (padded with the image's own border color when the border is
+  uniform, over a blurred fill of the image otherwise, and never
+  upscaled past 2×) — and responsive, lazily-loaded webp variants
   (480/736/1104 px `srcset`, never upscaled, with real width/height)
-  for still body images — Hugo natively through its image pipeline
-  and a render hook, Pelican through Pillow (`pip install pillow`, or
-  the `covers` extra): covers at export time, body variants encoded
-  after each build by a plugin embedded in the generated config,
-  mtime-cached so rebuilds only touch changed images. All four sites
+  for still body images: Hugo natively through its image pipeline
+  and a render hook, Pelican by a plugin embedded in the generated
+  config after each build, mtime-cached so rebuilds only touch
+  changed images. All four sites
   carry display copies of the images, not the archival originals:
   anything past a size cap is resized down as it is placed — stills to
   a 1600 px longest edge through Pillow, animated gifs (which get no
@@ -129,8 +134,9 @@ It works in independent steps:
   preserves `themes/`, and the exporter prints the clone command while it
   is missing). The [Dream theme](https://hugo-theme-dream.g1en.site)
   (Hugo ≥ 0.158) gets first-class support: each post's first still image
-  of sane size becomes its summary-card cover (Dream webp-encodes covers,
-  so animated gifs and 25-megapixel screenshots are passed over), authors
+  of sane size (animated gifs and 25-megapixel screenshots are passed
+  over) becomes its summary-card cover and og:image, baked to the same
+  640×360 crop-or-letterbox thumbnail as the built-in theme's, authors
   get per-post bylines with profile links, Dream's built-in search page
   and archives timeline are enabled, an Authors nav item points at the
   author taxonomy, `siteStartYear` is derived from the oldest post, and
