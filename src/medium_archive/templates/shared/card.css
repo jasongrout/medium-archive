@@ -21,20 +21,24 @@ body { margin: 0; background: var(--bg); color: var(--ink);
 a { color: var(--accent-dark); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* white on the accent with a soft shadow, and jupyter.org's banner
-   type: its font stack, 18px regular on a 27px line */
+/* jupyter.org's .global-banner styling, so a shared announcement file
+   looks the same here as there: white on the accent with a soft
+   shadow, in its font stack at 18px regular on a 27px line */
 .announcement { position: relative; background: var(--accent); color: #fff;
                 text-shadow: 0 0 4px #000;
                 text-align: center;
                 font: 400 1.125rem/1.5 "Myriad Pro", "Helvetica Neue",
                       Helvetica, Arial, sans-serif;
-                padding: .55rem 2.6rem; }
+                padding: .6em 2.5em; }
 .announcement[hidden] { display: none; }
-.announcement a { color: inherit; text-decoration: underline; }
-.announcement-close { position: absolute; right: .6rem; top: 50%;
-                      transform: translateY(-50%); padding: .1rem .4rem;
+.announcement p { margin: 0; }
+.announcement a { color: #fff; text-decoration: underline;
+                  text-decoration-thickness: 2px; }
+.announcement-close { position: absolute; right: .5em; top: 50%;
+                      transform: translateY(-50%); padding: .2em .4em;
                       border: 0; background: none; color: inherit;
-                      font-size: 1.25rem; line-height: 1; cursor: pointer; }
+                      text-shadow: inherit;
+                      font-size: 1.4em; line-height: 1; cursor: pointer; }
 
 .site-header { background: var(--card); border-bottom: 1px solid var(--line); }
 .site-header .bar { display: flex; align-items: center; justify-content: space-between;
