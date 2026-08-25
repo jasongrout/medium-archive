@@ -115,7 +115,6 @@
     "ghost_url": null,
     "description": "JupyterLab 4.6 and Notebook 7.6 are out! JupyterLab 4.6 features new interface customization options, improved file browser and debugger, an easy way to jump between recently edited cells, and …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterlab",
       "releases",
@@ -786,7 +785,6 @@
     "description": "JupyterLab 4.5 and Notebook 7.5 are available! JupyterLab 4.5 has been released! This new minor release of JupyterLab includes 51 new features and enhancements, 81 bug fixes, 44 maintenance tasks and …",
     "tags": [
       "ai",
-      "data-science",
       "jupyter-notebook",
       "jupyterlab",
       "releases"
@@ -998,7 +996,6 @@
     "ghost_url": null,
     "description": "Collaborative editing for GIS workflows with Jupyter and QGIS The QGIS open-source project is a cornerstone in the geosciences ecosystem, providing robust tools for spatial data analysis and …",
     "tags": [
-      "data-science",
       "gis",
       "jupyter-notebook"
     ],
@@ -1068,7 +1065,6 @@
     "ghost_url": null,
     "description": "JupyterLite 0.6.0 is released! 🎉 JupyterLite is an unofficial Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as …",
     "tags": [
-      "data-science",
       "jupyterlite",
       "releases"
     ],
@@ -1127,7 +1123,6 @@
     "description": "JupyterLab 4.4 and Notebook 7.4 are available! JupyterLab 4.4 has been released! This new minor release of JupyterLab includes 28 new features and enhancements, 76 bug fixes, 63 maintenance tasks and …",
     "tags": [
       "ai",
-      "data-science",
       "jupyter-notebook",
       "jupyterlab",
       "releases"
@@ -1281,7 +1276,6 @@
     "description": "Configure your dashboards with Voilà gridstack template Voilà is a new dashboarding solution from Jupyter ecosystem. It provides an easy-to-use tool to convert your Jupyter notebooks into …",
     "tags": [
       "dashboards",
-      "data-science",
       "voila"
     ],
     "images": [
@@ -1307,7 +1301,6 @@
     "ghost_url": null,
     "description": "JupyterCon 2025! We’re excited to host this year’s JupyterCon in sunny San Diego, California, from November 3–6, 2025. From its beginnings as IPython in 2001, Project Jupyter has grown to a …",
     "tags": [
-      "data-science",
       "jupytercon"
     ],
     "images": [
@@ -1774,7 +1767,6 @@
     "description": "MyBinder.org serves two million launches by the Binder Team Since the beginning of 2018, the Binder community has been hosting a BinderHub at https://mybinder.org as a free public service. Today, we …",
     "tags": [
       "binder",
-      "data-science",
       "jupyter-notebook",
       "kubernetes"
     ],
@@ -2086,7 +2078,6 @@
     "ghost_url": null,
     "description": "JupyterLab Desktop UI Modes We are pleased to announce UI Mode features recently added to JupyterLab Desktop (JLD). JupyterLab Desktop now provides a convenient way to set the JupyterLab UI layout …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterlab",
       "python"
@@ -2116,7 +2107,6 @@
     "ghost_url": null,
     "description": "Python environment management using JupyterLab Desktop CLI JupyterLab Desktop (JLD) CLI provides several commands and options to manage Python environments for use in the application. In my previous …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterlab",
       "python"
@@ -2219,7 +2209,6 @@
     "ghost_url": null,
     "description": "Python environment management in JupyterLab Desktop We are pleased to announce Python environment management features recently added to JupyterLab Desktop (JLD). Now you can create new Python …",
     "tags": [
-      "data-science",
       "jupyterlab",
       "python",
       "science"
@@ -2439,7 +2428,6 @@
     "ghost_url": "https://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science",
     "description": "“” is published by Project Jupyter in Jupyter Blog.",
     "tags": [
-      "data-science",
       "funding"
     ],
     "images": [],
@@ -2587,7 +2575,6 @@
     "ghost_url": null,
     "description": "Jupyter Notebook 7 is the most significant release of the Jupyter Notebook in years. Some highlights of this release include real-time…",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "python",
       "releases"
@@ -3125,7 +3112,6 @@
     "ghost_url": null,
     "description": "Introducing the new JupyterLab Desktop! We are pleased to announce a major update to JupyterLab Desktop which adds many new features with main focus on the user experience. JupyterLab Desktop is the …",
     "tags": [
-      "data-science",
       "jupyterlab",
       "python",
       "science"
@@ -3460,7 +3446,6 @@
     "ghost_url": null,
     "description": "JupyterLab Desktop — 2022 recap JupyterLab Desktop is the cross-platform desktop application distribution of JupyterLab. It is the quickest and easiest way to get started with Jupyter notebooks …",
     "tags": [
-      "data-science",
       "jupyterlab",
       "python",
       "science"
@@ -3537,7 +3522,9 @@
     "ghost_url": null,
     "description": "Contribute to your first open source project This Friday, 10/26, NumFOCUS DISC is excited to host a first of its kind Open Source Inclusion Sprint — no prior experience necessary! Register Now …",
     "tags": [
-      "data-science"
+      "diversity",
+      "events",
+      "numfocus"
     ],
     "images": [
       "images/001-1_E4wfBHKLHL_Hb85HN8dIRQ.png",
@@ -3605,7 +3592,6 @@
     "ghost_url": null,
     "description": "Jupyter Pop-Up, March 21, Boston A new series of local Jupyter events, starting in Boston. Many of you are looking forward to JupyterCon 2018 and have submitted a talk. Alongside these large …",
     "tags": [
-      "data-science",
       "events"
     ],
     "images": [
@@ -3628,7 +3614,6 @@
     "ghost_url": null,
     "description": "Safia Abdalla, Paige Bailey, Doug Blank lead community Jupyter Conference Advisory Committee to explore future Jupyter conference…",
     "tags": [
-      "data-science",
       "events"
     ],
     "images": [],
@@ -4388,7 +4373,6 @@
     "ghost_url": null,
     "description": "Jupyter for Science User Facilities and High Performance Computing Jupyter is the “Google Docs” of data science. It provides that same kind of easy-to-use ecosystem, but for interactive data …",
     "tags": [
-      "data-science",
       "jupyterhub",
       "jupyterlab",
       "science"
@@ -4596,7 +4580,6 @@
     "ghost_url": null,
     "description": "JupyterLab Desktop App now available! We are pleased to announce the release of desktop application for JupyterLab! Standalone and self-contained JupyterLab App is the cross-platform standalone …",
     "tags": [
-      "data-science",
       "jupyterlab",
       "python",
       "science"
@@ -4863,7 +4846,6 @@
     "ghost_url": null,
     "description": "Ploomber: Maintainable and Collaborative Pipelines in Jupyter Ploomber is an open-source framework that allows teams to develop maintainable pipelines in Jupyter. Jupyter is a fantastic tool for data …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "machine-learning",
       "python"
@@ -5167,7 +5149,6 @@
     "description": "Field Report on the Kernel Community Workshop From May 27th to May 29th 2019, thirty developers from the Jupyter community met in Paris for a three-days workshop on the Jupyter kernel protocol. For …",
     "tags": [
       "cpp",
-      "data-science",
       "kernels",
       "python",
       "workshops"
@@ -5340,7 +5321,6 @@
     "ghost_url": null,
     "description": "JupyterLab 3.0 is released! The 3.0 release of JupyterLab brings many new features to users and substantial improvements to the extension system. Installation To install JupyterLab with pip: pip …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterlab",
       "releases"
@@ -5373,7 +5353,6 @@
     "ghost_url": null,
     "description": "JupyterLite is a JupyterLab distribution that runs entirely in the web browser, backed by in-browser language kernels powered by…",
     "tags": [
-      "data-science",
       "jupyterlite",
       "python",
       "webassembly"
@@ -5518,7 +5497,6 @@
     "ghost_url": null,
     "description": "RetroLab — A JupyterLab distribution with a retro look and feel RetroLab is an alternative JupyterLab distribution, built from the ground-up, providing a notebook interface with a retro look and …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterlab"
     ],
@@ -5684,7 +5662,6 @@
     "ghost_url": null,
     "description": "Simpler authentication for small scale JupyterHubs with NativeAuthenticator NativeAuthenticator adds traditional username / password based sign up, login, & user management features to JupyterHub In …",
     "tags": [
-      "data-science",
       "jupyterhub",
       "outreachy"
     ],
@@ -5857,7 +5834,6 @@
     "ghost_url": null,
     "description": "Teaching and Learning with Jupyter From the early days — even before the Jupyter name — many of us foresaw that the IPython Notebook and the ecosystem of tools growing around it would be a …",
     "tags": [
-      "data-science",
       "education"
     ],
     "images": [
@@ -5880,7 +5856,6 @@
     "ghost_url": null,
     "description": "Tema Okun JupyterCon 2020 keynote speaker announcement JupyerCon Keynote Talk  Tackling Toxic Culture in Tech: Racism and Its Legacy Tema Okun has spent over 30 years working with and for …",
     "tags": [
-      "data-science",
       "diversity",
       "python"
     ],
@@ -5978,7 +5953,6 @@
     "ghost_url": null,
     "description": "Jupyter meets the Earth By Lindsey Heagy and Fernando Pérez We are thrilled to announce that the NSF is funding our EarthCube proposal “Jupyter meets the Earth: Enabling discovery in geoscience …",
     "tags": [
-      "data-science",
       "open-science",
       "science"
     ],
@@ -6028,7 +6002,6 @@
     "ghost_url": null,
     "description": "Voilà is one of the latest addition to the Jupyter ecosystem, and can be used to turn notebooks into standalone applications and…",
     "tags": [
-      "data-science",
       "voila"
     ],
     "images": [
@@ -6077,7 +6050,6 @@
     "ghost_url": null,
     "description": "JupyterDay in the Triangle We’re excited to announce the next JupyterDay event! Please join us for JupyterDay in the Triangle on November 13, 2018 at the Carolina Club on the University of North …",
     "tags": [
-      "data-science",
       "events",
       "jupyter-notebook"
     ],
@@ -6167,7 +6139,6 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: Jupyter Server Design and Roadmap Workshop We have some exciting news to share regarding the Jupyter Server Design and Roadmap Workshop as part of the Jupyter Community …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyter-server",
       "kernels",
@@ -6191,7 +6162,6 @@
     "ghost_url": null,
     "description": "Integrating output in documentation with jupyter-sphinx The problem We love Jupyter notebooks for accommodating a computational narrative — a combination of explanation, code, and the output of …",
     "tags": [
-      "data-science",
       "documentation"
     ],
     "images": [
@@ -6523,7 +6493,6 @@
     "ghost_url": null,
     "description": "Note: this announcement is cross-posted between the Jupyter Blog and the Executable Book Project updates blog",
     "tags": [
-      "data-science",
       "education",
       "jupyter-book",
       "publishing"
@@ -6707,7 +6676,6 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: Building upon the Jupyter Kernel Protocol We have some exciting news about the Jupyter Community Workshop on kernels! The workshop will be held in Paris, France, from May …",
     "tags": [
-      "data-science",
       "kernels",
       "workshops"
     ],
@@ -6845,7 +6813,6 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: Jupyter for Scientific User Facilities and High-Performance Computing We are excited to share more news about the Jupyter Community Workshop for Scientific User Facilities …",
     "tags": [
-      "data-science",
       "events",
       "workshops"
     ],
@@ -6894,7 +6861,6 @@
     "description": "Voilà can now serve your interactive dashboards in a slideshow format.",
     "tags": [
       "dashboards",
-      "data-science",
       "voila"
     ],
     "images": [
@@ -6921,7 +6887,6 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshops: Call for Proposals The large majority of Jupyter’s work is accomplished through remote, online collaboration; yet, over the years, we have found deep value in focused …",
     "tags": [
-      "data-science",
       "workshops"
     ],
     "images": [],
@@ -6942,7 +6907,6 @@
     "ghost_url": null,
     "description": "ipycanvas: A Python Canvas for Jupyter As you may already know, the Jupyter Notebook and JupyterLab are Browser-based applications. Browsers are incredibly powerful, they allow you to swap rich and …",
     "tags": [
-      "data-science",
       "ipycanvas",
       "jupyter-notebook",
       "python",
@@ -6977,7 +6941,6 @@
     "ghost_url": null,
     "description": "Interactive GIS in Jupyter with ipyleaflet As Jupyter grew in popularity, a broad ecosystem of visualization packages based on Jupyter widgets has been developed, bringing even more interactivity to …",
     "tags": [
-      "data-science",
       "gis",
       "visualization"
     ],
@@ -7046,7 +7009,6 @@
     "ghost_url": null,
     "description": "99 ways to extend the Jupyter ecosystem Whenever someone says ‘You can do that with an extension’ in the Jupyter ecosystem, it is often not clear what kind of extension they are talking about …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterlab"
     ],
@@ -7077,7 +7039,6 @@
     "description": "Jupyter Community Workshop: Dashboarding with Project Jupyter We have some exciting news about the Jupyter Community Workshop on dashboarding! The workshop will be held in Paris, France, from June …",
     "tags": [
       "dashboards",
-      "data-science",
       "workshops"
     ],
     "images": [
@@ -7101,7 +7062,6 @@
     "description": "… from Jupyter notebooks to standalone applications and dashboards",
     "tags": [
       "dashboards",
-      "data-science",
       "voila"
     ],
     "images": [
@@ -7156,7 +7116,6 @@
     "ghost_url": null,
     "description": "Jupyter QtConsole 4.4 We’re pleased to announce the release of QtConsole 4.4, along with a follow-on bugfix update, 4.4.1. QtConsole, which melds the feel of a lightweight terminal and the …",
     "tags": [
-      "data-science",
       "python",
       "releases"
     ],
@@ -7324,7 +7283,6 @@
     "ghost_url": null,
     "description": "Project Jupyter’s goals for our annual conference include serving our global community, connecting Jupyter users from different…",
     "tags": [
-      "data-science",
       "events",
       "jupytercon"
     ],
@@ -7346,7 +7304,6 @@
     "ghost_url": null,
     "description": "We recently announced a call for proposals for Jupyter Community Workshops. These workshops are intended to bring together small groups of…",
     "tags": [
-      "data-science",
       "workshops"
     ],
     "images": [],
@@ -7367,7 +7324,6 @@
     "ghost_url": null,
     "description": "We are thrilled to announce the Jupyter Community workshops for the first half of 2019. We had 16 proposals submitted, each of which…",
     "tags": [
-      "data-science",
       "workshops"
     ],
     "images": [],
@@ -7389,7 +7345,6 @@
     "description": "A new Python kernel for Jupyter Project Jupyter aims at providing a consistent set of tools for interactive computing workflows across multiple programming languages. Jupyter projects are popular at …",
     "tags": [
       "cpp",
-      "data-science",
       "jupyter-notebook",
       "kernels",
       "python"
@@ -7426,7 +7381,6 @@
     "ghost_url": null,
     "description": "The Binder Project’s repo2docker tool gives data scientists the benefits of containerization technology without needing to learn Docker…",
     "tags": [
-      "data-science",
       "docker",
       "github"
     ],
@@ -7529,7 +7483,6 @@
     "ghost_url": null,
     "description": "Bloomberg is a long-time partner and supporter of Project Jupyter. Earlier this year Bloomberg announced funding of $120,000 to enable…",
     "tags": [
-      "data-science",
       "workshops"
     ],
     "images": [],
@@ -7662,7 +7615,6 @@
     "ghost_url": null,
     "description": "The Atlanta Jupyter User Group is excited to announce Early Bird Tickets and the Call for Proposals to the second Jupyter Day Atlanta on March 31, 2018. Join us at the Georgia Tech Research Institute …",
     "tags": [
-      "data-science",
       "events",
       "science"
     ],
@@ -7750,7 +7702,6 @@
     "ghost_url": null,
     "description": "JupyterCon 2018, NYC August 21–25 Discover how data-driven organizations are using Jupyter to analyze data, share insights, and foster practices for dynamic, reproducible data science. I’m …",
     "tags": [
-      "data-science",
       "events",
       "jupytercon",
       "reproducibility"
@@ -7870,7 +7821,6 @@
     "description": "Interpreted C++ for GIS with Jupyter The recent release of the Jupyter kernel for C++, based on the Cling interpreter enabled a number of new workflows for the users of the C++ programming …",
     "tags": [
       "cpp",
-      "data-science",
       "gis"
     ],
     "images": [
@@ -7954,7 +7904,6 @@
     "ghost_url": null,
     "description": "We Analyzed 1 Million Jupyter Notebooks — Now You Can Too [Guest Post] This is a guest post on how members of the Jupyter community publish code, visualizations, and text using Jupyter Notebooks …",
     "tags": [
-      "data-science",
       "github",
       "jupyter-notebook"
     ],
@@ -7980,7 +7929,6 @@
     "ghost_url": null,
     "description": "Reproducible Data Dependencies for Python [Guest Post] This article is the first in a series of guest blog posts about open source projects in the Jupyter ecosystem and the problems they attempt to …",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "reproducibility"
     ],
@@ -8029,7 +7977,6 @@
     "ghost_url": null,
     "description": "We are proud to announce the beta release series of JupyterLab, the next-generation web-based interface for Project Jupyter.",
     "tags": [
-      "data-science",
       "javascript",
       "jupyter-notebook",
       "jupyterlab"
@@ -8077,7 +8024,6 @@
     "ghost_url": null,
     "description": "JupyterHub makes it possible to serve Jupyter instances to multiple users. The JupyterHub Helm Chart makes it possible to run this setup on…",
     "tags": [
-      "data-science",
       "jupyter-notebook",
       "jupyterhub",
       "kubernetes"
@@ -8264,7 +8210,6 @@
     "description": "Interactive Workflows for C++ with Jupyter Scientists, educators and engineers not only use programming languages to build software systems, but also in interactive workflows, using the tools …",
     "tags": [
       "cpp",
-      "data-science",
       "science"
     ],
     "images": [

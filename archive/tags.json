@@ -103,7 +103,8 @@
     "vtk",
     "writing",
     "youtube",
-    "zulip"
+    "zulip",
+    "data-science"
   ],
   "rename": {
     "notebook": "jupyter-notebook",
@@ -313,6 +314,11 @@
     "desktop-gis-software-in-the-cloud-with-jupyterhub": [
       "jupyterhub",
       "workshops"
+    ],
+    "disc-sprint-nyc-2018": [
+      "diversity",
+      "events",
+      "numfocus"
     ],
     "enabling-the-jupyterlab-debugger-with-ipykernel": [
       "jupyterlab"
@@ -575,7 +581,6 @@
       "announcements"
     ],
     "project-jupyter-computatio-nalnarratives-as-the-engine-of-collaborative-data-sci": [
-      "data-science",
       "funding"
     ],
     "project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley": [

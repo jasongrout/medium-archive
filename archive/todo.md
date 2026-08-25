@@ -135,12 +135,17 @@ JupyterCon posts without `jupytercon`, workshop reports without
 convert. Result: 287 distinct tags → 226 → 64, no untagged posts, and
 the only sub-3-post tags left are eleven tool tags plus `robotics`.
 
+`data-science` was then dropped too: of its 58 posts only three or four
+were about data science as a subject — the rest were releases, workshop
+logistics and JupyterCon posts carrying it for medium.com feed reach,
+concentrated in the 2018–2019 SEO era. Dropping it left every post with
+the right remaining tags (one, the NumFOCUS DISC sprint announcement,
+got real tags via `"add"` instead). 63 tags.
+
 Remaining judgement calls, all optional:
 
 - `announcements`/`releases` overlap and could merge if the distinction
   isn't wanted.
-- `data-science` (58 posts) is nearly as broad here as `jupyter` was;
-  it could be dropped the same way.
 - `jupyter-notebook` (108 posts, a third of the archive) mixes "about
   the Notebook application" with "uses notebooks"; splitting would be
   hand-work in `"add"`.
