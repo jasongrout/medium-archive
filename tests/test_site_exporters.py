@@ -307,7 +307,12 @@ def test_announcement_banner(archive):
         # dismissal is remembered keyed by the banner's content, so a
         # changed announcement clears it and shows again
         assert 'localStorage.setItem("announcement-dismissed", html)' in text, base
-        assert "dismissed === html" in text, base
+        assert 'localStorage.getItem("announcement-dismissed") === html' in text, base
+        # the last fetch's content is cached and rendered synchronously,
+        # so navigating the site doesn't shift the layout when the
+        # banner arrives
+        assert 'localStorage.setItem("announcement-cache"' in text, base
+        assert text.index("announcement-cache") < text.index("fetch(source)"), base
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".announcement" in css and ".announcement-close" in css
 

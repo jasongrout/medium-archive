@@ -48,8 +48,12 @@ These embed verbatim in both engines' pages, so they must carry no
   many sites can share one live banner file (how Jupyter projects use
   Sphinx's `announcement` option with jupyter.org/assets/banner.html;
   empty content keeps the banner hidden), anything else is the banner
-  HTML itself. Dismissal persists per browser keyed by the banner's
-  content, so a changed announcement shows again.
+  HTML itself. The last fetch's content is cached per browser and
+  rendered synchronously on the next page, so navigating the site
+  doesn't shift the layout when the banner arrives; the live fetch
+  corrects a changed announcement after the fact. Dismissal persists
+  per browser keyed by the banner's content, so a changed announcement
+  shows again.
 - `dark-palette.css` — included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link
