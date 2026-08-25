@@ -164,7 +164,11 @@ It works in independent steps:
 The `raw/` layer is the source of truth — the only part that cannot be
 regenerated once the Medium site is gone — and everything else is derived
 from it. A `README.md` written into the archive documents the full layout,
-the front matter fields, and the caveats.
+the front matter fields, and the caveats. If the archive lives in version
+control, the small derived files `posts.json` and `redirects.csv` are
+worth committing anyway: their diffs show what a `fixups/` or `tags.json`
+change did to every post, while the bulky derived trees (`posts/`, the
+site directories) are better gitignored and regenerated.
 
 ## Installation
 
