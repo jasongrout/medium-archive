@@ -49,6 +49,8 @@ a:hover { text-decoration: underline; }
 .site-title img { height: 2.1rem; width: auto; }
 .site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
 .site-header nav a:hover { color: var(--accent); }
+/* the current page's nav item, in the accent like jupyter.org's navbar */
+.site-header nav a[aria-current="page"] { color: var(--accent); }
 
 .theme-picker { display: inline-flex; vertical-align: middle;
                 margin-left: 1.25rem; }

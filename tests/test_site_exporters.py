@@ -275,7 +275,8 @@ def test_theme_picker_and_dark_scheme(archive):
         assert 'localStorage.getItem("theme")' in stub_source
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
-    for name in ("theme-init", "theme-picker", "term-sort", "announcement"):
+    for name in ("theme-init", "theme-picker", "term-sort", "announcement",
+                 "nav-current"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -315,6 +316,20 @@ def test_announcement_banner(archive):
         assert text.index("announcement-cache") < text.index("fetch(source)"), base
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".announcement" in css and ".announcement-close" in css
+
+
+def test_nav_current_highlight(archive):
+    # the nav link whose path prefixes the current page's gets
+    # aria-current, which the stylesheet paints in the accent
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for base in (hugo_site / "layouts/_default/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        text = base.read_text()
+        assert 'setAttribute("aria-current", "page")' in text, base
+        # the script follows the nav it marks
+        assert text.index("</header>") < text.index("aria-current"), base
+    assert 'a[aria-current="page"]' in (hugo_site / "static/css/style.css").read_text()
 
 
 def test_term_sort_control(archive):

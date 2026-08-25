@@ -41,6 +41,12 @@ These embed verbatim in both engines' pages, so they must carry no
   the choice persists per browser, like the theme picker's. The wiring
   waits for DOMContentLoaded because the chip list follows the control
   in the page.
+- `nav-current.html` — marks the header nav link whose path is the
+  longest prefix of the current page's with `aria-current="page"`
+  (which `card.css` paints in the accent, like jupyter.org's navbar):
+  the home link catches post and pagination pages, `/tags/` catches
+  every tag page, and so on. The feed link (no trailing slash) never
+  matches.
 - `announcement.html` — the site-wide announcement banner. The base
   templates emit the `.announcement` div (above the header, hidden)
   only when site.json sets `"announcement"`; the script fills it from
