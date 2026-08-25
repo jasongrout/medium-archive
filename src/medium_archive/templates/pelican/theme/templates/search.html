@@ -37,6 +37,9 @@ window.addEventListener("load", function () {
     else url.searchParams.delete("q");
     history.replaceState(null, "", url);
   });
+  // the component renders its input after document load, past the
+  // window native autofocus can act in -- focus it ourselves
+  input.focus();
 });
 </script>
 {% endblock %}
