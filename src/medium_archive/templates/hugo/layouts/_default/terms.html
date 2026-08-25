@@ -1,0 +1,7 @@
+{{ define "main" }}
+<h1 class="page-title">{{ .Title }}</h1>
+<!-- @include shared/term-sort.html -->
+<p class="term-list">
+{{ range .Data.Terms.Alphabetical }}<a class="chip" href="{{ .Page.RelPermalink }}">{{ .Page.Title }} <span>{{ .Count }}</span></a>
+{{ end }}</p>
+{{ end }}

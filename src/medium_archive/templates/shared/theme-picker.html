@@ -1,0 +1,28 @@
+<span class="theme-picker" role="group" aria-label="Color scheme" hidden>
+<button type="button" data-set-theme="light" title="Light" aria-label="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></button>
+<button type="button" data-set-theme="system" title="System" aria-label="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="2"/><path d="M9 20.5h6M12 17v3.5"/></svg></button>
+<button type="button" data-set-theme="dark" title="Dark" aria-label="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></button>
+</span>
+<script>
+(function () {
+  var root = document.documentElement;
+  var picker = document.querySelector(".theme-picker");
+  var buttons = picker.querySelectorAll("button");
+  function apply(choice) {
+    if (choice === "system") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", choice);
+    try {
+      if (choice === "system") localStorage.removeItem("theme");
+      else localStorage.setItem("theme", choice);
+    } catch (e) {}
+    buttons.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.setTheme === choice));
+    });
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.dataset.setTheme); });
+  });
+  apply(root.getAttribute("data-theme") || "system");
+  picker.hidden = false;
+})();
+</script>

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} · {{ SITENAME }}{% endblock %}
+{% block content %}
+<article class="post" data-pagefind-body>
+<h1>{{ article.title }}</h1>
+<p class="post-meta"><time>{{ article.locale_date }}</time>
+{%- if article.author %} · <a href="{{ SITEURL }}/{{ article.author.url }}">{{ article.author }}</a>{% endif %}
+{%- if article.tags %} ·{% for t in article.tags %} <a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a>{% endfor %}{% endif %}</p>
+{{ article.content }}
+</article>
+{% endblock %}

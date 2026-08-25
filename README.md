@@ -363,6 +363,9 @@ src/medium_archive/
   pelican.py     the pelican step: <out>/posts/ -> a Pelican site in <out>/site-pelican/
   sites.py       machinery shared by the site exporters: page slugs, the
                  in-publication link map, redirect maps, site.json
+  templates/     the site scaffolding the exporters copy into each site:
+                 generator configs, themes, CSS, shared JS snippets
+                 (see templates/README.md)
   compare.py     the compare step: verify page vs export conversion agreement
   lint.py        the lint step: scan converted posts for defect signatures
   stats.py       the stats step: summarize the converted archive

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
+{{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
+{{ range .AlternativeOutputFormats }}<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{ end }}<!-- @include shared/theme-init.html -->
+<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+</head>
+<body>
+<header class="site-header"><div class="wrap bar">
+<a class="site-title" href="{{ "/" | relURL }}">{{ with site.Params.avatar }}<img src="{{ . | relURL }}" alt="">{{ end }}{{ site.Title }}</a>
+<nav>
+<a href="{{ "/" | relURL }}">Blog</a>
+<a href="{{ "/tags/" | relURL }}">Tags</a>
+<a href="{{ "/authors/" | relURL }}">Authors</a>
+<a href="{{ "/archives/" | relURL }}">Archives</a>
+<a href="{{ "/search/" | relURL }}">Search</a>
+<a href="{{ "/index.xml" | relURL }}">RSS</a>
+<!-- @include shared/theme-picker.html -->
+</nav>
+</div></header>
+<main class="wrap">
+{{ block "main" . }}{{ end }}
+</main>
+<footer class="wrap site-footer">{{ site.Params.description }}</footer>
+</body>
+</html>

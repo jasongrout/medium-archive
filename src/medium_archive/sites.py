@@ -24,11 +24,36 @@ import struct
 import subprocess
 import tempfile
 import sys
+from importlib import resources
 from pathlib import Path
+from string import Template
 from urllib.parse import unquote, urlsplit
 
 from .lint import split_post
 from .urls import medium_id
+
+# The site scaffolding -- generator configs, themes, CSS, and the JS
+# snippets shared between generators -- lives as real files under
+# templates/ (see templates/README.md), copied into each site as it is
+# built. An `@include <path>` marker line (HTML- or CSS-comment form)
+# splices a templates/-relative file into the one that carries it, which
+# is how the hugo and pelican themes share their snippets. *.tmpl files
+# take config values through string.Template, whose $placeholders cannot
+# collide with the braces the generators' own template languages use.
+TEMPLATE_DIR = resources.files(__package__) / "templates"
+_INCLUDE_RE = re.compile(r"(?:<!--|/\*) @include ([\w./-]+) (?:-->|\*/)\n")
+
+
+def template_text(rel: str) -> str:
+    """templates/<rel>, with @include markers expanded."""
+    text = (TEMPLATE_DIR / rel).read_text(encoding="utf-8")
+    return _INCLUDE_RE.sub(lambda m: template_text(m.group(1)), text)
+
+
+def fill_template(rel: str, **values) -> str:
+    """templates/<rel> (a .tmpl) with its $placeholders substituted;
+    every value must arrive already serialized for the config's format."""
+    return Template(template_text(rel)).substitute(values)
 
 # Covers above this are skipped in favor of the post's next image: themes
 # and exporters thumbnail or encode each cover, and Medium archives carry

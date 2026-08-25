@@ -1,0 +1,13 @@
+{{- $img := .Page.Resources.Get .Destination -}}
+{{- if and $img (eq $img.MediaType.MainType "image") (not (in (slice "gif" "svg" "webp") $img.MediaType.SubType)) -}}
+{{- $srcset := slice -}}
+{{- range $w := slice 480 736 1104 -}}
+{{- if ge $img.Width $w -}}
+{{- $v := $img.Resize (printf "%dx q75 webp" $w) -}}
+{{- $srcset = $srcset | append (printf "%s %dw" $v.RelPermalink $v.Width) -}}
+{{- end -}}
+{{- end -}}
+<img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ .PlainText }}">
+{{- else -}}
+<img src="{{ .Destination | safeURL }}" alt="{{ .PlainText }}" loading="lazy">
+{{- end -}}

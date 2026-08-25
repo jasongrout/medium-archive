@@ -1,0 +1,38 @@
+{{ define "main" }}
+<h1 class="page-title">Search</h1>
+{{- /* Pagefind's Component UI (its recommended integration since 1.5),
+       composed as input + summary + in-page results rather than the
+       searchbox dropdown, so results stay on the page -- scrollable and
+       findable with the browser's own search. The elements find the
+       index bundle at /pagefind/ on their own. */}}
+<link rel="stylesheet" href="{{ "pagefind/pagefind-component-ui.css" | relURL }}">
+<script type="module" src="{{ "pagefind/pagefind-component-ui.js" | relURL }}"></script>
+<div id="search">
+<pagefind-input autofocus placeholder="Search the archive"></pagefind-input>
+<pagefind-summary></pagefind-summary>
+<pagefind-results></pagefind-results>
+</div>
+<script>
+window.addEventListener("load", function () {
+  if (!customElements.get("pagefind-input")) {
+    document.getElementById("search").textContent =
+      "Search index not built yet: run `pagefind --site public` after `hugo`.";
+    return;
+  }
+  // shareable searches: mirror the query into ?q=, restore it on load
+  var input = document.querySelector("pagefind-input input");
+  if (!input) return;
+  var q = new URLSearchParams(location.search).get("q");
+  if (q) {
+    input.value = q;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  input.addEventListener("input", function () {
+    var url = new URL(location);
+    if (input.value) url.searchParams.set("q", input.value);
+    else url.searchParams.delete("q");
+    history.replaceState(null, "", url);
+  });
+});
+</script>
+{{ end }}

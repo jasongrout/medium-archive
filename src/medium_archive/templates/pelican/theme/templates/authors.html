@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Authors · {{ SITENAME }}{% endblock %}
+{% block content %}
+<h1 class="page-title">Authors</h1>
+<!-- @include shared/term-sort.html -->
+<p class="term-list">
+{% for author, articles in authors %}<a class="chip" href="{{ SITEURL }}/{{ author.url }}">{{ author }} <span>{{ articles | length }}</span></a>
+{% endfor %}</p>
+{% endblock %}
