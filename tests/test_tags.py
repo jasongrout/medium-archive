@@ -73,6 +73,15 @@ def test_unused_entries_are_tracked(tmp_path):
     ({"drop": ["a"], "rename": {"a": "b"}}, "both dropped and renamed"),
     ({"drop": ["b"], "rename": {"a": "b"}}, "is dropped"),
     ({"rename": {"a": "b", "b": "c"}}, "is itself renamed"),
+    ({"add": ["a"]}, "must be an object"),
+    ({"add": {"": ["a"]}}, "non-empty strings"),
+    ({"add": {" s": ["a"]}}, "whitespace"),
+    ({"add": {"s": []}}, "non-empty list"),
+    ({"add": {"s": "a"}}, "non-empty list"),
+    ({"add": {"s": ["a", "a"]}}, "listed twice"),
+    ({"add": {"s": [""]}}, "non-empty strings"),
+    ({"drop": ["a"], "add": {"s": ["a"]}}, "is dropped"),
+    ({"rename": {"a": "b"}, "add": {"s": ["a"]}}, "add the final tag"),
 ])
 def test_malformed_config_aborts(tmp_path, config, message):
     write_config(tmp_path, config)
@@ -98,14 +107,59 @@ def test_convert_post_writes_cleaned_tags(tmp_path):
     assert "jupyter-notebook" in front and '"jupyter"' not in front
 
 
+def test_add_applies_by_slug_and_dedupes(tmp_path):
+    out = write_config(tmp_path, {
+        "rename": {"notebook": "jupyter-notebook"},
+        "add": {"my-post": ["releases", "python"]}})
+    tag_map = load_tag_map(out)
+    # a tag the post already carries (here via rename) is not re-added
+    assert tag_map.apply(["notebook", "python"], "my-post") \
+        == ["jupyter-notebook", "python", "releases"]
+    # a different slug is untouched by the entry
+    assert tag_map.apply(["python"], "other-post") == ["python"]
+
+
+def test_add_pairs_track_usage_per_tag(tmp_path):
+    out = write_config(tmp_path, {"add": {"my-post": ["releases", "python"]}})
+    tag_map = load_tag_map(out)
+    assert tag_map.unused() == ["my-post: +python", "my-post: +releases"]
+    tag_map.apply(["python"], "my-post")     # adds releases, python was there
+    assert tag_map.unused() == ["my-post: +python"]
+
+
+def test_convert_post_writes_added_tags(tmp_path):
+    raw = write_raw_post(tmp_path, ["notebook"])
+    tag_map = load_tag_map(write_config(tmp_path, {
+        "rename": {"notebook": "jupyter-notebook"},
+        "add": {"my-post": ["releases"]}}))
+    post = convert_post(URL, raw, tmp_path / "posts", prefer_page=False,
+                        tag_map=tag_map)
+    assert post["tags"] == ["jupyter-notebook", "releases"]
+
+
 def test_full_convert_aborts_on_stale_entry(tmp_path):
     write_raw_post(tmp_path, ["python"])
     write_config(tmp_path, {"drop": ["python", "no-such-tag"]})
-    with pytest.raises(SystemExit, match="no post carries: no-such-tag"):
+    with pytest.raises(SystemExit,
+                       match="entries changed no post: no-such-tag"):
         cmd_convert(convert_args(tmp_path))
     # the converted output itself is fine; only the config is stale
     manifest = json.loads((tmp_path / "posts.json").read_text())
     assert manifest[URL]["tags"] == []
+
+
+def test_full_convert_aborts_on_redundant_add(tmp_path):
+    write_raw_post(tmp_path, ["python"])
+    write_config(tmp_path, {"add": {"my-post": ["python"]}})
+    with pytest.raises(SystemExit, match=r"my-post: \+python"):
+        cmd_convert(convert_args(tmp_path))
+
+
+def test_full_convert_aborts_on_add_for_unknown_slug(tmp_path):
+    write_raw_post(tmp_path, ["python"])
+    write_config(tmp_path, {"add": {"no-such-post": ["python"]}})
+    with pytest.raises(SystemExit, match=r"no-such-post: \+python"):
+        cmd_convert(convert_args(tmp_path))
 
 
 def test_only_run_skips_the_stale_check(tmp_path):

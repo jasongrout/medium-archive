@@ -89,10 +89,13 @@ Notes:
     that only made sense on medium.com (the publication's own topic on
     every post, SEO reach tags), "rename" maps variants to a common tag
     ({"rename": {"notebooks": "jupyter-notebook"}}), which is how tags
-    are consolidated. posts.json and every derived site inherit the
-    cleaned tags; raw/ keeps the originals. Stale entries (matching no
-    post) abort a full convert run; `stats --tags` lists every tag with
-    its post count as the worklist for curating the file.
+    are consolidated, and "add" puts tags on specific posts by slug
+    ({"add": {"release-of-ipython-5-0": ["releases"]}}) for posts whose
+    Medium tags never named their plain topic. posts.json and every
+    derived site inherit the cleaned tags; raw/ keeps the originals.
+    Stale entries (changing no post) abort a full convert run; `stats
+    --tags` lists every tag with its post count as the worklist for
+    curating the file.
   * The archive layout is documented in the README.md written into <out>/.
 Progress is written to stderr.
 """

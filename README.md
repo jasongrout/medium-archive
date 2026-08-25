@@ -52,9 +52,10 @@ It works in independent steps:
   Medium again. An optional hand-written `<out>/tags.json` cleans up the
   Medium tags on the way into front matter — `"drop"` removes tags that
   only made sense on medium.com, `"rename"` consolidates variants onto a
-  common tag — reproducibly, with `raw/` keeping the originals; a stale
-  entry that matches no post aborts a full run, like a fixup that no
-  longer applies.
+  common tag, `"add"` puts tags on specific posts by slug when their
+  Medium tags never named the plain topic — reproducibly, with `raw/`
+  keeping the originals; a stale entry that changes no post aborts a
+  full run, like a fixup that no longer applies.
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
   `<out>/site/` from the converted posts: one page per post, a
   cover-image gallery landing page (every post as a card, newest first,

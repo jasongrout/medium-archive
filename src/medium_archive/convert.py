@@ -369,7 +369,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         # tags.json cleanup applies only here, at output: body extraction
         # above needs the original tags to recognize the page's tag-link
         # chrome, and raw/ keeps them untouched
-        "tags": (tag_map.apply(info["tags"]) if tag_map
+        "tags": (tag_map.apply(info["tags"], slug_of(canon)) if tag_map
                  else sorted(set(info["tags"]))),
         "images": used_images,
         "body_source": body_source,
@@ -416,9 +416,9 @@ def cmd_convert(args):
               f"from {args.out / 'fixups'}", file=sys.stderr)
     tag_map = load_tag_map(args.out)
     if tag_map:
-        print(f"tags: dropping {len(tag_map.drop)} and renaming "
-              f"{len(tag_map.rename)} tag(s) per {tag_map.path}",
-              file=sys.stderr)
+        print(f"tags: dropping {len(tag_map.drop)}, renaming "
+              f"{len(tag_map.rename)} and adding to {len(tag_map.add)} "
+              f"post(s) per {tag_map.path}", file=sys.stderr)
     ok = 0
     for n, url in enumerate(targets, 1):
         entry = index.get(url)
@@ -440,11 +440,12 @@ def cmd_convert(args):
     if not (args.out / "README.md").exists():
         write_readme(args.out, args.base or archive_base(args.out) or "(unknown publication)")
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
-    # A tags.json entry that matched no post is stale config -- fail
+    # A tags.json entry that changed no post is stale config -- fail
     # loudly, like a fixup that no longer applies. Only a complete run
     # can tell (--only sees a subset; a failed post's tags go unseen).
     if tag_map and not args.only and ok == len(targets):
         unused = tag_map.unused()
         if unused:
-            sys.exit(f"{tag_map.path}: no post carries: {', '.join(unused)} "
-                     "(remove the stale entries, or fix their spelling)")
+            sys.exit(f"{tag_map.path}: entries changed no post: "
+                     f"{', '.join(unused)} (remove the stale entries, "
+                     "or fix their spelling)")
