@@ -84,7 +84,8 @@ It works in independent steps:
   paginated home of cover-image cards —
   each post's first still image of sane size, chosen by header-sniffing
   dimensions — tag links, excerpt and byline per card; article pages;
-  tag/author card listings with chip indexes; and a `/search/` page
+  tag/author card listings with chip indexes sortable by name or by
+  post count; and a `/search/` page
   wired to [Pagefind](https://pagefind.app) — run `pagefind --site
   public|output` after building for full-text search served as a results
   page with highlighted, in-context excerpts and per-section

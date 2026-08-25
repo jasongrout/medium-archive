@@ -256,11 +256,28 @@ def test_theme_picker_and_dark_scheme(archive):
         assert text.index("localStorage.getItem") < text.index("stylesheet")
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
-    for snippet in (hugo.THEME_INIT, hugo.THEME_PICKER):
+    for snippet in (hugo.THEME_INIT, hugo.THEME_PICKER, hugo.TERM_SORT):
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar the config must still be valid Python
     # (json.dumps(None) would emit a NameError-raising `null`)
     assert "AVATAR = None" in (pelican_site / "pelicanconf.py").read_text()
+
+
+def test_term_sort_control(archive):
+    # the tag/author chip indexes carry the name/count sort control,
+    # placed above the chip list it reorders
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for page in (hugo_site / "layouts/_default/terms.html",
+                 pelican_site / "theme/templates/tags.html",
+                 pelican_site / "theme/templates/authors.html"):
+        text = page.read_text()
+        for order in ("name", "count"):
+            assert f'data-sort="{order}"' in text, page
+        assert text.index("term-sort") < text.index("term-list"), page
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert ".term-sort" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 
 def test_build_output_survives_regeneration(archive):

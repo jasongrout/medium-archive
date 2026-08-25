@@ -119,6 +119,59 @@ THEME_PICKER = """\
 </script>
 """
 
+# The tag/author chip indexes' sort control (shared with pelican, like
+# THEME_INIT): by name (A-Z, the order the generators emit, so the no-JS
+# page reads the same) or by count, most posts first. Hidden until its
+# script runs, since without JS the chips could not be reordered anyway;
+# the choice persists per browser, like the theme picker's. The wiring
+# waits for DOMContentLoaded because the chip list follows the control
+# in the page.
+TERM_SORT = """\
+<p class="term-sort" role="group" aria-label="Sort by" hidden>Sort by
+<button type="button" data-sort="name">name</button>
+<button type="button" data-sort="count">count</button>
+</p>
+<script>
+(function () {
+  function init() {
+    var control = document.querySelector(".term-sort");
+    var list = document.querySelector(".term-list");
+    if (!control || !list) return;
+    var buttons = control.querySelectorAll("button");
+    var chips = Array.prototype.map.call(
+      list.querySelectorAll(".chip"), function (chip) {
+        return { el: chip,
+                 name: chip.firstChild.textContent.trim().toLowerCase(),
+                 count: parseInt(chip.querySelector("span").textContent, 10) || 0 };
+      });
+    function apply(order) {
+      chips.slice().sort(function (a, b) {
+        if (order === "count" && a.count !== b.count) return b.count - a.count;
+        return a.name.localeCompare(b.name);
+      }).forEach(function (c) { list.appendChild(c.el); });
+      try {
+        if (order === "name") localStorage.removeItem("term-sort");
+        else localStorage.setItem("term-sort", order);
+      } catch (e) {}
+      buttons.forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.sort === order));
+      });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () { apply(b.dataset.sort); });
+    });
+    var stored = null;
+    try { stored = localStorage.getItem("term-sort"); } catch (e) {}
+    apply(stored === "count" ? "count" : "name");
+    control.hidden = false;
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
+"""
+
 BASEOF = """\
 <!DOCTYPE html>
 <html lang="{{ site.Language.Lang }}">
@@ -217,6 +270,7 @@ LIST = """\
 TERMS = """\
 {{ define "main" }}
 <h1 class="page-title">{{ .Title }}</h1>
+""" + TERM_SORT + """\
 <p class="term-list">
 {{ range .Data.Terms.Alphabetical }}<a class="chip" href="{{ .Page.RelPermalink }}">{{ .Page.Title }} <span>{{ .Count }}</span></a>
 {{ end }}</p>
@@ -428,6 +482,17 @@ a:hover { text-decoration: underline; }
         padding: .35rem .9rem; color: var(--ink); }
 .chip span { color: var(--muted); font-size: .85em; }
 .chip:hover { border-color: var(--accent); text-decoration: none; }
+
+.term-sort { margin: 1.5rem 0 0; color: var(--muted); font-size: .9rem; }
+.term-sort[hidden] { display: none; }
+.term-sort button { border: 1px solid var(--line); border-radius: 999px;
+                    background: var(--card); color: var(--soft); font: inherit;
+                    padding: .15rem .8rem; margin-left: .35rem; cursor: pointer; }
+.term-sort button:hover { border-color: var(--accent); }
+.term-sort button[aria-pressed="true"] { border-color: var(--accent);
+                                         color: var(--ink); }
+/* ~, not +: the snippet's script tag sits between the two */
+.term-sort ~ .term-list { margin-top: .9rem; }
 
 ul.pagination { display: flex; justify-content: center; gap: .25rem;
                 list-style: none; padding: 0; margin: 0 0 3rem; }
