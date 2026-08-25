@@ -107,11 +107,13 @@
     "data-science",
     "python-programming",
     "learning-python",
-    "python"
+    "python",
+    "announcements",
+    "notebook",
+    "notebooks",
+    "jupyter-notebook"
   ],
   "rename": {
-    "notebook": "jupyter-notebook",
-    "notebooks": "jupyter-notebook",
     "jupyter-lab-3": "jupyterlab",
     "cplusplus": "cpp",
     "c-plus-plus-language": "cpp",
@@ -267,6 +269,7 @@
       "events"
     ],
     "announcing-jupyter-notebook-7": [
+      "jupyter-notebook",
       "releases"
     ],
     "announcing-the-new-jupyter-book": [
@@ -313,6 +316,7 @@
       "funding"
     ],
     "cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyte": [
+      "jupyter-notebook",
       "jupyterlab"
     ],
     "deadline-extension-jupyter-community-workshops": [
@@ -354,7 +358,7 @@
       "kernels"
     ],
     "ibm-brings-jupyter-and-spark-to-the-mainframe": [
-      "announcements"
+      "community"
     ],
     "inspector-jupyterlab": [
       "jupyterlab"
@@ -435,6 +439,7 @@
       "workshops"
     ],
     "jupyter-community-workshop-the-notebook-file-format": [
+      "jupyter-notebook",
       "workshops"
     ],
     "jupyter-community-workshops": [
@@ -452,6 +457,10 @@
     "jupyter-community-workshops-early-2026": [
       "workshops"
     ],
+    "jupyter-games": [
+      "education",
+      "ipycanvas"
+    ],
     "jupyter-kernel-gateway": [
       "kernels"
     ],
@@ -466,24 +475,37 @@
       "releases"
     ],
     "jupyter-notebook-5-1-0": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyter-notebook-5-2-0": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyter-notebook-5-3-0": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyter-notebook-5-5-0": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyter-notebook-6-5-0-release-candidate": [
+      "jupyter-notebook",
       "releases"
     ],
+    "jupyter-notebook-format-workshop-outcomes": [
+      "jupyter-notebook"
+    ],
+    "jupyter-notebook-security-fixes": [
+      "jupyter-notebook"
+    ],
     "jupyter-notebook-user-experience-survey": [
-      "community"
+      "community",
+      "jupyter-notebook"
     ],
     "jupyter-notebook-xssi-security-fix": [
+      "jupyter-notebook",
       "security"
     ],
     "jupyter-qtconsole-4-4": [
@@ -563,21 +585,27 @@
       "releases"
     ],
     "jupyterlab-4-1-and-notebook-7-1-are-here": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyterlab-4-2-and-notebook-7-2-are-available": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyterlab-4-3-and-notebook-7-3-are-available": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyterlab-4-4-and-notebook-7-4-are-available": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyterlab-4-5-and-notebook-7-5-are-available": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyterlab-4-6-and-notebook-7-6-are-out": [
+      "jupyter-notebook",
       "releases"
     ],
     "jupyterlab-the-next-generation-of-the-jupyter-notebook": [
@@ -616,11 +644,17 @@
     "navigating-the-post-workshop-fog-a-path-to-myst": [
       "mystmd"
     ],
+    "nbterm-jupyter-notebooks-in-the-terminal": [
+      "jupyter-notebook"
+    ],
     "nbviewer-and-githubs-rate-limit": [
       "nbviewer"
     ],
     "nbviewer-has-a-new-host-ovhcloud": [
       "nbviewer"
+    ],
+    "notebook-4-1-release": [
+      "jupyter-notebook"
     ],
     "notebook-4-2": [
       "jupyter-notebook",
@@ -632,6 +666,9 @@
     "omoju-miller": [
       "events"
     ],
+    "open-redirect-vulnerability-in-jupyter-jupyterhub": [
+      "jupyter-notebook"
+    ],
     "openness-diversity-and-dignity-a-foundation-for-global-collaboration": [
       "diversity"
     ],
@@ -642,13 +679,16 @@
       "outreachy"
     ],
     "post0": [
-      "announcements"
+      "community"
     ],
     "project-jupyter-computatio-nalnarratives-as-the-engine-of-collaborative-data-sci": [
       "funding"
     ],
     "project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley": [
       "community"
+    ],
+    "public-notebooks-and-security": [
+      "jupyter-notebook"
     ],
     "real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter": [
       "science"
@@ -665,6 +705,12 @@
     ],
     "report-on-the-jupyterlite-community-workshop": [
       "jupyterlite"
+    ],
+    "retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel": [
+      "jupyter-notebook"
+    ],
+    "security-fix-for-jupyter-notebook": [
+      "jupyter-notebook"
     ],
     "security-fix-for-jupyterhub-gitlab-oauthenticator": [
       "jupyterhub"
@@ -690,8 +736,10 @@
       "jupytercon"
     ],
     "the-big-split": [
-      "announcements",
       "ipython"
+    ],
+    "the-continued-existence-of-the-emacs-ipython-notebook": [
+      "jupyter-notebook"
     ],
     "the-future-of-jupytercon-2019-and-beyond": [
       "jupytercon"

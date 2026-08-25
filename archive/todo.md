@@ -147,6 +147,17 @@ left untagged, and dropping it surfaced two monthly Community Call
 posts missing `community` and gave "Learn Python with Jupyter"
 `education` instead. 62 tags.
 
+Two more from the same review: `announcements` (nine posts, six of them
+release posts already tagged `releases`, on a blog where every post
+announces something) is dropped. And `jupyter-notebook` — a third of
+the archive, mostly meaning "Jupyter, the project", i.e. the dropped
+`jupyter` tag under another name — is split rather than dropped:
+medium-archive now allows re-adding a dropped tag via `"add"`, so the
+tag is dropped everywhere and re-asserted on the 29 posts genuinely
+about the Notebook application (its releases and security advisories,
+the UX survey, the notebook-format workshops, and notebook clients —
+EIN, nbterm, RetroLab). 61 tags.
+
 `geoscience` then became its own category — the ten geospatial posts
 (the JupyterGIS line, QGIS, ipyleaflet, ipyopenlayers, the "Jupyter
 meets the Earth" project) are a coherent cluster, so `gis` and the raw
@@ -158,11 +169,6 @@ same way: every JupyterCon post also carries `events`.
 
 Remaining judgement calls, all optional:
 
-- `announcements`/`releases` overlap and could merge if the distinction
-  isn't wanted.
-- `jupyter-notebook` (108 posts, a third of the archive) mixes "about
-  the Notebook application" with "uses notebooks"; splitting would be
-  hand-work in `"add"`.
 - The nested pairs (`geoscience` under `science`, `jupytercon` under
   `events`) work today by each post carrying both tags — every
   generator's taxonomy is flat, so the parent's tag page naturally
