@@ -11,14 +11,14 @@
 </head>
 <body>
 <header class="site-header"><div class="wrap bar">
-<a class="site-title" href="{{ "/" | relURL }}">{{ with site.Params.avatar }}<img src="{{ . | relURL }}" alt="">{{ end }}{{ site.Title }}</a>
+<a class="site-title" href="{{ site.Home.RelPermalink }}">{{ with site.Params.avatar }}<img src="{{ . | relURL }}" alt="">{{ end }}{{ site.Title }}</a>
 <nav>
-<a href="{{ "/" | relURL }}">Blog</a>
-<a href="{{ "/tags/" | relURL }}">Tags</a>
-<a href="{{ "/authors/" | relURL }}">Authors</a>
-<a href="{{ "/archives/" | relURL }}">Archives</a>
-<a href="{{ "/search/" | relURL }}">Search</a>
-<a href="{{ "/index.xml" | relURL }}">RSS</a>
+<a href="{{ site.Home.RelPermalink }}">Blog</a>
+<a href="{{ "tags/" | relURL }}">Tags</a>
+<a href="{{ "authors/" | relURL }}">Authors</a>
+<a href="{{ "archives/" | relURL }}">Archives</a>
+<a href="{{ "search/" | relURL }}">Search</a>
+<a href="{{ "index.xml" | relURL }}">RSS</a>
 <!-- @include shared/theme-picker.html -->
 </nav>
 </div></header>

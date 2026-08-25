@@ -68,7 +68,9 @@ a:hover { text-decoration: underline; }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
 .post-meta { color: var(--muted); margin: 0 0 2rem; }
 .post-meta .tag::before { content: "#"; opacity: .6; }
-.post img { max-width: 100%; height: auto; border-radius: 4px; }
+/* white behind transparency, like the baked card covers: these images
+   were drawn for Medium's white page, so dark logos stay legible */
+.post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-size: .9rem; }
 .post code { background: var(--code-bg); }
