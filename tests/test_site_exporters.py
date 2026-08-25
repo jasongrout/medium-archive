@@ -276,7 +276,7 @@ def test_theme_picker_and_dark_scheme(archive):
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "term-sort", "announcement",
-                 "nav-current"):
+                 "nav-current", "image-zoom"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -346,6 +346,34 @@ def test_term_sort_control(archive):
         assert text.index("term-sort") < text.index("term-list"), page
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".term-sort" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_image_zoom(archive):
+    # post pages carry the click-to-zoom modal, on both engines
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for page in (hugo_site / "layouts/_default/single.html",
+                 pelican_site / "theme/templates/article.html"):
+        text = page.read_text()
+        assert '<dialog class="zoom-dialog"' in text, page
+        # the dialog follows the article whose images it zooms
+        assert text.index("</article>") < text.index("zoom-dialog"), page
+        # zoom to the src attribute, never currentSrc: src is the
+        # full-size original, currentSrc the smaller srcset variant
+        assert "full.src = img.src" in text, page
+        assert "currentSrc" not in text, page
+        # only images holding more detail than the column shows are
+        # marked, and the width attribute -- not naturalWidth, which
+        # srcset density-corrects -- is what the original measures
+        assert 'parseInt(img.getAttribute("width"), 10)' in text, page
+        # keyboard reachable, and a linked image keeps its link
+        assert 'img.closest("a")' in text, page
+        assert "img.tabIndex = 0" in text, page
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert "img.zoomable { cursor: zoom-in; }" in css
+    assert ".zoom-dialog::backdrop" in css
+    assert "prefers-reduced-motion" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 

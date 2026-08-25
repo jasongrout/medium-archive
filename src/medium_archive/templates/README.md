@@ -60,6 +60,18 @@ These embed verbatim in both engines' pages, so they must carry no
   corrects a changed announcement after the fact. Dismissal persists
   per browser keyed by the banner's content, so a changed announcement
   shows again.
+- `image-zoom.html` — click-to-zoom for body images, spliced into the
+  post templates (not the base ones: only article pages have body
+  images). An image is marked zoomable, and given the cursor, the
+  button role and keyboard focus, only while the original holds detail
+  the column is not already showing; the measure is the `width`
+  attribute both exporters emit, since `naturalWidth` reports the
+  srcset variant's width density-corrected to the layout size. The
+  modal loads the `src` — always the full-size original, never a
+  srcset variant — into a `<dialog>`, captioned with the image's alt
+  text. Images inside a link are skipped, so a linked image still
+  follows its link. Closes on a click anywhere, on Esc (the dialog's
+  own) and on a page scroll, like Medium's. Re-measured on resize.
 - `dark-palette.css` — included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link

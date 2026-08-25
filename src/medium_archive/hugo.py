@@ -15,7 +15,10 @@ Hugo has no default theme. By default the exporter writes a small
 self-contained one (layouts/ + css, from the package's templates/hugo/
 and templates/shared/ files) with light and dark palettes and a
 light/dark/system picker in the header (the choice persists per
-browser; with none stored, the system scheme decides); search is then
+browser; with none stored, the system scheme decides) and
+click-to-zoom body images (post pages open an image whose original
+holds more detail than the column shows full size in a modal, like
+Medium's); search is then
 the one feature Hugo does not generate (run `pagefind --site public`
 after `hugo` for a static search UI). Or name a real theme in site.json --
 
