@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 from medium_archive.myst import (LinkMap, build_site, escape_prose,
-                                 page_stems, rewrite_body)
+                                 myst_slug, page_paths, page_stems,
+                                 rewrite_body)
 
 BASE = "https://blog.example.com"
 
@@ -40,7 +41,8 @@ def archive(tmp_path):
     second = tmp_path / "posts/2021-03-01-second-post"
     make_post(tmp_path, manifest, "second-post", "bbb222bbb222",
               "2021-03-01T10:00:00Z",
-              "An image:\n\n![pic](images/001-pic.png)\n")
+              "An image:\n\n![pic](images/001-pic.png)\n",
+              images=["images/001-pic.png"])
     (second / "images").mkdir()
     (second / "images" / "001-pic.png").write_bytes(b"PNG")
     (tmp_path / "posts.json").write_text(json.dumps(manifest))
@@ -59,19 +61,36 @@ def test_pages_images_and_toc(archive):
     assert 'tags: ["example"]' in text
     assert "![pic](images/001-pic.png)" in text
     assert (page.parent / "images/001-pic.png").read_bytes() == b"PNG"
+    # the first image becomes the page's thumbnail (its gallery card);
+    # junk bytes defeat the Pillow bake, so cover.jpg is a plain copy
+    assert 'thumbnail: "images/cover.jpg"' in text
+    assert (page.parent / "images/cover.jpg").read_bytes() == b"PNG"
+    first = (site / "posts/2020-01-05-first-post/first-post.md").read_text()
+    assert "thumbnail" not in first            # no images, no cover card
     # archive provenance stays out of site front matter
     assert "medium_id" not in text and "body_source" not in text
 
     yml = (site / "myst.yml").read_text()
     assert "template: book-theme" in yml
+    # the gallery plugin, then the local cover transform (order matters)
+    assert yml.index("myst-listing") < yml.index("listing-covers.mjs")
+    assert (site / "listing-covers.mjs").exists()
     # years newest first, one child file per post
     assert yml.index('- title: "2021"') < yml.index('- title: "2020"')
     assert "- file: posts/2021-03-01-second-post/second-post.md" in yml
     assert "- file: posts/2020-01-05-first-post/first-post.md" in yml
 
+    # the landing page is the gallery; the chronological list moved to
+    # archive.md, which the toc lists after it
     index = (site / "index.md").read_text()
-    assert "[Second Post](posts/2021-03-01-second-post/second-post.md)" in index
-    assert "## 2021" in index and "## 2020" in index
+    assert ":::{listing}" in index and ":display: gallery" in index
+    assert ":limit: 0" in index                 # every post, not the default 10
+    assert "(archive.md)" in index
+    assert yml.index("- file: index.md") < yml.index("- file: archive.md")
+    archive_page = (site / "archive.md").read_text()
+    assert "[Second Post](posts/2021-03-01-second-post/second-post.md)" \
+        in archive_page
+    assert "## 2021" in archive_page and "## 2020" in archive_page
 
 
 def test_internal_links_rewritten(archive):
@@ -175,6 +194,55 @@ def test_mononym_author_is_literal(tmp_path):
     site = build_site(tmp_path)
     text = (site / "posts/2020-01-01-solo/solo.md").read_text()
     assert 'authors:\n  - name:\n      literal: "yuvipanda"\n' in text
+
+
+def test_myst_slug_mirrors_mystmd():
+    # unchanged: already a short [a-z0-9-] slug
+    assert myst_slug("first-post") == "first-post"
+    # non-ascii collapses to '-', like mystmd's createSlug
+    assert myst_slug("voilà-0-5-0-homecoming") == "voil-0-5-0-homecoming"
+    # a leading enumeration is stripped, but a year is kept
+    assert myst_slug("700-jupyterlab-4-extensions") == "jupyterlab-4-extensions"
+    assert myst_slug("2026-06-24-congratulations-post") == \
+        "2026-06-24-congratulations-post"
+    # capped at 50 characters after the trim, so a '-' can survive at the end
+    long = "a-users-journey-with-plugin-playground-from-first-idea"
+    assert myst_slug(long) == long[:50] and myst_slug(long).endswith("-")
+
+
+def test_page_paths_number_collisions_in_toc_order(tmp_path):
+    manifest = {}
+    # both truncate to the same 50-character slug; mystmd numbers the one
+    # it loads second -- the older post, in the newest-first toc
+    base = "join-us-for-the-jupyter-accessibility-workshops-part"
+    make_post(tmp_path, manifest, base + "-1", "aaa111aaa111",
+              "2022-08-01T00:00:00Z", "One.\n")
+    make_post(tmp_path, manifest, base + "-2", "bbb222bbb222",
+              "2022-11-01T00:00:00Z", "Two.\n")
+    # a post literally named archive collides with the archive page
+    make_post(tmp_path, manifest, "archive", "ccc333ccc333",
+              "2023-01-01T00:00:00Z", "Three.\n")
+    stems = page_stems(manifest)
+    paths = page_paths(manifest, stems)
+    trunc = myst_slug(base + "-2")
+    assert trunc == myst_slug(base + "-1")     # they do collide
+    assert paths[base + "-2"] == f"/{trunc}"
+    assert paths[base + "-1"] == f"/{trunc}-1"
+    assert paths["archive"] == "/archive-1"
+
+
+def test_redirects_use_served_urls(tmp_path):
+    manifest = {}
+    slug = "announcing-jupyter-builder-a-standalone-build-system"
+    make_post(tmp_path, manifest, slug, "aaa111aaa111",
+              "2026-06-19T00:00:00Z", "Hi.\n")
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    site = build_site(tmp_path)
+    rows = (site / "redirects.csv").read_text()
+    # the page file keeps the full slug; the redirect target is the
+    # 50-character URL mystmd will actually serve
+    assert (site / f"posts/2026-06-19-{slug}/{slug}.md").exists()
+    assert f",/{slug[:50]}," in rows and f",/{slug}," not in rows
 
 
 def test_missing_manifest_exits(tmp_path):

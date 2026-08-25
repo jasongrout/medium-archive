@@ -56,18 +56,30 @@ It works in independent steps:
   entry that matches no post aborts a full run, like a fixup that no
   longer applies.
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
-  `<out>/site/` from the converted posts: one page per post (its filename
-  is the page's URL slug), a chronological landing page, a year-grouped
-  table of contents, and a `site/redirects.csv` mapping every old inbound
-  path — Medium slug+id, `/p/<id>`, Ghost-era — to its page URL. Links
+  `<out>/site/` from the converted posts: one page per post, a
+  cover-image gallery landing page (every post as a card, newest first,
+  via the [myst-listing](https://contrib.mystmd.org/myst-listing/)
+  plugin, with each post's first still image of sane size baked to the
+  same 640×360 thumbnail as the hugo/pelican card themes' and doubling
+  as the page's social-card image; a small generated companion plugin,
+  `site/listing-covers.mjs`, turns the gallery's cover backgrounds into
+  real image nodes so mystmd's image pipeline serves local thumbnails),
+  a chronological `archive` page, a year-grouped table of contents, and
+  a `site/redirects.csv` mapping every old inbound path — Medium
+  slug+id, `/p/<id>`, Ghost-era — to its page URL, the one mystmd
+  actually serves: slugs are capped at 50 characters and stripped to
+  `[a-z0-9-]`, so the exporter replicates mystmd's slug rules (including
+  collision numbering) rather than assuming filename == URL. Links
   between posts of the publication are rewritten from Medium URLs to site
   pages, front matter is reshaped to MyST's schema, and prose MyST would
   misparse (`@handle` mentions as citations, paired `$` signs as math) is
   escaped. Like `convert` it never touches the network, so the whole site
-  reproduces from `raw/` + `fixups/`: `convert` then `myst`. Site-wide
-  text (title, description, landing-page intro) comes from an optional
-  hand-written `<out>/site.json`. Render the result with `myst start` or
-  `myst build --html` inside `<out>/site/` (`npm install -g mystmd`).
+  reproduces from `raw/` + `fixups/`: `convert` then `myst` (mystmd
+  downloads the pinned listing plugin at build time, like the site theme
+  itself). Site-wide text (title, description, landing-page intro) comes
+  from an optional hand-written `<out>/site.json`. Render the result with
+  `myst start` or `myst build --html` inside `<out>/site/`
+  (`npm install -g mystmd`).
 * **`hugo`**, **`zola`** and **`pelican`** (optional) do the same for
   those generators, into `<out>/site-hugo/`, `<out>/site-zola/` and
   `<out>/site-pelican/` — same page URLs (`/posts/<slug>/`), same link
