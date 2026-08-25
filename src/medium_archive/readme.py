@@ -25,15 +25,15 @@ Medium. It has two layers:
   the contract the new site's redirects are built from. The bulky derived
   trees (`posts/` and the site directories) are better left ignored and
   regenerated.
-* `site/` (optional) is a **MyST site** derived from the converted posts by
-  `medium-archive myst`: one page per post, a cover-image gallery landing
+* `site-myst/` (optional) is a **MyST site** derived from the converted
+  posts by `medium-archive myst`: one page per post, a cover-image landing
   page (every post as a card, newest first, via the myst-listing plugin,
   https://contrib.mystmd.org/myst-listing/), a chronological `archive`
   page, a year-grouped table of contents, links between posts of the
-  publication rewritten to site pages, and a `site/redirects.csv` mapping
-  every old inbound path to the page URL mystmd actually serves.
+  publication rewritten to site pages, and a `site-myst/redirects.csv`
+  mapping every old inbound path to the page URL mystmd actually serves.
   Regenerate it any time (`convert` then `myst`); render it with
-  `myst start` or `myst build --html` inside `site/`
+  `myst start` or `myst build --html` inside `site-myst/`
   (https://mystmd.org). Site-wide text lives in a hand-written
   `site.json` (title, description, landing-page intro, optional base_url),
   versioned with the archive. `medium-archive hugo` and `pelican` build
@@ -169,7 +169,7 @@ posts/
     images/<filename>         images copied from raw/, referenced relatively
 site.json                     optional hand-written site text used by `myst`:
                                 title, description, intro (landing page)
-site/                         optional MyST site built by `medium-archive
+site-myst/                    optional MyST site built by `medium-archive
                                 myst` from posts/ + posts.json:
   myst.yml                    project config, plugins, and year-grouped toc
   index.md                    landing page: intro + cover-image post gallery
@@ -275,8 +275,8 @@ too.
   one) until the post is re-fetched.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating (the
-  `myst` step already does this for the MyST site in `site/`).
-* In `site/` pages, `@handle` mentions and `$` signs are backslash-escaped
+  `myst` step already does this for the MyST site in `site-myst/`).
+* In `site-myst/` pages, `@handle` mentions and `$` signs are backslash-escaped
   so MyST does not parse them as citations or math; links to in-page
   anchors that never survived the Medium conversion (old footnote anchors)
   stay as they are in `posts/` and are reported by `myst build`.
@@ -293,7 +293,7 @@ too.
     medium-archive convert --clean --out {out}           # rebuild posts/ from raw/
     medium-archive lint --out {out}                      # check for conversion defects
     medium-archive stats --out {out}                     # summarize the archive
-    medium-archive myst --out {out}                      # rebuild site/ from posts/
+    medium-archive myst --out {out}                      # rebuild site-myst/ from posts/
     medium-archive hugo --out {out}                      # rebuild site-hugo/
     medium-archive pelican --out {out}                   # rebuild site-pelican/
 
@@ -327,7 +327,7 @@ pelican (preferred):
 myst:
 
     medium-archive myst --out {out}
-    cd {out}/site
+    cd {out}/site-myst
     myst start
 """
 

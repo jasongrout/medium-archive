@@ -53,7 +53,7 @@ clean `lint` run, and the offline test suite):
   editor-state copy: its markup offsets index into the stored text, so
   editing it would skew them.
 
-- **`myst` subcommand** — builds a MyST (mystmd) site in `<out>/site/`
+- **`myst` subcommand** — builds a MyST (mystmd) site in `<out>/site-myst/`
   from the converted posts, so a browsable blog reproduces offline from
   `raw/` + `fixups/` (`convert` then `myst`). One page per post with its
   filename as the URL slug (date-prefixed only when several posts share a
@@ -65,7 +65,7 @@ clean `lint` run, and the offline test suite):
   640×360 crop-or-letterbox thumbnails as the hugo/pelican card
   themes', double as each page's social-card image, and are made to
   work for local files by a small generated companion plugin,
-  `site/listing-covers.mjs`, that turns the gallery's CSS cover
+  `site-myst/listing-covers.mjs`, that turns the gallery's CSS cover
   backgrounds into real image nodes mystmd's image pipeline serves), a
   chronological `archive` page, in-publication links rewritten to site
   pages, MyST-hostile prose escaped (`@handle` would parse as a

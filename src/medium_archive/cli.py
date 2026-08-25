@@ -9,7 +9,7 @@
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in <out>/posts/, plus posts.json and redirects.csv
-    myst           build a MyST (mystmd) site in <out>/site/ from the
+    myst           build a MyST (mystmd) site in <out>/site-myst/ from the
                    converted posts, ready for `myst start` / `myst build`
     hugo           build a Hugo site in <out>/site-hugo/
     pelican        build a Pelican site in <out>/site-pelican/
@@ -36,7 +36,7 @@ Examples:
     medium-archive import-ghost https://blog.example.com/     # Ghost captures
     medium-archive compare                                      # page vs export check
     medium-archive convert                                      # raw -> posts/
-    medium-archive myst                                         # posts/ -> site/
+    medium-archive myst                                         # posts/ -> site-myst/
     medium-archive hugo                                         # posts/ -> site-hugo/
     medium-archive stats                                        # summarize the archive
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
@@ -240,15 +240,16 @@ def main():
                        help="skip image downloads (convert will keep the "
                             "original, likely dead, URLs)")
     add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
-    parser("myst", help="build a MyST (mystmd) site in <out>/site/ from the "
-                        "converted posts: one page per post, a chronological "
+    parser("myst", help="build a MyST (mystmd) site in <out>/site-myst/ "
+                        "from the converted posts: one page per post, a "
+                        "chronological "
                         "landing page, a year-grouped table of contents, "
                         "in-publication links rewritten to site pages, and a "
                         "redirect map from old inbound paths to page URLs. "
                         "Rebuilt from scratch each run; site-wide text (title, "
                         "description, landing-page intro) comes from an "
                         "optional hand-written <out>/site.json. Render with "
-                        "`myst start` or `myst build --html` inside <out>/site/ "
+                        "`myst start` or `myst build --html` inside <out>/site-myst/ "
                         "(https://mystmd.org)")
     parser("hugo", help="build a Hugo site in <out>/site-hugo/ from the "
                         "converted posts: a self-contained card-grid blog "

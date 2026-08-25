@@ -59,16 +59,16 @@ It works in independent steps:
   keeping the originals; a stale entry that changes no post aborts a
   full run, like a fixup that no longer applies.
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
-  `<out>/site/` from the converted posts: one page per post, a
+  `<out>/site-myst/` from the converted posts: one page per post, a
   cover-image gallery landing page (every post as a card, newest first,
   via the [myst-listing](https://contrib.mystmd.org/myst-listing/)
   plugin, with each post's first still image of sane size baked to the
   same 640×360 thumbnail as the hugo/pelican card themes' and doubling
   as the page's social-card image; a small generated companion plugin,
-  `site/listing-covers.mjs`, turns the gallery's cover backgrounds into
-  real image nodes so mystmd's image pipeline serves local thumbnails),
+  `site-myst/listing-covers.mjs`, turns the gallery's cover backgrounds
+  into real image nodes so mystmd's image pipeline serves local thumbnails),
   a chronological `archive` page, a year-grouped table of contents, and
-  a `site/redirects.csv` mapping every old inbound path — Medium
+  a `site-myst/redirects.csv` mapping every old inbound path — Medium
   slug+id, `/p/<id>`, Ghost-era — to its page URL, the one mystmd
   actually serves: slugs are capped at 50 characters and stripped to
   `[a-z0-9-]`, so the exporter replicates mystmd's slug rules (including
@@ -81,7 +81,7 @@ It works in independent steps:
   downloads the pinned listing plugin at build time, like the site theme
   itself). Site-wide text (title, description, landing-page intro) comes
   from an optional hand-written `<out>/site.json`. Render the result with
-  `myst start` or `myst build --html` inside `<out>/site/`
+  `myst start` or `myst build --html` inside `<out>/site-myst/`
   (`npm install -g mystmd`).
 * **`hugo`** and **`pelican`** (optional) do the same for
   those generators, into `<out>/site-hugo/` and
@@ -229,7 +229,7 @@ medium-archive import-export medium-export.zip
 medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
 medium-archive convert                                      # raw -> posts/
-medium-archive myst                                         # posts/ -> site/
+medium-archive myst                                         # posts/ -> site-myst/
 medium-archive hugo                                         # posts/ -> site-hugo/
 medium-archive pelican                                      # posts/ -> site-pelican/
 medium-archive lint                                         # check for conversion defects
@@ -377,7 +377,7 @@ src/medium_archive/
   export.py      Medium account exports: parsing and the import-export step
   ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
-  myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site/
+  myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site-myst/
   hugo.py        the hugo step: <out>/posts/ -> a Hugo site in <out>/site-hugo/
   pelican.py     the pelican step: <out>/posts/ -> a Pelican site in <out>/site-pelican/
   sites.py       machinery shared by the site exporters: page slugs, the
