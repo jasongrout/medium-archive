@@ -16,9 +16,11 @@ and real width/height. Metadata uses Pelican's `Key: value` header format; tags 
 authors are first-class in Pelican, so tag/author listing pages and
 Atom feeds (site-wide and per tag/author) come out of the box.
 
-The exporter writes its own theme -- a card-grid blog: paginated home
-of cover-image cards, article pages, tag/author card listings, chip
-indexes, an archives timeline, and a /search/ page wired to Pagefind
+The exporter writes its own theme -- the card-grid blog shared with
+the hugo step, light and dark palettes and the header's
+light/dark/system picker included: paginated home of cover-image
+cards, article pages, tag/author card listings, chip indexes, an
+archives timeline, and a /search/ page wired to Pagefind
 (run `pagefind --site output` after `pelican` for full-text search with
 highlighted, in-context excerpts). Card covers are 640x360 thumbnails
 generated at export time when Pillow is installed (`pip install
@@ -36,6 +38,8 @@ import json
 import re
 import sys
 
+from .hugo import CSS as CARD_CSS  # hugo and pelican share the look
+from .hugo import THEME_INIT, THEME_PICKER
 from .sites import (ImagePlacer, bake_cover_thumbnails, clean_site,
                     export_content, load_site_inputs, page_stems,
                     pick_cover, write_redirects_csv)
@@ -267,6 +271,7 @@ BASE = """\
 <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
 <meta name="description" content="{{ SITESUBTITLE }}">
 <link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
+""" + THEME_INIT + """\
 <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
 </head>
 <body>
@@ -279,6 +284,7 @@ BASE = """\
 <a href="{{ SITEURL }}/archives/">Archives</a>
 <a href="{{ SITEURL }}/search/">Search</a>
 <a href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}">RSS</a>
+""" + THEME_PICKER + """\
 </nav>
 </div></header>
 <main class="wrap">
@@ -504,10 +510,10 @@ def build_site(out):
         description=json.dumps(config.get("description", ""),
                                ensure_ascii=False),
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
-        avatar=json.dumps(avatar_setting),
+        # json for the string case; None must render as Python's None
+        avatar=json.dumps(avatar_setting) if avatar_setting else "None",
     ) + SITE_PLUGIN, encoding="utf-8")
 
-    from .hugo import CSS as CARD_CSS      # hugo and pelican share the look
     for rel, text in {"theme/templates/base.html": BASE,
                       "theme/templates/macros.html": MACROS,
                       "theme/templates/pagination.html": PAGINATION,

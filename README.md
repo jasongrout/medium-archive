@@ -73,7 +73,10 @@ It works in independent steps:
   optimization, redirect stubs, capped full-content feeds); the myst
   and zola sites are maintained as simpler alternates. `hugo` and
   `pelican` ship the same self-contained card-grid blog theme (in the
-  vein of pytorch.org/blog): a paginated home of cover-image cards —
+  vein of pytorch.org/blog), in light and dark palettes with a
+  light/dark/system picker in the header — the choice persists per
+  browser, and with none stored the system scheme decides: a
+  paginated home of cover-image cards —
   each post's first still image of sane size, chosen by header-sniffing
   dimensions — tag links, excerpt and byline per card; article pages;
   tag/author card listings with chip indexes; and a `/search/` page
