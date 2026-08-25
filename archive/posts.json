@@ -8481,5 +8481,31 @@
     ],
     "body_source": "feed",
     "dir": "posts/2026-08-24-jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more"
+  },
+  "https://blog.jupyter.org/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f": {
+    "title": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey",
+    "author": "Jupyter Foundation",
+    "author_url": "https://medium.com/@jupyterfoundation",
+    "date": "2026-08-25T13:42:25Z",
+    "updated": "2026-08-25T21:08:53Z",
+    "original_url": "https://blog.jupyter.org/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f",
+    "original_path": "/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f",
+    "medium_id": "9a2d911cf42f",
+    "slug": "what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey From time to time, Jupyter runs user surveys to understand how our communities use Jupyter technology …",
+    "tags": [],
+    "images": [
+      "images/001-1_EcfaS7-4u-hlCUlTaEBitQ.png",
+      "images/002-1_1Q3i-K3MyiXphDKM3T6HPw.png",
+      "images/003-1_L0ijL6NDSBdIacvf-dZEZg.png",
+      "images/004-1__kmIHa7KfW5V6GCVnRyOzg.png",
+      "images/005-1_T7HFyQuaysQbyU7YqdcAgA.png",
+      "images/006-1_EqKzmO74B8Rk9uteMOxlWA.png",
+      "images/007-1_OuWj_WKQ2Oxl7rO6bV8NLA.png"
+    ],
+    "body_source": "feed",
+    "dir": "posts/2026-08-25-what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan"
   }
 }
