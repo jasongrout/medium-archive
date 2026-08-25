@@ -167,3 +167,11 @@ Remaining judgement calls, all optional:
   line on the child's page) would be a medium-archive theme change:
   a parent-map in the site config that the hugo/pelican/zola/myst
   tag-index templates read. Nothing needed in this repo but the map.
+- Another natural hierarchy: a broad "Jupyter projects" parent over the
+  specific tool tags (`jupyterlab`, `jupyterhub`, `binder`, `voila`,
+  `jupyterlite`, `xeus`, and the small ones — `anywidget`, `elyra`,
+  `jupytercad`, `tljh`, …). Unlike geoscience/jupytercon it would sit
+  on most of the archive, so it is more a tag-index grouping than a tag
+  every post should carry; probably wants the parent-map/theme approach
+  above rather than denormalized double-tagging. Idea only — not acted
+  on.
