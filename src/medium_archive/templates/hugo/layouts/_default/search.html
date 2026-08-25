@@ -3,11 +3,13 @@
 {{- /* Pagefind's Component UI (its recommended integration since 1.5),
        composed as input + summary + in-page results rather than the
        searchbox dropdown, so results stay on the page -- scrollable and
-       findable with the browser's own search. The elements find the
-       index bundle at /pagefind/ on their own. */}}
+       findable with the browser's own search. The elements default to a
+       host-root /pagefind/ bundle, so under a subpath baseURL both the
+       bundle and the result links must be pointed at the deployment. */}}
 <link rel="stylesheet" href="{{ "pagefind/pagefind-component-ui.css" | relURL }}">
 <script type="module" src="{{ "pagefind/pagefind-component-ui.js" | relURL }}"></script>
 <div id="search">
+<pagefind-config bundle-path="{{ "pagefind/" | relURL }}" base-url="{{ site.Home.RelPermalink }}"></pagefind-config>
 <pagefind-input autofocus placeholder="Search the archive"></pagefind-input>
 <pagefind-summary></pagefind-summary>
 <pagefind-results></pagefind-results>

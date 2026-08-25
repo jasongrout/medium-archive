@@ -4,7 +4,8 @@
 :root { --accent: #f37726; --accent-dark: #c85a11; --ink: #1c1c1c;
         --soft: #444444; --muted: #6a6a6a; --bg: #f4f4f4; --card: #ffffff;
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
-        color-scheme: light; }
+        --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
+        --error-soft: #b91c1c; color-scheme: light; }
 :root[data-theme="dark"] {
 /* @include shared/dark-palette.css */
 }
@@ -119,7 +120,10 @@ ul.pagination .active .page-link { background: var(--accent); color: #fff; }
           --pf-text: var(--ink); --pf-text-secondary: var(--soft);
           --pf-text-muted: var(--muted); --pf-background: var(--card);
           --pf-border: var(--line); --pf-skeleton: var(--code-bg);
-          --pf-hover: var(--code-bg); --pf-mark: var(--ink); }
+          --pf-hover: var(--code-bg); --pf-mark: var(--ink);
+          --pf-error-bg: var(--error-bg); --pf-error-border: var(--error-line);
+          --pf-error-text: var(--error-ink);
+          --pf-error-text-secondary: var(--error-soft); }
 #search mark { color: inherit; border-radius: 2px; padding: 0 .12em;
                background: var(--mark) !important; }
 #search .pf-result-title { margin-bottom: .2rem; }
