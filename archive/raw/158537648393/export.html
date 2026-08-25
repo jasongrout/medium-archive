@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Release of IPython 5.5 and 6.2</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Release of IPython 5.5 and 6.2</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Four month after releasing IPython 6.1 and 5.4, and a couple of hours after the release of the notebook 5.1, we are happy to announce the…
+</section>
+<section data-field="body" class="e-content">
+<section name="79c7" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="243e" id="243e" class="graf graf--h3 graf--leading graf--title">Release of IPython 5.5 and 6.2</h3><p name="dc21" id="dc21" class="graf graf--p graf-after--h3">Four month after releasing IPython 6.1 and 5.4, and a couple of hours after the release of the notebook 5.1, we are happy to announce the release of IPython 6.2 (Python 3 only), and it’s cousin IPython 5.5 still compatible with Python 2.7.</p><p name="b12c" id="b12c" class="graf graf--p graf-after--p">You can update now by using:</p><pre name="1bd5" id="1bd5" class="graf graf--pre graf-after--p">pip install --upgrade ipython</pre><p name="c8fc" id="c8fc" class="graf graf--p graf-after--pre">If you have a recent enough version of pip you will get the latest compatible version of IPython regardless of the version of Python you are running.</p><p name="a739" id="a739" class="graf graf--p graf-after--p">The conda packages are on their way; once available you will be able to update with:</p><pre name="787d" id="787d" class="graf graf--pre graf-after--p">conda install ipython</pre><h3 name="2dbb" id="2dbb" class="graf graf--h3 graf-after--pre">New Features</h3><p name="2acc" id="2acc" class="graf graf--p graf-after--h3">As IPython 6.2 and 5.5 are minor releases you will only find a small number of new features. When API additions were done on IPython 6.2 they were backported on 5.5 to simplify the maintenance of code compatible both with Python 2.7 and 3+. You can find the full list of new features in the <a href="http://ipython.readthedocs.io/en/stable/whatsnew/version6.html" data-href="http://ipython.readthedocs.io/en/stable/whatsnew/version6.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">changelog</a>.</p><p name="114f" id="114f" class="graf graf--p graf-after--p">As a quick teaser, IPython 6.2 can now:</p><ul class="postList"><li name="d943" id="d943" class="graf graf--li graf-after--p">Show function signature in the terminal while completing.</li><li name="b64c" id="b64c" class="graf graf--li graf-after--li">Assignments can trigger the display mechanism</li><li name="19bd" id="19bd" class="graf graf--li graf-after--li">IPdb can be called recursively</li><li name="be38" id="be38" class="graf graf--li graf-after--li">Support for system-wide configuration</li><li name="b019" id="b019" class="graf graf--li graf-after--li">Built-in support for Progress Bar.</li></ul><p name="8411" id="8411" class="graf graf--p graf-after--li">Head <a href="http://ipython.readthedocs.io/en/stable/whatsnew/version6.html#ipython-6-2" data-href="http://ipython.readthedocs.io/en/stable/whatsnew/version6.html#ipython-6-2" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">there</a> for more complete description.</p><h3 name="837e" id="837e" class="graf graf--h3 graf-after--p">Slowing down backports to 5.x</h3><p name="42c1" id="42c1" class="graf graf--p graf-after--h3">As stated on our <a href="https://github.com/jupyter/roadmap/blob/master/accepted/migration-to-python-3-only.md" data-href="https://github.com/jupyter/roadmap/blob/master/accepted/migration-to-python-3-only.md" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">roadmap</a>, we’ll keep releasing a 5.x for some time, though starting at end of year. However, we will decrease our active involvement in fixing bugs affecting the 5.x branch. We will still accept PRs, and backport if you nicely ask us. Releases will happen occasionally if fixes are available, but we will be sunsetting the Python 2 support slowly.</p><p name="a5d8" id="a5d8" class="graf graf--p graf-after--p">If you are interested in further maintenance of the 5.x branch, we would love help with that work. Feel free to contact us on GitHub.</p><h3 name="f7e5" id="f7e5" class="graf graf--h3 graf-after--p">What’s next ?</h3><p name="ab01" id="ab01" class="graf graf--p graf-after--h3">We are going to start thinking about IPython 7, and start to embrace more of the Python 3 only features. Slowing down backports should allow us to be more confident that changes will not affect the automatic application of patches on old branches. Trimming down old legacy code may also help to regain some speed on interpreter startup, and should lead to plenty of opportunities for new contributors to join.</p><p name="d713" id="d713" class="graf graf--p graf-after--p">We will also try to simplify our documentation, and make often requested sections easier to find.</p><p name="b4ad" id="b4ad" class="graf graf--p graf-after--p">If you are looking for a project to contribute to – code, documentation, example, design, helping others, feel free to contact us so we can guide you through the process.</p><p name="552d" id="552d" class="graf graf--p graf-after--p graf--trailing">Enjoy this new release, and hope to see you around the mailing list and bug tracker!</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@mbussonn" class="p-author h-card">M Bussonnier</a> on <a href="https://medium.com/p/158537648393"><time class="dt-published" datetime="2017-09-15T18:42:51.052Z">September 15, 2017</time></a>.</p><p><a href="https://medium.com/@mbussonn/release-of-ipython-5-5-and-6-2-158537648393" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 25, 2026.</p></footer></article></body></html>

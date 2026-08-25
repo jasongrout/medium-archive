@@ -786,7 +786,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:09:44+00:00",
     "images": 0,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/jupytergis-d63b7adf9d0c": {
     "medium_id": "d63b7adf9d0c",
@@ -1460,7 +1462,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:13:21+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/jupyter-conference-advisory-committee-9c096d308552": {
     "medium_id": "9c096d308552",
@@ -1482,7 +1486,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:13:24+00:00",
     "images": 0,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/jupyter-notebooks-for-post-election-audits-4bdd13d3e800": {
     "medium_id": "4bdd13d3e800",
@@ -1901,7 +1907,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:15:13+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-1-133e0e522d1b": {
     "medium_id": "133e0e522d1b",
@@ -2097,7 +2105,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:16:21+00:00",
     "images": 1,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/field-report-on-the-kernel-community-workshop-a4ad73a1a718": {
     "medium_id": "a4ad73a1a718",
@@ -2149,7 +2159,9 @@
     "found_via": "sitemap",
     "fetched_at": "2026-08-22T22:16:35+00:00",
     "images": 0,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/build-a-jupyter-widget-with-react-and-typescript-d83e07340fa3": {
     "medium_id": "d83e07340fa3",
@@ -2973,7 +2985,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:21:15+00:00",
     "images": 6,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/introducing-jupyter-enterprise-gateway-db4859f86762": {
     "medium_id": "db4859f86762",
@@ -3015,7 +3029,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:21:24+00:00",
     "images": 2,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/security-fix-for-jupyter-notebook-450f272b6932": {
     "medium_id": "450f272b6932",
@@ -3155,7 +3171,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:21:47+00:00",
     "images": 4,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/new-funding-for-jupyter-12009a836867": {
     "medium_id": "12009a836867",
@@ -3306,7 +3324,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:22:21+00:00",
     "images": 0,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/jupytercon-2018-call-for-proposal-87986014ee0b": {
     "medium_id": "87986014ee0b",
@@ -3316,7 +3336,9 @@
     "found_via": "wayback",
     "fetched_at": "2026-08-22T22:22:24+00:00",
     "images": 3,
-    "in_feed": false
+    "in_feed": false,
+    "in_export": true,
+    "imported_at": "2026-08-25T21:25:27+00:00"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-3-0-f2b08652279d": {
     "medium_id": "f2b08652279d",
