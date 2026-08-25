@@ -158,3 +158,12 @@ Remaining judgement calls, all optional:
 - `jupyter-notebook` (108 posts, a third of the archive) mixes "about
   the Notebook application" with "uses notebooks"; splitting would be
   hand-work in `"add"`.
+- The nested pairs (`geoscience` under `science`, `jupytercon` under
+  `events`) work today by each post carrying both tags — every
+  generator's taxonomy is flat, so the parent's tag page naturally
+  includes the children's posts — but the tag index pages still list
+  parent and child as siblings. Displaying the relationship (children
+  indented under their parent on the tag index, a "part of: science"
+  line on the child's page) would be a medium-archive theme change:
+  a parent-map in the site config that the hugo/pelican/zola/myst
+  tag-index templates read. Nothing needed in this repo but the map.
