@@ -33,7 +33,7 @@ from pathlib import Path
 from .sites import (ImagePlacer, LinkMap, by_year, clean_site,
                     link_or_copy, load_site_inputs, make_cover_thumbnail,
                     page_stems, pick_cover, read_post_body,
-                    rewrite_body as _rewrite, template_text,
+                    retarget_images, rewrite_body as _rewrite, template_text,
                     write_redirects_csv)
 
 # Segments MyST-escaping must leave alone: inline code, link destinations,
@@ -244,21 +244,28 @@ def build_site(out: Path) -> Path:
         page_dir = site / "posts" / Path(p["dir"]).name
         page_dir.mkdir()
         cover = covers.get(url)
-        (page_dir / f"{stems[url]}.md").write_text(
-            page_front_matter(p, cover and ("images/cover.jpg" if have_pillow
-                                            else cover)) + body,
-            encoding="utf-8")
+        # images first: a display copy can change format, and the page
+        # has to reference the name that was actually placed
+        renames = {}
         images = out / p["dir"] / "images"
         if images.is_dir():
             (page_dir / "images").mkdir()
             for img in sorted(images.iterdir()):
-                placer.place(img, page_dir / "images" / img.name)
+                dst = placer.place(img, page_dir / "images" / img.name)
+                if dst.name != img.name:
+                    renames[img.name] = dst.name
+        (page_dir / f"{stems[url]}.md").write_text(
+            retarget_images(
+                page_front_matter(p, cover and ("images/cover.jpg"
+                                                if have_pillow else cover))
+                + body, renames),
+            encoding="utf-8")
         if cover and have_pillow:
             # baked beside the placed originals; an image that defeats
             # Pillow keeps its (already placed) display copy instead
             dst = page_dir / "images" / "cover.jpg"
             if not make_cover_thumbnail(out / p["dir"] / cover, dst):
-                link_or_copy(page_dir / cover, dst)
+                link_or_copy(page_dir / retarget_images(cover, renames), dst)
         pages += 1
 
     placer.report()

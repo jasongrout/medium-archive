@@ -42,17 +42,23 @@ def _write_redirect_stubs(pelican_obj):
 # Responsive body images, like the hugo exporter's render hook: webp
 # variants at these widths (never upscaled), advertised via srcset with
 # this sizes hint, plus real width/height so the layout cannot shift.
+# Photographs only -- png and webp here are line art the placer kept
+# whole (see ImagePlacer), whose 9 px text does not survive a 736 px
+# variant, and an animated gif would lose its frames.
 VARIANT_WIDTHS = (480, 736, 1104)
 SIZES_ATTR = "(max-width: 800px) 100vw, 736px"
 IMG_TAG_RE = None   # compiled on first use
-ARTICLE_IMG = r"/?posts/[^/]+/images/[^/]+\.(?:png|jpe?g)"
+ARTICLE_IMG = r"/?posts/[^/]+/images/[^/]+\.(?:png|jpe?g|gif|webp)"
+VARIANT_IMG = r"/?posts/[^/]+/images/[^/]+\.jpe?g"
 
 
 def _optimize_article_images(pelican_obj):
-    # Rewrite each article's still body images (the constrained pattern
-    # this exporter itself emits; gif/svg/webp pass through) to lazily
-    # loaded responsive variants. Variants are cached by mtime, so only
-    # new or changed images are re-encoded on later builds.
+    # Rewrite each article's body images (the constrained pattern this
+    # exporter itself emits; anything else passes through): every one
+    # gets real width/height and a link to the file itself, and
+    # photographs additionally get lazily loaded responsive variants.
+    # Variants are cached by mtime, so only new or changed images are
+    # re-encoded on later builds.
     try:
         from PIL import Image
     except ImportError:
@@ -65,6 +71,7 @@ def _optimize_article_images(pelican_obj):
     tag_re = re.compile(r"<img\b[^>]*>")
     attr_re = re.compile(r'([-\w]+)="([^"]*)"')
     path_re = re.compile(ARTICLE_IMG + "$", re.I)
+    variant_re = re.compile(VARIANT_IMG + "$", re.I)
     stats = {"variants": 0, "pages": 0}
 
     here = os.path.dirname(os.path.abspath(__file__))
@@ -85,15 +92,18 @@ def _optimize_article_images(pelican_obj):
         if not os.path.exists(source):
             source = local
         try:
+            wants_variants = bool(variant_re.fullmatch(path))
             with Image.open(source) as im:
                 width, height = im.size
-                im.load()
-                if im.mode == "P":
-                    im = im.convert("RGBA")
-                elif im.mode not in ("RGB", "RGBA"):
-                    im = im.convert("RGB")
                 srcset = []
-                for vw in VARIANT_WIDTHS:
+                # line art and animations are read for their dimensions
+                # alone; only a photograph is decoded and re-encoded
+                if wants_variants:
+                    if im.mode == "P":
+                        im = im.convert("RGBA")
+                    elif im.mode not in ("RGB", "RGBA"):
+                        im = im.convert("RGB")
+                for vw in (VARIANT_WIDTHS if wants_variants else ()):
                     if width < vw:
                         continue
                     variant = os.path.splitext(local)[0] + "-%d.webp" % vw
