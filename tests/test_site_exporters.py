@@ -187,6 +187,34 @@ def test_pelican_site(archive):
     assert "VARIANT_WIDTHS = (480, 736, 1104)" in config
 
 
+def test_theme_picker_and_dark_scheme(archive):
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    css = (hugo_site / "static/css/style.css").read_text()
+    # dark palette under both routes: an explicit picker choice pins
+    # data-theme; with none stored, the system scheme decides
+    assert ':root[data-theme="dark"]' in css
+    assert "@media (prefers-color-scheme: dark)" in css
+    assert ':root:not([data-theme="light"])' in css
+    assert ".theme-picker" in css
+    assert (pelican_site / "theme/static/css/style.css").read_text() == css
+    for base in (hugo_site / "layouts/_default/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        text = base.read_text()
+        for choice in ("light", "system", "dark"):
+            assert f'data-set-theme="{choice}"' in text, base
+        # the stored choice applies before the stylesheet loads, so a
+        # page cannot flash the wrong scheme
+        assert text.index("localStorage.getItem") < text.index("stylesheet")
+    # the snippets embed verbatim, so they must carry no template syntax
+    # the other engine would mangle
+    for snippet in (hugo.THEME_INIT, hugo.THEME_PICKER):
+        assert "{{" not in snippet and "{%" not in snippet
+    # without an avatar the config must still be valid Python
+    # (json.dumps(None) would emit a NameError-raising `null`)
+    assert "AVATAR = None" in (pelican_site / "pelicanconf.py").read_text()
+
+
 def test_build_output_survives_regeneration(archive):
     for module, kept in ((hugo, "public"), (zola, "public"),
                          (pelican, "output")):

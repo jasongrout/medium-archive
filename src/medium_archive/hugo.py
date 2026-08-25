@@ -12,9 +12,11 @@ and per-term RSS feeds, and every old inbound path (Medium slug+id,
 old links on any static host.
 
 Hugo has no default theme. By default the exporter writes a small
-self-contained one (layouts/ + css); search is then the one feature Hugo
-does not generate (run `pagefind --site public` after `hugo` for a
-static search UI). Or name a real theme in site.json --
+self-contained one (layouts/ + css) with light and dark palettes and a
+light/dark/system picker in the header (the choice persists per
+browser; with none stored, the system scheme decides); search is then
+the one feature Hugo does not generate (run `pagefind --site public`
+after `hugo` for a static search UI). Or name a real theme in site.json --
 
     "hugo": {"theme": "dream",
              "theme_repo": "https://github.com/g1eny0ung/hugo-theme-dream",
@@ -64,6 +66,58 @@ author = "authors"
 unsafe = true
 """
 
+# Runs before the stylesheet loads, so a stored choice cannot flash the
+# wrong scheme: an explicit light/dark choice pins data-theme on <html>;
+# no attribute means prefers-color-scheme decides (see CSS). Plain
+# HTML+JS with no {{ }}, so the hugo and pelican templates embed the
+# same snippet verbatim.
+THEME_INIT = """\
+<script>
+(function () {
+  try {
+    var theme = localStorage.getItem("theme");
+    if (theme === "light" || theme === "dark")
+      document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {}
+})();
+</script>
+"""
+
+# The header's light/system/dark picker (shared with pelican, like
+# THEME_INIT). Hidden until its script runs, since without JS a choice
+# could not apply anyway; picking "system" clears the stored choice so
+# prefers-color-scheme rules again.
+THEME_PICKER = """\
+<span class="theme-picker" role="group" aria-label="Color scheme" hidden>
+<button type="button" data-set-theme="light" title="Light" aria-label="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></button>
+<button type="button" data-set-theme="system" title="System" aria-label="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="2"/><path d="M9 20.5h6M12 17v3.5"/></svg></button>
+<button type="button" data-set-theme="dark" title="Dark" aria-label="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></button>
+</span>
+<script>
+(function () {
+  var root = document.documentElement;
+  var picker = document.querySelector(".theme-picker");
+  var buttons = picker.querySelectorAll("button");
+  function apply(choice) {
+    if (choice === "system") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", choice);
+    try {
+      if (choice === "system") localStorage.removeItem("theme");
+      else localStorage.setItem("theme", choice);
+    } catch (e) {}
+    buttons.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.setTheme === choice));
+    });
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.dataset.setTheme); });
+  });
+  apply(root.getAttribute("data-theme") || "system");
+  picker.hidden = false;
+})();
+</script>
+"""
+
 BASEOF = """\
 <!DOCTYPE html>
 <html lang="{{ site.Language.Lang }}">
@@ -73,7 +127,8 @@ BASEOF = """\
 <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
 {{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
 {{ range .AlternativeOutputFormats }}<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
-{{ end }}<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+{{ end }}""" + THEME_INIT + """\
+<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
 <header class="site-header"><div class="wrap bar">
@@ -85,6 +140,7 @@ BASEOF = """\
 <a href="{{ "/archives/" | relURL }}">Archives</a>
 <a href="{{ "/search/" | relURL }}">Search</a>
 <a href="{{ "/index.xml" | relURL }}">RSS</a>
+""" + THEME_PICKER + """\
 </nav>
 </div></header>
 <main class="wrap">
@@ -273,9 +329,32 @@ RENDER_IMAGE = """\
 {{- end -}}
 """
 
+# The dark palette, emitted twice below: once for an explicit picker
+# choice (data-theme="dark") and once for a dark system scheme with no
+# stored choice. --accent-dark doubles as the link color, so dark mode
+# lightens it to keep contrast against the dark cards.
+_DARK_PALETTE = """\
+  --accent-dark: #f08b4b; --ink: #e8e6e3; --soft: #c9c6c2; --muted: #9b9791;
+  --bg: #131313; --card: #1e1e1e; --line: #333333; --code-bg: #2a2a2a;
+  --mark: #7a4114; color-scheme: dark;
+"""
+
 CSS = """\
+/* Light is the default palette. The header picker pins an explicit
+   choice as data-theme on <html> (persisted in localStorage); with no
+   attribute, prefers-color-scheme decides -- the "system" setting. */
 :root { --accent: #f37726; --accent-dark: #c85a11; --ink: #1c1c1c;
-        --muted: #6a6a6a; --bg: #f4f4f4; --card: #ffffff; }
+        --soft: #444444; --muted: #6a6a6a; --bg: #f4f4f4; --card: #ffffff;
+        --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
+        color-scheme: light; }
+:root[data-theme="dark"] {
+""" + _DARK_PALETTE + """\
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+""" + _DARK_PALETTE + """\
+  }
+}
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink);
        font: 1rem/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -283,14 +362,27 @@ body { margin: 0; background: var(--bg); color: var(--ink);
 a { color: var(--accent-dark); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.site-header { background: var(--card); border-bottom: 1px solid #e2e2e2; }
+.site-header { background: var(--card); border-bottom: 1px solid var(--line); }
 .site-header .bar { display: flex; align-items: center; justify-content: space-between;
                     flex-wrap: wrap; gap: .5rem; padding-top: .9rem; padding-bottom: .9rem; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
-.site-header nav a { margin-left: 1.25rem; color: #444; font-weight: 500; }
+.site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
 .site-header nav a:hover { color: var(--accent-dark); }
+
+.theme-picker { display: inline-flex; vertical-align: middle; gap: .15rem;
+                margin-left: 1.25rem; padding: .15rem;
+                border: 1px solid var(--line); border-radius: 999px; }
+.theme-picker[hidden] { display: none; }
+.theme-picker button { display: inline-flex; align-items: center;
+                       justify-content: center; width: 1.6rem; height: 1.6rem;
+                       padding: 0; border: 0; border-radius: 999px;
+                       background: none; color: var(--muted); cursor: pointer; }
+.theme-picker button:hover { color: var(--accent-dark); }
+.theme-picker button[aria-pressed="true"] { background: var(--bg);
+                                            color: var(--ink); }
+.theme-picker svg { width: 1rem; height: 1rem; }
 
 .page-title { font-size: 2.4rem; font-weight: 400; margin: 2.2rem 0 1rem; }
 .intro { max-width: 46rem; color: var(--muted); margin-bottom: 2rem; }
@@ -319,15 +411,15 @@ a:hover { text-decoration: underline; }
 .post-meta { color: var(--muted); margin: 0 0 2rem; }
 .post-meta .tag::before { content: "#"; opacity: .6; }
 .post img { max-width: 100%; height: auto; border-radius: 4px; }
-.post pre { overflow-x: auto; padding: 1rem; background: #f6f6f6;
+.post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-size: .9rem; }
-.post code { background: #f6f6f6; }
+.post code { background: var(--code-bg); }
 .post blockquote { margin-left: 0; padding-left: 1rem;
-                   border-left: 3px solid var(--accent); color: #555; }
+                   border-left: 3px solid var(--accent); color: var(--soft); }
 .post figcaption, .post em img + em { color: var(--muted); }
 
 .term-list { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.5rem 0 3rem; }
-.chip { background: var(--card); border: 1px solid #e2e2e2; border-radius: 999px;
+.chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px;
         padding: .35rem .9rem; color: var(--ink); }
 .chip span { color: var(--muted); font-size: .85em; }
 .chip:hover { border-color: var(--accent); text-decoration: none; }
@@ -349,15 +441,23 @@ ul.pagination .active .page-link { background: var(--accent); color: #fff; }
    reserved for the highlighted matches; article titles are set off from
    the per-section heading hits typographically -- large bold vs small
    semibold, both in neutral ink. */
-#search { margin: 0 0 3rem; }
+#search { margin: 0 0 3rem;
+          /* The component styles itself from --pf-* custom properties
+             (light values on :root; it does not follow
+             prefers-color-scheme on its own). Redefining them here from
+             the site tokens makes the search UI track whichever palette
+             is active. */
+          --pf-text: var(--ink); --pf-text-secondary: var(--soft);
+          --pf-text-muted: var(--muted); --pf-background: var(--card);
+          --pf-border: var(--line); --pf-skeleton: var(--code-bg);
+          --pf-hover: var(--code-bg); --pf-mark: var(--ink); }
 #search mark { color: inherit; border-radius: 2px; padding: 0 .12em;
-               background: #fbd6bc !important;
-               background: color-mix(in srgb, var(--accent) 30%, white) !important; }
+               background: var(--mark) !important; }
 #search .pf-result-title { margin-bottom: .2rem; }
 #search .pf-result-link { font-size: 1.25rem !important;
                           font-weight: 700 !important;
                           color: var(--ink) !important; }
-#search .pf-result-excerpt { color: #3a3a3a !important; }
+#search .pf-result-excerpt { color: var(--soft) !important; }
 #search .pf-heading-link { font-size: .92rem !important;
                            font-weight: 600 !important;
                            color: var(--ink) !important; }
