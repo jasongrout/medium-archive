@@ -7,7 +7,8 @@
 <meta name="description" content="{{ SITESUBTITLE }}">
 <link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
 <!-- @include shared/theme-init.html -->
-<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
+{% if FAVICON %}<link rel="icon" href="{{ SITEURL }}/{{ FAVICON }}">
+{% endif %}<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
 </head>
 <body>
 {% if ANNOUNCEMENT %}<div class="announcement" data-source="{{ ANNOUNCEMENT|e }}" hidden></div>

@@ -53,6 +53,10 @@ def archive(tmp_path):
 
 
 def test_hugo_site(archive):
+    (archive / "icon.svg").write_bytes(b"SVG")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["favicon"] = "icon.svg"
+    (archive / "site.json").write_text(json.dumps(cfg))
     site = hugo.build_site(archive)
     page = site / "content/posts/second-post/index.md"
     front = json.loads(page.read_text().split("\n\n", 1)[0])
@@ -69,6 +73,10 @@ def test_hugo_site(archive):
     config = (site / "hugo.toml").read_text()
     assert 'baseURL = "https://blog.example.org/"' in config
     assert 'author = "authors"' in config
+    # the tab icon lands at the site root, under its canonical name
+    assert 'favicon = "favicon.svg"' in config
+    assert (site / "static/favicon.svg").read_bytes() == b"SVG"
+    assert 'rel="icon"' in (site / "layouts/_default/baseof.html").read_text()
     # full-content feed, capped: announce new posts, don't ship the archive
     assert "[services.rss]\nlimit = 20" in config
     rss = (site / "layouts/_default/rss.xml").read_text()
@@ -199,8 +207,10 @@ def test_zola_site(archive):
 
 def test_pelican_site(archive):
     (archive / "logo.png").write_bytes(b"IMG")
+    (archive / "icon.svg").write_bytes(b"SVG")
     cfg = json.loads((archive / "site.json").read_text())
     cfg["avatar"] = "logo.png"
+    cfg["favicon"] = "icon.svg"
     (archive / "site.json").write_text(json.dumps(cfg))
     site = pelican.build_site(archive)
     text = (site / "content/posts/second-post/index.md").read_text()
@@ -222,6 +232,9 @@ def test_pelican_site(archive):
     assert "_LazyImages" in config           # body images load lazily
     assert 'AVATAR = "theme/img/avatar.png"' in config
     assert (site / "theme/static/img/avatar.png").read_bytes() == b"IMG"
+    assert 'FAVICON = "theme/favicon.svg"' in config
+    assert (site / "theme/static/favicon.svg").read_bytes() == b"SVG"
+    assert 'rel="icon"' in (site / "theme/templates/base.html").read_text()
     for tpl in ("base", "index", "article", "tag", "tags", "author",
                 "authors", "archives", "search", "macros", "pagination"):
         assert (site / f"theme/templates/{tpl}.html").exists(), tpl
@@ -269,6 +282,7 @@ def test_theme_picker_and_dark_scheme(archive):
     # Python (json.dumps(None) would emit a NameError-raising `null`)
     config = (pelican_site / "pelicanconf.py").read_text()
     assert "AVATAR = None" in config
+    assert "FAVICON = None" in config
     assert "ANNOUNCEMENT = None" in config
 
 

@@ -7,7 +7,8 @@
 {{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
 {{ range .AlternativeOutputFormats }}<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
 {{ end }}<!-- @include shared/theme-init.html -->
-<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+{{ with site.Params.favicon }}<link rel="icon" href="{{ . | relURL }}">
+{{ end }}<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
 {{ with site.Params.announcement }}<div class="announcement" data-source="{{ . }}" hidden></div>

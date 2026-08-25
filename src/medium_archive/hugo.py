@@ -188,6 +188,19 @@ def build_site(out):
             params["avatar"] = f"img/{dst.name}"
         else:
             print(f"avatar not found, skipped: {src}", file=sys.stderr)
+    # "favicon" (site.json top level, or hugo section): archive-relative
+    # path of the tab icon; copied to the site root so browsers that ask
+    # for /favicon.ico by convention are covered when it is an .ico
+    favicon = hugo_config.get("favicon") or config.get("favicon")
+    if favicon:
+        src = out / favicon
+        if src.is_file():
+            dst = site / "static" / ("favicon" + src.suffix)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            params["favicon"] = dst.name
+        else:
+            print(f"favicon not found, skipped: {src}", file=sys.stderr)
     # "announcement": a site-wide banner above the header -- an http(s)
     # URL the theme fetches client-side (empty content hides the banner,
     # like Sphinx themes' html announcement option), or literal HTML
