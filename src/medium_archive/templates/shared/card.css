@@ -29,17 +29,15 @@ a:hover { text-decoration: underline; }
 .site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
 .site-header nav a:hover { color: var(--accent-dark); }
 
-.theme-picker { display: inline-flex; vertical-align: middle; gap: .15rem;
-                margin-left: 1.25rem; padding: .15rem;
-                border: 1px solid var(--line); border-radius: 999px; }
+.theme-picker { display: inline-flex; vertical-align: middle;
+                margin-left: 1.25rem; }
 .theme-picker[hidden] { display: none; }
 .theme-picker button { display: inline-flex; align-items: center;
-                       justify-content: center; width: 1.6rem; height: 1.6rem;
-                       padding: 0; border: 0; border-radius: 999px;
-                       background: none; color: var(--muted); cursor: pointer; }
+                       justify-content: center; width: 1.9rem; height: 1.9rem;
+                       padding: 0; border: 1px solid var(--line);
+                       border-radius: 999px; background: none;
+                       color: var(--muted); cursor: pointer; }
 .theme-picker button:hover { color: var(--accent-dark); }
-.theme-picker button[aria-pressed="true"] { background: var(--bg);
-                                            color: var(--ink); }
 .theme-picker svg { width: 1rem; height: 1rem; }
 
 .page-title { font-size: 2.4rem; font-weight: 400; margin: 2.2rem 0 1rem; }
