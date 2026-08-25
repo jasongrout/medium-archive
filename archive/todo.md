@@ -116,14 +116,73 @@ consolidates variant spellings onto one tag each (`notebook`/`notebooks`
 `convert` applies it to front matter, so posts.json and all four sites
 inherit the cleaned tags; `raw/` keeps the originals, and a stale entry
 aborts a full convert. Curate with `medium-archive stats --tags`.
-Result: 287 distinct tags → 226; 43 posts are untagged (their only tags
-were publication-scope ones).
+
+A second, aggressive pass then consolidated the long tail. Every tag
+that isn't the name of a specific Jupyter-ecosystem tool now has at
+least three posts: one-post variants fold into broader categories
+(`astronomy`/`physics`/`scientific-computing` → `science`,
+`cve`/`mfa`/`bug-bounty` → `security`, `grafana`/`bots`/`outage` →
+`devops`, `octave`/`r`/`sql`/`lua`/`debugger` → `kernels`, places →
+`events`/`workshops`, …), post-specific descriptors are dropped
+outright (`box2d`, `kubespray`, `moore`, `oreilly`, …), and tool tags
+stay separate under the tool's name even with one or two posts
+(`anywidget`, `elyra`, `ipycytoscape`, `jupytercad` — renamed from
+`cad` — `tljh`, `repo2docker`, …). The same pass added the `"add"`
+section: posts whose title plainly names an existing tag's topic but
+never carried the tag (release announcements without `releases`,
+JupyterCon posts without `jupytercon`, workshop reports without
+`workshops`, the untagged early Ghost-era posts) now get it during
+convert. Result: 287 distinct tags → 226 → 64, no untagged posts, and
+the only sub-3-post tags left are eleven tool tags plus `robotics`.
+
+`data-science` was then dropped too: of its 58 posts only three or four
+were about data science as a subject — the rest were releases, workshop
+logistics and JupyterCon posts carrying it for medium.com feed reach,
+concentrated in the 2018–2019 SEO era. Dropping it left every post with
+the right remaining tags (one, the NumFOCUS DISC sprint announcement,
+got real tags via `"add"` instead). `python` followed for the same
+reason — inconsistently applied (43 of 334 posts, while nearly every
+post involves Python) and overly broad on a Jupyter blog; nothing was
+left untagged, and dropping it surfaced two monthly Community Call
+posts missing `community` and gave "Learn Python with Jupyter"
+`education` instead. 62 tags.
+
+Two more from the same review: `announcements` (nine posts, six of them
+release posts already tagged `releases`, on a blog where every post
+announces something) is dropped. And `jupyter-notebook` — a third of
+the archive, mostly meaning "Jupyter, the project", i.e. the dropped
+`jupyter` tag under another name — is split rather than dropped:
+medium-archive now allows re-adding a dropped tag via `"add"`, so the
+tag is dropped everywhere and re-asserted on the 29 posts genuinely
+about the Notebook application (its releases and security advisories,
+the UX survey, the notebook-format workshops, and notebook clients —
+EIN, nbterm, RetroLab). 61 tags.
+
+`geoscience` then became its own category — the ten geospatial posts
+(the JupyterGIS line, QGIS, ipyleaflet, ipyopenlayers, the "Jupyter
+meets the Earth" project) are a coherent cluster, so `gis` and the raw
+`geoscience`/`geospatial-data` tags all consolidate onto `geoscience`,
+and each of those posts also carries the broader `science` tag (added
+via `"add"`, since a rename can only produce one tag). `jupytergis`
+stays separate as the tool tag. `jupytercon` nests under `events` the
+same way: every JupyterCon post also carries `events`.
 
 Remaining judgement calls, all optional:
 
-- ~180 tags still appear on a single post (event locations like
-  `boston`/`hawaii`/`latam`, grantmaker names `helmsley`/`moore`,
-  hyper-specific tech like `box2d`, `kubespray`). Harmless — they just
-  make thin taxonomy pages — extend `"drop"` as they're reviewed.
-- `announcements`/`releases` overlap and could merge if the distinction
-  isn't wanted.
+- The nested pairs (`geoscience` under `science`, `jupytercon` under
+  `events`) work today by each post carrying both tags — every
+  generator's taxonomy is flat, so the parent's tag page naturally
+  includes the children's posts — but the tag index pages still list
+  parent and child as siblings. Displaying the relationship (children
+  indented under their parent on the tag index, a "part of: science"
+  line on the child's page) would be a medium-archive theme change:
+  a parent-map in the site config that the hugo/pelican/zola/myst
+  tag-index templates read. Nothing needed in this repo but the map.
+- Another natural hierarchy: a broad "Jupyter projects" parent over the
+  specific tool tags (`jupyterlab`, `jupyterhub`, `binder`, `voila`,
+  `jupyterlite`, `xeus`, and the small ones — `anywidget`, `elyra`,
+  `jupytercad`, `tljh`, …). Unlike geoscience/jupytercon it would sit
+  on most of the archive, so it is more a tag-index grouping than a tag
+  every post should carry; probably wants the parent-map/theme approach
+  above rather than denormalized double-tagging. Idea only — not acted
+  on.
