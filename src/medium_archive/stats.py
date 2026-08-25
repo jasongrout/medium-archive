@@ -128,6 +128,11 @@ def cmd_stats(args):
           f"{sum(1 for c in image_counts if c)} posts with images, "
           f"max {max(image_counts)} in one post")
 
+    list_all = getattr(args, "tags", False)
     print(f"\nTags: {len(tags)} distinct"
           + (f", {untagged} untagged posts" if untagged else ""))
-    print(top(tags, args.top, n))
+    print(top(tags, len(tags) if list_all else args.top, n))
+    if list_all:
+        singles = sum(1 for c in tags.values() if c == 1)
+        if singles:
+            print(f"  ({singles} tags appear on a single post)")

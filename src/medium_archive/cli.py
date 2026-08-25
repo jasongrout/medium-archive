@@ -84,6 +84,15 @@ Notes:
     comments); *.patch files hold unified patches for structural edits
     (targets named <medium_id>/<file>). A substitution or hunk that no
     longer applies aborts the run rather than being skipped.
+  * Tags: an optional hand-written <out>/tags.json cleans up the Medium
+    tags as convert writes each post's front matter -- "drop" lists tags
+    that only made sense on medium.com (the publication's own topic on
+    every post, SEO reach tags), "rename" maps variants to a common tag
+    ({"rename": {"notebooks": "jupyter-notebook"}}), which is how tags
+    are consolidated. posts.json and every derived site inherit the
+    cleaned tags; raw/ keeps the originals. Stale entries (matching no
+    post) abort a full convert run; `stats --tags` lists every tag with
+    its post count as the worklist for curating the file.
   * The archive layout is documented in the README.md written into <out>/.
 Progress is written to stderr.
 """
@@ -305,6 +314,10 @@ def main():
                                    "(posts, provenance, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",
                          help="how many authors/tags to list (default: 15)")
+    stats_p.add_argument("--tags", action="store_true",
+                         help="list every tag with its post count instead of "
+                              "the top N -- the worklist for curating "
+                              "<out>/tags.json (see convert)")
     both = parser("all", help="fetch then convert")
     add_fetch_args(both)
     add_convert_args(both)

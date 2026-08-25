@@ -49,7 +49,12 @@ It works in independent steps:
   `redirects.csv` mapping old Medium URLs to the new post directories.
   It never touches the network, so it can be re-run freely while tuning the
   conversion (selectors, Markdown style, output layout) without hitting
-  Medium again.
+  Medium again. An optional hand-written `<out>/tags.json` cleans up the
+  Medium tags on the way into front matter — `"drop"` removes tags that
+  only made sense on medium.com, `"rename"` consolidates variants onto a
+  common tag — reproducibly, with `raw/` keeping the originals; a stale
+  entry that matches no post aborts a full run, like a fixup that no
+  longer applies.
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
   `<out>/site/` from the converted posts: one page per post (its filename
   is the page's URL slug), a chronological landing page, a year-grouped
@@ -144,6 +149,8 @@ It works in independent steps:
   (how each post was discovered — feed, sitemap, Wayback, Ghost era — which
   sources were recovered for it, and which one each body was converted
   from), authors, article length quartiles, tag frequencies, image counts.
+  `stats --tags` lists every tag with its post count — the worklist for
+  curating `tags.json`.
 
 The `raw/` layer is the source of truth — the only part that cannot be
 regenerated once the Medium site is gone — and everything else is derived
@@ -340,6 +347,7 @@ src/medium_archive/
   net.py         HTTP session and retrying GET
   dates.py       date parsing and the --start/--end window check
   urls.py        Medium URL and post-identifier helpers
+  tags.py        hand-curated tag cleanup (<out>/tags.json), applied by convert
   readme.py      the README.md written into each archive
 tests/           offline tests (canned HTTP responses, no network);
                  run with `uv run pytest`
