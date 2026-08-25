@@ -116,14 +116,31 @@ consolidates variant spellings onto one tag each (`notebook`/`notebooks`
 `convert` applies it to front matter, so posts.json and all four sites
 inherit the cleaned tags; `raw/` keeps the originals, and a stale entry
 aborts a full convert. Curate with `medium-archive stats --tags`.
-Result: 287 distinct tags → 226; 43 posts are untagged (their only tags
-were publication-scope ones).
+
+A second, aggressive pass then consolidated the long tail. Every tag
+that isn't the name of a specific Jupyter-ecosystem tool now has at
+least three posts: one-post variants fold into broader categories
+(`astronomy`/`physics`/`geoscience`/`scientific-computing` → `science`,
+`cve`/`mfa`/`bug-bounty` → `security`, `grafana`/`bots`/`outage` →
+`devops`, `octave`/`r`/`sql`/`lua`/`debugger` → `kernels`, places →
+`events`/`workshops`, …), post-specific descriptors are dropped
+outright (`box2d`, `kubespray`, `moore`, `oreilly`, …), and tool tags
+stay separate under the tool's name even with one or two posts
+(`anywidget`, `elyra`, `ipycytoscape`, `jupytercad` — renamed from
+`cad` — `tljh`, `repo2docker`, …). The same pass added the `"add"`
+section: posts whose title plainly names an existing tag's topic but
+never carried the tag (release announcements without `releases`,
+JupyterCon posts without `jupytercon`, workshop reports without
+`workshops`, the untagged early Ghost-era posts) now get it during
+convert. Result: 287 distinct tags → 226 → 64, no untagged posts, and
+the only sub-3-post tags left are eleven tool tags plus `robotics`.
 
 Remaining judgement calls, all optional:
 
-- ~180 tags still appear on a single post (event locations like
-  `boston`/`hawaii`/`latam`, grantmaker names `helmsley`/`moore`,
-  hyper-specific tech like `box2d`, `kubespray`). Harmless — they just
-  make thin taxonomy pages — extend `"drop"` as they're reviewed.
 - `announcements`/`releases` overlap and could merge if the distinction
   isn't wanted.
+- `data-science` (58 posts) is nearly as broad here as `jupyter` was;
+  it could be dropped the same way.
+- `jupyter-notebook` (108 posts, a third of the archive) mixes "about
+  the Notebook application" with "uses notebooks"; splitting would be
+  hand-work in `"add"`.

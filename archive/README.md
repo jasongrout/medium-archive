@@ -80,9 +80,12 @@ Medium. It has two layers:
   consolidated, reproducibly, while `raw/` keeps the original tags:
   `"drop"` lists tags to remove everywhere; `"rename"` maps old tag to
   new (renaming several variants to one common tag consolidates them,
-  and a post tagged with two variants gets the target once).
+  and a post tagged with two variants gets the target once); `"add"`
+  puts tags on specific posts by slug, for posts whose Medium tags never
+  named their plain topic (release announcements without `releases`,
+  early Ghost-era posts with no tags at all).
   `posts.json` and every derived site inherit the cleaned tags. An entry
-  matching no post aborts a full `convert` run, like a fixup that no
+  changing no post aborts a full `convert` run, like a fixup that no
   longer applies; `medium-archive stats --tags` lists every tag with its
   post count as the worklist for curating the file. Back it up with
   `raw/`.
