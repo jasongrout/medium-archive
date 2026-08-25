@@ -19,36 +19,35 @@ Medium. It has two layers:
   the contract the new site's redirects are built from. The bulky derived
   trees (`posts/` and the site directories) are better left ignored and
   regenerated.
-* `site/` (optional) is a **MyST site** derived from the converted posts by
-  `medium-archive myst`: one page per post, a cover-image gallery landing
+* `site-myst/` (optional) is a **MyST site** derived from the converted
+  posts by `medium-archive myst`: one page per post, a cover-image landing
   page (every post as a card, newest first, via the myst-listing plugin,
   https://contrib.mystmd.org/myst-listing/), a chronological `archive`
   page, a year-grouped table of contents, links between posts of the
-  publication rewritten to site pages, and a `site/redirects.csv` mapping
-  every old inbound path to the page URL mystmd actually serves.
+  publication rewritten to site pages, and a `site-myst/redirects.csv`
+  mapping every old inbound path to the page URL mystmd actually serves.
   Regenerate it any time (`convert` then `myst`); render it with
-  `myst start` or `myst build --html` inside `site/`
+  `myst start` or `myst build --html` inside `site-myst/`
   (https://mystmd.org). Site-wide text lives in a hand-written
   `site.json` (title, description, landing-page intro, optional base_url),
-  versioned with the archive. `medium-archive hugo`, `zola` and `pelican`
-  build the same site for those generators (same page URLs, link
-  rewriting, and `site.json`) into `site-hugo/`, `site-zola/` and
-  `site-pelican/`. The hugo and pelican sites are the preferred
-  targets, carrying the full feature set; the myst and zola sites are
-  simpler alternates. hugo and pelican share a self-contained card-grid
-  blog theme -- cover-image cards, tag/author card listings, optimized
-  images on both (640x360 cover thumbnails; responsive, lazily-loaded
-  webp srcset variants for still body images; click-to-zoom, so an
-  image with more detail than the column shows opens full size in a
-  modal, like Medium's),
-  and a /search/ page wired to Pagefind (`pagefind --site public|output`
-  after building: full-text search with highlighted in-context
-  excerpts). Both can show a site-wide announcement banner above the
+  versioned with the archive. `medium-archive hugo` and `pelican` build
+  the same site for those generators (same page URLs, link rewriting,
+  and `site.json`) into `site-hugo/` and `site-pelican/`. The hugo and
+  pelican sites are the preferred targets, carrying the full feature
+  set; the myst site is a simpler alternate. hugo and pelican share a
+  self-contained card-grid blog theme -- cover-image cards, tag/author
+  card listings, optimized images on both (640x360 cover thumbnails;
+  responsive, lazily-loaded webp srcset variants for still body images;
+  click-to-zoom, so an image with more detail than the column shows
+  opens full size in a modal, like Medium's), and a /search/ page wired
+  to Pagefind (`pagefind --site public|output` after building: full-text
+  search with highlighted in-context excerpts). Both can show a
+  site-wide announcement banner above the
   header (site.json's "announcement": an http(s) URL fetched
   client-side -- the mechanism behind Sphinx's announcement theme
   option, with empty content hiding the banner -- or literal HTML;
   dismissable per browser, and a changed announcement clears the
-  dismissal). All four sites carry display copies of the images, not
+  dismissal). All three sites carry display copies of the images, not
   the archival originals: anything past a size cap is resized as it is
   placed (stills to a 1600 px longest edge via Pillow, animated gifs
   to 1104 px via gifsicle when installed), built once into
@@ -56,17 +55,14 @@ Medium. It has two layers:
   keep full resolution, and `site.json` tunes or disables the caps
   (`"images": {"still_max_edge": N, "animated_max_edge": N}`,
   0 = off).
-  All three render redirect stubs at every old inbound path
-  (hugo/zola via aliases, pelican via a plugin embedded in its
-  generated config) and add per-term feeds; every feed carries the 20
-  most recent posts with their full content, like the publication's
-  original Medium feed. zola keeps a list theme with its built-in
-  search box.
-  Render with `hugo server`, `zola serve`, or `pelican -l`. The hugo
-  step can instead target a real theme named in site.json's hugo
-  section (first-class support for Dream, hugo-theme-dream,
-  Hugo >= 0.158); clone the theme once into site-hugo/themes/ --
-  regeneration preserves it.
+  Both render redirect stubs at every old inbound path (hugo via
+  aliases, pelican via a plugin embedded in its generated config) and
+  add per-term feeds; every feed carries the 20 most recent posts with
+  their full content, like the publication's original Medium feed.
+  Render with `hugo server` or `pelican -l`. The hugo step can instead
+  target a real theme named in site.json's hugo section (first-class
+  support for Dream, hugo-theme-dream, Hugo >= 0.158); clone the theme
+  once into site-hugo/themes/ -- regeneration preserves it.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
@@ -167,7 +163,7 @@ posts/
     images/<filename>         images copied from raw/, referenced relatively
 site.json                     optional hand-written site text used by `myst`:
                                 title, description, intro (landing page)
-site/                         optional MyST site built by `medium-archive
+site-myst/                    optional MyST site built by `medium-archive
                                 myst` from posts/ + posts.json:
   myst.yml                    project config, plugins, and year-grouped toc
   index.md                    landing page: intro + cover-image post gallery
@@ -181,11 +177,11 @@ site/                         optional MyST site built by `medium-archive
     images/<filename>         hard links to the images in posts/, plus the
                                 baked cover.jpg gallery thumbnail
   redirects.csv               old inbound path -> the page URL mystmd serves
-site-hugo/, site-zola/,       optional Hugo/Zola/Pelican sites built by
-site-pelican/                   `medium-archive hugo|zola|pelican`: the same
+site-hugo/,                   optional Hugo/Pelican sites built by
+site-pelican/                   `medium-archive hugo|pelican`: the same
                                 posts as content/posts/<slug>/index.md with
                                 generator-native front matter, config, and
-                                (hugo, zola) a minimal theme; each carries
+                                the shared card-grid theme; each carries
                                 its own redirects.csv
 ```
 
@@ -273,8 +269,8 @@ too.
   one) until the post is re-fetched.
 * Links inside bodies that point at other posts in this publication still
   point at Medium; rewrite them using `redirects.csv` when migrating (the
-  `myst` step already does this for the MyST site in `site/`).
-* In `site/` pages, `@handle` mentions and `$` signs are backslash-escaped
+  `myst` step already does this for the MyST site in `site-myst/`).
+* In `site-myst/` pages, `@handle` mentions and `$` signs are backslash-escaped
   so MyST does not parse them as citations or math; links to in-page
   anchors that never survived the Medium conversion (old footnote anchors)
   stay as they are in `posts/` and are reported by `myst build`.
@@ -291,16 +287,15 @@ too.
     medium-archive convert --clean --out ../blog_export           # rebuild posts/ from raw/
     medium-archive lint --out ../blog_export                      # check for conversion defects
     medium-archive stats --out ../blog_export                     # summarize the archive
-    medium-archive myst --out ../blog_export                      # rebuild site/ from posts/
+    medium-archive myst --out ../blog_export                      # rebuild site-myst/ from posts/
     medium-archive hugo --out ../blog_export                      # rebuild site-hugo/
-    medium-archive zola --out ../blog_export                      # rebuild site-zola/
     medium-archive pelican --out ../blog_export                   # rebuild site-pelican/
 
 ## Building the sites
 
 Tools: Hugo extended >= 0.158, `pip install pelican markdown pillow`,
-gifsicle (optional: animated-gif display copies keep full size without it),
-Zola, `npm install -g mystmd pagefind`.
+gifsicle (optional: animated-gif display copies keep full size without
+it), `npm install -g mystmd pagefind`.
 
 Before deploying, set `base_url` in `site.json` to the site's real
 domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
@@ -323,14 +318,8 @@ pelican (preferred):
     pagefind --site output
     pelican -l
 
-zola:
-
-    medium-archive zola --out ../blog_export
-    cd ../blog_export/site-zola
-    zola serve
-
 myst:
 
     medium-archive myst --out ../blog_export
-    cd ../blog_export/site
+    cd ../blog_export/site-myst
     myst start

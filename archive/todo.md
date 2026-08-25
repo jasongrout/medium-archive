@@ -1,45 +1,50 @@
 # Archive notes and remaining work
 
-## 0. Site builds (MyST, Hugo, Zola, Pelican)
+## 0. Site builds (MyST, Hugo, Pelican)
 
 **The hugo and pelican sites are the preferred targets** — they carry
 the full feature set (card theme, Pagefind search with highlighted
 in-context results and shareable ?q= links, optimized images, redirect
 stubs at every old inbound path, archives timeline, capped
-full-content feeds). The myst and zola sites remain as simpler
-alternates.
+full-content feeds). The myst site remains as a simpler alternate.
 
-`medium-archive myst|hugo|zola|pelican --out .` builds a browsable site
-in `site/`, `site-hugo/`, `site-zola/`, or `site-pelican/` (all
+A fourth exporter, `zola`, was dropped in 2026-08: its site kept the
+older list theme that none of the card-theme, search and image work
+reached, so it was a fourth build to keep green for a target nobody
+would ship. `site-zola/`, if one was ever built here, is stale output
+and can be deleted.
+
+`medium-archive myst|hugo|pelican --out .` builds a browsable site
+in `site-myst/`, `site-hugo/`, or `site-pelican/` (all
 gitignored, like `posts/` — everything regenerates from `raw/` +
 `fixups/`); `site.json` holds the hand-written site title, description,
-landing-page intro, and (for hugo/zola) the base_url baked into
-absolute links and redirect stubs. The four exporters share page URLs
+landing-page intro, and (for hugo) the base_url baked into
+absolute links and redirect stubs. The three exporters share page URLs
 and link rewriting, so the generators can be compared on identical
 content, then the keepers kept and the rest ignored.
 
 **Previews:** the `.github/workflows/preview.yml` workflow rebuilds all
-four sites from `raw/` on every push to main (or on demand) and
-publishes them to GitHub Pages under `/hugo/`, `/pelican/`, `/zola/`
+three sites from `raw/` on every push to main (or on demand) and
+publishes them to GitHub Pages under `/hugo/`, `/pelican/`
 and `/myst/`, behind a landing page (`.github/preview-index.html`)
-linking the four. Each exporter runs with `site.json`'s `base_url`
+linking the three. Each exporter runs with `site.json`'s `base_url`
 pointed at its subpath (patched only in the runner's workspace), so
 baked-in absolute links land in the right place. Caveat: with
-full-resolution images copied into every site, the four previews total
-~3.3 GB — above GitHub Pages' documented 1 GB site limit (the deploy
+full-resolution images copied into every site, the three previews total
+~2.5 GB — above GitHub Pages' documented 1 GB site limit (the deploy
 may still go through; the 10 GB artifact limit is the hard one).
 The fix is capping image sizes in the generated sites at export time —
 a planned medium-archive change, tracked in that repo's `todo.md` —
 after which the deployment drops to a fraction of the limit.
 
-Last full validation, all four against all 333 posts:
+Last full validation, all three against all 333 posts:
 
 - **myst** (`myst build --html`, mystmd 1.10.1): all pages render, with
   built-in full-text search and a cover-image gallery landing page (all
   334 posts as cards, 255 with 640×360 cover thumbnails, via the
   myst-listing plugin plus a generated companion transform that makes
   local covers work; the chronological list moved to `/archive`).
-  `site/redirects.csv` now targets the URLs mystmd actually serves
+  `site-myst/redirects.csv` now targets the URLs mystmd actually serves
   (slugs capped at 50 chars, unicode folded, collisions numbered) —
   previously 84 of 334 targets pointed at over-long slugs mystmd
   truncates. The only warnings are ~57 links to
@@ -65,11 +70,6 @@ Last full validation, all four against all 333 posts:
   (Markdown extension in the generated config), heading ids for search
   anchors, and the same Pagefind /search/ page (`pagefind --site
   output`). Verified in headless Chromium.
-- **zola** (zola 0.21.0): 333 pages in ~2 s, taxonomy pages and
-  per-term Atom feeds, aliases, and a working search box (built-in
-  elasticlunr index). The 53 dead in-page anchors are reported as
-  warnings (`link_checker.internal_level = "warn"` in the generated
-  config).
 - The pelican build writes 676 redirect stubs (matching the hugo
   count) via a plugin embedded in its generated config — Pelican has
   no aliases feature of its own, so the plugin renders
@@ -176,7 +176,7 @@ Remaining judgement calls, all optional:
   parent and child as siblings. Displaying the relationship (children
   indented under their parent on the tag index, a "part of: science"
   line on the child's page) would be a medium-archive theme change:
-  a parent-map in the site config that the hugo/pelican/zola/myst
+  a parent-map in the site config that the hugo/pelican/myst
   tag-index templates read. Nothing needed in this repo but the map.
 - Another natural hierarchy: a broad "Jupyter projects" parent over the
   specific tool tags (`jupyterlab`, `jupyterhub`, `binder`, `voila`,
