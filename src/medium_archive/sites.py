@@ -172,6 +172,103 @@ def link_or_copy(src: Path, dst: Path):
         shutil.copy2(src, dst)
 
 
+# Card covers render in a 640x360 (16:9) frame on both card themes (hugo,
+# pelican). A center crop composes photos and screenshots well, but the
+# archives are full of logo covers -- wordmarks up to 7:1, square project
+# logos -- whose meaning spans edge to edge, and a crop guts those. So
+# sources near 16:9 are cropped and sources far from it are letterboxed
+# instead: scaled to fit the frame (tiny logos at most 2x, not pixelated
+# to fill) over the image's own border color when the border is uniform
+# (a logo on white pads invisibly), else over a blurred cover-crop of the
+# image itself.
+COVER_SIZE = (640, 360)
+COVER_CROP_ASPECTS = (1.3, 2.4)   # crop within this band, letterbox outside
+COVER_MAX_UPSCALE = 2.0
+
+
+def _flatten_rgb(im):
+    """RGB, any transparency composited onto white: convert()'s default
+    is black, which turns a dark-on-transparent logo into an illegible
+    dark-on-dark card."""
+    from PIL import Image
+    if im.mode == "P":
+        im = im.convert("RGBA" if "transparency" in im.info else "RGB")
+    if im.mode in ("RGBA", "LA"):
+        flat = Image.new("RGB", im.size, "white")
+        flat.paste(im, mask=im.getchannel("A"))
+        return flat
+    return im.convert("RGB")
+
+
+def _border_color(im):
+    """The single color the image's 1px border is close to, or None.
+    Uniformity tolerates compression noise and antialiased content
+    touching the edge."""
+    w, h = im.size
+    raw = b"".join(im.crop(box).tobytes() for box in
+                   ((0, 0, w, 1), (0, h - 1, w, h),
+                    (0, 0, 1, h), (w - 1, 0, w, h)))
+    edges = [raw[i:i + 3] for i in range(0, len(raw), 3)]
+    n = len(edges)
+    median = tuple(sorted(p[c] for p in edges)[n // 2] for c in range(3))
+    near = sum(all(abs(p[c] - median[c]) <= 16 for c in range(3))
+               for p in edges)
+    return median if near >= n * 0.9 else None
+
+
+def _letterbox(im):
+    """im centered in the 640x360 frame: on its border color when the
+    border is uniform, else on a blurred cover-crop of itself."""
+    from PIL import Image, ImageFilter, ImageOps
+    tw, th = COVER_SIZE
+    color = _border_color(im)
+    if color is None:
+        canvas = ImageOps.fit(im, COVER_SIZE, Image.Resampling.LANCZOS)
+        canvas = canvas.filter(ImageFilter.GaussianBlur(20))
+    else:
+        canvas = Image.new("RGB", COVER_SIZE, color)
+    scale = min(tw / im.width, th / im.height, COVER_MAX_UPSCALE)
+    fg = im.resize((max(1, round(im.width * scale)),
+                    max(1, round(im.height * scale))),
+                   Image.Resampling.LANCZOS)
+    canvas.paste(fg, ((tw - fg.width) // 2, (th - fg.height) // 2))
+    return canvas
+
+
+def make_cover_thumbnail(src, dst) -> bool:
+    """640x360 JPEG for a post's summary card, a fraction of the archived
+    full-resolution original: center-cropped when the source is near
+    16:9, letterboxed when far from it (see COVER_SIZE and friends)."""
+    from PIL import Image, ImageOps
+    try:
+        with Image.open(src) as im:
+            im = _flatten_rgb(im)
+            lo, hi = COVER_CROP_ASPECTS
+            if lo <= im.width / im.height <= hi:
+                thumb = ImageOps.fit(im, COVER_SIZE, Image.Resampling.LANCZOS)
+            else:
+                thumb = _letterbox(im)
+            thumb.save(dst, "JPEG", quality=80, optimize=True,
+                       progressive=True)
+        return True
+    except OSError as e:
+        print(f"cover thumbnail failed ({e}); using original: {src}",
+              file=sys.stderr)
+        return False
+
+
+def bake_cover_thumbnails(out: Path, site: Path, manifest: dict,
+                          stems: dict, covers: dict):
+    """Each covered post's baked images/cover.jpg, beside the page that
+    export_content wrote. An image that defeats Pillow is copied in
+    unchanged -- the extension is cosmetic."""
+    for url, cover in covers.items():
+        src = out / manifest[url]["dir"] / cover
+        dst = site / "content" / "posts" / stems[url] / "images" / "cover.jpg"
+        if dst.parent.is_dir() and not make_cover_thumbnail(src, dst):
+            shutil.copy2(src, dst)
+
+
 # Sites carry display copies of the archive's images, not the archival
 # originals -- raw/ and posts/ keep those at full resolution -- so
 # anything past these caps is resized down to them (longest edge) as it

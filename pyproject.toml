@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# card-cover thumbnails in the pelican exporter
+# card-cover thumbnails in the hugo and pelican exporters
 covers = ["pillow"]
 
 [project.scripts]
