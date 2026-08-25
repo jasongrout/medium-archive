@@ -148,7 +148,8 @@ meets the Earth" project) are a coherent cluster, so `gis` and the raw
 `geoscience`/`geospatial-data` tags all consolidate onto `geoscience`,
 and each of those posts also carries the broader `science` tag (added
 via `"add"`, since a rename can only produce one tag). `jupytergis`
-stays separate as the tool tag.
+stays separate as the tool tag. `jupytercon` nests under `events` the
+same way: every JupyterCon post also carries `events`.
 
 Remaining judgement calls, all optional:
 

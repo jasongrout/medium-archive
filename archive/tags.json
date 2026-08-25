@@ -262,6 +262,9 @@
     "and-voilà": [
       "voila"
     ],
+    "anima-anandkumar": [
+      "events"
+    ],
     "announcing-jupyter-notebook-7": [
       "releases"
     ],
@@ -275,6 +278,9 @@
     "becoming-the-new-jupyterhub-and-jupyter-book-community-manager": [
       "jupyter-book",
       "jupyterhub"
+    ],
+    "benjamin-ragan-kelley": [
+      "events"
     ],
     "better-sharing-ux-with-nbgitpuller-and-contextual-error-handling": [
       "jupyterhub"
@@ -323,6 +329,9 @@
     ],
     "enabling-the-jupyterlab-debugger-with-ipykernel": [
       "jupyterlab"
+    ],
+    "enjoy-jupytercon-2017-on-youtube": [
+      "events"
     ],
     "expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps": [
       "jupytergis",
@@ -389,6 +398,9 @@
     ],
     "join-us-for-the-jupyter-accessibility-workshops-part-2": [
       "workshops"
+    ],
+    "juan-klopper": [
+      "events"
     ],
     "jupyter-accessibility-workshops-wrap-up": [
       "workshops"
@@ -486,12 +498,27 @@
       "jupytercon"
     ],
     "jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h": [
+      "events",
       "jupytercon"
+    ],
+    "jupytercon-2023-keynotes": [
+      "events"
+    ],
+    "jupytercon-2025": [
+      "events"
+    ],
+    "jupytercon-is-back-in-2023": [
+      "events"
     ],
     "jupytercon-nyc-august-2017": [
+      "events",
       "jupytercon"
     ],
+    "jupytercon-nyc-august-22nd-25th": [
+      "events"
+    ],
     "jupytercon-online-more-than-a-conference": [
+      "events",
       "jupytercon"
     ],
     "jupyterday-atlanta-2016": [
@@ -564,6 +591,9 @@
     "jupyterlite-officially-joins-project-jupyter": [
       "jupyterlite"
     ],
+    "lucy-dagostino-mcgowan": [
+      "events"
+    ],
     "mamba-meets-jupyterlite": [
       "jupyterlite"
     ],
@@ -588,6 +618,9 @@
     "notebook-4-2": [
       "jupyter-notebook",
       "releases"
+    ],
+    "omoju-miller": [
+      "events"
     ],
     "openness-diversity-and-dignity-a-foundation-for-global-collaboration": [
       "diversity"
@@ -643,6 +676,7 @@
       "kernels"
     ],
     "synopsis-jupytercon-2018-education-track": [
+      "events",
       "jupytercon"
     ],
     "the-big-split": [
