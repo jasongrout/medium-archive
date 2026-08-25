@@ -1,4 +1,4 @@
-"""The myst step: posts/ + posts.json -> a MyST site in site/."""
+"""The myst step: posts/ + posts.json -> a MyST site in site-myst/."""
 
 import json
 from pathlib import Path

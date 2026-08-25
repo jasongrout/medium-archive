@@ -1,4 +1,4 @@
-"""Machinery shared by the site exporters (myst, hugo, zola, pelican).
+"""Machinery shared by the site exporters (myst, hugo, pelican).
 
 Each exporter derives a ready-to-render site from the converted archive --
 posts.json and <out>/posts/ -- so every site is as reproducible as the
@@ -387,7 +387,7 @@ class ImagePlacer:
     webp, photographs are capped and encoded lossily (JPEG, or webp when
     they carry alpha), animated gifs go through gifsicle. Copies are
     built once into <out>/.image-cache/<scheme-caps>/ and hard-linked
-    into every site that wants them, so the four exporters (and re-runs)
+    into every site that wants them, so the three exporters (and re-runs)
     share the work. Stills need Pillow and animated gifs need gifsicle;
     when either is missing the affected images are placed unchanged,
     with a note in the summary.
@@ -704,7 +704,7 @@ def read_post_body(src: Path):
 
 def export_content(out: Path, site: Path, manifest: dict, stems: dict,
                    front_matter, escape=None, placer=None) -> int:
-    """The shared page loop for the /posts/<stem>/ exporters (hugo, zola,
+    """The shared page loop for the /posts/<stem>/ exporters (hugo,
     pelican): one content/posts/<stem>/index.md per post -- front matter
     from front_matter(url, post), body with in-publication links rewritten
     to /posts/<stem>/ -- plus the post's images beside it (through

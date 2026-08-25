@@ -1,12 +1,13 @@
-"""The myst step: build a MyST (mystmd) site in <out>/site/ from the
+"""The myst step: build a MyST (mystmd) site in <out>/site-myst/ from the
 converted archive -- one page per post with its images, a cover-image
 gallery landing page, a chronological archive page, a year-grouped table
 of contents, and a site-level redirect map.
 
 Works from posts.json and <out>/posts/ alone (run convert first), so the
 site is as reproducible as the posts are: raw/ + fixups/ -> convert ->
-posts/ -> myst -> site/. Never touches the network; rendering the site
-(`myst start` or `myst build --html` inside <out>/site/) is mystmd's job,
+posts/ -> myst -> site-myst/. Never touches the network; rendering the
+site (`myst start` or `myst build --html` inside <out>/site-myst/) is
+mystmd's job,
 not this step's. (The landing-page gallery uses the myst-listing plugin,
 which mystmd downloads at build time like the site theme itself.)
 
@@ -22,7 +23,7 @@ inbound path to the page URL mystmd actually serves.
 Site-wide text (title, description, the landing-page intro) comes from an
 optional hand-written <out>/site.json, so it is versioned with the archive
 and survives regeneration. The machinery shared with the other site
-exporters (hugo, zola, pelican) lives in sites.py.
+exporters (hugo, pelican) lives in sites.py.
 """
 
 import json
@@ -49,7 +50,7 @@ DOLLAR_RE = re.compile(r"(?<!\\)\$")
 LISTING_PLUGIN_URL = ("https://github.com/myst-contrib/myst-listing/"
                       "releases/download/v0.1.9/plugin.mjs")
 
-# Companion plugin written into site/ beside myst.yml, from
+# Companion plugin written into site-myst/ beside myst.yml, from
 # templates/myst/listing-covers.mjs (its header comment explains why the
 # gallery's cover images need it). It must be listed *after* myst-listing
 # in myst.yml: plugin transforms run in listing order.
@@ -110,7 +111,7 @@ def escape_prose(line: str) -> str:
 def rewrite_body(markdown: str, links: LinkMap, prefix: str) -> str:
     """Point links at other posts of the publication to their site pages
     instead of Medium, and escape prose MyST would misparse. prefix is
-    the path from the referring page's directory to site/posts/ ("../"
+    the path from the referring page's directory to site-myst/posts/ ("../"
     for a post page, "posts/" for the landing page)."""
     def target_for(url):
         hit = links.page_for(url)
@@ -216,7 +217,7 @@ def build_site(out: Path) -> Path:
     links = LinkMap(manifest, stems)
     # Rebuild from scratch, but keep mystmd's _build/ (its template cache
     # and rendered output) so regenerating doesn't force a re-download.
-    site = out / "site"
+    site = out / "site-myst"
     clean_site(site, keep=("_build",))
     (site / "posts").mkdir(parents=True)
 

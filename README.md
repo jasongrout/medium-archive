@@ -59,16 +59,16 @@ It works in independent steps:
   keeping the originals; a stale entry that changes no post aborts a
   full run, like a fixup that no longer applies.
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
-  `<out>/site/` from the converted posts: one page per post, a
+  `<out>/site-myst/` from the converted posts: one page per post, a
   cover-image gallery landing page (every post as a card, newest first,
   via the [myst-listing](https://contrib.mystmd.org/myst-listing/)
   plugin, with each post's first still image of sane size baked to the
   same 640×360 thumbnail as the hugo/pelican card themes' and doubling
   as the page's social-card image; a small generated companion plugin,
-  `site/listing-covers.mjs`, turns the gallery's cover backgrounds into
-  real image nodes so mystmd's image pipeline serves local thumbnails),
+  `site-myst/listing-covers.mjs`, turns the gallery's cover backgrounds
+  into real image nodes so mystmd's image pipeline serves local thumbnails),
   a chronological `archive` page, a year-grouped table of contents, and
-  a `site/redirects.csv` mapping every old inbound path — Medium
+  a `site-myst/redirects.csv` mapping every old inbound path — Medium
   slug+id, `/p/<id>`, Ghost-era — to its page URL, the one mystmd
   actually serves: slugs are capped at 50 characters and stripped to
   `[a-z0-9-]`, so the exporter replicates mystmd's slug rules (including
@@ -81,17 +81,17 @@ It works in independent steps:
   downloads the pinned listing plugin at build time, like the site theme
   itself). Site-wide text (title, description, landing-page intro) comes
   from an optional hand-written `<out>/site.json`. Render the result with
-  `myst start` or `myst build --html` inside `<out>/site/`
+  `myst start` or `myst build --html` inside `<out>/site-myst/`
   (`npm install -g mystmd`).
-* **`hugo`**, **`zola`** and **`pelican`** (optional) do the same for
-  those generators, into `<out>/site-hugo/`, `<out>/site-zola/` and
+* **`hugo`** and **`pelican`** (optional) do the same for
+  those generators, into `<out>/site-hugo/` and
   `<out>/site-pelican/` — same page URLs (`/posts/<slug>/`), same link
   rewriting, same `site.json`, and a `redirects.csv` in each site — so
   the generators can be compared on identical content. The **hugo and
   pelican sites are the preferred targets**: they carry the full
   feature set described below (the card theme, Pagefind search, image
   optimization, redirect stubs, capped full-content feeds); the myst
-  and zola sites are maintained as simpler alternates. `hugo` and
+  site is maintained as a simpler alternate. `hugo` and
   `pelican` ship the same self-contained card-grid blog theme (in the
   vein of pytorch.org/blog), in light and dark palettes with a
   light/dark/system picker in the header — the choice persists per
@@ -133,7 +133,7 @@ It works in independent steps:
   generated config after each build, mtime-cached so rebuilds only
   touch changed images; line art and animated gifs are left out of the
   ladder, and carry real width/height so click-to-zoom can measure
-  them. All four sites carry display copies of the images, not
+  them. All three sites carry display copies of the images, not
   the archival originals. Line art — the charts, screenshots and
   diagrams most of the archive's PNGs are — keeps every pixel at its
   own resolution as lossless webp (~60% smaller than the source PNG,
@@ -146,24 +146,21 @@ It works in independent steps:
   Copies are built once into `<out>/.image-cache/` and hard-linked
   into every site. `raw/` and `posts/` keep full resolution;
   `site.json` tunes or disables the caps (`"images":
-  {"still_max_edge": N, "animated_max_edge": N}`, 0 = off). All three render
+  {"still_max_edge": N, "animated_max_edge": N}`, 0 = off). Both render
   every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
-  redirect stub that works on any static host — `hugo` and `zola`
-  through their `aliases` front matter, `pelican` through a small
+  redirect stub that works on any static host — `hugo`
+  through its `aliases` front matter, `pelican` through a small
   plugin embedded in the generated config that turns the exported
   `redirects.csv` into the same stub pages after each build. Tag *and*
-  author pages come with per-term RSS/Atom feeds on all three
+  author pages come with per-term RSS/Atom feeds on both
   (`pelican`'s from Pelican's own tag/author machinery); every feed
   carries the 20 most recent posts with their full content — like the
   publication's original Medium feed — with feed URLs absolutized
   against `base_url` and responsive `srcset` markup stripped, since a
   feed announces new posts while the site itself is the archive.
-  `zola` keeps a
-  smaller
-  list-style theme with its generator's built-in search index wired to
-  a search box. Any of the generated themes can be replaced by a real
-  one without touching `content/`. Render with `hugo server`,
-  `zola serve`, or `pelican -l` respectively.
+  Either generated theme can be replaced by a real
+  one without touching `content/`. Render with `hugo server` or
+  `pelican -l` respectively.
 
   The `hugo` step can also target a real theme, named in `site.json`:
 
@@ -232,9 +229,8 @@ medium-archive import-export medium-export.zip
 medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
 medium-archive convert                                      # raw -> posts/
-medium-archive myst                                         # posts/ -> site/
+medium-archive myst                                         # posts/ -> site-myst/
 medium-archive hugo                                         # posts/ -> site-hugo/
-medium-archive zola                                         # posts/ -> site-zola/
 medium-archive pelican                                      # posts/ -> site-pelican/
 medium-archive lint                                         # check for conversion defects
 medium-archive stats                                        # summarize the archive
@@ -381,9 +377,8 @@ src/medium_archive/
   export.py      Medium account exports: parsing and the import-export step
   ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
   convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
-  myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site/
+  myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site-myst/
   hugo.py        the hugo step: <out>/posts/ -> a Hugo site in <out>/site-hugo/
-  zola.py        the zola step: <out>/posts/ -> a Zola site in <out>/site-zola/
   pelican.py     the pelican step: <out>/posts/ -> a Pelican site in <out>/site-pelican/
   sites.py       machinery shared by the site exporters: page slugs, the
                  in-publication link map, redirect maps, site.json
