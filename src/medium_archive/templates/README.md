@@ -52,9 +52,8 @@ These embed verbatim in both engines' pages, so they must carry no
   content, so a changed announcement shows again.
 - `dark-palette.css` — included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
-  system scheme with no stored choice. `--accent-dark` doubles as the
-  link color, so dark mode lightens it to keep contrast against the
-  dark cards.
+  system scheme with no stored choice. `--accent` doubles as the link
+  color and stays the same in both palettes.
 - `card.css` — the card-grid look, written as both the hugo theme's and
   the pelican theme's stylesheet.
 
