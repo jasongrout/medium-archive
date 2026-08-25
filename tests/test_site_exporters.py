@@ -254,6 +254,12 @@ def test_theme_picker_and_dark_scheme(archive):
         # the stored choice applies before the stylesheet loads, so a
         # page cannot flash the wrong scheme
         assert text.index("localStorage.getItem") < text.index("stylesheet")
+    # redirect stubs load no stylesheet, so they must paint the palette
+    # themselves -- following a redirect must not flash white in dark mode
+    for stub_source in ((hugo_site / "layouts/alias.html").read_text(),
+                        (pelican_site / "pelicanconf.py").read_text()):
+        assert "prefers-color-scheme: dark" in stub_source
+        assert 'localStorage.getItem("theme")' in stub_source
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "term-sort"):

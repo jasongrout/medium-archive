@@ -4,7 +4,8 @@
 :root { --accent: #f37726; --accent-dark: #c85a11; --ink: #1c1c1c;
         --soft: #444444; --muted: #6a6a6a; --bg: #f4f4f4; --card: #ffffff;
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
-        color-scheme: light; }
+        --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
+        --error-soft: #b91c1c; color-scheme: light; }
 :root[data-theme="dark"] {
 /* @include shared/dark-palette.css */
 }
@@ -29,17 +30,15 @@ a:hover { text-decoration: underline; }
 .site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
 .site-header nav a:hover { color: var(--accent-dark); }
 
-.theme-picker { display: inline-flex; vertical-align: middle; gap: .15rem;
-                margin-left: 1.25rem; padding: .15rem;
-                border: 1px solid var(--line); border-radius: 999px; }
+.theme-picker { display: inline-flex; vertical-align: middle;
+                margin-left: 1.25rem; }
 .theme-picker[hidden] { display: none; }
 .theme-picker button { display: inline-flex; align-items: center;
-                       justify-content: center; width: 1.6rem; height: 1.6rem;
-                       padding: 0; border: 0; border-radius: 999px;
-                       background: none; color: var(--muted); cursor: pointer; }
+                       justify-content: center; width: 1.9rem; height: 1.9rem;
+                       padding: 0; border: 1px solid var(--line);
+                       border-radius: 999px; background: none;
+                       color: var(--muted); cursor: pointer; }
 .theme-picker button:hover { color: var(--accent-dark); }
-.theme-picker button[aria-pressed="true"] { background: var(--bg);
-                                            color: var(--ink); }
 .theme-picker svg { width: 1rem; height: 1rem; }
 
 .page-title { font-size: 2.4rem; font-weight: 400; margin: 2.2rem 0 1rem; }
@@ -68,7 +67,9 @@ a:hover { text-decoration: underline; }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
 .post-meta { color: var(--muted); margin: 0 0 2rem; }
 .post-meta .tag::before { content: "#"; opacity: .6; }
-.post img { max-width: 100%; height: auto; border-radius: 4px; }
+/* white behind transparency, like the baked card covers: these images
+   were drawn for Medium's white page, so dark logos stay legible */
+.post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-size: .9rem; }
 .post code { background: var(--code-bg); }
@@ -119,7 +120,10 @@ ul.pagination .active .page-link { background: var(--accent); color: #fff; }
           --pf-text: var(--ink); --pf-text-secondary: var(--soft);
           --pf-text-muted: var(--muted); --pf-background: var(--card);
           --pf-border: var(--line); --pf-skeleton: var(--code-bg);
-          --pf-hover: var(--code-bg); --pf-mark: var(--ink); }
+          --pf-hover: var(--code-bg); --pf-mark: var(--ink);
+          --pf-error-bg: var(--error-bg); --pf-error-border: var(--error-line);
+          --pf-error-text: var(--error-ink);
+          --pf-error-text-secondary: var(--error-soft); }
 #search mark { color: inherit; border-radius: 2px; padding: 0 .12em;
                background: var(--mark) !important; }
 #search .pf-result-title { margin-bottom: .2rem; }

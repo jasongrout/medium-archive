@@ -1,0 +1,14 @@
+{{- /* Overrides Hugo's embedded alias template: the same redirect
+       stub, but painted from the site palette (see redirect-head.html)
+       so following a redirect does not flash white in dark mode. */}}<!DOCTYPE html>
+<html lang="{{ site.Language.Lang }}">
+<head>
+<meta charset="utf-8">
+<title>{{ .Permalink }}</title>
+<link rel="canonical" href="{{ .Permalink }}">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url={{ .Permalink }}">
+<!-- @include shared/redirect-head.html -->
+</head>
+<body><a href="{{ .Permalink }}">{{ .Permalink }}</a></body>
+</html>
