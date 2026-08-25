@@ -35,7 +35,14 @@ after which the deployment drops to a fraction of the limit.
 Last full validation, all four against all 333 posts:
 
 - **myst** (`myst build --html`, mystmd 1.10.1): all pages render, with
-  built-in full-text search. The only warnings are ~57 links to
+  built-in full-text search and a cover-image gallery landing page (all
+  334 posts as cards, 255 with 640×360 cover thumbnails, via the
+  myst-listing plugin plus a generated companion transform that makes
+  local covers work; the chronological list moved to `/archive`).
+  `site/redirects.csv` now targets the URLs mystmd actually serves
+  (slugs capped at 50 chars, unicode folded, collisions numbered) —
+  previously 84 of 334 targets pointed at over-long slugs mystmd
+  truncates. The only warnings are ~57 links to
   in-page anchors that never survived the original Medium conversion
   (old footnote anchors, also dead in `posts/`) and one h3→h5 heading
   jump published that way in 2015.
