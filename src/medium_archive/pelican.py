@@ -19,7 +19,8 @@ Atom feeds (site-wide and per tag/author) come out of the box.
 The exporter writes its own theme -- the card-grid blog shared with
 the hugo step, light and dark palettes and the header's
 light/dark/system picker included: paginated home of cover-image
-cards, article pages, tag/author card listings, chip indexes, an
+cards, article pages, tag/author card listings, chip indexes
+(sortable by name or by post count), an
 archives timeline, and a /search/ page wired to Pagefind
 (run `pagefind --site output` after `pelican` for full-text search with
 highlighted, in-context excerpts). Card covers are 640x360 thumbnails
@@ -39,7 +40,7 @@ import re
 import sys
 
 from .hugo import CSS as CARD_CSS  # hugo and pelican share the look
-from .hugo import THEME_INIT, THEME_PICKER
+from .hugo import TERM_SORT, THEME_INIT, THEME_PICKER
 from .sites import (ImagePlacer, bake_cover_thumbnails, clean_site,
                     export_content, load_site_inputs, page_stems,
                     pick_cover, write_redirects_csv)
@@ -367,6 +368,7 @@ TAGS = """\
 {% block title %}Tags · {{ SITENAME }}{% endblock %}
 {% block content %}
 <h1 class="page-title">Tags</h1>
+""" + TERM_SORT + """\
 <p class="term-list">
 {% for tag, articles in tags | sort %}<a class="chip" href="{{ SITEURL }}/{{ tag.url }}">{{ tag }} <span>{{ articles | length }}</span></a>
 {% endfor %}</p>
@@ -378,6 +380,7 @@ AUTHORS = """\
 {% block title %}Authors · {{ SITENAME }}{% endblock %}
 {% block content %}
 <h1 class="page-title">Authors</h1>
+""" + TERM_SORT + """\
 <p class="term-list">
 {% for author, articles in authors %}<a class="chip" href="{{ SITEURL }}/{{ author.url }}">{{ author }} <span>{{ articles | length }}</span></a>
 {% endfor %}</p>

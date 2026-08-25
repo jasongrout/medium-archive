@@ -127,6 +127,16 @@ clean `lint` run, and the offline test suite):
   every derived layer gets typed image names — 103 such files in the
   reference archive. Both sites validated end-to-end in headless
   Chromium, including search-with-highlights.
+- **Sortable tag/author chip indexes (hugo + pelican)** — the card
+  theme's /tags/ and /authors/ pages get a "Sort by name/count"
+  control, a plain HTML+JS snippet shared verbatim between the two
+  generators like the theme picker: name is the A–Z order the
+  generators emit (so the no-JS page reads the same), count sorts most
+  posts first with alphabetical ties, and the choice persists per
+  browser via localStorage. Verified in headless Chromium against the
+  reference archive on all four pages (both generators × tags/authors),
+  including persistence across reloads and identical counts across
+  generators.
 - **Hugo theme support (Dream)** — site.json's `hugo` section can name
   a real theme (`theme`, `theme_repo`, optional `avatar` and `params`);
   the exporter then emits that theme's config instead of its own
