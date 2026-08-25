@@ -648,8 +648,9 @@
     "ghost_url": null,
     "description": "Expanding Geospatial Workflows in JupyterGIS: STAC Browsing and Story Maps Since its initial announcement less than two years ago, JupyterGIS has been a growing effort to bring interactive geospatial …",
     "tags": [
-      "gis",
-      "jupytergis"
+      "geoscience",
+      "jupytergis",
+      "science"
     ],
     "images": [
       "images/001-0_X3PRP6d54Z82wwEO.png",
@@ -996,8 +997,9 @@
     "ghost_url": null,
     "description": "Collaborative editing for GIS workflows with Jupyter and QGIS The QGIS open-source project is a cornerstone in the geosciences ecosystem, providing robust tools for spatial data analysis and …",
     "tags": [
-      "gis",
-      "jupyter-notebook"
+      "geoscience",
+      "jupyter-notebook",
+      "science"
     ],
     "images": [
       "images/001-1__WoRjRDGSKbaUY6b4TsndA.png",
@@ -1687,9 +1689,10 @@
     "ghost_url": null,
     "description": "Interactive Mapping with ipyopenlayers Bringing the Power of OpenLayers to Jupyter. Interactive maps play a crucial role in presenting complex geospatial information in a clear and engaging manner …",
     "tags": [
-      "gis",
+      "geoscience",
       "jupyter-notebook",
       "python",
+      "science",
       "visualization"
     ],
     "images": [
@@ -1956,9 +1959,10 @@
     "description": "JupyterGIS Pioneering Web-based, Collaborative, and Open-source GIS Tools By Sylvain Corlay [1], Anne Fouilloux [2], and Monika Weissschnur [3] We are thrilled to announce that the European Space …",
     "tags": [
       "collaboration",
-      "gis",
+      "geoscience",
       "jupytergis",
-      "jupyterlab"
+      "jupyterlab",
+      "science"
     ],
     "images": [
       "images/001-1_IkYCf2cbk3SaxaROQ0eUsA.png"
@@ -2550,8 +2554,9 @@
       "accessibility",
       "cloud-computing",
       "education",
-      "gis",
+      "geoscience",
       "jupyterhub",
+      "science",
       "workshops"
     ],
     "images": [
@@ -5953,6 +5958,7 @@
     "ghost_url": null,
     "description": "Jupyter meets the Earth By Lindsey Heagy and Fernando Pérez We are thrilled to announce that the NSF is funding our EarthCube proposal “Jupyter meets the Earth: Enabling discovery in geoscience …",
     "tags": [
+      "geoscience",
       "open-science",
       "science"
     ],
@@ -6311,6 +6317,7 @@
     "ghost_url": null,
     "description": "Jupyter meets the Earth: EarthCube Community Meeting By: Lindsey Heagy, Fernando Pérez, Joe Hamman and the Jupyter meets the Earth team (cross-posted on the Pangeo Blog) As a part of the 2020 …",
     "tags": [
+      "geoscience",
       "open-science",
       "science"
     ],
@@ -6941,7 +6948,8 @@
     "ghost_url": null,
     "description": "Interactive GIS in Jupyter with ipyleaflet As Jupyter grew in popularity, a broad ecosystem of visualization packages based on Jupyter widgets has been developed, bringing even more interactivity to …",
     "tags": [
-      "gis",
+      "geoscience",
+      "science",
       "visualization"
     ],
     "images": [
@@ -7821,7 +7829,8 @@
     "description": "Interpreted C++ for GIS with Jupyter The recent release of the Jupyter kernel for C++, based on the Cling interpreter enabled a number of new workflows for the users of the C++ programming …",
     "tags": [
       "cpp",
-      "gis"
+      "geoscience",
+      "science"
     ],
     "images": [
       "images/001-1_FzUw4j635uJgWHZzc8_QiQ.png",
@@ -8564,11 +8573,12 @@
     "ghost_url": null,
     "description": "JupyterGIS 0.16: New visualization capabilities, collaborative Story Maps, and more Read this article in Notebook.link, as a live story-map …",
     "tags": [
-      "gis",
+      "geoscience",
       "jupyter-notebook",
       "jupytergis",
       "jupyterlab",
-      "jupyterlite"
+      "jupyterlite",
+      "science"
     ],
     "images": [
       "images/001-1_gyuKfOzFSbmRhH9LVBTJiA.gif",

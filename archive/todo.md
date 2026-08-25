@@ -120,7 +120,7 @@ aborts a full convert. Curate with `medium-archive stats --tags`.
 A second, aggressive pass then consolidated the long tail. Every tag
 that isn't the name of a specific Jupyter-ecosystem tool now has at
 least three posts: one-post variants fold into broader categories
-(`astronomy`/`physics`/`geoscience`/`scientific-computing` → `science`,
+(`astronomy`/`physics`/`scientific-computing` → `science`,
 `cve`/`mfa`/`bug-bounty` → `security`, `grafana`/`bots`/`outage` →
 `devops`, `octave`/`r`/`sql`/`lua`/`debugger` → `kernels`, places →
 `events`/`workshops`, …), post-specific descriptors are dropped
@@ -141,6 +141,14 @@ logistics and JupyterCon posts carrying it for medium.com feed reach,
 concentrated in the 2018–2019 SEO era. Dropping it left every post with
 the right remaining tags (one, the NumFOCUS DISC sprint announcement,
 got real tags via `"add"` instead). 63 tags.
+
+`geoscience` then became its own category — the ten geospatial posts
+(the JupyterGIS line, QGIS, ipyleaflet, ipyopenlayers, the "Jupyter
+meets the Earth" project) are a coherent cluster, so `gis` and the raw
+`geoscience`/`geospatial-data` tags all consolidate onto `geoscience`,
+and each of those posts also carries the broader `science` tag (added
+via `"add"`, since a rename can only produce one tag). `jupytergis`
+stays separate as the tool tag.
 
 Remaining judgement calls, all optional:
 

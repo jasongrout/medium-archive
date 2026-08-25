@@ -148,7 +148,7 @@
     "cloud-robotics": "robotics",
     "fundraising": "funding",
     "open-education": "education",
-    "geospatial-data": "gis",
+    "geospatial-data": "geoscience",
     "gnu-octave": "kernels",
     "myst-markdown": "mystmd",
     "extension": "extensions",
@@ -170,7 +170,6 @@
     "astronomy": "science",
     "physics": "science",
     "genomics": "science",
-    "geoscience": "science",
     "medical-imaging": "science",
     "research": "science",
     "politics": "science",
@@ -231,7 +230,8 @@
     "university-of-edinburgh": "education",
     "collaborative-editing": "collaboration",
     "cad": "jupytercad",
-    "canvas": "ipycanvas"
+    "canvas": "ipycanvas",
+    "gis": "geoscience"
   },
   "add": {
     "a-2019-retrospective-from-the-binder-project": [
@@ -313,6 +313,7 @@
     ],
     "desktop-gis-software-in-the-cloud-with-jupyterhub": [
       "jupyterhub",
+      "science",
       "workshops"
     ],
     "disc-sprint-nyc-2018": [
@@ -324,7 +325,8 @@
       "jupyterlab"
     ],
     "expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps": [
-      "jupytergis"
+      "jupytergis",
+      "science"
     ],
     "exploring-open-access-art-using-the-deno-jupyter-kernel": [
       "kernels"
@@ -346,6 +348,15 @@
     ],
     "inspector-jupyterlab": [
       "jupyterlab"
+    ],
+    "interactive-gis-in-jupyter-with-ipyleaflet": [
+      "science"
+    ],
+    "interactive-mapping-with-ipyopenlayers": [
+      "science"
+    ],
+    "interpreted-c-for-gis-with-jupyter": [
+      "science"
     ],
     "introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes": [
       "jupyterhub",
@@ -425,6 +436,12 @@
     "jupyter-kernel-gateway": [
       "kernels"
     ],
+    "jupyter-meets-the-earth": [
+      "science"
+    ],
+    "jupyter-meets-the-earth-earthcube-community-meeting": [
+      "science"
+    ],
     "jupyter-notebook-5-0": [
       "jupyter-notebook",
       "releases"
@@ -499,7 +516,11 @@
       "events"
     ],
     "jupytergis": [
-      "jupytergis"
+      "jupytergis",
+      "science"
+    ],
+    "jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more": [
+      "science"
     ],
     "jupyterlab-3-0-is-out": [
       "releases"
@@ -585,6 +606,9 @@
     ],
     "project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley": [
       "community"
+    ],
+    "real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter": [
+      "science"
     ],
     "release-of-ipython-5-0": [
       "ipython",
