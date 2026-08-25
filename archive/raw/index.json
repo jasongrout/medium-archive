@@ -3570,5 +3570,15 @@
     "fetched_at": "2026-08-24T19:43:13+00:00",
     "images": 14,
     "in_feed": true
+  },
+  "https://blog.jupyter.org/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f": {
+    "medium_id": "9a2d911cf42f",
+    "title": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey",
+    "published": "2026-08-25T13:42:25Z",
+    "sitemap_date": "2026-08-25T21:08:55+00:00",
+    "found_via": "feed",
+    "fetched_at": "2026-08-25T21:27:54+00:00",
+    "images": 14,
+    "in_feed": true
   }
 }

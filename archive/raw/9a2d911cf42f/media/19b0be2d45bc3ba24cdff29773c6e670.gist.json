@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/f4e4e08c907583ab563dd6f97c17c48c",
+  "forks_url": "https://api.github.com/gists/f4e4e08c907583ab563dd6f97c17c48c/forks",
+  "commits_url": "https://api.github.com/gists/f4e4e08c907583ab563dd6f97c17c48c/commits",
+  "id": "f4e4e08c907583ab563dd6f97c17c48c",
+  "node_id": "G_kwDOAFkAxtoAIGY0ZTRlMDhjOTA3NTgzYWI1NjNkZDZmOTdjMTdjNDhj",
+  "git_pull_url": "https://gist.github.com/f4e4e08c907583ab563dd6f97c17c48c.git",
+  "git_push_url": "https://gist.github.com/f4e4e08c907583ab563dd6f97c17c48c.git",
+  "html_url": "https://gist.github.com/krassowski/f4e4e08c907583ab563dd6f97c17c48c",
+  "files": {
+    "OTHER-THEMES.md": {
+      "filename": "OTHER-THEMES.md",
+      "type": "text/markdown",
+      "language": "Markdown",
+      "raw_url": "https://gist.githubusercontent.com/krassowski/f4e4e08c907583ab563dd6f97c17c48c/raw/6c1257672351a8c77eecb1fd1f92bf4210e73af8/OTHER-THEMES.md",
+      "size": 3668,
+      "truncated": false,
+      "content": "| Theme | People | What might help today |\n| ----- | ----- | ----- |\n| Performance with large data | 15 | Recent versions of JupyterLab/Notebook improve UI performance. Large outputs freezing the browser can be prevented by using visualisation and tabulation libraries that make use of rasterization and canvas renderers (e.g. plotly, [ipydatagrid](https://github.com/jupyter-widgets/ipydatagrid) or newcomers like [xy](https://github.com/reflex-dev/xy)). Third-party extensions streamline work with large dataset in dedicated big data formats (e.g. [jupyterlab-h5web](https://github.com/silx-kit/jupyterlab-h5web) for HDF5, NeXus, ANNData, etc; [Arbalister](https://github.com/QuantStack/Arbalister) for Parquet, CSV, Avro, ORC, SQLite, Arrow IPC). |\n| Documentation and discoverability | 14 | [Jupyter documentation](https://docs.jupyter.org/) and [Discourse](https://discourse.jupyter.org/). We are aware that changelogs and breaking-change notes are missing or inconsistent across subprojects, and this needs addressing. |\n| Deployment and multi-user operations | 12 | [The Littlest JupyterHub](https://tljh.jupyter.org/) for single-server teaching and [Zero to JupyterHub](https://z2jh.jupyter.org/) on Kubernetes. [batchspawner](https://github.com/jupyterhub/batchspawner) for Slurm and HPC, [systemdspawner](https://github.com/jupyterhub/systemdspawner) for resource limits and sandboxing. Third-party: [jupyterhub-usage-quotas](https://github.com/2i2c-org/jupyterhub-usage-quotas) and [jupyterhub-cost-monitoring](https://github.com/2i2c-org/jupyterhub-cost-monitoring). |\n| Security, authentication and compliance (including accessibility) | 6 | [JupyterHub authenticators](https://jupyterhub.readthedocs.io/en/stable/reference/authenticators.html) cover most institutional identity providers, and Zero to JupyterHub documents TLS and network configuration. [jupyterlab-a11y-checker](https://github.com/berkeley-cdss/jupyterlab-a11y-checker) is a UC Berkeley CDSS extension for assisting authors of extensions. New versions of Jupyter software include notable accessibility improvements: [JupyterLab](https://jupyterlab.readthedocs.io/en/latest/getting_started/changelog.html#keyboard-navigation-and-accessibility), [myst-theme](https://jupyterbook.org/blog/posts/2026/accessibility-improvements) |\n| Teaching and grading | 8 | [nbgrader](https://nbgrader.readthedocs.io/) for assignment distribution and autograding, usually alongside JupyterHub. |\n| Execution model and cell state | 8 | In IPython `%load_ext autoreload` followed by `%autoreload 2` gives hot reload while developing a package against a live kernel. Third-party [ipyflow](https://github.com/ipyflow/ipyflow) brings reactive execution to Jupyter interfaces. |\n| Publishing and export | 7 | `jupyter nbconvert --to webpdf` produces PDFs without a LaTeX installation. [Jupyter Book](https://jupyterbook.org/) for longer documents and [Voilà](https://voila.readthedocs.io/) for dashboards. Third-party: [Quarto](https://quarto.org/). |\n| Mobile and tablet access | 3 | No good answer today. Recent work on lumino is addressing certain limitations. |\n| Non-Python kernels | 3 | Maturity varies by language. Specific bugs are best filed on the relevant kernel's issue tracker, where they can be followed up. |\n| Excel and spreadsheet interop | 3 | JupyterLab opens CSV and TSV files in a data grid without any extension. Third-party: [jupyterlab-spreadsheet-editor](https://github.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor) makes CSV and TSV files editable in place, and [jupyterlab-spreadsheet](https://github.com/quigleyj97/jupyterlab-spreadsheet) opens Excel workbooks read-only. |\n",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2026-08-25T16:54:42Z",
+  "updated_at": "2026-08-25T16:54:43Z",
+  "description": "Other themes",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/f4e4e08c907583ab563dd6f97c17c48c/comments",
+  "owner": {
+    "login": "krassowski",
+    "id": 5832902,
+    "node_id": "MDQ6VXNlcjU4MzI5MDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5832902?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/krassowski",
+    "html_url": "https://github.com/krassowski",
+    "followers_url": "https://api.github.com/users/krassowski/followers",
+    "following_url": "https://api.github.com/users/krassowski/following{/other_user}",
+    "gists_url": "https://api.github.com/users/krassowski/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/krassowski/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/krassowski/subscriptions",
+    "organizations_url": "https://api.github.com/users/krassowski/orgs",
+    "repos_url": "https://api.github.com/users/krassowski/repos",
+    "events_url": "https://api.github.com/users/krassowski/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/krassowski/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "krassowski",
+        "id": 5832902,
+        "node_id": "MDQ6VXNlcjU4MzI5MDI=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/5832902?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/krassowski",
+        "html_url": "https://github.com/krassowski",
+        "followers_url": "https://api.github.com/users/krassowski/followers",
+        "following_url": "https://api.github.com/users/krassowski/following{/other_user}",
+        "gists_url": "https://api.github.com/users/krassowski/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/krassowski/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/krassowski/subscriptions",
+        "organizations_url": "https://api.github.com/users/krassowski/orgs",
+        "repos_url": "https://api.github.com/users/krassowski/repos",
+        "events_url": "https://api.github.com/users/krassowski/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/krassowski/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "806cd0efff48df53afe9d96d76c390b6a6f3bade",
+      "committed_at": "2026-08-25T16:54:42Z",
+      "change_status": {
+        "total": 12,
+        "additions": 12,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/f4e4e08c907583ab563dd6f97c17c48c/806cd0efff48df53afe9d96d76c390b6a6f3bade"
+    }
+  ],
+  "truncated": false
+}

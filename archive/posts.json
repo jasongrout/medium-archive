@@ -1899,7 +1899,7 @@
     "title": "Release of IPython 5.5 and 6.2",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2017-09-15T18:42:51Z",
+    "date": "2017-09-15T18:42:51.052Z",
     "updated": "2017-09-15T18:42:51Z",
     "original_url": "https://blog.jupyter.org/release-of-ipython-5-5-and-6-2-158537648393",
     "original_path": "/release-of-ipython-5-5-and-6-2-158537648393",
@@ -1907,13 +1907,13 @@
     "slug": "release-of-ipython-5-5-and-6-2",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Release of IPython 5.5 and 6.2 Four month after releasing IPython 6.1 and 5.4, and a couple of hours after the release of the notebook 5.1, we are happy to announce the release of IPython 6.2 (Python …",
+    "description": "Four month after releasing IPython 6.1 and 5.4, and a couple of hours after the release of the notebook 5.1, we are happy to announce the…",
     "tags": [
       "ipython",
       "releases"
     ],
     "images": [],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2017-09-15-release-of-ipython-5-5-and-6-2"
   },
   "https://blog.jupyter.org/jupytergis-d63b7adf9d0c": {
@@ -3533,7 +3533,7 @@
     "title": "Jupyter Pop-Up, March 21, Boston",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2018-02-09T22:20:32Z",
+    "date": "2018-02-09T22:20:32.360Z",
     "updated": "2018-02-09T22:20:32Z",
     "original_url": "https://blog.jupyter.org/jupyter-pop-up-march-21-boston-b736d842fa8f",
     "original_path": "/jupyter-pop-up-march-21-boston-b736d842fa8f",
@@ -3541,14 +3541,14 @@
     "slug": "jupyter-pop-up-march-21-boston",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Pop-Up, March 21, Boston A new series of local Jupyter events, starting in Boston. Many of you are looking forward to JupyterCon 2018 and have submitted a talk. Alongside these large …",
+    "description": "A new series of local Jupyter events, starting in Boston.",
     "tags": [
       "events"
     ],
     "images": [
       "images/001-1_uYXtEHsSpXF7flT8eZdeQQ.png"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2018-02-09-jupyter-pop-up-march-21-boston"
   },
   "https://blog.jupyter.org/jupyter-conference-advisory-committee-9c096d308552": {
@@ -3575,7 +3575,7 @@
     "title": "Incident Report: Jupyter services down",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2017-12-14T19:52:41Z",
+    "date": "2017-12-14T19:52:41.167Z",
     "updated": "2017-12-14T20:46:30Z",
     "original_url": "https://blog.jupyter.org/incident-report-jupyter-services-down-f5b3888fa5c2",
     "original_path": "/incident-report-jupyter-services-down-f5b3888fa5c2",
@@ -3583,13 +3583,13 @@
     "slug": "incident-report-jupyter-services-down",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Incident Report: Jupyter services down update: December 14, 20:45 UTC, all services should be restored and back up. On December 13, at 22:10 UTC (4:10pm EST), a large number of Jupyter-provided …",
+    "description": "update: December 14, 20:45 UTC, all services should be restored and back up.",
     "tags": [
       "cloud-computing",
       "devops"
     ],
     "images": [],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2017-12-14-incident-report-jupyter-services-down"
   },
   "https://blog.jupyter.org/jupyter-notebooks-for-post-election-audits-4bdd13d3e800": {
@@ -4555,7 +4555,7 @@
     "title": "Release of IPython 8.0",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2022-01-12T13:37:51Z",
+    "date": "2022-01-12T13:37:51.828Z",
     "updated": "2022-01-12T16:14:28Z",
     "original_url": "https://blog.jupyter.org/release-of-ipython-8-0-6e034ff122ef",
     "original_path": "/release-of-ipython-8-0-6e034ff122ef",
@@ -4563,7 +4563,7 @@
     "slug": "release-of-ipython-8-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Release of IPython 8.0 IPython is a powerful Python REPL that gives you tab completion, better tracebacks, multiline editing, and several useful features on top of pure Python Scripts. It is also the …",
+    "description": "IPython is a powerful Python REPL that gives you tab completion, better tracebacks, multiline editing, and several useful features on top…",
     "tags": [
       "ipython",
       "releases"
@@ -4571,7 +4571,7 @@
     "images": [
       "images/001-1_2_TYKwP_RInA4QVp9UhMhw.png"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2022-01-12-release-of-ipython-8-0"
   },
   "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-1-133e0e522d1b": {
@@ -5047,7 +5047,7 @@
     "title": "Jupyter’s role in #ChaosDB",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2021-09-01T21:43:45Z",
+    "date": "2021-09-01T21:43:45.641Z",
     "updated": "2021-09-02T06:56:25Z",
     "original_url": "https://blog.jupyter.org/jupyter-role-in-chaosdb-4cb269815d26",
     "original_path": "/jupyter-role-in-chaosdb-4cb269815d26",
@@ -5055,14 +5055,14 @@
     "slug": "jupyter-role-in-chaosdb",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter’s role in #ChaosDB On August 26 it was revealed that a misconfiguration in Microsoft’s internal deployment of CosmosDB using Jupyter would allow attackers to access all customer data …",
+    "description": "On August 26 it was revealed that a misconfiguration in Microsoft’s internal deployment of CosmosDB using Jupyter would allow attackers to…",
     "tags": [
       "security"
     ],
     "images": [
       "images/001-1_v0isW10uaM0t1DyKOIL02Q.png"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2021-09-01-jupyter-role-in-chaosdb"
   },
   "https://blog.jupyter.org/field-report-on-the-kernel-community-workshop-a4ad73a1a718": {
@@ -5171,7 +5171,7 @@
     "title": "CVE-2021–32797 and CVE-2021–32798 Remote Code execution in JupyterLab and Jupyter Notebook",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2021-08-09T20:05:49Z",
+    "date": "2021-08-09T20:05:49.573Z",
     "updated": "2021-08-09T20:19:21Z",
     "original_url": "https://blog.jupyter.org/cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyter-notebook-a70fae0d3239",
     "original_path": "/cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyter-notebook-a70fae0d3239",
@@ -5179,7 +5179,7 @@
     "slug": "cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyte",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "CVE-2021–32797 and CVE-2021–32798 Remote Code execution in JupyterLab and Jupyter Notebook TL:DR; All recent JupyterLab and Notebook versions are susceptible to a attack where a maliciously …",
+    "description": "TL:DR; All recent JupyterLab and Notebook versions are susceptible to a attack where a maliciously crafted notebook can trigger arbitrary…",
     "tags": [
       "jupyter-notebook",
       "jupyterlab",
@@ -5187,7 +5187,7 @@
       "security"
     ],
     "images": [],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2021-08-09-cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyte"
   },
   "https://blog.jupyter.org/build-a-jupyter-widget-with-react-and-typescript-d83e07340fa3": {
@@ -7302,7 +7302,7 @@
     "title": "IPython 7.0, Async REPL",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2018-09-27T17:41:03Z",
+    "date": "2018-09-27T17:41:03.848Z",
     "updated": "2018-09-27T17:41:03Z",
     "original_url": "https://blog.jupyter.org/ipython-7-0-async-repl-a35ce050f7f7",
     "original_path": "/ipython-7-0-async-repl-a35ce050f7f7",
@@ -7310,7 +7310,7 @@
     "slug": "ipython-7-0-async-repl",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "IPython 7.0, Async REPL Today we are pleased to announce the release of IPython 7.0, the powerful Python interactive shell that goes above and beyond the default Python REPL with advanced tab …",
+    "description": "Today we are pleased to announce the release of IPython 7.0, the powerful Python interactive shell that goes above and beyond the default…",
     "tags": [
       "ipython",
       "releases"
@@ -7323,7 +7323,7 @@
       "images/005-1_LBoQBdKymSQYv_k1Yb1jAg.png",
       "images/006-1_aJEDRVPyMtyaiDQGXsx6-w.png"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2018-09-27-ipython-7-0-async-repl"
   },
   "https://blog.jupyter.org/introducing-jupyter-enterprise-gateway-db4859f86762": {
@@ -7400,7 +7400,7 @@
     "title": "JupyterCon 2018: Registration Open",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2018-04-11T15:01:01Z",
+    "date": "2018-04-11T15:01:01.255Z",
     "updated": "2018-08-16T19:35:29Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2018-registration-open-3b52abba9cce",
     "original_path": "/jupytercon-2018-registration-open-3b52abba9cce",
@@ -7408,7 +7408,7 @@
     "slug": "jupytercon-2018-registration-open",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2018: Registration Open Dear Jupyter Community, For the past six months, the Project Jupyter team in collaboration with O’Reilly Media and NumFOCUS have been planning JupyterCon 2018. In …",
+    "description": "Dear Jupyter Community,",
     "tags": [
       "events",
       "jupytercon"
@@ -7417,7 +7417,7 @@
       "images/001-1_-DqMOJzy1XN-UnTaLKZaow.jpeg",
       "images/002-1_Dd2zMnOvFbSdzClbeBxuFg.jpeg"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2018-04-11-jupytercon-2018-registration-open"
   },
   "https://blog.jupyter.org/security-fix-for-jupyter-notebook-450f272b6932": {
@@ -7643,7 +7643,7 @@
     "title": "I Python, You R, We Julia",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2018-05-29T16:11:01Z",
+    "date": "2018-05-29T16:11:01.362Z",
     "updated": "2018-05-29T16:11:01Z",
     "original_url": "https://blog.jupyter.org/i-python-you-r-we-julia-baf064ca1fb6",
     "original_path": "/i-python-you-r-we-julia-baf064ca1fb6",
@@ -7651,7 +7651,7 @@
     "slug": "i-python-you-r-we-julia",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "I Python, You R, We Julia When we decided to rename part of the IPython project to Jupyter in 2014, we had many good reasons. Our goal was to make (Data)Science and Education better, by providing …",
+    "description": "When we decided to rename part of the IPython project to Jupyter in 2014, we had many good reasons. Our goal was to make (Data)Science and…",
     "tags": [
       "kernels"
     ],
@@ -7661,7 +7661,7 @@
       "images/003-1_DEtOH4NVIEGL65S598P6kQ.png",
       "images/004-1_jJ1qjNDSNeBm78cnBLZsIg.png"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2018-05-29-i-python-you-r-we-julia"
   },
   "https://blog.jupyter.org/new-funding-for-jupyter-12009a836867": {
@@ -7961,7 +7961,7 @@
     "title": "Enjoy JupyterCon 2017 on YouTube",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2017-11-24T10:09:01Z",
+    "date": "2017-11-24T10:09:01.159Z",
     "updated": "2018-01-08T16:43:52Z",
     "original_url": "https://blog.jupyter.org/enjoy-jupytercon-2017-on-youtube-670e5ee606a8",
     "original_path": "/enjoy-jupytercon-2017-on-youtube-670e5ee606a8",
@@ -7969,21 +7969,21 @@
     "slug": "enjoy-jupytercon-2017-on-youtube",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Enjoy JupyterCon 2017 on YouTube About a year ago the Jupyter team started a partnership with O’Reilly Media and NumFOCUS to organize JupyterCon 2017, the first in a series of Jupyter-related …",
+    "description": "About a year ago the Jupyter team started a partnership with O’Reilly Media and NumFOCUS to organize JupyterCon 2017, the first in a series…",
     "tags": [
       "events",
       "jupytercon",
       "numfocus"
     ],
     "images": [],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2017-11-24-enjoy-jupytercon-2017-on-youtube"
   },
   "https://blog.jupyter.org/jupytercon-2018-call-for-proposal-87986014ee0b": {
     "title": "JupyterCon 2018: Call For Proposal",
     "author": "M Bussonnier",
     "author_url": "https://medium.com/@mbussonn",
-    "date": "2018-01-18T22:53:13Z",
+    "date": "2018-01-18T22:53:13.831Z",
     "updated": "2018-02-20T21:27:12Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2018-call-for-proposal-87986014ee0b",
     "original_path": "/jupytercon-2018-call-for-proposal-87986014ee0b",
@@ -7991,7 +7991,7 @@
     "slug": "jupytercon-2018-call-for-proposal",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2018: Call For Proposal Dear fellow Jovyans, It is with great pleasure that we are opening the Call For Proposals (CFP) for JupyterCon 2018! Last August, Project Jupyter, the NumFOCUS …",
+    "description": "Dear fellow Jovyans,",
     "tags": [
       "events",
       "jupytercon"
@@ -8001,7 +8001,7 @@
       "images/002-1_eBDo76BnRMrk-OHLzlSd6g.jpeg",
       "images/003-1_geuYDAU8htqwczKSJ2peCw.jpeg"
     ],
-    "body_source": "state",
+    "body_source": "export",
     "dir": "posts/2018-01-18-jupytercon-2018-call-for-proposal"
   },
   "https://blog.jupyter.org/jupyter-notebook-5-3-0-f2b08652279d": {
