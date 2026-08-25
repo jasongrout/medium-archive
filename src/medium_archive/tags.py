@@ -29,8 +29,11 @@ post tagged with two variants ends up with the target once.
 were chosen for medium.com discovery, so a post plainly about a topic
 the archive tracks often never carried the tag (early Ghost-era posts
 carried none at all). Slugs are not guaranteed unique; an entry applies
-to every post with that slug. Added tags must be final names -- adding a
-dropped or renamed tag aborts at load, so the cleanup stays one pass.
+to every post with that slug. Added tags must be final names -- adding
+a renamed tag aborts at load, so the cleanup stays one pass. Adding a
+dropped tag is allowed, and is how an over-applied tag is split: drop
+clears the inherited uses everywhere, and add re-asserts the tag on the
+posts that genuinely deserve it (adds run after drops and renames).
 
 The config fails loudly, like a fixup that no longer applies: unknown
 top-level keys, malformed entries, a tag both dropped and renamed, a
@@ -158,9 +161,6 @@ def load_tag_map(out: Path) -> TagMap | None:
             if tag in seen:
                 _fail(path, f"add {slug!r}: {tag!r} listed twice")
             seen.add(tag)
-            if tag in drop:
-                _fail(path, f"add {slug!r}: {tag!r} is dropped; adds must "
-                            "use tags the cleanup keeps")
             if tag in rename:
                 _fail(path, f"add {slug!r}: {tag!r} is renamed to "
                             f"{rename[tag]!r}; add the final tag instead")
