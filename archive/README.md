@@ -58,7 +58,9 @@ Medium. It has two layers:
   Hugo >= 0.158); clone the theme once into site-hugo/themes/ --
   regeneration preserves it. This archive's site.json uses the built-in
   card theme, with `avatar.svg` (the official Jupyter logo mark from
-  https://github.com/jupyter/design, BSD-licensed) in the header, and
+  https://github.com/jupyter/design, BSD-licensed) in the header,
+  `favicon.svg` (the same mark centered on a square viewBox) as the
+  browser-tab icon, and
   sets `"announcement"` to https://jupyter.org/assets/banner.html, so
   the sites show the same Jupyter-wide announcement banner as
   jupyter.org and the projects' Sphinx documentation sites.
