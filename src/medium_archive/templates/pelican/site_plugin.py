@@ -1,10 +1,16 @@
+# Substituted into STUB as a format() value, never as a format string:
+# the spliced CSS/JS is full of braces.
+THEME_HEAD = """\
+<!-- @include shared/redirect-head.html -->
+"""
+
 STUB = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <title>{target}</title>
 <link rel="canonical" href="{target}">
 <meta name="robots" content="noindex">
 <meta http-equiv="refresh" content="0; url={target}">
-</head><body><a href="{target}">{target}</a></body></html>
+{theme_head}</head><body><a href="{target}">{target}</a></body></html>
 """
 
 
@@ -27,7 +33,8 @@ def _write_redirect_stubs(pelican_obj):
             continue
         os.makedirs(os.path.dirname(stub), exist_ok=True)
         with open(stub, "w", encoding="utf-8") as fh:
-            fh.write(STUB.format(target=SITEURL + row["new_path"]))
+            fh.write(STUB.format(target=SITEURL + row["new_path"],
+                                 theme_head=THEME_HEAD))
         written += 1
     print(f"redirect stubs: {written} written from redirects.csv")
 

@@ -57,6 +57,7 @@ TEMPLATES = {
     "layouts/_default/terms.html": "hugo/layouts/_default/terms.html",
     "layouts/_default/archives.html": "hugo/layouts/_default/archives.html",
     "layouts/_default/search.html": "hugo/layouts/_default/search.html",
+    "layouts/alias.html": "hugo/layouts/alias.html",
     "layouts/_default/_markup/render-image.html":
         "hugo/layouts/_default/_markup/render-image.html",
     "static/css/style.css": "shared/card.css",
