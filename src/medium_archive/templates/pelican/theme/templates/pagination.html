@@ -1,7 +1,36 @@
+{# Hugo's built-in pager, recreated: «« « with a five-number window » »».
+   Page 1 of a direct template is "index.html"; serve it as its directory,
+   the way Hugo links the first page. #}
+{% macro page_url(number) -%}
+{%- set u = articles_paginator.page(number).url -%}
+{{ SITEURL }}/{{ u[:-10] if u.endswith("index.html") else u }}
+{%- endmacro %}
 {% if articles_page and articles_page.has_other_pages() %}
+{% set current = articles_page.number %}
+{% set total = articles_paginator.num_pages %}
+{% set start = [[current - 2, total - 4] | min, 1] | max %}
+{% set end = [start + 4, total] | min %}
 <ul class="pagination">
-{% if articles_page.has_previous() %}<li><a class="page-link" href="{{ SITEURL }}/{{ articles_previous_page.url }}">← Newer</a></li>{% endif %}
-<li class="active"><span class="page-link">Page {{ articles_page.number }} of {{ articles_paginator.num_pages }}</span></li>
-{% if articles_page.has_next() %}<li><a class="page-link" href="{{ SITEURL }}/{{ articles_next_page.url }}">Older →</a></li>{% endif %}
+{% if articles_page.has_previous() %}
+<li><a class="page-link" href="{{ page_url(1) }}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+<li><a class="page-link" href="{{ page_url(current - 1) }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+{% else %}
+<li class="disabled"><span class="page-link" aria-hidden="true">&laquo;&laquo;</span></li>
+<li class="disabled"><span class="page-link" aria-hidden="true">&laquo;</span></li>
+{% endif %}
+{% for number in range(start, end + 1) %}
+{% if number == current %}
+<li class="active"><span class="page-link" aria-current="page" aria-label="Page {{ number }}">{{ number }}</span></li>
+{% else %}
+<li><a class="page-link" href="{{ page_url(number) }}" aria-label="Page {{ number }}">{{ number }}</a></li>
+{% endif %}
+{% endfor %}
+{% if articles_page.has_next() %}
+<li><a class="page-link" href="{{ page_url(current + 1) }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+<li><a class="page-link" href="{{ page_url(total) }}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+{% else %}
+<li class="disabled"><span class="page-link" aria-hidden="true">&raquo;</span></li>
+<li class="disabled"><span class="page-link" aria-hidden="true">&raquo;&raquo;</span></li>
+{% endif %}
 </ul>
 {% endif %}

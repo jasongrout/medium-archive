@@ -99,6 +99,7 @@ ul.pagination { display: flex; justify-content: center; gap: .25rem;
 ul.pagination .page-link { display: inline-block; padding: .35rem .8rem;
                            background: var(--card); border-radius: 6px; color: var(--ink); }
 ul.pagination .active .page-link { background: var(--accent); color: #fff; }
+ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
 
 .archives { list-style: none; padding: 0; margin: 1rem 0 2rem; }
 .archives time { color: var(--muted); font-variant-numeric: tabular-nums;
