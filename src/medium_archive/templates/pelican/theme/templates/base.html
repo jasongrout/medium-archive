@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="{{ DEFAULT_LANG }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ SITENAME }}{% endblock %}</title>
+<meta name="description" content="{{ SITESUBTITLE }}">
+<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
+<!-- @include shared/theme-init.html -->
+<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
+</head>
+<body>
+<header class="site-header"><div class="wrap bar">
+<a class="site-title" href="{{ SITEURL }}/">{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}</a>
+<nav>
+<a href="{{ SITEURL }}/">Blog</a>
+<a href="{{ SITEURL }}/tags/">Tags</a>
+<a href="{{ SITEURL }}/authors/">Authors</a>
+<a href="{{ SITEURL }}/archives/">Archives</a>
+<a href="{{ SITEURL }}/search/">Search</a>
+<a href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}">RSS</a>
+<!-- @include shared/theme-picker.html -->
+</nav>
+</div></header>
+<main class="wrap">
+{% block content %}{% endblock %}
+</main>
+<footer class="wrap site-footer">{{ SITESUBTITLE }}</footer>
+</body>
+</html>

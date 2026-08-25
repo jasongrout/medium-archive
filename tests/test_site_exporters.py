@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from medium_archive import hugo, pelican, zola
+from medium_archive import hugo, pelican, sites, zola
 
 BASE = "https://blog.example.com"
 
@@ -256,7 +256,8 @@ def test_theme_picker_and_dark_scheme(archive):
         assert text.index("localStorage.getItem") < text.index("stylesheet")
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
-    for snippet in (hugo.THEME_INIT, hugo.THEME_PICKER, hugo.TERM_SORT):
+    for name in ("theme-init", "theme-picker", "term-sort"):
+        snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar the config must still be valid Python
     # (json.dumps(None) would emit a NameError-raising `null`)

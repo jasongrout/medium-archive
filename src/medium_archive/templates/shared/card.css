@@ -1,0 +1,136 @@
+/* Light is the default palette. The header picker pins an explicit
+   choice as data-theme on <html> (persisted in localStorage); with no
+   attribute, prefers-color-scheme decides -- the "system" setting. */
+:root { --accent: #f37726; --accent-dark: #c85a11; --ink: #1c1c1c;
+        --soft: #444444; --muted: #6a6a6a; --bg: #f4f4f4; --card: #ffffff;
+        --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
+        color-scheme: light; }
+:root[data-theme="dark"] {
+/* @include shared/dark-palette.css */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+/* @include shared/dark-palette.css */
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+       font: 1rem/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
+a { color: var(--accent-dark); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.site-header { background: var(--card); border-bottom: 1px solid var(--line); }
+.site-header .bar { display: flex; align-items: center; justify-content: space-between;
+                    flex-wrap: wrap; gap: .5rem; padding-top: .9rem; padding-bottom: .9rem; }
+.site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
+              display: flex; align-items: center; gap: .55rem; }
+.site-title img { height: 2.1rem; width: auto; }
+.site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
+.site-header nav a:hover { color: var(--accent-dark); }
+
+.theme-picker { display: inline-flex; vertical-align: middle; gap: .15rem;
+                margin-left: 1.25rem; padding: .15rem;
+                border: 1px solid var(--line); border-radius: 999px; }
+.theme-picker[hidden] { display: none; }
+.theme-picker button { display: inline-flex; align-items: center;
+                       justify-content: center; width: 1.6rem; height: 1.6rem;
+                       padding: 0; border: 0; border-radius: 999px;
+                       background: none; color: var(--muted); cursor: pointer; }
+.theme-picker button:hover { color: var(--accent-dark); }
+.theme-picker button[aria-pressed="true"] { background: var(--bg);
+                                            color: var(--ink); }
+.theme-picker svg { width: 1rem; height: 1rem; }
+
+.page-title { font-size: 2.4rem; font-weight: 400; margin: 2.2rem 0 1rem; }
+.intro { max-width: 46rem; color: var(--muted); margin-bottom: 2rem; }
+
+.card-grid { display: grid; gap: 1.5rem; margin: 1rem 0 2.5rem;
+             grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--card); border-radius: 8px; overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05);
+        display: flex; flex-direction: column; }
+.card-cover { display: block; aspect-ratio: 16/9; background: var(--bg); }
+.card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card-body { padding: 1.1rem 1.25rem 1.25rem; display: flex;
+             flex-direction: column; flex: 1; }
+.card-tags { margin: 0 0 .35rem; }
+.card-tags a { color: var(--accent-dark); font-size: .82rem; font-weight: 600;
+               margin-right: .6rem; }
+.card-title { margin: 0 0 .5rem; font-size: 1.3rem; line-height: 1.3; }
+.card-title a { color: var(--ink); }
+.card-excerpt { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
+.card-meta { margin: 1rem 0 0; color: var(--muted); font-size: .85rem; }
+
+.post { background: var(--card); border-radius: 8px; margin: 2rem auto 3rem;
+        padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem); max-width: 52rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
+.post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
+.post-meta { color: var(--muted); margin: 0 0 2rem; }
+.post-meta .tag::before { content: "#"; opacity: .6; }
+.post img { max-width: 100%; height: auto; border-radius: 4px; }
+.post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
+            border-radius: 6px; font-size: .9rem; }
+.post code { background: var(--code-bg); }
+.post blockquote { margin-left: 0; padding-left: 1rem;
+                   border-left: 3px solid var(--accent); color: var(--soft); }
+.post figcaption, .post em img + em { color: var(--muted); }
+
+.term-list { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.5rem 0 3rem; }
+.chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+        padding: .35rem .9rem; color: var(--ink); }
+.chip span { color: var(--muted); font-size: .85em; }
+.chip:hover { border-color: var(--accent); text-decoration: none; }
+
+.term-sort { margin: 1.5rem 0 0; color: var(--muted); font-size: .9rem; }
+.term-sort[hidden] { display: none; }
+.term-sort button { border: 1px solid var(--line); border-radius: 999px;
+                    background: var(--card); color: var(--soft); font: inherit;
+                    padding: .15rem .8rem; margin-left: .35rem; cursor: pointer; }
+.term-sort button:hover { border-color: var(--accent); }
+.term-sort button[aria-pressed="true"] { border-color: var(--accent);
+                                         color: var(--ink); }
+/* ~, not +: the snippet's script tag sits between the two */
+.term-sort ~ .term-list { margin-top: .9rem; }
+
+ul.pagination { display: flex; justify-content: center; gap: .25rem;
+                list-style: none; padding: 0; margin: 0 0 3rem; }
+ul.pagination .page-link { display: inline-block; padding: .35rem .8rem;
+                           background: var(--card); border-radius: 6px; color: var(--ink); }
+ul.pagination .active .page-link { background: var(--accent); color: #fff; }
+
+.archives { list-style: none; padding: 0; margin: 1rem 0 2rem; }
+.archives time { color: var(--muted); font-variant-numeric: tabular-nums;
+                 margin-right: .6rem; }
+.archives a { color: var(--ink); }
+
+/* Pagefind's component CSS boosts every selector to ID-level specificity
+   (its :is(*, #\#) prefix) so host styles lose by default; it leaves
+   !important to the host page as the intended override lever. Orange is
+   reserved for the highlighted matches; article titles are set off from
+   the per-section heading hits typographically -- large bold vs small
+   semibold, both in neutral ink. */
+#search { margin: 0 0 3rem;
+          /* The component styles itself from --pf-* custom properties
+             (light values on :root; it does not follow
+             prefers-color-scheme on its own). Redefining them here from
+             the site tokens makes the search UI track whichever palette
+             is active. */
+          --pf-text: var(--ink); --pf-text-secondary: var(--soft);
+          --pf-text-muted: var(--muted); --pf-background: var(--card);
+          --pf-border: var(--line); --pf-skeleton: var(--code-bg);
+          --pf-hover: var(--code-bg); --pf-mark: var(--ink); }
+#search mark { color: inherit; border-radius: 2px; padding: 0 .12em;
+               background: var(--mark) !important; }
+#search .pf-result-title { margin-bottom: .2rem; }
+#search .pf-result-link { font-size: 1.25rem !important;
+                          font-weight: 700 !important;
+                          color: var(--ink) !important; }
+#search .pf-result-excerpt { color: var(--soft) !important; }
+#search .pf-heading-link { font-size: .92rem !important;
+                           font-weight: 600 !important;
+                           color: var(--ink) !important; }
+#search .pf-heading-excerpt { color: var(--muted) !important;
+                              font-size: .9rem !important; }
+.site-footer { color: var(--muted); font-size: .85rem; padding-top: 1rem;
+               padding-bottom: 2.5rem; }

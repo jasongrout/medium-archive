@@ -1,0 +1,9 @@
+{{ define "main" }}
+<article class="post" data-pagefind-body>
+<h1>{{ .Title }}</h1>
+<p class="post-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>
+{{- range .GetTerms "authors" }} · <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
+{{- with .Params.tags }} ·{{ range $.GetTerms "tags" }} <a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}</p>
+{{ .Content }}
+</article>
+{{ end }}

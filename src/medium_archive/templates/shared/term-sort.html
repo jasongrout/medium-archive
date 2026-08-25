@@ -1,0 +1,43 @@
+<p class="term-sort" role="group" aria-label="Sort by" hidden>Sort by
+<button type="button" data-sort="name">name</button>
+<button type="button" data-sort="count">count</button>
+</p>
+<script>
+(function () {
+  function init() {
+    var control = document.querySelector(".term-sort");
+    var list = document.querySelector(".term-list");
+    if (!control || !list) return;
+    var buttons = control.querySelectorAll("button");
+    var chips = Array.prototype.map.call(
+      list.querySelectorAll(".chip"), function (chip) {
+        return { el: chip,
+                 name: chip.firstChild.textContent.trim().toLowerCase(),
+                 count: parseInt(chip.querySelector("span").textContent, 10) || 0 };
+      });
+    function apply(order) {
+      chips.slice().sort(function (a, b) {
+        if (order === "count" && a.count !== b.count) return b.count - a.count;
+        return a.name.localeCompare(b.name);
+      }).forEach(function (c) { list.appendChild(c.el); });
+      try {
+        if (order === "name") localStorage.removeItem("term-sort");
+        else localStorage.setItem("term-sort", order);
+      } catch (e) {}
+      buttons.forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.sort === order));
+      });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () { apply(b.dataset.sort); });
+    });
+    var stored = null;
+    try { stored = localStorage.getItem("term-sort"); } catch (e) {}
+    apply(stored === "count" ? "count" : "name");
+    control.hidden = false;
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>

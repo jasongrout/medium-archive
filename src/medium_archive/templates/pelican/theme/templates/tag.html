@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "macros.html" import card with context %}
+{% block title %}{{ tag }} · {{ SITENAME }}{% endblock %}
+{% block content %}
+<h1 class="page-title">{{ tag }}</h1>
+<div class="card-grid">
+{% for article in articles_page.object_list %}{{ card(article) }}{% endfor %}
+</div>
+{% include "pagination.html" %}
+{% endblock %}

@@ -1,0 +1,23 @@
+<article class="card">
+{{- $cover := "" }}{{ with .Params.cover }}{{ $cover = $.Resources.Get . }}{{ end }}
+{{- with $cover }}
+<a class="card-cover" href="{{ $.RelPermalink }}">
+  {{- if and (eq .MediaType.MainType "image") (not (in (slice "gif" "svg") .MediaType.SubType)) -}}
+  {{- /* the exporter bakes covers to exactly 640x360 (crop or
+         letterbox by aspect -- see sites.make_cover_thumbnail); Fill
+         is the fallback when they kept their source size (no Pillow) */ -}}
+  {{- $thumb := . -}}
+  {{- if or (ne .Width 640) (ne .Height 360) -}}{{- $thumb = .Fill "640x360 q75" -}}{{- end -}}
+  <img src="{{ $thumb.RelPermalink }}" width="640" height="360" alt="" loading="lazy">
+  {{- else -}}
+  <img src="{{ .RelPermalink }}" alt="" loading="lazy">
+  {{- end -}}
+</a>
+{{- end }}
+<div class="card-body">
+{{ with .GetTerms "tags" }}<p class="card-tags">{{ range . }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a> {{ end }}</p>{{ end }}
+<h2 class="card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+<p class="card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
+<p class="card-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>{{ with .Params.author }} · {{ . }}{{ end }}</p>
+</div>
+</article>
