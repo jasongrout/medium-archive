@@ -6,4 +6,5 @@
 {{- with .Params.tags }} ·{{ range $.GetTerms "tags" }} <a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}</p>
 {{ .Content }}
 </article>
+<!-- @include shared/image-zoom.html -->
 {{ end }}

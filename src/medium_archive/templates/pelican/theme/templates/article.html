@@ -8,4 +8,5 @@
 {%- if article.tags %} ·{% for t in article.tags %} <a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a>{% endfor %}{% endif %}</p>
 {{ article.content }}
 </article>
+<!-- @include shared/image-zoom.html -->
 {% endblock %}

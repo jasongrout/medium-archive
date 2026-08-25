@@ -137,6 +137,27 @@ clean `lint` run, and the offline test suite):
   reference archive on all four pages (both generators × tags/authors),
   including persistence across reloads and identical counts across
   generators.
+- **Click-to-zoom body images (hugo + pelican)** — clicking an
+  article image (or pressing Enter on it, since zoomable images take
+  keyboard focus and a button role) opens it full size in a `<dialog>`
+  modal captioned with its alt text, restoring the one Medium reading
+  affordance the conversion drops: Medium's own "Press enter or click
+  to view image in full size" hint is stripped as chrome by
+  `pages.py`. Another plain HTML+JS snippet shared verbatim between
+  the two generators, spliced into the post templates rather than the
+  base ones. Only images worth zooming are marked, so the cursor never
+  promises a no-op: the test is the `width` attribute both exporters
+  already emit against the rendered width, not `naturalWidth`, which
+  the browser density-corrects to the layout size once a srcset
+  variant is in play. The modal loads the `src` — the full-size
+  original the responsive markup keeps there, never a variant — and
+  images inside a link are left alone, so a linked image still follows
+  its link. Closes on a click anywhere, Esc, or a page scroll.
+  Verified in headless Chromium against real hugo (0.140.2 extended)
+  and pelican (4.12.0) builds of a fixture archive: 26 assertions per
+  generator over marking, the affordances, open/close by mouse,
+  keyboard and scroll, the zoomed source being the original, and
+  re-measurement when the window resizes under an image.
 - **Hugo theme support (Dream)** — site.json's `hugo` section can name
   a real theme (`theme`, `theme_repo`, optional `avatar` and `params`);
   the exporter then emits that theme's config instead of its own
