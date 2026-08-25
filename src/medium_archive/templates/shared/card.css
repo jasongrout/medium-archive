@@ -94,6 +94,9 @@ a:hover { text-decoration: underline; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
+/* body images link to the file itself: a chart or screenshot the column
+   narrows is one click from its full resolution */
+.post a.image-link { display: inline-block; text-decoration: none; }
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-size: .9rem; }
 .post code { background: var(--code-bg); }

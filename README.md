@@ -123,19 +123,26 @@ It works in independent steps:
   uniform, over a blurred fill of the image otherwise, and never
   upscaled past 2×) — and responsive, lazily-loaded webp variants
   (480/736/1104 px `srcset`, never upscaled, with real width/height)
-  for still body images: Hugo natively through its image pipeline
-  and a render hook, Pelican by a plugin embedded in the generated
-  config after each build, mtime-cached so rebuilds only touch
-  changed images. All four sites
-  carry display copies of the images, not the archival originals:
-  anything past a size cap is resized down as it is placed — stills to
-  a 1600 px longest edge through Pillow, animated gifs (which get no
-  srcset variants and dominate the built sites byte-wise) to 1104 px
-  through gifsicle when it is installed — built once into
-  `<out>/.image-cache/` and hard-linked into every site. `raw/` and
-  `posts/` keep full resolution; `site.json` tunes or disables the
-  caps (`"images": {"still_max_edge": N, "animated_max_edge": N}`,
-  0 = off). All three render
+  for photographic body images: Hugo natively through its image
+  pipeline and a render hook, Pelican by a plugin embedded in the
+  generated config after each build, mtime-cached so rebuilds only
+  touch changed images; every body image also links to the file
+  itself, so a chart the column narrows is one click from full
+  resolution. All four sites carry display copies of the images, not
+  the archival originals. Line art — the charts, screenshots and
+  diagrams most of the archive's PNGs are — keeps every pixel at its
+  own resolution as lossless webp (~60% smaller than the source PNG,
+  and pixel-exact: downscaling is what makes 9 px axis labels
+  unreadable, and it barely saves bytes on flat color anyway).
+  Photographs are resized past a size cap as they are placed — to a
+  1600 px longest edge through Pillow, and lossily re-encoded — as are
+  animated gifs (which get no srcset variants and dominate the built
+  sites byte-wise) to 1104 px through gifsicle when it is installed.
+  Copies are built once into `<out>/.image-cache/` and hard-linked
+  into every site. `raw/` and `posts/` keep full resolution;
+  `site.json` tunes or disables the caps (`"images":
+  {"still_max_edge": N, "animated_max_edge": N}`, 0 = off) and can
+  keep line art in its own PNG (`"lossless_line_art": false`). All three render
   every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
   redirect stub that works on any static host — `hugo` and `zola`
   through their `aliases` front matter, `pelican` through a small

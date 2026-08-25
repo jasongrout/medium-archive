@@ -8,8 +8,8 @@ None of them touch the network; rendering is the site generator's job.
 Common to all of them: page URL slugs chosen from the Medium slug
 (date-prefixed only when several posts share one), links between posts of
 the publication rewritten from Medium URLs to site pages, images placed
-from posts/ (hard-linked as-is when small enough, resized display copies
-past the caps below -- see ImagePlacer), a redirect map from every old
+from posts/ (hard-linked as they are when nothing is to be gained,
+else display copies -- see ImagePlacer), a redirect map from every old
 inbound path to its page URL, and site-wide text (title, description,
 landing-page intro, optional base_url) from a hand-written
 <out>/site.json.
@@ -149,6 +149,17 @@ def rewrite_body(markdown: str, target_for, escape=None) -> str:
                 line = escape(line)
         out.append(line)
     return "\n".join(out)
+
+
+def retarget_images(text: str, renames: dict) -> str:
+    """A page's text with its images/<name> references pointed at the
+    names actually placed beside it -- a display copy that changed
+    format (see ImagePlacer.place) lands under a new extension."""
+    if not renames:
+        return text
+    pattern = re.compile(r"images/(%s)\b"
+                         % "|".join(re.escape(n) for n in renames))
+    return pattern.sub(lambda m: "images/" + renames[m.group(1)], text)
 
 
 def image_size(path):
@@ -296,53 +307,134 @@ def bake_cover_thumbnails(out: Path, site: Path, manifest: dict,
 
 # Sites carry display copies of the archive's images, not the archival
 # originals -- raw/ and posts/ keep those at full resolution -- so
-# anything past these caps is resized down to them (longest edge) as it
-# is placed into a site. 1600 px keeps stills sharp past the card
+# photographs past these caps are resized down to them (longest edge) as
+# they are placed into a site. 1600 px keeps them sharp past the card
 # themes' widest srcset variant (1104 px); animated gifs get no srcset
 # variants, render in the ~736 px body column, and dominate the built
 # sites byte-wise, so they are capped tighter. site.json overrides
 # either cap ("images": {"still_max_edge": N, "animated_max_edge": N},
 # 0 = leave that kind untouched).
+#
+# Line art -- the charts, screenshots and diagrams that most of this
+# archive's PNGs are -- is exempt from the still cap and never encoded
+# lossily. Its meaning sits in 9 px text and single-pixel strokes, which
+# downscaling destroys: on a survey chart, ink contrast measured 3.4:1
+# at the source's 1430 px but 2.3:1 at the 736 px variant a phone picks,
+# well under the 3:1 that small text needs. Nor does downscaling buy
+# much, since flat color compresses by run length rather than by pixel
+# count -- lossless encodes of most of this archive's line art come out
+# *larger* downscaled, as antialiasing invents intermediate colors.
+# Lossless webp of the full-resolution original instead is pixel-exact
+# and still ~60% smaller than the source PNG.
 STILL_MAX_EDGE = 1600
 ANIMATED_MAX_EDGE = 1104
 STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
+# A still is line art when it holds few enough distinct colors and
+# enough flat runs. The two classes separate cleanly on that pair --
+# this archive's line art runs 200-8000 colors at 0.55-0.98 flat, its
+# photographs past 14000 colors at under 0.5 -- and it costs ~8 ms an
+# image. Only PNGs are classified: a photograph saved as PNG re-encodes
+# down the photo path, while a screenshot already in JPEG has taken its
+# lossy hit and is left alone.
+LINE_ART_MAX_COLORS = 8192
+LINE_ART_MIN_FLAT = 0.55
+# Full resolution is kept within this byte budget: a lossless encode
+# over it retries lossy at a quality that leaves text crisp, and only an
+# outlier -- a panorama tens of thousands of pixels wide -- is finally
+# resized, to an edge far past what any body column asks for.
+LINE_ART_MAX_BYTES = 500_000
+LINE_ART_MAX_EDGE = 4000
+LINE_ART_QUALITY = 90
+PHOTO_QUALITY = 85
+# Bumped when the copies a given cap produces change shape, so caches
+# written by an older scheme are ignored rather than misread.
+CACHE_SCHEME = "v2"
+
+
+def flat_fraction(im) -> float:
+    """The share of horizontally adjacent pixel pairs that are identical
+    -- near 1 for flat-colored art, near 0 under a photograph's sensor
+    noise."""
+    from PIL import ImageChops
+    w, h = im.size
+    if w < 2:
+        return 1.0
+    grey = im.convert("L")
+    diff = ImageChops.difference(grey.crop((1, 0, w, h)),
+                                 grey.crop((0, 0, w - 1, h)))
+    return diff.histogram()[0] / ((w - 1) * h)
+
+
+def is_line_art(im) -> bool:
+    """True for a chart, screenshot or diagram -- art whose meaning is in
+    thin strokes and small text -- and False for a photograph. See
+    LINE_ART_MAX_COLORS."""
+    rgb = im.convert("RGB")
+    if rgb.getcolors(maxcolors=LINE_ART_MAX_COLORS) is None:
+        return False               # more colors than flat-colored art has
+    return flat_fraction(rgb) >= LINE_ART_MIN_FLAT
+
+
+def has_alpha(im) -> bool:
+    return im.mode in ("RGBA", "LA", "PA") or "transparency" in im.info
+
 
 class ImagePlacer:
     """Place a post's images into a site: hard-link each unchanged when
-    it is within the caps (or nothing available can resize it), else
-    place a resized display copy. Copies are built once into
-    <out>/.image-cache/<caps>/ and hard-linked into every site that
-    wants them, so the four exporters (and re-runs) share the work.
-    Stills resize through Pillow, animated gifs through gifsicle; when
-    either is missing the affected images are placed unchanged, with a
-    note in the summary."""
+    nothing is to be gained (or nothing available can process it), else
+    place a display copy. Line-art PNGs become full-resolution lossless
+    webp, photographs are capped and encoded lossily (JPEG, or webp when
+    they carry alpha), animated gifs go through gifsicle. Copies are
+    built once into <out>/.image-cache/<scheme-caps>/ and hard-linked
+    into every site that wants them, so the four exporters (and re-runs)
+    share the work. Stills need Pillow and animated gifs need gifsicle;
+    when either is missing the affected images are placed unchanged,
+    with a note in the summary.
+
+    place() returns the path it actually wrote, which carries a new
+    extension when the copy changed format -- the exporters rewrite
+    their pages' image references from it."""
 
     def __init__(self, out: Path, config: dict):
         images = config.get("images", {})
         self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
         self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
-        self.cache = out / ".image-cache" / f"{self.still_cap}-{self.gif_cap}"
+        # off keeps line art in its own PNG (readers save a .png, sites
+        # carry the larger file); the resolution is preserved either way
+        self.lossless_line_art = images.get("lossless_line_art", True)
+        scheme = f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}"
+        if not self.lossless_line_art:
+            scheme += "-plain"
+        self.cache = out / ".image-cache" / scheme
         self.gifsicle = shutil.which("gifsicle")
         try:
             from PIL import Image
             self.pillow = Image
         except ImportError:
             self.pillow = None
-        self.resized = self.unchanged = 0
+        self.resized = self.converted = self.unchanged = 0
         self.bytes_in = self.bytes_out = 0
         self.notes = []
 
-    def place(self, src: Path, dst: Path):
+    def place(self, src: Path, dst: Path) -> Path:
+        """Place src at dst -- or beside it under the display copy's own
+        extension, when the copy changed format -- and return the path
+        written."""
         copy = self._display_copy(src)
         if copy is None:
             self.unchanged += 1
             link_or_copy(src, dst)
-        else:
+            return dst
+        if copy.suffix == src.suffix:
             self.resized += 1
-            self.bytes_in += src.stat().st_size
-            self.bytes_out += copy.stat().st_size
-            link_or_copy(copy, dst)
+        else:
+            self.converted += 1
+            dst = dst.with_suffix(copy.suffix)
+        self.bytes_in += src.stat().st_size
+        self.bytes_out += copy.stat().st_size
+        link_or_copy(copy, dst)
+        return dst
 
     def warm(self, out: Path, manifest: dict):
         """Build the display copies for every post image up front, in
@@ -359,12 +451,13 @@ class ImagePlacer:
                 pass
 
     def report(self):
-        if self.resized:
+        if self.resized or self.converted:
             mb = 1e6
-            print(f"display-copy images: {self.resized} resized "
+            print(f"display-copy images: {self.converted} re-encoded, "
+                  f"{self.resized} resized "
                   f"({self.bytes_in / mb:.0f} MB -> "
                   f"{self.bytes_out / mb:.0f} MB), "
-                  f"{self.unchanged} within caps", file=sys.stderr)
+                  f"{self.unchanged} placed as they are", file=sys.stderr)
         for note in self.notes:
             print(note, file=sys.stderr)
 
@@ -373,43 +466,67 @@ class ImagePlacer:
             self.notes.append(text)
 
     def _display_copy(self, src: Path):
-        """The cached resized copy for src, built on first sight; None
+        """The cached display copy for src, built on first sight; None
         when src should be placed as it is. Cache entries are named by
-        source content hash, so reuse survives regeneration and fresh
-        checkouts (mtimes carry no meaning there) and identical images
-        shared between posts resize once."""
+        source content hash plus the extension the copy carries, so
+        reuse survives regeneration and fresh checkouts (mtimes carry no
+        meaning there) and identical images shared between posts are
+        built once. A copy that came out no smaller than its source is
+        cached as a link to the source, which reads back as that same
+        None -- the verdict is remembered, not recomputed."""
         ext = src.suffix.lower()
         if ext == ".gif":
-            cap, build = self.gif_cap, self._resize_gif
-            if cap and not self.gifsicle:
+            cap, build, candidates = self.gif_cap, self._resize_gif, (ext,)
+            if not cap:
+                return None
+            if not self.gifsicle:
                 self._note("gifsicle not installed: animated gifs keep "
                            "their full size")
                 return None
+            size = self._probe(src)
+            if size is None or max(size) <= cap:
+                return None
         elif ext in STILL_EXTS:
-            cap, build = self.still_cap, self._resize_still
-            if cap and not self.pillow:
+            # the extensions a still's copy can carry, newest scheme
+            # first: line art lands in webp, a photograph in jpg, and a
+            # copy that did not pay off under the source's own
+            cap, candidates = self.still_cap, (".webp", ".jpg", ext)
+            if not cap:
+                return None
+            if not self.pillow:
                 self._note("pillow not installed: still images keep "
                            "their full size")
                 return None
+            if ext == ".png":
+                build = self._copy_png       # picks format and size itself
+            else:
+                build = self._resize_still   # kept as it is, only smaller
+                size = self._probe(src)
+                if size is None or max(size) <= cap:
+                    return None
         else:
             return None                    # svg and friends pass through
-        size = self._probe(src)
-        if not cap or size is None or max(size) <= cap:
-            return None
         digest = hashlib.sha256(src.read_bytes()).hexdigest()[:16]
-        cached = self.cache / f"{digest}{ext}"
-        if not cached.exists():
-            self.cache.mkdir(parents=True, exist_ok=True)
-            fd, tmp = tempfile.mkstemp(dir=self.cache, suffix=ext)
-            os.close(fd)
-            if not build(src, tmp, cap):
-                os.remove(tmp)
-                return None
-            if os.path.getsize(tmp) >= src.stat().st_size:
-                os.remove(tmp)             # the resize did not pay off
-                link_or_copy(src, cached)  # cache the verdict all the same
-            else:
-                os.replace(tmp, cached)
+        for suffix in candidates:
+            cached = self.cache / f"{digest}{suffix}"
+            if cached.exists():
+                return (cached if cached.stat().st_size < src.stat().st_size
+                        else None)
+        self.cache.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=self.cache, suffix=ext)
+        os.close(fd)
+        built = build(src, tmp, cap)
+        if not built:
+            os.remove(tmp)
+            return None
+        if os.path.getsize(tmp) >= src.stat().st_size:
+            os.remove(tmp)                 # the copy did not pay off
+            built = ext                    # cache the verdict all the same
+            cached = self.cache / f"{digest}{built}"
+            link_or_copy(src, cached)
+        else:
+            cached = self.cache / f"{digest}{built}"
+            os.replace(tmp, cached)
         return cached if cached.stat().st_size < src.stat().st_size else None
 
     def _probe(self, src: Path):
@@ -426,7 +543,7 @@ class ImagePlacer:
                 return None
         return size
 
-    def _resize_gif(self, src: Path, tmp: str, cap: int) -> bool:
+    def _resize_gif(self, src: Path, tmp: str, cap: int):
         # -O2 re-optimizes frames after the resize (2/3 the bytes of a
         # bare resize on the reference archive); --lossy measured slower
         # for no further gain, and --no-conserve-memory avoids a slow
@@ -440,15 +557,72 @@ class ImagePlacer:
             self._note(f"gifsicle failed on {src.name}"
                        + (f": {detail[-1]}" if detail else "")
                        + "; placed at full size")
-            return False
-        return True
+            return None
+        return ".gif"
 
-    def _resize_still(self, src: Path, tmp: str, cap: int) -> bool:
+    def _copy_png(self, src: Path, tmp: str, cap: int):
+        """A PNG is line art or a photograph in PNG clothing (see
+        is_line_art): the first keeps every pixel, the second takes the
+        photo path. Returns the extension written, or None to place the
+        source as it is."""
+        try:
+            with self.pillow.open(src) as im:
+                if getattr(im, "n_frames", 1) > 1:
+                    return None        # animated: not ours to flatten
+                im.load()
+                if not is_line_art(im):
+                    return self._save_photo(im, tmp, cap)
+                if not self.lossless_line_art:
+                    return None        # full-resolution PNG, placed as it is
+                return self._save_line_art(im, tmp)
+        except Exception as e:
+            self._note(f"re-encode failed on {src.name} ({e}); "
+                       "placed at full size")
+            return None
+
+    def _save_line_art(self, im, tmp: str) -> str:
+        """Lossless webp at the source's own resolution: every pixel of
+        the text kept, for a fraction of the PNG's bytes."""
+        icc = im.info.get("icc_profile")
+        kwargs = {"icc_profile": icc} if icc else {}
+        im = im.convert("RGBA" if has_alpha(im) else "RGB")
+        im.save(tmp, "WEBP", lossless=True, quality=100, method=6, **kwargs)
+        if os.path.getsize(tmp) <= LINE_ART_MAX_BYTES:
+            return ".webp"
+        # An intricate one -- a dense screenshot, a photographic inset --
+        # costs more losslessly than a page should carry. Spend the
+        # quality rather than the resolution: it is the resolution the
+        # small text needs, and q90 leaves strokes crisp.
+        im.save(tmp, "WEBP", quality=LINE_ART_QUALITY, method=4, **kwargs)
+        if (os.path.getsize(tmp) > LINE_ART_MAX_BYTES
+                and max(im.size) > LINE_ART_MAX_EDGE):
+            im.thumbnail((LINE_ART_MAX_EDGE, LINE_ART_MAX_EDGE),
+                         self.pillow.Resampling.LANCZOS)
+            im.save(tmp, "WEBP", quality=LINE_ART_QUALITY, method=4, **kwargs)
+        return ".webp"
+
+    def _save_photo(self, im, tmp: str, cap: int) -> str:
+        """Capped and lossily encoded: JPEG, or webp for the alpha JPEG
+        cannot carry."""
+        icc = im.info.get("icc_profile")
+        kwargs = {"icc_profile": icc} if icc else {}
+        alpha = has_alpha(im)
+        im = im.convert("RGBA" if alpha else "RGB")
+        if cap and max(im.size) > cap:
+            im.thumbnail((cap, cap), self.pillow.Resampling.LANCZOS)
+        if alpha:
+            im.save(tmp, "WEBP", quality=PHOTO_QUALITY, method=4, **kwargs)
+            return ".webp"
+        im.save(tmp, "JPEG", quality=PHOTO_QUALITY, optimize=True,
+                progressive=True, **kwargs)
+        return ".jpg"
+
+    def _resize_still(self, src: Path, tmp: str, cap: int):
         Image = self.pillow
         try:
             with Image.open(src) as im:
                 if getattr(im, "n_frames", 1) > 1:
-                    return False           # animated: not ours to flatten
+                    return None            # animated: not ours to flatten
                 # Medium archives hold the odd mislabeled file (a PNG
                 # under a .jpeg name); re-encode what the bytes are,
                 # not what the name says -- the filename stays as the
@@ -461,18 +635,18 @@ class ImagePlacer:
                 im.thumbnail((cap, cap), Image.Resampling.LANCZOS)
                 kwargs = {"icc_profile": icc} if icc else {}
                 if fmt == "JPEG":
-                    kwargs |= {"quality": 85, "optimize": True,
+                    kwargs |= {"quality": PHOTO_QUALITY, "optimize": True,
                                "progressive": True}
                 elif fmt == "WEBP":
-                    kwargs |= {"quality": 85, "method": 4}
+                    kwargs |= {"quality": PHOTO_QUALITY, "method": 4}
                 else:
                     kwargs |= {"optimize": True}
                 im.save(tmp, format=fmt, **kwargs)
         except Exception as e:
             self._note(f"resize failed on {src.name} ({e}); "
                        "placed at full size")
-            return False
-        return True
+            return None
+        return src.suffix.lower()
 
 
 def by_year(manifest: dict) -> list:
@@ -563,14 +737,23 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
         body = rewrite_body(body, target_for, escape)
         page_dir = site / "content" / "posts" / stems[url]
         page_dir.mkdir(parents=True)
-        (page_dir / "index.md").write_text(front_matter(url, p) + body,
-                                           encoding="utf-8")
+        # images first: a display copy can change format, and the page
+        # has to reference the name that was actually placed
+        renames = {}
         images = out / p["dir"] / "images"
         if images.is_dir():
             (page_dir / "images").mkdir()
-            place = placer.place if placer else link_or_copy
             for img in sorted(images.iterdir()):
-                place(img, page_dir / "images" / img.name)
+                dst = page_dir / "images" / img.name
+                if placer:
+                    dst = placer.place(img, dst)
+                else:
+                    link_or_copy(img, dst)
+                if dst.name != img.name:
+                    renames[img.name] = dst.name
+        (page_dir / "index.md").write_text(
+            retarget_images(front_matter(url, p) + body, renames),
+            encoding="utf-8")
         pages += 1
     if placer:
         placer.report()

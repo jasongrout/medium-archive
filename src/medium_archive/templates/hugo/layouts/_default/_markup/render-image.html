@@ -1,13 +1,20 @@
 {{- $img := .Page.Resources.Get .Destination -}}
-{{- if and $img (eq $img.MediaType.MainType "image") (not (in (slice "gif" "svg" "webp") $img.MediaType.SubType)) -}}
+{{- $alt := .PlainText -}}
+{{- if and $img (eq $img.MediaType.MainType "image") (ne $img.MediaType.SubType "svg") -}}
 {{- $srcset := slice -}}
+{{- /* Only photographs get the variant ladder: png and webp here are
+       line art the placer kept whole (see ImagePlacer), whose 9 px text
+       does not survive a 736 px variant, and an animated gif loses its
+       frames through the image pipeline. */ -}}
+{{- if not (in (slice "gif" "webp" "png") $img.MediaType.SubType) -}}
 {{- range $w := slice 480 736 1104 -}}
 {{- if ge $img.Width $w -}}
 {{- $v := $img.Resize (printf "%dx q75 webp" $w) -}}
 {{- $srcset = $srcset | append (printf "%s %dw" $v.RelPermalink $v.Width) -}}
 {{- end -}}
 {{- end -}}
-<img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ .PlainText }}">
+{{- end -}}
+<a class="image-link" href="{{ $img.RelPermalink }}"><img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ $alt }}"></a>
 {{- else -}}
-<img src="{{ .Destination | safeURL }}" alt="{{ .PlainText }}" loading="lazy">
+<img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy">
 {{- end -}}

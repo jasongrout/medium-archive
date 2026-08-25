@@ -205,6 +205,37 @@ data loss here):
   gifsicle test that skips where it is not installed) and a full
   four-site rebuild of the reference archive.
 
+- **Line art is kept whole, not resized** — the cap above treated a
+  survey chart like a photograph, and the srcset ladder below it
+  finished the job: measured on one of the 2026 survey charts, ink
+  contrast fell from 3.4:1 at the source's 1430 px to 2.3:1 at the
+  736 px variant a phone picks, well under the 3:1 small text needs,
+  and its 9 px axis labels came out ~4.6 px. Downscaling was not even
+  buying much: flat color compresses by run length, not pixel count,
+  so a lossless encode of most of this archive's line art comes out
+  *larger* downscaled (18 of 25 sampled), as antialiasing invents
+  intermediate colors. `ImagePlacer` now classifies each PNG —
+  `<= 8192` colors and `>= 0.55` horizontally flat pixel pairs, ~8 ms
+  an image, which separates this archive's line art (200-8000 colors,
+  0.55-0.98 flat) from its photographs (14000+ colors, under 0.5
+  flat) — and re-encodes line art to lossless webp at its own
+  resolution, exempt from the still cap: pixel-exact text for ~60%
+  fewer bytes than the source PNG (the 2026 survey post: 557 KB of
+  PNG -> 201 KB, against 264 KB for a ladder that could not render
+  the captions). A photograph that arrived as PNG takes the photo
+  path instead (capped, JPEG q85, or webp when it carries alpha),
+  which is where the archive's 63 photo-in-PNG files, ~70 MB, were
+  hiding. Intricate line art is bounded rather than resized: past
+  500 KB lossless it retries at webp q90, and only a panorama past
+  4000 px is finally scaled. `place()` returns the path it wrote and
+  the exporters retarget their pages' `images/<name>` references, so
+  a changed format follows through to the markdown; the hugo render
+  hook and pelican plugin skip the variant ladder for png (and now
+  wrap every body image in a link to the file itself). `site.json`
+  can keep line art in its own PNG (`"images": {"lossless_line_art":
+  false}`), and the cache directory carries a scheme tag so copies
+  written by the old scheme are ignored rather than misread.
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for

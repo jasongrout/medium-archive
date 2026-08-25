@@ -359,20 +359,37 @@ def test_build_output_survives_regeneration(archive):
         assert (site / kept / "index.html").read_text() == "built"
 
 
+def line_art(w, h):
+    """Flat-colored art like the charts and screenshots most of the
+    archive's PNGs are: few colors, long runs of identical pixels."""
+    from PIL import Image, ImageDraw
+
+    im = Image.new("RGB", (w, h), "white")
+    draw = ImageDraw.Draw(im)
+    for i in range(h // 40):
+        draw.rectangle((20, 20 + i * 40, 20 + (i + 1) * 30, 44 + i * 40),
+                       fill="#1f77b4")
+        draw.text((26, 24 + i * 40), f"row {i} of the chart", fill="black")
+    return im
+
+
 def make_image_post(tmp_path, still_bytes=None, gif_bytes=None):
     """An archive whose one post carries real images: a large noisy PNG
-    (resizable), a small PNG (within caps), and junk bytes with a .png
-    name (unreadable; must pass through)."""
+    (a photograph, in PNG clothing), a small noisy PNG, a wide line-art
+    PNG (a chart), and junk bytes with a .png name (unreadable; must
+    pass through)."""
     import os
 
     from PIL import Image
 
     manifest = {}
-    images = ["images/big.png", "images/small.png", "images/junk.png"]
+    images = ["images/big.png", "images/small.png", "images/chart.png",
+              "images/junk.png"]
     if gif_bytes:
         images.append("images/anim.gif")
     make_post(tmp_path, manifest, "picture-post", "ccc333ccc333",
-              "2022-06-01T10:00:00Z", "![big](images/big.png)\n",
+              "2022-06-01T10:00:00Z",
+              "![big](images/big.png)\n\n![chart](images/chart.png)\n",
               images=images)
     img_dir = tmp_path / "posts/2022-06-01-picture-post/images"
     img_dir.mkdir()
@@ -382,6 +399,7 @@ def make_image_post(tmp_path, still_bytes=None, gif_bytes=None):
 
     noise(2000, 1200).save(img_dir / "big.png")
     noise(200, 100).save(img_dir / "small.png")
+    line_art(2400, 900).save(img_dir / "chart.png")
     (img_dir / "junk.png").write_bytes(b"PNG")
     if gif_bytes:
         frames = [noise(1600, 1200).convert("P") for _ in range(3)]
@@ -392,27 +410,82 @@ def make_image_post(tmp_path, still_bytes=None, gif_bytes=None):
     return img_dir
 
 
-def test_images_capped_into_display_copies(tmp_path):
+def test_photographs_capped_into_display_copies(tmp_path):
     from PIL import Image
 
     src = make_image_post(tmp_path)
     site = zola.build_site(tmp_path)
     placed = site / "content/posts/picture-post/images"
-    with Image.open(placed / "big.png") as im:
-        assert max(im.size) == 1600
-    assert (placed / "big.png").stat().st_size < (src / "big.png").stat().st_size
-    # within the cap and unreadable files pass through as hard links
-    assert (placed / "small.png").stat().st_ino == (src / "small.png").stat().st_ino
+    # a photograph is capped and encoded lossily, whatever it arrived as
+    with Image.open(placed / "big.jpg") as im:
+        assert max(im.size) == 1600 and im.format == "JPEG"
+    assert not (placed / "big.png").exists()
+    assert (placed / "big.jpg").stat().st_size < (src / "big.png").stat().st_size
+    assert (placed / "small.jpg").stat().st_size < (src / "small.png").stat().st_size
+    # the page follows the images it actually got
+    page = (site / "content/posts/picture-post/index.md").read_text()
+    assert "![big](images/big.jpg)" in page
+    # an unreadable file passes through as a hard link
     assert (placed / "junk.png").read_bytes() == b"PNG"
+    assert (placed / "junk.png").stat().st_ino == (src / "junk.png").stat().st_ino
     # the display copy is built once and shared across exporters
     hugo_site = hugo.build_site(tmp_path)
-    assert (hugo_site / "content/posts/picture-post/images/big.png"
-            ).stat().st_ino == (placed / "big.png").stat().st_ino
-    # caps are configurable, 0 turns one off
+    assert (hugo_site / "content/posts/picture-post/images/big.jpg"
+            ).stat().st_ino == (placed / "big.jpg").stat().st_ino
+    # caps are configurable, 0 leaves stills alone entirely
     (tmp_path / "site.json").write_text(json.dumps(
         {"title": "Pics", "images": {"still_max_edge": 0}}))
     site = zola.build_site(tmp_path)
     assert (placed / "big.png").stat().st_ino == (src / "big.png").stat().st_ino
+
+
+def test_line_art_keeps_every_pixel(tmp_path):
+    """Charts and screenshots are re-encoded losslessly at their own
+    resolution: the small text in them does not survive a downscale, and
+    flat color costs little to keep."""
+    from PIL import Image, ImageChops
+
+    src = make_image_post(tmp_path)
+    site = zola.build_site(tmp_path)
+    placed = site / "content/posts/picture-post/images"
+    assert not (placed / "chart.png").exists()
+    with Image.open(src / "chart.png") as before, \
+            Image.open(placed / "chart.webp") as after:
+        assert after.size == before.size          # past the 1600 px cap
+        assert not ImageChops.difference(before.convert("RGB"),
+                                         after.convert("RGB")).getbbox()
+    assert (placed / "chart.webp").stat().st_size < (
+        src / "chart.png").stat().st_size
+    page = (site / "content/posts/picture-post/index.md").read_text()
+    assert "![chart](images/chart.webp)" in page
+
+
+def test_line_art_can_stay_png(tmp_path):
+    """lossless_line_art off keeps line art in its own PNG -- still at
+    full resolution, just larger on disk."""
+    src = make_image_post(tmp_path)
+    (tmp_path / "site.json").write_text(json.dumps(
+        {"title": "Pics", "images": {"lossless_line_art": False}}))
+    site = zola.build_site(tmp_path)
+    placed = site / "content/posts/picture-post/images"
+    assert (placed / "chart.png").stat().st_ino == (src / "chart.png").stat().st_ino
+    assert not (placed / "chart.webp").exists()
+    # photographs still take the photo path
+    assert (placed / "big.jpg").exists()
+
+
+def test_line_art_classifier(tmp_path):
+    import os
+
+    from PIL import Image
+
+    assert sites.is_line_art(line_art(600, 400))
+    noise = Image.frombytes("RGB", (300, 200), os.urandom(300 * 200 * 3))
+    assert not sites.is_line_art(noise)
+    # a photograph on a flat background is still a photograph
+    inset = Image.new("RGB", (600, 400), "white")
+    inset.paste(noise, (150, 100))
+    assert not sites.is_line_art(inset)
 
 
 @pytest.mark.skipif(not __import__("shutil").which("gifsicle"),
