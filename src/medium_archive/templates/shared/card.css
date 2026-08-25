@@ -16,7 +16,8 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink);
-       font: 1rem/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
+       /* jupyter.org's body stack */
+       font: 1rem/1.65 "Helvetica Neue", Helvetica, Arial, sans-serif; }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
