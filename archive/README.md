@@ -13,12 +13,15 @@ Medium. It has two layers:
   can be deleted and regenerated at any time (`convert --clean`), and are the
   layer to change when adapting the archive to a new site generator.
 * `site/` (optional) is a **MyST site** derived from the converted posts by
-  `medium-archive myst`: one page per post, a chronological landing page, a
-  year-grouped table of contents, links between posts of the publication
-  rewritten to site pages, and a `site/redirects.csv` mapping every old
-  inbound path to its page URL. Regenerate it any time (`convert` then
-  `myst`); render it with `myst start` or `myst build --html` inside
-  `site/` (https://mystmd.org). Site-wide text lives in a hand-written
+  `medium-archive myst`: one page per post, a cover-image gallery landing
+  page (every post as a card, newest first, via the myst-listing plugin,
+  https://contrib.mystmd.org/myst-listing/), a chronological `archive`
+  page, a year-grouped table of contents, links between posts of the
+  publication rewritten to site pages, and a `site/redirects.csv` mapping
+  every old inbound path to the page URL mystmd actually serves.
+  Regenerate it any time (`convert` then `myst`); render it with
+  `myst start` or `myst build --html` inside `site/`
+  (https://mystmd.org). Site-wide text lives in a hand-written
   `site.json` (title, description, landing-page intro, optional base_url),
   versioned with the archive. `medium-archive hugo`, `zola` and `pelican`
   build the same site for those generators (same page URLs, link
@@ -146,13 +149,18 @@ site.json                     optional hand-written site text used by `myst`:
                                 title, description, intro (landing page)
 site/                         optional MyST site built by `medium-archive
                                 myst` from posts/ + posts.json:
-  myst.yml                    project config and year-grouped table of contents
-  index.md                    landing page: intro + chronological post list
+  myst.yml                    project config, plugins, and year-grouped toc
+  index.md                    landing page: intro + cover-image post gallery
+  archive.md                  chronological post list, grouped by year
+  listing-covers.mjs          generated myst-listing companion plugin: makes
+                                the gallery serve the local cover thumbnails
   posts/<YYYY-MM-DD>-<slug>/
     <page>.md                 the post, MyST front matter + rewritten body;
-                                the filename is the page's URL slug
-    images/<filename>         hard links to the images in posts/
-  redirects.csv               old inbound path -> new page URL
+                                the page's URL slug is the filename, capped
+                                by mystmd at 50 characters
+    images/<filename>         hard links to the images in posts/, plus the
+                                baked cover.jpg gallery thumbnail
+  redirects.csv               old inbound path -> the page URL mystmd serves
 site-hugo/, site-zola/,       optional Hugo/Zola/Pelican sites built by
 site-pelican/                   `medium-archive hugo|zola|pelican`: the same
                                 posts as content/posts/<slug>/index.md with
