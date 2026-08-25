@@ -56,6 +56,18 @@ Medium. It has two layers:
   (targets named `<medium_id>/<file>`) for structural edits a
   substitution cannot express. A fixup that no longer applies aborts the
   run rather than being skipped. Back them up with `raw/`.
+* `tags.json` (optional) holds **hand-written tag cleanup** that `convert`
+  applies as it writes each post's front matter, so tags that only made
+  sense on medium.com can be dropped and variants of one concept
+  consolidated, reproducibly, while `raw/` keeps the original tags:
+  `"drop"` lists tags to remove everywhere; `"rename"` maps old tag to
+  new (renaming several variants to one common tag consolidates them,
+  and a post tagged with two variants gets the target once).
+  `posts.json` and every derived site inherit the cleaned tags. An entry
+  matching no post aborts a full `convert` run, like a fixup that no
+  longer applies; `medium-archive stats --tags` lists every tag with its
+  post count as the worklist for curating the file. Back it up with
+  `raw/`.
 
 ## Layout
 
@@ -120,6 +132,8 @@ raw/
                                 as code fences
 fixups/*.sub, *.patch         optional hand-written corrections, applied to
                                 raw files in memory by convert and compare
+tags.json                     optional hand-written tag cleanup ("drop" and
+                                "rename"), applied by convert to front matter
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
 redirects.csv                 original_path, medium_id, original_url,
@@ -165,7 +179,7 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
 | `description`   | the subtitle (from the account export) or Medium's summary text |
-| `tags`          | tag slugs (RSS categories, scraped tag links, or page state) |
+| `tags`          | tag slugs (RSS categories, scraped tag links, or page state), after `tags.json` cleanup when present |
 | `images`        | relative paths of images used by the body |
 | `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML), `ghost` (Ghost page from a Wayback capture) or `state` (reconstructed from a shell page's embedded editor state) |
 

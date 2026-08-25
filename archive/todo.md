@@ -97,3 +97,26 @@ below. No required work remains.
   identical in the Ghost capture and the Medium sources — it was
   published that way in 2015 — so the archive is faithful; fixups could
   hand-correct the worst of it if desired.
+
+## 3. Tag cleanup (tags.json)
+
+`tags.json` drops the tags that only made sense on Medium (the
+publication's own subject — `jupyter`, the `open-source` family — and
+one-post SEO reach tags like `technology`, `programming`) and
+consolidates variant spellings onto one tag each (`notebook`/`notebooks`
+→ `jupyter-notebook`, `cplusplus`/`c-plus-plus-language` → `cpp`,
+`dashboard`/`dashboarding` → `dashboards`, `voilà` → `voila`, …).
+`convert` applies it to front matter, so posts.json and all four sites
+inherit the cleaned tags; `raw/` keeps the originals, and a stale entry
+aborts a full convert. Curate with `medium-archive stats --tags`.
+Result: 287 distinct tags → 226; 43 posts are untagged (their only tags
+were publication-scope ones).
+
+Remaining judgement calls, all optional:
+
+- ~180 tags still appear on a single post (event locations like
+  `boston`/`hawaii`/`latam`, grantmaker names `helmsley`/`moore`,
+  hyper-specific tech like `box2d`, `kubespray`). Harmless — they just
+  make thin taxonomy pages — extend `"drop"` as they're reviewed.
+- `announcements`/`releases` overlap and could merge if the distinction
+  isn't wanted.
