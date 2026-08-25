@@ -57,14 +57,26 @@ clean `lint` run, and the offline test suite):
   from the converted posts, so a browsable blog reproduces offline from
   `raw/` + `fixups/` (`convert` then `myst`). One page per post with its
   filename as the URL slug (date-prefixed only when several posts share a
-  slug), year-grouped TOC, chronological landing page, in-publication
-  links rewritten to site pages, MyST-hostile prose escaped (`@handle`
-  would parse as a citation, paired `$` as math), and a site-level
-  `redirects.csv` from every old inbound path (slug+id, `/p/<id>`,
-  Ghost-era) to its page URL. Site-wide text comes from a hand-written
-  `<out>/site.json`. Validated with a full `myst build --html` over the
-  real archive: 333/333 pages, no warnings beyond pre-existing dead
-  in-page anchors from the Medium era (`src/medium_archive/myst.py`).
+  slug; mystmd caps served slugs at 50 chars, and `redirects.csv` targets
+  replicate its slug rules — truncation, `[a-z0-9-]` folding, collision
+  numbering — rather than assuming filename == URL), year-grouped TOC,
+  a cover-image gallery landing page (every post as a card, newest
+  first, via the pinned myst-listing plugin; covers are the same
+  640×360 crop-or-letterbox thumbnails as the hugo/pelican card
+  themes', double as each page's social-card image, and are made to
+  work for local files by a small generated companion plugin,
+  `site/listing-covers.mjs`, that turns the gallery's CSS cover
+  backgrounds into real image nodes mystmd's image pipeline serves), a
+  chronological `archive` page, in-publication links rewritten to site
+  pages, MyST-hostile prose escaped (`@handle` would parse as a
+  citation, paired `$` as math), and a site-level `redirects.csv` from
+  every old inbound path (slug+id, `/p/<id>`, Ghost-era) to its served
+  page URL. Site-wide text comes from a hand-written `<out>/site.json`.
+  Validated with a full `myst build --html` over the real archive:
+  336/336 pages (334 posts + landing + archive), 334 gallery cards (255
+  with covers), every redirect target resolving to a built page, no
+  warnings beyond pre-existing dead in-page anchors from the Medium era
+  (`src/medium_archive/myst.py`).
 - **`hugo`, `zola`, `pelican` subcommands** — the same site for those
   generators (`site-hugo/`, `site-zola/`, `site-pelican/`), sharing
   page URLs, link rewriting, `site.json`, and per-site redirect maps
