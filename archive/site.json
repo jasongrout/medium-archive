@@ -3,5 +3,6 @@
   "description": "The Project Jupyter blog: news, releases, and community stories, archived from blog.jupyter.org.",
   "intro": "News, release announcements, and community stories from [Project Jupyter](https://jupyter.org), 2015–present. This site is a static archive of the publication that lived at blog.jupyter.org, first on Ghost and then on Medium; every post below is preserved with its original images, author, and date.",
   "hugo": {},
-  "avatar": "avatar.svg"
+  "avatar": "avatar.svg",
+  "announcement": "https://jupyter.org/assets/banner.html"
 }

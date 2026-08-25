@@ -41,7 +41,12 @@ Medium. It has two layers:
   webp srcset variants for still body images),
   and a /search/ page wired to Pagefind (`pagefind --site public|output`
   after building: full-text search with highlighted in-context
-  excerpts). All three render redirect stubs at every old inbound path
+  excerpts). Both can show a site-wide announcement banner above the
+  header (site.json's "announcement": an http(s) URL fetched
+  client-side -- the mechanism behind Sphinx's announcement theme
+  option, with empty content hiding the banner -- or literal HTML;
+  dismissable per browser, and a changed announcement clears the
+  dismissal). All three render redirect stubs at every old inbound path
   (hugo/zola via aliases, pelican via a plugin embedded in its
   generated config) and add per-term feeds; every feed carries the 20
   most recent posts with their full content, like the publication's
@@ -53,7 +58,10 @@ Medium. It has two layers:
   Hugo >= 0.158); clone the theme once into site-hugo/themes/ --
   regeneration preserves it. This archive's site.json uses the built-in
   card theme, with `avatar.svg` (the official Jupyter logo mark from
-  https://github.com/jupyter/design, BSD-licensed) in the header.
+  https://github.com/jupyter/design, BSD-licensed) in the header, and
+  sets `"announcement"` to https://jupyter.org/assets/banner.html, so
+  the sites show the same Jupyter-wide announcement banner as
+  jupyter.org and the projects' Sphinx documentation sites.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
