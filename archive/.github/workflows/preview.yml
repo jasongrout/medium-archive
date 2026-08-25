@@ -1,6 +1,6 @@
-# Build previews of the archive's four generated sites and publish them
-# to GitHub Pages under /hugo/, /pelican/, /zola/ and /myst/, with a
-# landing page linking the four -- so the generators can be compared on
+# Build previews of the archive's three generated sites and publish them
+# to GitHub Pages under /hugo/, /pelican/ and /myst/, with a landing
+# page linking the three -- so the generators can be compared on
 # identical content before one is chosen.
 #
 # Everything is regenerated from raw/ + fixups/ on each run: `convert`
@@ -11,7 +11,7 @@
 #
 # Note on size: the exporters place capped display copies of the
 # images (originals stay in raw/ and posts/), which puts each built
-# site around 0.7 GB and the four previews together around 2.7 GB.
+# site around 0.7 GB and the three previews together around 2.0 GB.
 # That is above GitHub Pages' documented 1 GB site limit -- observed
 # to deploy fine (the hard limit is the 10 GB artifact) -- and the
 # eventual single-site deployment fits comfortably within it.
@@ -40,7 +40,6 @@ env:
   # Hugo extended >= 0.158 (webp encoding); the other pins are the
   # versions the archive was last validated against (see todo.md).
   HUGO_VERSION: "0.158.0"
-  ZOLA_VERSION: "0.19.2"
   MYSTMD_VERSION: "1.10.1"
   PAGEFIND_VERSION: "1.5.2"
 
@@ -70,13 +69,12 @@ jobs:
           "medium-archive[covers] @ git+https://github.com/jasongrout/medium-archive"
           pelican markdown
 
-      - name: Install Hugo (extended), Zola, MyST, Pagefind and gifsicle
+      - name: Install Hugo (extended), MyST, Pagefind and gifsicle
         run: |
           sudo apt-get install -y gifsicle
           curl -sSL "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz" | sudo tar -xz -C /usr/local/bin hugo
-          curl -sSL "https://github.com/getzola/zola/releases/download/v${ZOLA_VERSION}/zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz" | sudo tar -xz -C /usr/local/bin zola
           npm install -g "mystmd@${MYSTMD_VERSION}" "pagefind@${PAGEFIND_VERSION}"
-          hugo version && zola --version && myst --version && pagefind --version
+          hugo version && myst --version && pagefind --version
 
       # The exporters place resized display copies of oversized images,
       # built once into .image-cache/ (content-addressed, so a restored
@@ -108,26 +106,18 @@ jobs:
           pelican
           pagefind --site output
 
-      - name: Build the Zola site
-        run: |
-          python3 .github/scripts/set_base_url.py "${{ steps.pages.outputs.base_url }}/zola"
-          medium-archive zola --out .
-          cd site-zola
-          zola build
-
       - name: Build the MyST site
         run: |
           medium-archive myst --out .
-          cd site
+          cd site-myst
           BASE_URL="${{ steps.pages.outputs.base_path }}/myst" myst build --html
 
       - name: Assemble the deployment
         run: |
           mkdir _site
-          mv site-hugo/public    _site/hugo
-          mv site-pelican/output _site/pelican
-          mv site-zola/public    _site/zola
-          mv site/_build/html    _site/myst
+          mv site-hugo/public      _site/hugo
+          mv site-pelican/output   _site/pelican
+          mv site-myst/_build/html _site/myst
           cp .github/preview-index.html _site/index.html
           cp avatar.svg _site/
           du -sh _site/*
@@ -135,7 +125,7 @@ jobs:
       # The artifact tar needs a few GB of scratch space; drop what the
       # deployment no longer references before it is created.
       - name: Free runner disk before the artifact step
-        run: rm -rf .git raw posts site site-hugo site-zola site-pelican
+        run: rm -rf .git raw posts site-myst site-hugo site-pelican
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
