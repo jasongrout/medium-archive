@@ -163,8 +163,7 @@
     "tags": [
       "community",
       "jupyter-notebook",
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_tvqSgVCwpnNq8c4yARxlZQ.jpeg",
@@ -328,8 +327,7 @@
     "description": "nb-cli: A Command-Line Interface for AI Agents and Notebook Automation The rise of AI coding agents has transformed how we think about developer tools. Large language models like Claude, GPT, and …",
     "tags": [
       "ai",
-      "jupyter-notebook",
-      "python"
+      "jupyter-notebook"
     ],
     "images": [
       "images/001-1_TGHiiVA5yiE4HBdvSAZ6vg.png",
@@ -1155,8 +1153,7 @@
     "tags": [
       "community",
       "jupyter-notebook",
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_NAL0ma8SVR9HGcwBo0RorA.jpeg",
@@ -1452,6 +1449,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Call: February 2025 Hey Jovyans, we want to see the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing committee is holding an open call …",
     "tags": [
+      "community",
       "jupyter-notebook",
       "jupyterlab"
     ],
@@ -1597,8 +1595,8 @@
     "ghost_url": null,
     "description": "November 2024 Jupyter Community Call Hey, Jupyter community! We want to see the cool things you’re doing with Jupyter, so the Diversity, Equity, and Inclusion (DEI) standing committee is holding an …",
     "tags": [
-      "jupyter-notebook",
-      "python"
+      "community",
+      "jupyter-notebook"
     ],
     "images": [],
     "body_source": "state",
@@ -1693,7 +1691,6 @@
     "tags": [
       "geoscience",
       "jupyter-notebook",
-      "python",
       "science",
       "visualization"
     ],
@@ -1939,7 +1936,6 @@
     "description": "Release of IPython 5.5 and 6.2 Four month after releasing IPython 6.1 and 5.4, and a couple of hours after the release of the notebook 5.1, we are happy to announce the release of IPython 6.2 (Python …",
     "tags": [
       "ipython",
-      "python",
       "releases"
     ],
     "images": [],
@@ -2085,8 +2081,7 @@
     "description": "JupyterLab Desktop UI Modes We are pleased to announce UI Mode features recently added to JupyterLab Desktop (JLD). JupyterLab Desktop now provides a convenient way to set the JupyterLab UI layout …",
     "tags": [
       "jupyter-notebook",
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_YPG0bV4tNk2-LWmd3LrNcg.png",
@@ -2114,8 +2109,7 @@
     "description": "Python environment management using JupyterLab Desktop CLI JupyterLab Desktop (JLD) CLI provides several commands and options to manage Python environments for use in the application. In my previous …",
     "tags": [
       "jupyter-notebook",
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_HS9E-UDLEIo2U0qvMFngeA.png",
@@ -2216,7 +2210,6 @@
     "description": "Python environment management in JupyterLab Desktop We are pleased to announce Python environment management features recently added to JupyterLab Desktop (JLD). Now you can create new Python …",
     "tags": [
       "jupyterlab",
-      "python",
       "science"
     ],
     "images": [
@@ -2281,8 +2274,7 @@
     "description": "The Jupytext Menu is back! A few weeks back, jupytext==1.16.0 went out. That release included multiple amazing contributions by Mahendra Paipuri, this post will go over the new features, and thank …",
     "tags": [
       "documentation",
-      "jupyter-notebook",
-      "python"
+      "jupyter-notebook"
     ],
     "images": [
       "images/001-1_OekPCzL8Obv0NYracG_-uA.png",
@@ -2512,8 +2504,7 @@
     "description": "Generative AI in Jupyter Jupyter AI brings generative artificial intelligence to Jupyter notebooks, giving users the power to explain and generate code, fix errors, summarize content, ask questions …",
     "tags": [
       "ai",
-      "jupyter-notebook",
-      "python"
+      "jupyter-notebook"
     ],
     "images": [
       "images/001-0_LKAfjrw26xlrAJ-s.png",
@@ -2583,7 +2574,6 @@
     "description": "Jupyter Notebook 7 is the most significant release of the Jupyter Notebook in years. Some highlights of this release include real-time…",
     "tags": [
       "jupyter-notebook",
-      "python",
       "releases"
     ],
     "images": [
@@ -2658,7 +2648,6 @@
     "tags": [
       "anywidget",
       "javascript",
-      "python",
       "widgets"
     ],
     "images": [
@@ -2820,7 +2809,6 @@
     "description": "JupyterLab 4.0 is Here The Jupyter contributor community is proud to announce JupyterLab 4.0, the next major release of our full-featured development environment. The package is now available on PyPI …",
     "tags": [
       "jupyterlab",
-      "python",
       "releases"
     ],
     "images": [
@@ -2905,8 +2893,8 @@
     "ghost_url": null,
     "description": "Introducing “Learn Python with Jupyter” A free course book to develop computational thinking while learning to code Learning a programming language is about learning a language. When learning a …",
     "tags": [
-      "jupyter-notebook",
-      "python"
+      "education",
+      "jupyter-notebook"
     ],
     "images": [
       "images/001-1_YogfUsOzSo54H_RaM8t8iA.png"
@@ -2996,8 +2984,7 @@
     "description": "Embed interactive itkwidgets 3D renderings into JupyterLite deployments A tutorial that demonstrates a zero-server, interactive 3D rendering notebook and walks through the quick and easy …",
     "tags": [
       "itkwidgets",
-      "jupyterlite",
-      "python"
+      "jupyterlite"
     ],
     "images": [
       "images/001-0__zowwA1kefuHdpEX.gif"
@@ -3022,7 +3009,6 @@
       "binder",
       "docker",
       "jupyterhub",
-      "python",
       "reproducibility"
     ],
     "images": [
@@ -3121,7 +3107,6 @@
     "description": "Introducing the new JupyterLab Desktop! We are pleased to announce a major update to JupyterLab Desktop which adds many new features with main focus on the user experience. JupyterLab Desktop is the …",
     "tags": [
       "jupyterlab",
-      "python",
       "science"
     ],
     "images": [
@@ -3195,7 +3180,6 @@
     "tags": [
       "community",
       "jupyterlite",
-      "python",
       "workshops"
     ],
     "images": [
@@ -3457,7 +3441,6 @@
     "description": "JupyterLab Desktop — 2022 recap JupyterLab Desktop is the cross-platform desktop application distribution of JupyterLab. It is the quickest and easiest way to get started with Jupyter notebooks …",
     "tags": [
       "jupyterlab",
-      "python",
       "science"
     ],
     "images": [
@@ -3558,7 +3541,6 @@
     "description": "Jupyter Notebook 5.1.0 We are pleased to announce the release of Jupyter Notebook 5.1.0. This is a minor release that includes mostly bug fixes and improvements with the notable addition of i18n …",
     "tags": [
       "jupyter-notebook",
-      "python",
       "releases"
     ],
     "images": [],
@@ -3990,8 +3972,7 @@
     "description": "Packaging for Jupyter in 2022 Packaging has been difficult and changing over time in the Python ecosystem, and packaging extensions for Jupyter has been especially troublesome. Jupyter extensions …",
     "tags": [
       "jupyter-notebook",
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_SL9lt02en8mWEJylo9sFhw.png"
@@ -4185,7 +4166,6 @@
     "tags": [
       "jupyter-notebook",
       "jupyterlite",
-      "python",
       "webassembly"
     ],
     "images": [
@@ -4335,8 +4315,7 @@
     "tags": [
       "documentation",
       "jupyter-notebook",
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_pRzjLlwQIIMhJmx2G_3-Mw.png",
@@ -4362,8 +4341,7 @@
     "description": "Jupyter Hackathon Series in Hawaii PyHawaii hosted a three-part Jupyter Hackathon as part of a workshop grant, generously offered by Bloomberg. PyHawaii, a user group in Hawaii, led the three-part …",
     "tags": [
       "events",
-      "hackathons",
-      "python"
+      "hackathons"
     ],
     "images": [
       "images/001-1_GuHCAz6LEpCel7Mxg3csfQ.jpeg",
@@ -4514,8 +4492,7 @@
     "ghost_url": null,
     "description": "Jupyter Everywhere Easily embed a console, a notebook, or a fully-fledged IDE on any web page. In a previous blog post, we announced JupyterLite, a JupyterLab distribution that runs entirely in the …",
     "tags": [
-      "jupyterlite",
-      "python"
+      "jupyterlite"
     ],
     "images": [
       "images/001-1_6o4AQYSXu5D0FUEDuKN12g.png",
@@ -4595,7 +4572,6 @@
     "description": "JupyterLab Desktop App now available! We are pleased to announce the release of desktop application for JupyterLab! Standalone and self-contained JupyterLab App is the cross-platform standalone …",
     "tags": [
       "jupyterlab",
-      "python",
       "science"
     ],
     "images": [
@@ -4839,7 +4815,6 @@
     "description": "Jupyter Notebook 5.5.0 We are pleased to announce the release of Jupyter Notebook 5.5.0. This is a minor release that introduces some new features such as: Dynamic Download as… menu for nbconvert …",
     "tags": [
       "jupyter-notebook",
-      "python",
       "releases"
     ],
     "images": [],
@@ -4861,8 +4836,7 @@
     "description": "Ploomber: Maintainable and Collaborative Pipelines in Jupyter Ploomber is an open-source framework that allows teams to develop maintainable pipelines in Jupyter. Jupyter is a fantastic tool for data …",
     "tags": [
       "jupyter-notebook",
-      "machine-learning",
-      "python"
+      "machine-learning"
     ],
     "images": [
       "images/001-1_JJ-jCKjGCs71jmW_jUUo9Q.png",
@@ -5164,7 +5138,6 @@
     "tags": [
       "cpp",
       "kernels",
-      "python",
       "workshops"
     ],
     "images": [
@@ -5368,7 +5341,6 @@
     "description": "JupyterLite is a JupyterLab distribution that runs entirely in the web browser, backed by in-browser language kernels powered by…",
     "tags": [
       "jupyterlite",
-      "python",
       "webassembly"
     ],
     "images": [
@@ -5622,7 +5594,6 @@
       "ipython",
       "jupyterlab",
       "kernels",
-      "python",
       "xeus"
     ],
     "images": [
@@ -5734,8 +5705,7 @@
     "ghost_url": null,
     "description": "Robotic Process Automation with JupyterLab Introducing a new Jupyter kernel for Robot Framework Robotic Process Automation (RPA) differs from classical automation tools in that the actions to …",
     "tags": [
-      "jupyterlab",
-      "python"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_3HNfLnwDpXNZ6n6HPD2lXQ.png",
@@ -5870,8 +5840,7 @@
     "ghost_url": null,
     "description": "Tema Okun JupyterCon 2020 keynote speaker announcement JupyerCon Keynote Talk  Tackling Toxic Culture in Tech: Racism and Its Legacy Tema Okun has spent over 30 years working with and for …",
     "tags": [
-      "diversity",
-      "python"
+      "diversity"
     ],
     "images": [
       "images/001-1_WUZj93A-VftEeOJiaouFOA.jpeg",
@@ -6044,7 +6013,6 @@
     "description": "Jupyter Notebook 5.2.0 We are pleased to announce the release of Jupyter Notebook 5.2.0. This is a minor release that includes mostly bug fixes and improvements with the notable addition of RTL …",
     "tags": [
       "jupyter-notebook",
-      "python",
       "releases"
     ],
     "images": [],
@@ -6113,7 +6081,6 @@
     "ghost_url": null,
     "description": "Jupyter Notebook security fixes Two security issues have been found and fixed this week, where untrusted javascript could be executed if malicious files could be delivered to the users system and the …",
     "tags": [
-      "python",
       "security"
     ],
     "images": [],
@@ -6928,7 +6895,6 @@
     "tags": [
       "ipycanvas",
       "jupyter-notebook",
-      "python",
       "visualization"
     ],
     "images": [
@@ -7136,7 +7102,6 @@
     "ghost_url": null,
     "description": "Jupyter QtConsole 4.4 We’re pleased to announce the release of QtConsole 4.4, along with a follow-on bugfix update, 4.4.1. QtConsole, which melds the feel of a lightweight terminal and the …",
     "tags": [
-      "python",
       "releases"
     ],
     "images": [
@@ -7220,7 +7185,6 @@
     "ghost_url": null,
     "description": "ROS @ Jupyter Project Jupyter is a huge hit in data science, but it has not yet found widespread adoption in robotics. Today, we are releasing the first version of jupyter-ros, a collection of …",
     "tags": [
-      "python",
       "robotics",
       "visualization"
     ],
@@ -7248,7 +7212,6 @@
     "description": "Open Redirect Vulnerability in Jupyter notebook, JupyterHub Update: notebook 5.7.7 and JupyterHub 0.9.5 contained incomplete fixes for this issue. 5.7.8 and 0.9.6 are released with more complete …",
     "tags": [
       "jupyterhub",
-      "python",
       "security"
     ],
     "images": [],
@@ -7269,7 +7232,6 @@
     "ghost_url": null,
     "description": "Authoring Custom Jupyter Widgets A Hands-On Guide Guest post authored by Olivier Borderies, Olivier Coudray, and Pierre Marion Jupyter interactive widgets enhance the notebook experience by allowing …",
     "tags": [
-      "python",
       "widgets"
     ],
     "images": [
@@ -7366,8 +7328,7 @@
     "tags": [
       "cpp",
       "jupyter-notebook",
-      "kernels",
-      "python"
+      "kernels"
     ],
     "images": [
       "images/001-1_ySP_XtCM_MMBawtlOOixag.png",
@@ -8140,7 +8101,6 @@
     "description": "Jupyter Notebook 5.3.0 We are pleased to announce the release of Jupyter Notebook 5.3.0. This is a minor release that introduces some notable improvements, such as terminal support for Windows and …",
     "tags": [
       "jupyter-notebook",
-      "python",
       "releases"
     ],
     "images": [],

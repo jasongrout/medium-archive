@@ -140,7 +140,12 @@ were about data science as a subject — the rest were releases, workshop
 logistics and JupyterCon posts carrying it for medium.com feed reach,
 concentrated in the 2018–2019 SEO era. Dropping it left every post with
 the right remaining tags (one, the NumFOCUS DISC sprint announcement,
-got real tags via `"add"` instead). 63 tags.
+got real tags via `"add"` instead). `python` followed for the same
+reason — inconsistently applied (43 of 334 posts, while nearly every
+post involves Python) and overly broad on a Jupyter blog; nothing was
+left untagged, and dropping it surfaced two monthly Community Call
+posts missing `community` and gave "Learn Python with Jupyter"
+`education` instead. 62 tags.
 
 `geoscience` then became its own category — the ten geospatial posts
 (the JupyterGIS line, QGIS, ipyleaflet, ipyopenlayers, the "Jupyter

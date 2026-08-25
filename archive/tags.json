@@ -104,7 +104,10 @@
     "writing",
     "youtube",
     "zulip",
-    "data-science"
+    "data-science",
+    "python-programming",
+    "learning-python",
+    "python"
   ],
   "rename": {
     "notebook": "jupyter-notebook",
@@ -141,8 +144,6 @@
     "agentic-ai": "ai",
     "ml": "machine-learning",
     "deep-learning": "machine-learning",
-    "python-programming": "python",
-    "learning-python": "python",
     "robot-operating-system": "robotics",
     "ros": "robotics",
     "cloud-robotics": "robotics",
@@ -367,6 +368,9 @@
     "interpreted-c-for-gis-with-jupyter": [
       "science"
     ],
+    "introducing-learn-python-with-jupyter": [
+      "education"
+    ],
     "introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes": [
       "jupyterhub",
       "kubernetes"
@@ -408,6 +412,9 @@
     "jupyter-ascending": [
       "ipython",
       "releases"
+    ],
+    "jupyter-community-call-february-2025": [
+      "community"
     ],
     "jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol": [
       "kernels",
@@ -618,6 +625,9 @@
     "notebook-4-2": [
       "jupyter-notebook",
       "releases"
+    ],
+    "november-2024-jupyter-community-call": [
+      "community"
     ],
     "omoju-miller": [
       "events"
