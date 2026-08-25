@@ -103,18 +103,12 @@ regular list and taxonomy pages share `list.html`), plus:
 - `pelicanconf.py.tmpl` — the generated config, including the
   `_LazyImages` Markdown extension (body images load lazily).
 - `site_plugin.py` — appended verbatim after the filled config: gives
-  Pelican the redirect stubs Hugo and Zola render for aliases, and the
+  Pelican the redirect stubs Hugo renders for aliases, and the
   responsive body images the hugo theme's render hook produces. It
   refers to names the config defines (`SITEURL`, `PATH`), so it is not
   importable on its own.
 - `theme/templates/` — the Jinja theme. `author.html` is `tag.html`
   with the `tag` variable swapped for `author`; keep them in step.
-
-## zola/
-
-`config.toml.tmpl`, the Tera templates, and a small standalone
-stylesheet (the zola exporter predates the card look and keeps its
-simpler list theme).
 
 ## myst/
 

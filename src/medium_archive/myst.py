@@ -22,7 +22,7 @@ inbound path to the page URL mystmd actually serves.
 Site-wide text (title, description, the landing-page intro) comes from an
 optional hand-written <out>/site.json, so it is versioned with the archive
 and survives regeneration. The machinery shared with the other site
-exporters (hugo, zola, pelican) lives in sites.py.
+exporters (hugo, pelican) lives in sites.py.
 """
 
 import json

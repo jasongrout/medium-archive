@@ -12,7 +12,6 @@
     myst           build a MyST (mystmd) site in <out>/site/ from the
                    converted posts, ready for `myst start` / `myst build`
     hugo           build a Hugo site in <out>/site-hugo/
-    zola           build a Zola site in <out>/site-zola/
     pelican        build a Pelican site in <out>/site-pelican/
     lint           scan converted posts for conversion-defect signatures
     stats          summarize the converted archive
@@ -114,7 +113,6 @@ from .lint import cmd_lint
 from .hugo import cmd_hugo
 from .myst import cmd_myst
 from .pelican import cmd_pelican
-from .zola import cmd_zola
 from .stats import cmd_stats
 from .dates import parse_date
 from .export import cmd_import_export
@@ -267,13 +265,6 @@ def main():
                         "gets first-class support. Render with "
                         "`hugo server` inside <out>/site-hugo/ "
                         "(https://gohugo.io)")
-    parser("zola", help="build a Zola site in <out>/site-zola/ from the "
-                        "converted posts: taxonomy pages and per-term Atom "
-                        "feeds for tags and authors, a site feed, a working "
-                        "full-text search box, aliases for old inbound "
-                        "paths, a small self-contained set of templates, "
-                        "and a redirect map. Render with `zola serve` "
-                        "inside <out>/site-zola/ (https://www.getzola.org)")
     parser("pelican", help="build a Pelican site in <out>/site-pelican/ "
                            "from the converted posts, with the same "
                            "card-grid theme as the hugo step: cover-image "
@@ -340,8 +331,6 @@ def main():
         cmd_myst(args)
     if args.command == "hugo":
         cmd_hugo(args)
-    if args.command == "zola":
-        cmd_zola(args)
     if args.command == "pelican":
         cmd_pelican(args)
     if args.command == "compare":

@@ -31,7 +31,7 @@ generated at export time when Pillow is installed (`pip install
 pillow`), center-cropped or letterboxed by aspect ratio (see
 sites.make_cover_thumbnail); without it, cards use the full-size image.
 
-Pelican has no built-in equivalent of Hugo's and Zola's aliases, so the
+Pelican has no built-in equivalent of Hugo's aliases, so the
 generated config embeds a small plugin (templates/pelican/site_plugin.py,
 appended verbatim): after each build it reads the
 exported redirects.csv and writes a meta-refresh redirect stub at every

@@ -77,18 +77,17 @@ clean `lint` run, and the offline test suite):
   with covers), every redirect target resolving to a built page, no
   warnings beyond pre-existing dead in-page anchors from the Medium era
   (`src/medium_archive/myst.py`).
-- **`hugo`, `zola`, `pelican` subcommands** — the same site for those
-  generators (`site-hugo/`, `site-zola/`, `site-pelican/`), sharing
+- **`hugo`, `pelican` subcommands** — the same site for those
+  generators (`site-hugo/`, `site-pelican/`), sharing
   page URLs, link rewriting, `site.json`, and per-site redirect maps
   through `src/medium_archive/sites.py`, so generators can be compared
-  on identical content. Hugo and Zola get tag+author taxonomy pages
+  on identical content. Hugo gets tag+author taxonomy pages
   with per-term feeds, old inbound paths as alias redirect stubs, and
-  a minimal self-contained theme; Zola's templates wire its built-in
-  search index to a working search box (and its link checker is set to
-  warn, not fail, on the Medium-era dead in-page anchors); Pelican
+  a minimal self-contained theme; Pelican
   relies on its built-in theme, with colocated images rewritten to
   `{attach}` links. Each validated with a real generator build over
-  the full archive (hugo 0.152.2, zola 0.21.0, pelican 4.12.0).
+  the full archive (hugo 0.152.2, pelican 4.12.0). A third exporter,
+  `zola`, shipped alongside these and was dropped later (see below).
 - **Card-grid blog theme for hugo and pelican, with Pagefind search
   and image optimization** — both exporters now ship the same
   self-contained card theme (in the vein of pytorch.org/blog):
@@ -206,7 +205,7 @@ data loss here):
   (~800 MB of a ~850 MB site on the reference archive, duplicated per
   generator, animated gifs alone ~600 MB) while the themes' srcset
   ladders top out at 1104 px. The shared image-placement path
-  (`ImagePlacer` in `sites.py`, used by all four exporters) now
+  (`ImagePlacer` in `sites.py`, used by every site exporter) now
   resizes anything past a cap as it is placed: stills to a 1600 px
   longest edge via Pillow (format preserved, ICC kept, palette images
   de-paletted, and the original kept whenever the resize doesn't
@@ -256,6 +255,15 @@ data loss here):
   rather than a 1600 px resample. The cache directory carries a scheme
   tag, so copies written by the old scheme are ignored rather than
   misread.
+- **`zola` exporter dropped** — the Zola site fell far enough behind the
+  hugo and pelican ones to stop being worth carrying: those two share
+  the card-grid theme, Pagefind search, cover thumbnails and responsive
+  body images, while the zola site kept the older list theme none of
+  that work reached. Its module, Tera templates, config template,
+  stylesheet and tests are gone, along with the `zola` subcommand; the
+  shared machinery in `sites.py` is unchanged, so `hugo`, `pelican` and
+  `myst` build exactly as before. The archive's `site-zola/` directory,
+  if one was built, is now stale output and can be deleted.
 
 ## Remaining
 

@@ -1,11 +1,11 @@
-"""The hugo, zola, and pelican steps: posts/ + posts.json -> a site."""
+"""The hugo and pelican steps: posts/ + posts.json -> a site."""
 
 import json
 from pathlib import Path
 
 import pytest
 
-from medium_archive import hugo, pelican, sites, zola
+from medium_archive import hugo, pelican, sites
 
 BASE = "https://blog.example.com"
 
@@ -188,23 +188,6 @@ def test_cover_thumbnails_crop_or_letterbox(tmp_path):
     assert len(corners) > 1
 
 
-def test_zola_site(archive):
-    site = zola.build_site(archive)
-    text = (site / "content/posts/second-post/index.md").read_text()
-    assert text.startswith('+++\ntitle = "Second Post"\n'
-                           'slug = "second-post"\n')
-    assert "date = 2021-03-01T10:00:00Z" in text        # TOML datetime
-    assert '[taxonomies]\ntags = ["example"]\nauthors = ["Ada Lovelace"]' in text
-    assert 'aliases = ["/second-post-bbb222bbb222", "/p/bbb222bbb222"]' in text
-    config = (site / "config.toml").read_text()
-    assert 'base_url = "https://blog.example.org"' in config   # no trailing /
-    assert "build_search_index = true" in config
-    assert "feed_limit = 20" in config
-    assert '{ name = "authors", feed = true }' in config
-    assert (site / "templates/page.html").exists()
-    assert (site / "content/posts/_index.md").read_text().count("sort_by")
-
-
 def test_pelican_site(archive):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "icon.svg").write_bytes(b"SVG")
@@ -378,8 +361,7 @@ def test_image_zoom(archive):
 
 
 def test_build_output_survives_regeneration(archive):
-    for module, kept in ((hugo, "public"), (zola, "public"),
-                         (pelican, "output")):
+    for module, kept in ((hugo, "public"), (pelican, "output")):
         site = module.build_site(archive)
         (site / kept).mkdir()
         (site / kept / "index.html").write_text("built")
@@ -442,7 +424,7 @@ def test_photographs_capped_into_display_copies(tmp_path):
     from PIL import Image
 
     src = make_image_post(tmp_path)
-    site = zola.build_site(tmp_path)
+    site = hugo.build_site(tmp_path)
     placed = site / "content/posts/picture-post/images"
     # a photograph is capped and encoded lossily, whatever it arrived as
     with Image.open(placed / "big.jpg") as im:
@@ -457,13 +439,13 @@ def test_photographs_capped_into_display_copies(tmp_path):
     assert (placed / "junk.png").read_bytes() == b"PNG"
     assert (placed / "junk.png").stat().st_ino == (src / "junk.png").stat().st_ino
     # the display copy is built once and shared across exporters
-    hugo_site = hugo.build_site(tmp_path)
-    assert (hugo_site / "content/posts/picture-post/images/big.jpg"
+    pelican_site = pelican.build_site(tmp_path)
+    assert (pelican_site / "content/posts/picture-post/images/big.jpg"
             ).stat().st_ino == (placed / "big.jpg").stat().st_ino
     # caps are configurable, 0 leaves stills alone entirely
     (tmp_path / "site.json").write_text(json.dumps(
         {"title": "Pics", "images": {"still_max_edge": 0}}))
-    site = zola.build_site(tmp_path)
+    site = hugo.build_site(tmp_path)
     assert (placed / "big.png").stat().st_ino == (src / "big.png").stat().st_ino
 
 
@@ -474,7 +456,7 @@ def test_line_art_keeps_every_pixel(tmp_path):
     from PIL import Image, ImageChops
 
     src = make_image_post(tmp_path)
-    site = zola.build_site(tmp_path)
+    site = hugo.build_site(tmp_path)
     placed = site / "content/posts/picture-post/images"
     assert not (placed / "chart.png").exists()
     with Image.open(src / "chart.png") as before, \
@@ -508,7 +490,7 @@ def test_animated_gifs_capped_via_gifsicle(tmp_path):
     from PIL import Image
 
     src = make_image_post(tmp_path, gif_bytes=True)
-    site = zola.build_site(tmp_path)
+    site = hugo.build_site(tmp_path)
     placed = site / "content/posts/picture-post/images/anim.gif"
     with Image.open(placed) as im:
         assert max(im.size) == 1104 and im.n_frames == 3
