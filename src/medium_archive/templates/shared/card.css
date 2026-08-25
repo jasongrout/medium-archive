@@ -2,7 +2,9 @@
    choice as data-theme on <html> (persisted in localStorage); with no
    attribute, prefers-color-scheme decides -- the "system" setting. */
 :root { --accent: #f37626; --ink: #1c1c1c;
-        --soft: #444444; --muted: #6a6a6a; --bg: #f4f4f4; --card: #ffffff;
+        /* text grays clear WCAG AAA (7:1) on both the page background
+           and the white cards */
+        --soft: #444444; --muted: #525252; --bg: #f4f4f4; --card: #ffffff;
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
         --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
         --error-soft: #b91c1c; color-scheme: light; }
