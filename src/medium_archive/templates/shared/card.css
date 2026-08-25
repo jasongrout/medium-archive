@@ -21,6 +21,16 @@ body { margin: 0; background: var(--bg); color: var(--ink);
 a { color: var(--accent-dark); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+.announcement { position: relative; background: var(--accent); color: #1c1c1c;
+                text-align: center; font-weight: 500;
+                padding: .55rem 2.6rem; }
+.announcement[hidden] { display: none; }
+.announcement a { color: inherit; text-decoration: underline; }
+.announcement-close { position: absolute; right: .6rem; top: 50%;
+                      transform: translateY(-50%); padding: .1rem .4rem;
+                      border: 0; background: none; color: inherit;
+                      font-size: 1.25rem; line-height: 1; cursor: pointer; }
+
 .site-header { background: var(--card); border-bottom: 1px solid var(--line); }
 .site-header .bar { display: flex; align-items: center; justify-content: space-between;
                     flex-wrap: wrap; gap: .5rem; padding-top: .9rem; padding-bottom: .9rem; }

@@ -47,7 +47,12 @@ Medium. It has two layers:
   webp srcset variants for still body images),
   and a /search/ page wired to Pagefind (`pagefind --site public|output`
   after building: full-text search with highlighted in-context
-  excerpts). All four sites carry display copies of the images, not
+  excerpts). Both can show a site-wide announcement banner above the
+  header (site.json's "announcement": an http(s) URL fetched
+  client-side -- the mechanism behind Sphinx's announcement theme
+  option, with empty content hiding the banner -- or literal HTML;
+  dismissable per browser, and a changed announcement clears the
+  dismissal). All four sites carry display copies of the images, not
   the archival originals: anything past a size cap is resized as it is
   placed (stills to a 1600 px longest edge via Pillow, animated gifs
   to 1104 px via gifsicle when installed), built once into

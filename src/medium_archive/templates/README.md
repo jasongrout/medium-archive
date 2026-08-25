@@ -41,6 +41,15 @@ These embed verbatim in both engines' pages, so they must carry no
   the choice persists per browser, like the theme picker's. The wiring
   waits for DOMContentLoaded because the chip list follows the control
   in the page.
+- `announcement.html` — the site-wide announcement banner. The base
+  templates emit the `.announcement` div (above the header, hidden)
+  only when site.json sets `"announcement"`; the script fills it from
+  the div's `data-source` — an http(s) URL is fetched client-side, so
+  many sites can share one live banner file (how Jupyter projects use
+  Sphinx's `announcement` option with jupyter.org/assets/banner.html;
+  empty content keeps the banner hidden), anything else is the banner
+  HTML itself. Dismissal persists per browser keyed by the banner's
+  content, so a changed announcement shows again.
 - `dark-palette.css` — included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent-dark` doubles as the

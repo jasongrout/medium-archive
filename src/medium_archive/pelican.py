@@ -135,8 +135,13 @@ def build_site(out):
         description=json.dumps(config.get("description", ""),
                                ensure_ascii=False),
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
-        # json for the string case; None must render as Python's None
+        # json for the string cases; None must render as Python's None
         avatar=json.dumps(avatar_setting) if avatar_setting else "None",
+        # a site-wide banner above the header -- an http(s) URL the theme
+        # fetches client-side (empty content hides the banner, like Sphinx
+        # themes' html announcement option), or literal HTML
+        announcement=(json.dumps(config["announcement"], ensure_ascii=False)
+                      if config.get("announcement") else "None"),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")
 
     for rel, src in TEMPLATES.items():

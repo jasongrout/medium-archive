@@ -1,0 +1,31 @@
+<script>
+(function () {
+  var banner = document.querySelector(".announcement");
+  var source = banner.getAttribute("data-source");
+  function show(html) {
+    html = html.trim();
+    if (!html) return;
+    var dismissed = null;
+    try { dismissed = localStorage.getItem("announcement-dismissed"); } catch (e) {}
+    if (dismissed === html) return;
+    banner.innerHTML = html;
+    var close = document.createElement("button");
+    close.type = "button";
+    close.className = "announcement-close";
+    close.setAttribute("aria-label", "Dismiss announcement");
+    close.textContent = "×";
+    close.addEventListener("click", function () {
+      banner.hidden = true;
+      try { localStorage.setItem("announcement-dismissed", html); } catch (e) {}
+    });
+    banner.appendChild(close);
+    banner.hidden = false;
+  }
+  if (/^https?:\/\//i.test(source)) {
+    fetch(source).then(function (r) { return r.ok ? r.text() : ""; })
+      .then(show, function () {});
+  } else {
+    show(source);
+  }
+})();
+</script>

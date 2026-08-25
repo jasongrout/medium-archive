@@ -97,7 +97,14 @@ It works in independent steps:
   each post's first still image of sane size, chosen by header-sniffing
   dimensions — tag links, excerpt and byline per card; article pages;
   tag/author card listings with chip indexes sortable by name or by
-  post count; and a `/search/` page
+  post count; an optional site-wide announcement banner above the
+  header (`site.json`'s `"announcement"`: an http(s) URL fetched
+  client-side — the mechanism behind Sphinx's `announcement` theme
+  option, so a file like `https://jupyter.org/assets/banner.html` can
+  drive a blog and its project's documentation sites alike, with empty
+  content hiding the banner — or literal HTML; dismissable per
+  browser, and a changed announcement clears the dismissal); and a
+  `/search/` page
   wired to [Pagefind](https://pagefind.app) — run `pagefind --site
   public|output` after building for full-text search served as a results
   page with highlighted, in-context excerpts and per-section

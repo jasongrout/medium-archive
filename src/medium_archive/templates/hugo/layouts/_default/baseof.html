@@ -10,7 +10,9 @@
 <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
-<header class="site-header"><div class="wrap bar">
+{{ with site.Params.announcement }}<div class="announcement" data-source="{{ . }}" hidden></div>
+<!-- @include shared/announcement.html -->
+{{ end }}<header class="site-header"><div class="wrap bar">
 <a class="site-title" href="{{ site.Home.RelPermalink }}">{{ with site.Params.avatar }}<img src="{{ . | relURL }}" alt="">{{ end }}{{ site.Title }}</a>
 <nav>
 <a href="{{ site.Home.RelPermalink }}">Blog</a>
