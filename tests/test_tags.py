@@ -80,7 +80,6 @@ def test_unused_entries_are_tracked(tmp_path):
     ({"add": {"s": "a"}}, "non-empty list"),
     ({"add": {"s": ["a", "a"]}}, "listed twice"),
     ({"add": {"s": [""]}}, "non-empty strings"),
-    ({"drop": ["a"], "add": {"s": ["a"]}}, "is dropped"),
     ({"rename": {"a": "b"}, "add": {"s": ["a"]}}, "add the final tag"),
 ])
 def test_malformed_config_aborts(tmp_path, config, message):
@@ -125,6 +124,18 @@ def test_add_pairs_track_usage_per_tag(tmp_path):
     assert tag_map.unused() == ["my-post: +python", "my-post: +releases"]
     tag_map.apply(["python"], "my-post")     # adds releases, python was there
     assert tag_map.unused() == ["my-post: +python"]
+
+
+def test_drop_then_add_splits_an_overapplied_tag(tmp_path):
+    # dropping clears the inherited uses; add re-asserts the tag on the
+    # posts that genuinely deserve it
+    out = write_config(tmp_path, {
+        "drop": ["notebook"], "add": {"my-post": ["notebook"]}})
+    tag_map = load_tag_map(out)
+    assert tag_map.apply(["notebook", "python"], "other-post") == ["python"]
+    assert tag_map.apply(["notebook", "python"], "my-post") \
+        == ["notebook", "python"]
+    assert tag_map.unused() == []
 
 
 def test_convert_post_writes_added_tags(tmp_path):

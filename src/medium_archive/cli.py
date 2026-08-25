@@ -91,7 +91,9 @@ Notes:
     ({"rename": {"notebooks": "jupyter-notebook"}}), which is how tags
     are consolidated, and "add" puts tags on specific posts by slug
     ({"add": {"release-of-ipython-5-0": ["releases"]}}) for posts whose
-    Medium tags never named their plain topic. posts.json and every
+    Medium tags never named their plain topic; dropping a tag and
+    re-adding it on chosen posts splits an over-applied tag into its
+    deliberate uses. posts.json and every
     derived site inherit the cleaned tags; raw/ keeps the originals.
     Stale entries (changing no post) abort a full convert run; `stats
     --tags` lists every tag with its post count as the worklist for
