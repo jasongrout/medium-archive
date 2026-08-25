@@ -400,13 +400,8 @@ class ImagePlacer:
         images = config.get("images", {})
         self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
         self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
-        # off keeps line art in its own PNG (readers save a .png, sites
-        # carry the larger file); the resolution is preserved either way
-        self.lossless_line_art = images.get("lossless_line_art", True)
-        scheme = f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}"
-        if not self.lossless_line_art:
-            scheme += "-plain"
-        self.cache = out / ".image-cache" / scheme
+        self.cache = (out / ".image-cache"
+                      / f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}")
         self.gifsicle = shutil.which("gifsicle")
         try:
             from PIL import Image
@@ -572,8 +567,6 @@ class ImagePlacer:
                 im.load()
                 if not is_line_art(im):
                     return self._save_photo(im, tmp, cap)
-                if not self.lossless_line_art:
-                    return None        # full-resolution PNG, placed as it is
                 return self._save_line_art(im, tmp)
         except Exception as e:
             self._note(f"re-encode failed on {src.name} ({e}); "

@@ -146,8 +146,7 @@ It works in independent steps:
   Copies are built once into `<out>/.image-cache/` and hard-linked
   into every site. `raw/` and `posts/` keep full resolution;
   `site.json` tunes or disables the caps (`"images":
-  {"still_max_edge": N, "animated_max_edge": N}`, 0 = off) and can
-  keep line art in its own PNG (`"lossless_line_art": false`). All three render
+  {"still_max_edge": N, "animated_max_edge": N}`, 0 = off). All three render
   every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
   redirect stub that works on any static host — `hugo` and `zola`
   through their `aliases` front matter, `pelican` through a small

@@ -488,20 +488,6 @@ def test_line_art_keeps_every_pixel(tmp_path):
     assert "![chart](images/chart.webp)" in page
 
 
-def test_line_art_can_stay_png(tmp_path):
-    """lossless_line_art off keeps line art in its own PNG -- still at
-    full resolution, just larger on disk."""
-    src = make_image_post(tmp_path)
-    (tmp_path / "site.json").write_text(json.dumps(
-        {"title": "Pics", "images": {"lossless_line_art": False}}))
-    site = zola.build_site(tmp_path)
-    placed = site / "content/posts/picture-post/images"
-    assert (placed / "chart.png").stat().st_ino == (src / "chart.png").stat().st_ino
-    assert not (placed / "chart.webp").exists()
-    # photographs still take the photo path
-    assert (placed / "big.jpg").exists()
-
-
 def test_line_art_classifier(tmp_path):
     import os
 
