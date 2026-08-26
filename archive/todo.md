@@ -167,6 +167,68 @@ via `"add"`, since a rename can only produce one tag). `jupytergis`
 stays separate as the tool tag. `jupytercon` nests under `events` the
 same way: every JupyterCon post also carries `events`.
 
+A per-tag audit of everything used more than ten times then found the
+inherited-tag problem in the other direction: tags that are right on
+most of their posts but wrong on a handful, which `"drop"` cannot fix
+and `"rename"` cannot either. medium-archive grew a per-post
+`"remove"` for exactly that, and `tags.json` now uses it:
+
+- `jupyterlab` (64 posts) was the worst case. Twenty-one of its posts
+  were not about JupyterLab at all: monthly community calls,
+  distinguished-contributor announcements, the LF Charities move, the
+  media-strategy post, a security sprint, and the workshop and
+  governance posts all carried it from medium.com discovery, while
+  JupyterLite releases, JupyterGIS, xeus-python and Jupyter Server
+  posts carried it for the framework they build on or mention in
+  passing. It keeps the 43 posts about the application — releases,
+  Desktop, extensions, debugger, accessibility and UI work. The posts
+  that were left with nothing real got the tag that does apply
+  (`community` for the news posts, `extensions` for the 2022 packaging
+  post).
+- `jupyterhub` lost seven (the same community calls, the mybinder
+  federation and OVHcloud posts, an nbgrader hackathon — JupyterHub
+  appears in a PR link), `science` eight, `education` two, `ipython`
+  one, `jupyterlite` one.
+- `science` also shed `scientific-computing`, which was Medium
+  boilerplate on the JupyterLab Desktop line and one release post
+  rather than a subject; it is dropped rather than renamed now, as is
+  `tutorial`, whose single use sat on a widget how-to. Everything else
+  reviewed at that size — `community`, `events`, `releases`,
+  `workshops`, `jupyter-notebook`, `kernels`, `jupytercon`, `binder`,
+  `security`, `visualization`, `kubernetes`, `dashboards`, `widgets`,
+  `webassembly`, `geoscience` — held up post by post and is unchanged.
+
+`numfocus` and `linux-foundation` are dropped: partner and host
+organizations are metadata about a post's origin, not what it is about,
+and they only ever landed on JupyterCon and funding posts that say so
+themselves (the JupyterCon 2020 keynote announcement for Jeremy Howard
+carried `numfocus` alone, so it gets `jupytercon` via `"add"`).
+
+The `jupytercon` → `events` nesting is now a rule rather than 20
+repeated `"add"` entries: tags.json's new `"imply"` section states
+`jupytercon` and `workshops` both entail `events`, so every conference
+and workshop post carries it (events: 42 → 67) and future posts inherit
+the pairing without another edit. 60 tags, still no untagged post — the
+2026 user-experience survey results post, which came off Medium with no
+tags at all, gets `community` like the other survey posts.
+
+`jupyter-foundation` is the one tag this pass added rather than
+removed. The Foundation is new — announced in the October 2024 LF
+Charities post — and the blog has covered it steadily since, but no
+post carries a Medium tag for it, so all eight uses come from `"add"`:
+its founding, the 2025 Executive Council election that explains its
+governing board, the three community-funding posts (both calls for
+proposals and the first round of awards), its community-manager hire,
+and the 2026 user survey it ran plus the results. The line drawn is
+"the Foundation is the actor", not "the Foundation is thanked": a
+dozen more posts credit it for sponsoring or funding the work they
+describe — the Plugin Playground and jupyter-builder proposals, the
+eslint plugin, JupyterLab 4.6, the workshop reports, and the Positron
+guest post from a member company — and those keep the tags for what
+they are about. The two workshop-program posts (`Workshops Are Back`,
+`Early 2026`) are the closest call: the program runs on Foundation
+money and LF Events logistics, but the posts are about the workshops.
+
 Remaining judgement calls, all optional:
 
 - The nested pairs (`geoscience` under `science`, `jupytercon` under

@@ -1,30 +1,15 @@
 {
   "drop": [
-    "jupyter",
-    "project-jupyter",
-    "jupyter-community",
-    "open-source",
-    "open-source-software",
-    "opensource",
-    "open-source-communities",
-    "technology",
-    "programming",
-    "software-development",
-    "web-development",
-    "technical-computing",
-    "startup",
-    "builders",
-    "platform",
     "2015",
-    "updates",
-    "new-features",
     "3d-modeling",
     "accomplice",
+    "announcements",
     "apache-arrow",
     "apache-spark",
     "asyncio",
     "big-data",
     "box2d",
+    "builders",
     "button",
     "canada",
     "code-linters",
@@ -36,6 +21,7 @@
     "cuda",
     "data-analysis",
     "data-engineering",
+    "data-science",
     "dataframes",
     "debian",
     "decision-making",
@@ -54,14 +40,27 @@
     "human-in-the-loop",
     "interactive",
     "itk",
+    "jupyter",
+    "jupyter-community",
+    "jupyter-notebook",
     "kubespray",
     "latam",
     "leaflet",
+    "learning-python",
+    "linux-foundation",
     "llvm",
     "mamba",
     "mysql",
+    "new-features",
     "new-york",
+    "notebook",
+    "notebooks",
+    "numfocus",
     "observability",
+    "open-source",
+    "open-source-communities",
+    "open-source-software",
+    "opensource",
     "openstack",
     "oracle",
     "oreilly",
@@ -71,9 +70,14 @@
     "pangeo",
     "parallel-computing",
     "performance",
+    "platform",
     "positron",
     "postgres",
+    "programming",
+    "project-jupyter",
     "proxy",
+    "python",
+    "python-programming",
     "racism",
     "react",
     "reactive-programming",
@@ -86,32 +90,32 @@
     "rstudio",
     "rust",
     "science-platform",
+    "scientific-computing",
     "slides",
+    "software-development",
     "sphinx",
     "spyder",
     "sqlite",
+    "startup",
     "stencila",
     "story-maps",
     "storytelling",
     "tabular-data",
     "team-collaboration",
+    "technical-computing",
+    "technology",
     "traefik",
     "trusted-ci",
+    "tutorial",
+    "updates",
     "version-control",
     "visual-programming",
     "vscode",
     "vtk",
+    "web-development",
     "writing",
     "youtube",
-    "zulip",
-    "data-science",
-    "python-programming",
-    "learning-python",
-    "python",
-    "announcements",
-    "notebook",
-    "notebooks",
-    "jupyter-notebook"
+    "zulip"
   ],
   "rename": {
     "jupyter-lab-3": "jupyterlab",
@@ -177,7 +181,6 @@
     "research": "science",
     "politics": "science",
     "elections": "science",
-    "scientific-computing": "science",
     "open-data": "open-science",
     "open-scholarship": "open-science",
     "zenodo": "open-science",
@@ -229,14 +232,24 @@
     "pdf": "publishing",
     "publication": "publishing",
     "slideshow": "voila",
-    "tutorial": "education",
     "university-of-edinburgh": "education",
     "collaborative-editing": "collaboration",
     "cad": "jupytercad",
     "canvas": "ipycanvas",
     "gis": "geoscience"
   },
+  "imply": {
+    "jupytercon": [
+      "events"
+    ],
+    "workshops": [
+      "events"
+    ]
+  },
   "add": {
+    "2026-jupyter-community-call-for-funding-proposals": [
+      "jupyter-foundation"
+    ],
     "a-2019-retrospective-from-the-binder-project": [
       "binder"
     ],
@@ -265,12 +278,12 @@
     "and-voilà": [
       "voila"
     ],
-    "anima-anandkumar": [
-      "events"
-    ],
     "announcing-jupyter-notebook-7": [
       "jupyter-notebook",
       "releases"
+    ],
+    "announcing-our-first-jupyter-community-funded-proposals": [
+      "jupyter-foundation"
     ],
     "announcing-the-new-jupyter-book": [
       "jupyter-book"
@@ -282,9 +295,6 @@
     "becoming-the-new-jupyterhub-and-jupyter-book-community-manager": [
       "jupyter-book",
       "jupyterhub"
-    ],
-    "benjamin-ragan-kelley": [
-      "events"
     ],
     "better-sharing-ux-with-nbgitpuller-and-contextual-error-handling": [
       "jupyterhub"
@@ -301,6 +311,9 @@
     ],
     "collaborative-cad-in-jupyterlab": [
       "jupyterlab"
+    ],
+    "community-building-report-project-jupyter": [
+      "community"
     ],
     "community-note": [
       "community"
@@ -329,14 +342,10 @@
     ],
     "disc-sprint-nyc-2018": [
       "diversity",
-      "events",
-      "numfocus"
+      "events"
     ],
     "enabling-the-jupyterlab-debugger-with-ipykernel": [
       "jupyterlab"
-    ],
-    "enjoy-jupytercon-2017-on-youtube": [
-      "events"
     ],
     "expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps": [
       "jupytergis",
@@ -401,14 +410,14 @@
     "jdboston16-speaker-announcement": [
       "events"
     ],
+    "jeremy-howard": [
+      "jupytercon"
+    ],
     "join-us-for-the-jupyter-accessibility-workshops-part-1": [
       "workshops"
     ],
     "join-us-for-the-jupyter-accessibility-workshops-part-2": [
       "workshops"
-    ],
-    "juan-klopper": [
-      "events"
     ],
     "jupyter-accessibility-workshops-wrap-up": [
       "workshops"
@@ -464,6 +473,9 @@
     "jupyter-kernel-gateway": [
       "kernels"
     ],
+    "jupyter-media-strategy-social-media-update": [
+      "community"
+    ],
     "jupyter-meets-the-earth": [
       "science"
     ],
@@ -514,6 +526,9 @@
     "jupyter-server-2-0-is-released": [
       "releases"
     ],
+    "jupyter-user-survey": [
+      "jupyter-foundation"
+    ],
     "jupytercon-2018-call-for-proposal": [
       "jupytercon"
     ],
@@ -527,27 +542,12 @@
       "jupytercon"
     ],
     "jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h": [
-      "events",
       "jupytercon"
-    ],
-    "jupytercon-2023-keynotes": [
-      "events"
-    ],
-    "jupytercon-2025": [
-      "events"
-    ],
-    "jupytercon-is-back-in-2023": [
-      "events"
     ],
     "jupytercon-nyc-august-2017": [
-      "events",
       "jupytercon"
     ],
-    "jupytercon-nyc-august-22nd-25th": [
-      "events"
-    ],
     "jupytercon-online-more-than-a-conference": [
-      "events",
       "jupytercon"
     ],
     "jupyterday-atlanta-2016": [
@@ -626,9 +626,6 @@
     "jupyterlite-officially-joins-project-jupyter": [
       "jupyterlite"
     ],
-    "lucy-dagostino-mcgowan": [
-      "events"
-    ],
     "mamba-meets-jupyterlite": [
       "jupyterlite"
     ],
@@ -663,9 +660,6 @@
     "november-2024-jupyter-community-call": [
       "community"
     ],
-    "omoju-miller": [
-      "events"
-    ],
     "open-redirect-vulnerability-in-jupyter-jupyterhub": [
       "jupyter-notebook"
     ],
@@ -673,10 +667,14 @@
       "diversity"
     ],
     "our-new-jupyter-foundation-community-manager": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "outreachy-jupyter-supporting-diversity-in-open-communities": [
       "outreachy"
+    ],
+    "packaging-for-jupyter-in-2022": [
+      "extensions"
     ],
     "post0": [
       "community"
@@ -686,6 +684,13 @@
     ],
     "project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley": [
       "community"
+    ],
+    "project-jupyter-joins-lf-charities": [
+      "community",
+      "jupyter-foundation"
+    ],
+    "project-jupyters-2025-executive-council-elections": [
+      "jupyter-foundation"
     ],
     "public-notebooks-and-security": [
       "jupyter-notebook"
@@ -732,7 +737,6 @@
       "kernels"
     ],
     "synopsis-jupytercon-2018-education-track": [
-      "events",
       "jupytercon"
     ],
     "the-big-split": [
@@ -757,14 +761,112 @@
     "voilà-is-now-an-official-jupyter-subproject": [
       "voila"
     ],
+    "what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan": [
+      "community",
+      "jupyter-foundation"
+    ],
     "xeus-is-now-a-jupyter-subproject": [
       "xeus"
     ],
     "xeus-lite": [
       "xeus"
     ],
+    "your-ideas-our-support-jupyter-community-call-for-funding-proposals": [
+      "jupyter-foundation"
+    ],
     "zero-to-jupyterhub-helm-chart-0-8": [
       "jupyterhub"
+    ]
+  },
+  "remove": {
+    "abracadabra-bringing-the-magics-to-xeus-python": [
+      "jupyterlab"
+    ],
+    "announcing-a-new-jupyter-governance-model-and-our-first-executive-council": [
+      "ipython"
+    ],
+    "announcing-jupyter-day-atlanta-spring-2018": [
+      "science"
+    ],
+    "announcing-the-2023-jupyter-distinguished-contributor-award-recipients": [
+      "jupyterlab"
+    ],
+    "announcing-the-new-jupyter-book": [
+      "education"
+    ],
+    "berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-": [
+      "jupyterhub"
+    ],
+    "community-building-report-project-jupyter": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "congratulations-distinguished-contributors": [
+      "jupyterlab"
+    ],
+    "https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackat": [
+      "jupyterhub"
+    ],
+    "jupyter-community-call-december-2025": [
+      "jupyterlab"
+    ],
+    "jupyter-community-call-february-2025": [
+      "jupyterlab"
+    ],
+    "jupyter-community-call-february-2026": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "jupyter-community-call-june-2025": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "jupyter-community-call-september-2025": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "jupyter-community-workshop-south-america": [
+      "jupyterlab"
+    ],
+    "jupyter-for-science-user-facilities-and-high-performance-computing": [
+      "jupyterlab"
+    ],
+    "jupyter-media-strategy-social-media-update": [
+      "jupyterlab"
+    ],
+    "jupyter-security-sprint-march-31st": [
+      "jupyterlab"
+    ],
+    "jupyter-server-2-0-is-released": [
+      "jupyterlab"
+    ],
+    "jupytercon-2020-is-a-go": [
+      "education"
+    ],
+    "jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h": [
+      "science"
+    ],
+    "jupytergis": [
+      "jupyterlab"
+    ],
+    "jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more": [
+      "jupyterlab",
+      "jupyterlite"
+    ],
+    "jupyterlite-0-7-is-released": [
+      "jupyterlab"
+    ],
+    "jupyterlite-0-8-is-released": [
+      "jupyterlab"
+    ],
+    "mybinder-ovhcloud": [
+      "jupyterhub"
+    ],
+    "packaging-for-jupyter-in-2022": [
+      "jupyterlab"
+    ],
+    "project-jupyter-joins-lf-charities": [
+      "jupyterlab"
     ]
   }
 }

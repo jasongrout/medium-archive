@@ -35,7 +35,6 @@
     "ghost_url": null,
     "description": "JupyterLite 0.8 is released! 🎉 JupyterLite is a Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as JupyterLite sites are …",
     "tags": [
-      "jupyterlab",
       "jupyterlite",
       "releases",
       "webassembly"
@@ -66,6 +65,7 @@
     "ghost_url": null,
     "description": "Navigating the Post-Workshop Fog: a Path to Myst by Chiara Marmo and Serena Bonaretti From June 15th to 17th 2026 a Jupyter Workshop took place at Paris-Saclay University : “Demystifying MyST …",
     "tags": [
+      "events",
       "jupyter-book",
       "mystmd",
       "workshops"
@@ -92,7 +92,7 @@
     "description": "The Jupyter Executive Council and Jupyter Foundation are pleased to announce a new Call for Proposals (CFP) for funding the Jupyter…",
     "tags": [
       "funding",
-      "linux-foundation"
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-0_jwHtZqyuA711MXw9.png"
@@ -116,8 +116,7 @@
     "tags": [
       "jupyter-notebook",
       "jupyterlab",
-      "releases",
-      "science"
+      "releases"
     ],
     "images": [
       "images/001-1_zni6m_lgsXqu-zsGH77zBw.png",
@@ -160,8 +159,7 @@
     "ghost_url": null,
     "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2025 cohort of contributors. Project Jupyter …",
     "tags": [
-      "community",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_tvqSgVCwpnNq8c4yARxlZQ.jpeg",
@@ -210,7 +208,8 @@
     "ghost_url": null,
     "description": "The Jupyter Foundation is excited to gather your feedback on the Jupyter user experience through a brief survey. If you had a magic wand…",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [],
     "body_source": "export",
@@ -304,7 +303,8 @@
     "ghost_url": null,
     "description": "Our new Jupyter Foundation Community Manager The Jupyter Foundation is excited to announce that we have contracted with Jason Grout to be a part-time Jupyter Foundation Community Manager. The primary …",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [],
     "body_source": "state",
@@ -350,6 +350,7 @@
     "ghost_url": null,
     "description": "A Jupyter Workshop: Demystifying MyST Markdown in Education A new Jupyter Workshop is happening June 15–17, 2026 in Orsay, France. Demystifying MyST Markdown in Education is a three-day workshop …",
     "tags": [
+      "events",
       "jupyter-book",
       "mystmd",
       "workshops"
@@ -474,8 +475,7 @@
     "ghost_url": null,
     "description": "Berkeley Institute for Data Science (BIDS) joins the mybinder.org federation in partnership with 2i2c The Berkeley Institute for Data Science (BIDS) is the birthplace of the current iteration of …",
     "tags": [
-      "binder",
-      "jupyterhub"
+      "binder"
     ],
     "images": [
       "images/001-1_7pRDcpGYyl1R6pBWsIC5UQ.png"
@@ -542,7 +542,6 @@
     "ghost_url": null,
     "description": "Jupyter Security Sprint March 31st This is a critical moment for open source software. AI enables new contributors in new ways, but maintainers are also faced with an unprecedented volume of …",
     "tags": [
-      "jupyterlab",
       "security"
     ],
     "images": [
@@ -695,9 +694,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Call: February 2026 Hey Jovyans, we’d love for you to join us on our final community call of the year! We want to learn all about the great things you’re doing with Jupyter. The …",
     "tags": [
-      "community",
-      "jupyterhub",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_R6exYjMGAakITpsy0WDcAQ.png"
@@ -744,7 +741,6 @@
     "ghost_url": null,
     "description": "JupyterLite 0.7 is released! 🎉 JupyterLite is a Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as JupyterLite sites are …",
     "tags": [
-      "jupyterlab",
       "jupyterlite",
       "releases",
       "webassembly"
@@ -804,6 +800,7 @@
     "ghost_url": null,
     "description": "The Jupyter Community Building Working Group is happy to announce the Jupyter Community Workshops selected for funding in early 2026. The…",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [],
@@ -845,8 +842,7 @@
     "ghost_url": null,
     "description": "Hey Jovyans, we’d love for you to join us on our final community call of the year! We want to learn all about the great things you’re doing with Jupyter. The Community Building working group is …",
     "tags": [
-      "community",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_5sfekG4Kp-oJAmpmejRqGw.png"
@@ -869,6 +865,7 @@
     "description": "We are thrilled to announce the results of our first round of Jupyter Community Funding proposals. This is the first funding call from the…",
     "tags": [
       "funding",
+      "jupyter-foundation",
       "sustainability"
     ],
     "images": [
@@ -918,7 +915,7 @@
     "description": "The Jupyter Executive Council and Jupyter Foundation are pleased to announce a call for proposals for the Jupyter community. Visit the…",
     "tags": [
       "funding",
-      "linux-foundation"
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-1_62F-8MV2IQQToNrR4GdU_g.png"
@@ -940,6 +937,7 @@
     "ghost_url": null,
     "description": "The Jupyter Community Building Working Group is pleased to announce that the next call for proposals for Jupyter Community Workshops is now…",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [],
@@ -960,9 +958,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Call: September 2025 Hey Jovyans, we want to learn about the great things you’re doing with Jupyter! The Community Building working group is holding an open call with the …",
     "tags": [
-      "community",
-      "jupyterhub",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_gmOBCJ-kSWiaSxWWpECerQ.jpeg"
@@ -1085,9 +1081,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Call: June 2025 Hey Jovyans, we want to learn about the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing committee is holding an open …",
     "tags": [
-      "community",
-      "jupyterhub",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_yIEU3e51tbC4uOdX4w9v4Q.png"
@@ -1138,8 +1132,7 @@
     "ghost_url": null,
     "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2024 cohort of contributors. Project Jupyter …",
     "tags": [
-      "community",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_NAL0ma8SVR9HGcwBo0RorA.jpeg",
@@ -1310,7 +1303,8 @@
     "ghost_url": null,
     "description": "Project Jupyter recently completed its 2025 Executive Council (EC) election, marking an important transition in its leadership. The newly…",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [],
     "body_source": "export",
@@ -1433,8 +1427,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Call: February 2025 Hey Jovyans, we want to see the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing committee is holding an open call …",
     "tags": [
-      "community",
-      "jupyterlab"
+      "community"
     ],
     "images": [],
     "body_source": "state",
@@ -1622,8 +1615,8 @@
     "ghost_url": null,
     "description": "We are excited to announce that Project Jupyter is entering a new phase in our journey: we are joining LF Charities, a 501(c)(3) non-profit…",
     "tags": [
-      "jupyterlab",
-      "linux-foundation"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-1_LKQqc8xdq6K7gCQderCHrA.jpeg"
@@ -1698,8 +1691,7 @@
     "ghost_url": null,
     "description": "Announcing the 2023 Jupyter Distinguished Contributor Award Recipients We are delighted to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2023 cohort. Project …",
     "tags": [
-      "community",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-0_psjWHR7z2EmlvZlF.png"
@@ -1796,8 +1788,7 @@
     "ghost_url": null,
     "description": "Community Building Report: Project Jupyter The Jupyter Community Building Working Group would like to share a report and community building recommendations from interviews with members of Project …",
     "tags": [
-      "jupyterhub",
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-1_AuDqkqkQjDlNIr96Vc2o1Q.jpeg"
@@ -1933,7 +1924,6 @@
       "collaboration",
       "geoscience",
       "jupytergis",
-      "jupyterlab",
       "science"
     ],
     "images": [
@@ -2136,8 +2126,7 @@
     "description": "Curvenote joins the mybinder.org federation Curvenote is now a part of the mybinder.org federation. By hosting a BinderHub instance running on the company’s infrastructure, additional capacity is …",
     "tags": [
       "binder",
-      "open-science",
-      "science"
+      "open-science"
     ],
     "images": [
       "images/001-0_4FQGtOrs8XWEQ75G.png"
@@ -2180,8 +2169,7 @@
     "ghost_url": null,
     "description": "Python environment management in JupyterLab Desktop We are pleased to announce Python environment management features recently added to JupyterLab Desktop (JLD). Now you can create new Python …",
     "tags": [
-      "jupyterlab",
-      "science"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_OHi6WzYg6MXIxl8EyPqWkQ.png",
@@ -2300,7 +2288,7 @@
     "ghost_url": null,
     "description": "Announcing the Jupyter Media Strategy working group (JMS)",
     "tags": [
-      "jupyterlab"
+      "community"
     ],
     "images": [
       "images/001-0_GlGLIwzCCqvYGXHl.png",
@@ -2512,6 +2500,7 @@
       "accessibility",
       "cloud-computing",
       "education",
+      "events",
       "geoscience",
       "jupyterhub",
       "science",
@@ -2900,6 +2889,7 @@
     "description": "Jupyter Notebook format workshop outcomes The Jupyter Community Workshop on the notebook file format took place at the Safran Campus near Paris from February 28th to March 2nd. It was a great …",
     "tags": [
       "community",
+      "events",
       "jupyter-notebook",
       "workshops"
     ],
@@ -3044,9 +3034,7 @@
       "community",
       "events",
       "jupytercon",
-      "numfocus",
-      "open-science",
-      "science"
+      "open-science"
     ],
     "images": [
       "images/001-1_Z4u6ayzHYFz5ljFqlfmLFQ.jpeg"
@@ -3068,8 +3056,7 @@
     "ghost_url": null,
     "description": "Introducing the new JupyterLab Desktop! We are pleased to announce a major update to JupyterLab Desktop which adds many new features with main focus on the user experience. JupyterLab Desktop is the …",
     "tags": [
-      "jupyterlab",
-      "science"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_8xMIZPHtmjJFVoJ8Vh6Lig.png",
@@ -3141,6 +3128,7 @@
     "description": "Report on the JupyterLite Community Workshop 💡 The JupyterLite Community Workshop, held at the OVHcloud headquarters in Paris, France from December 7th to December 9th, 2022, brought together a …",
     "tags": [
       "community",
+      "events",
       "jupyterlite",
       "workshops"
     ],
@@ -3189,8 +3177,7 @@
     "ghost_url": null,
     "description": "Project Jupyter is proud to announce its new governance model, including an Executive Council and Software Steering Council (SSC).",
     "tags": [
-      "community",
-      "ipython"
+      "community"
     ],
     "images": [
       "images/001-1_bILOKGalg_DgzOpUbVa-ow.png"
@@ -3378,6 +3365,7 @@
     "tags": [
       "community",
       "education",
+      "events",
       "workshops"
     ],
     "images": [
@@ -3400,8 +3388,7 @@
     "ghost_url": null,
     "description": "JupyterLab Desktop — 2022 recap JupyterLab Desktop is the cross-platform desktop application distribution of JupyterLab. It is the quickest and easiest way to get started with Jupyter notebooks …",
     "tags": [
-      "jupyterlab",
-      "science"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_aZfy2BCz8UCBS6GaqpyH2w.png",
@@ -3429,6 +3416,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: The notebook file format We are excited to announce the next in-person Jupyter Community Workshop! It will focus on the Notebook file format. Jupyter Community Workshops …",
     "tags": [
+      "events",
       "jupyter-notebook",
       "workshops"
     ],
@@ -3476,8 +3464,7 @@
     "description": "Contribute to your first open source project This Friday, 10/26, NumFOCUS DISC is excited to host a first of its kind Open Source Inclusion Sprint — no prior experience necessary! Register Now …",
     "tags": [
       "diversity",
-      "events",
-      "numfocus"
+      "events"
     ],
     "images": [
       "images/001-1_E4wfBHKLHL_Hb85HN8dIRQ.png",
@@ -3522,7 +3509,6 @@
     "description": "Jupyter Server 2.0 is released! We are thrilled to announce the release of Jupyter Server 2.0! Jupyter Server provides the core web server that powers JupyterLab and Jupyter Notebook. This release …",
     "tags": [
       "jupyter-server",
-      "jupyterlab",
       "releases"
     ],
     "images": [],
@@ -3680,8 +3666,7 @@
     "tags": [
       "education",
       "events",
-      "jupytercon",
-      "numfocus"
+      "jupytercon"
     ],
     "images": [
       "images/001-1_Pv7g_IdbOpvxFT_BW3Z4xA.png",
@@ -3704,8 +3689,7 @@
     "ghost_url": null,
     "description": "MyBinder @ OVHcloud OVHcloud is a long-time supporter of the Jupyter project. In the past few years, they have provided computing resources to several Jupyter-related endeavors to support its …",
     "tags": [
-      "binder",
-      "jupyterhub"
+      "binder"
     ],
     "images": [
       "images/001-1_Hb4_lgwkmAmw--MbWzaKLw.png"
@@ -3728,6 +3712,7 @@
     "description": "Jupyter Community Workshop: JupyterLite We are thrilled to announce the next in-person Jupyter Community Workshop, which will focus on the JupyterLite project! The event will be held at the OVHCloud …",
     "tags": [
       "community",
+      "events",
       "jupyterlite",
       "webassembly",
       "workshops"
@@ -3776,7 +3761,7 @@
     "description": "Jupyter Community Workshops Update — Current Round Review & Sneak Peek into Round 4 We are excited to share an update on round three of the Jupyter Community Workshops! This comes just as our round …",
     "tags": [
       "community",
-      "numfocus",
+      "events",
       "workshops"
     ],
     "images": [
@@ -3827,8 +3812,7 @@
     "description": "Lucy D’Agostino McGowan JupyterCon 2020 keynote speaker announcement Lucy is an assistant professor of statistics at Wake Forest University in North Carolina. She previously was a postdoctoral …",
     "tags": [
       "events",
-      "jupytercon",
-      "numfocus"
+      "jupytercon"
     ],
     "images": [
       "images/001-1__-QyPyiBBZTWsD27ElsXUw.jpeg",
@@ -3851,6 +3835,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: The Future of Jupyter Widgets After a long break from in-person events, we are excited to announce an in-person Jupyter Community Workshop! Jupyter Community Workshops is …",
     "tags": [
+      "events",
       "widgets",
       "workshops"
     ],
@@ -3923,7 +3908,7 @@
     "ghost_url": null,
     "description": "Packaging for Jupyter in 2022 Packaging has been difficult and changing over time in the Python ecosystem, and packaging extensions for Jupyter has been especially troublesome. Jupyter extensions …",
     "tags": [
-      "jupyterlab"
+      "extensions"
     ],
     "images": [
       "images/001-1_SL9lt02en8mWEJylo9sFhw.png"
@@ -4142,6 +4127,7 @@
     "tags": [
       "community",
       "education",
+      "events",
       "workshops"
     ],
     "images": [
@@ -4314,7 +4300,6 @@
     "description": "Jupyter for Science User Facilities and High Performance Computing Jupyter is the “Google Docs” of data science. It provides that same kind of easy-to-use ecosystem, but for interactive data …",
     "tags": [
       "jupyterhub",
-      "jupyterlab",
       "science"
     ],
     "images": [
@@ -4519,8 +4504,7 @@
     "ghost_url": null,
     "description": "JupyterLab Desktop App now available! We are pleased to announce the release of desktop application for JupyterLab! Standalone and self-contained JupyterLab App is the cross-platform standalone …",
     "tags": [
-      "jupyterlab",
-      "science"
+      "jupyterlab"
     ],
     "images": [
       "images/001-1_ZbqjB3evW_yB_SKFjqliWA.png",
@@ -4543,6 +4527,7 @@
     "ghost_url": null,
     "description": "We are pleased to announce the third call for proposals for Jupyter Community Workshops is now open!",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [
@@ -5080,6 +5065,7 @@
     "description": "Field Report on the Kernel Community Workshop From May 27th to May 29th 2019, thirty developers from the Jupyter community met in Paris for a three-days workshop on the Jupyter kernel protocol. For …",
     "tags": [
       "cpp",
+      "events",
       "kernels",
       "workshops"
     ],
@@ -5107,6 +5093,7 @@
     "description": "Report on the Jupyter Community Workshop on Dashboarding From June 3rd to June 6th 2019, thirty-five developers from the Jupyter community met in Paris for a four-day workshop on dashboarding with …",
     "tags": [
       "dashboards",
+      "events",
       "visualization",
       "workshops"
     ],
@@ -5204,7 +5191,6 @@
     "ghost_url": null,
     "description": "Build a Jupyter Widget with React and TypeScript When using a Jupyter Notebook to work on data science projects, I’ve found small user interface abstractions to be very useful. Scrubbing a slider …",
     "tags": [
-      "education",
       "javascript",
       "widgets"
     ],
@@ -5532,7 +5518,6 @@
     "description": "Abracadabra! Bringing the magics to xeus-python Last year, we set ourselves to implement a visual debugger for JupyterLab. This endeavor required major developments in the JupyterLab front-end, in …",
     "tags": [
       "ipython",
-      "jupyterlab",
       "kernels",
       "xeus"
     ],
@@ -6057,6 +6042,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: Jupyter Server Design and Roadmap Workshop We have some exciting news to share regarding the Jupyter Server Design and Roadmap Workshop as part of the Jupyter Community …",
     "tags": [
+      "events",
       "jupyter-server",
       "kernels",
       "workshops"
@@ -6104,8 +6090,7 @@
     "description": "University of Edinburgh Jupyter Community nbgrader Hackathon The University of Edinburgh is happy to announce our upcoming event as part of the Jupyter Community Workshop series funded by Bloomberg …",
     "tags": [
       "education",
-      "hackathons",
-      "jupyterhub"
+      "hackathons"
     ],
     "images": [],
     "body_source": "state",
@@ -6260,8 +6245,7 @@
     "description": "Omoju Miller JupyterCon 2020 keynote speaker announcement Omoju Miller is Technical Advisor to the CEO at GitHub, where she was previously a Senior Machine Learning Engineer. She has a PhD in …",
     "tags": [
       "events",
-      "jupytercon",
-      "numfocus"
+      "jupytercon"
     ],
     "images": [
       "images/001-1_XfG5wBdnXZ-vHu0bHhSCVA.jpeg",
@@ -6409,7 +6393,6 @@
     "ghost_url": null,
     "description": "Note: this announcement is cross-posted between the Jupyter Blog and the Executable Book Project updates blog",
     "tags": [
-      "education",
       "jupyter-book",
       "publishing"
     ],
@@ -6438,8 +6421,7 @@
     "description": "Anima Anandkumar JupyterCon 2020 keynote speaker announcement Anima Anandkumar is Bren Professor of Computing and Mathematical Sciences at Caltech, and the Director of Machine Learning at NVIDIA. She …",
     "tags": [
       "events",
-      "jupytercon",
-      "numfocus"
+      "jupytercon"
     ],
     "images": [
       "images/001-1_meN5OOGZsFvR2n29GQk_7Q.jpeg",
@@ -6462,7 +6444,8 @@
     "ghost_url": null,
     "description": "Jeremy Howard JupyterCon 2020 keynote speaker announcement Jeremy Howard is co-founder of fast.ai, and researcher in residence on medical data science at the University of San Francisco. He is Chief …",
     "tags": [
-      "numfocus"
+      "events",
+      "jupytercon"
     ],
     "images": [
       "images/001-1_Ebx6DZ_ltN15SsAOqLy0Lg.jpeg",
@@ -6592,6 +6575,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: Building upon the Jupyter Kernel Protocol We have some exciting news about the Jupyter Community Workshop on kernels! The workshop will be held in Paris, France, from May …",
     "tags": [
+      "events",
       "kernels",
       "workshops"
     ],
@@ -6682,10 +6666,8 @@
     "ghost_url": null,
     "description": "JupyterCon 2020 is a go! UPDATE: Please read the announcement (June 29, 2020) on JupyterCon Online: “JupyterCon: more than a conference.” Just over a year ago, Project Jupyter announced it was …",
     "tags": [
-      "education",
       "events",
-      "jupytercon",
-      "numfocus"
+      "jupytercon"
     ],
     "images": [
       "images/001-1_IwySdMiNeUvnSvLeNJgUWg.jpeg"
@@ -6802,6 +6784,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshops: Call for Proposals The large majority of Jupyter’s work is accomplished through remote, online collaboration; yet, over the years, we have found deep value in focused …",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [],
@@ -6952,6 +6935,7 @@
     "description": "Jupyter Community Workshop: Dashboarding with Project Jupyter We have some exciting news about the Jupyter Community Workshop on dashboarding! The workshop will be held in Paris, France, from June …",
     "tags": [
       "dashboards",
+      "events",
       "workshops"
     ],
     "images": [
@@ -7007,7 +6991,7 @@
     "ghost_url": null,
     "description": "Jupyter Community Workshop: South America I would like to share some exciting news about a Jupyter Community Workshop in South America! The workshop will be held in Córdoba, Argentina, from Jun 22nd …",
     "tags": [
-      "jupyterlab",
+      "events",
       "workshops"
     ],
     "images": [],
@@ -7213,6 +7197,7 @@
     "ghost_url": null,
     "description": "We recently announced a call for proposals for Jupyter Community Workshops. These workshops are intended to bring together small groups of…",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [],
@@ -7233,6 +7218,7 @@
     "ghost_url": null,
     "description": "We are thrilled to announce the Jupyter Community workshops for the first half of 2019. We had 16 proposals submitted, each of which…",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [],
@@ -7390,6 +7376,7 @@
     "ghost_url": null,
     "description": "Bloomberg is a long-time partner and supporter of Project Jupyter. Earlier this year Bloomberg announced funding of $120,000 to enable…",
     "tags": [
+      "events",
       "workshops"
     ],
     "images": [],
@@ -7521,8 +7508,7 @@
     "ghost_url": null,
     "description": "The Atlanta Jupyter User Group is excited to announce Early Bird Tickets and the Call for Proposals to the second Jupyter Day Atlanta on March 31, 2018. Join us at the Georgia Tech Research Institute …",
     "tags": [
-      "events",
-      "science"
+      "events"
     ],
     "images": [
       "images/001-1_3o8wyeVbjpWInCh82qZeNA.png"
@@ -7972,8 +7958,7 @@
     "description": "About a year ago the Jupyter team started a partnership with O’Reilly Media and NumFOCUS to organize JupyterCon 2017, the first in a series…",
     "tags": [
       "events",
-      "jupytercon",
-      "numfocus"
+      "jupytercon"
     ],
     "images": [],
     "body_source": "export",
@@ -8466,8 +8451,6 @@
     "tags": [
       "geoscience",
       "jupytergis",
-      "jupyterlab",
-      "jupyterlite",
       "science"
     ],
     "images": [
@@ -8495,7 +8478,10 @@
     "canonical_url": null,
     "ghost_url": null,
     "description": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey From time to time, Jupyter runs user surveys to understand how our communities use Jupyter technology …",
-    "tags": [],
+    "tags": [
+      "community",
+      "jupyter-foundation"
+    ],
     "images": [
       "images/001-1_EcfaS7-4u-hlCUlTaEBitQ.png",
       "images/002-1_1Q3i-K3MyiXphDKM3T6HPw.png",
