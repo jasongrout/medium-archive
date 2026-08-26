@@ -47,6 +47,13 @@ These embed verbatim in both engines' pages, so they must carry no
   the home link catches post and pagination pages, `/tags/` catches
   every tag page, and so on. The feed link (no trailing slash) never
   matches.
+- `feed-icon.html` — the RSS mark, as an inline SVG in the same
+  stroked 24x24 style as the theme picker's icons. It is the header's
+  feed link, and the link beside a tag's or an author's heading where
+  that term has a feed of its own (`card.css` sizes both through
+  `.feed-icon`). Being a marker *line*, the `@include` sits on its own
+  line inside the anchor; the whitespace that leaves is not a flex item,
+  so the icon still centres.
 - `announcement.html` — the site-wide announcement banner. The base
   templates emit the `.announcement` div (above the header, hidden)
   only when site.json sets `"announcement"`; the script fills it from
@@ -101,11 +108,15 @@ regular list and taxonomy pages share `list.html`), plus:
 ## pelican/
 
 - `pelicanconf.py.tmpl` — the generated config, including the
-  `_LazyImages` Markdown extension (body images load lazily).
+  `_LazyImages` Markdown extension (body images load lazily) and
+  `TAG_DISPLAY`, the tag-slug-to-name map (tags reach Pelican as slugs
+  so their URLs are exact; see `tags.py`).
 - `site_plugin.py` — appended verbatim after the filled config: gives
-  Pelican the redirect stubs Hugo renders for aliases, and the
-  responsive body images the hugo theme's render hook produces. It
-  refers to names the config defines (`SITEURL`, `PATH`), so it is not
+  Pelican the redirect stubs Hugo renders for aliases, the responsive
+  body images the hugo theme's render hook produces, and the names tags
+  are shown under (from `TAG_DISPLAY`, set on the `Tag` objects so the
+  theme and the per-tag feeds both pick them up). It refers to names the
+  config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`), so it is not
   importable on its own.
 - `theme/templates/` — the Jinja theme. `author.html` is `tag.html`
   with the `tag` variable swapped for `author`; keep them in step.

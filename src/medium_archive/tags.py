@@ -20,7 +20,8 @@ survives regeneration, while raw/ keeps the original tags untouched:
       },
       "remove": {
         "jupyter-community-call-june-2025": ["jupyterlab"]
-      }
+      },
+      "display": {"ipython": "IPython", "jupyterhub": "JupyterHub"}
     }
 
 `drop` removes a tag everywhere; `rename` replaces one with another, so
@@ -54,14 +55,30 @@ rename, add, imply, remove -- so a remove has the last word, even over an
 implication, and a post that both adds and removes one tag aborts at
 load rather than resolving the contradiction silently.
 
+`display` gives a tag its name on a rendered site, so the tag itself
+stays a slug -- what posts.json stores, what every section above names,
+and what a site builds its /tags/<tag>/ URL from -- while the pages show
+"Jupyter Notebook" and "IPython". Spelling a tag with spaces and
+capitals is a display concern, not an identity one, so nothing about a
+tag's identity has to move for its name to read correctly. Without an
+entry a tag displays as itself with its hyphens as spaces
+("open-science" -> "open science"), which is why the section holds only
+the tags that need a proper name; an entry repeating that default aborts
+at load like any other entry that changes nothing, and two tags may not
+share a name, which would make a site's tag index ambiguous. Only a tag
+that can reach a page may be named, so a dropped tag aborts unless an
+`add` puts it back -- the split-an-over-applied-tag case above, where
+the tag does still reach the posts that deserve it.
+
 The config fails loudly, like a fixup that no longer applies: unknown
 top-level keys, malformed entries, a tag both dropped and renamed, a
 rename to a dropped tag, and rename chains (a target that is itself
 renamed) all abort at load; an entry that changes no post aborts a full
 convert run -- a drop/rename matching no post's tags, an implication no
 post's tags ever trigger, an add whose every matching post already
-carries the tag, or a remove whose every matching post never had it --
-so stale entries cannot rot silently. `stats --tags` lists every tag
+carries the tag, a remove whose every matching post never had it, or a
+display name for a tag no post carries -- so stale entries cannot rot
+silently. `stats --tags` lists every tag
 with its post count, as a worklist for curating the file.
 """
 
@@ -70,20 +87,33 @@ import sys
 from pathlib import Path
 
 
+def default_display(tag: str) -> str:
+    """How a site shows a tag with no `display` entry: the slug with its
+    hyphens as spaces, so "open-science" reads "open science"."""
+    return tag.replace("-", " ")
+
+
+def display_name(tag: str, display: dict = None) -> str:
+    """`tag` as a site should show it, given a `display` map."""
+    return (display or {}).get(tag) or default_display(tag)
+
+
 class TagMap:
     """A loaded tags.json: apply() cleans one post's tag list, and the
     entries that changed no post over a whole run are reported by
     unused() so convert can fail loudly on stale config."""
 
     def __init__(self, drop: set, rename: dict, imply: dict, add: dict,
-                 remove: dict, path: Path):
+                 remove: dict, display: dict, path: Path):
         self.drop = drop
         self.rename = rename
         self.imply = imply                    # tag -> [tags it entails]
         self.add = add                        # slug -> [tags to ensure]
         self.remove = remove                  # slug -> [tags to subtract]
+        self.display = display                # tag -> its name on a site
         self.path = path
         # drop/rename tags, (tag, tag) imply pairs, (slug, tag) add/remove
+        # and ("display", tag) for a name some post's tags reached
         self._used = set()
 
     def apply(self, tags, slug: str = None) -> list:
@@ -110,6 +140,8 @@ class TagMap:
             if tag in result:                 # a tag the post never had
                 self._used.add((slug, tag))   # doesn't count either
                 result.discard(tag)
+        for tag in result & set(self.display):   # a name is used when some
+            self._used.add(("display", tag))     # post carries its tag
         return sorted(result)
 
     def unused(self) -> list:
@@ -120,6 +152,8 @@ class TagMap:
                   for tag in tags if (slug, tag) not in self._used}
         stale |= {f"{slug}: -{tag}" for slug, tags in self.remove.items()
                   for tag in tags if (slug, tag) not in self._used}
+        stale |= {f"{tag} as {name!r}" for tag, name in self.display.items()
+                  if ("display", tag) not in self._used}
         return sorted(stale)
 
 
@@ -174,7 +208,7 @@ def load_tag_map(out: Path) -> TagMap | None:
         _fail(path, f"not valid JSON: {e}")
     if not isinstance(config, dict):
         _fail(path, "top level must be an object with 'drop' and/or 'rename'")
-    known = {"drop", "rename", "imply", "add", "remove"}
+    known = {"drop", "rename", "imply", "add", "remove", "display"}
     unknown = set(config) - known
     if unknown:
         _fail(path, f"unknown key(s) {sorted(unknown)}; only "
@@ -252,4 +286,38 @@ def load_tag_map(out: Path) -> TagMap | None:
                             "everywhere")
             if tag in add.get(slug, ()):
                 _fail(path, f"{slug!r}: {tag!r} is both added and removed")
-    return TagMap(drop, rename, imply, add, remove, path)
+
+    display = config.get("display", {})
+    if not isinstance(display, dict):
+        _fail(path, "'display' must be an object of {tag: name} entries")
+    named = {}                                # name -> the tag claiming it
+    readded = {tag for tags in add.values() for tag in tags}
+    for tag, name in display.items():
+        _check_tag(path, tag, "display")
+        if not isinstance(name, str) or not name.strip():
+            _fail(path, f"display {tag!r}: the name must be a non-empty "
+                        f"string, got {name!r}")
+        if name != name.strip():
+            _fail(path, f"display {tag!r}: {name!r} has leading/trailing "
+                        "whitespace")
+        if tag in drop and tag not in readded:     # dropped-then-re-added
+            _fail(path, f"display: {tag!r} is dropped, so it is never shown")
+        if tag in rename:
+            _fail(path, f"display: {tag!r} is renamed to {rename[tag]!r}; "
+                        "name the final tag instead")
+        if name == default_display(tag):
+            _fail(path, f"display: {tag!r} shows as {name!r} without an "
+                        "entry; drop it")
+        if name in named:
+            _fail(path, f"display: {tag!r} and {named[name]!r} would both "
+                        f"show as {name!r}")
+        named[name] = tag
+    return TagMap(drop, rename, imply, add, remove, display, path)
+
+
+def load_tag_display(out: Path) -> dict:
+    """<out>/tags.json's `display` map alone, for the site exporters: the
+    tags in posts.json are already final, so a site needs nothing from
+    the file but each tag's name."""
+    tag_map = load_tag_map(out)
+    return tag_map.display if tag_map else {}

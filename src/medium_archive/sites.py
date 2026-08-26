@@ -10,9 +10,11 @@ Common to all of them: page URL slugs chosen from the Medium slug
 the publication rewritten from Medium URLs to site pages, images placed
 from posts/ (hard-linked as they are when nothing is to be gained,
 else display copies -- see ImagePlacer), a redirect map from every old
-inbound path to its page URL, and site-wide text (title, description,
-landing-page intro, optional base_url) from a hand-written
-<out>/site.json.
+inbound path to its page URL, tag names from <out>/tags.json's `display`
+map (the tags themselves stay slugs -- spaces and capitals are a display
+concern, so nothing a URL is built from moves), and site-wide text
+(title, description, landing-page intro, optional base_url) from a
+hand-written <out>/site.json.
 """
 
 import hashlib
@@ -30,6 +32,7 @@ from string import Template
 from urllib.parse import unquote, urlsplit
 
 from .lint import split_post
+from .tags import display_name, load_tag_display
 from .urls import medium_id
 
 # The site scaffolding -- generator configs, themes, CSS, and the JS
@@ -78,6 +81,16 @@ def load_site_inputs(out: Path):
     if (out / "site.json").exists():
         config.update(json.loads((out / "site.json").read_text()))
     return manifest, config
+
+
+def tag_names(manifest: dict, out: Path) -> dict:
+    """Every tag the archive uses -> the name a site shows it under.
+    Tags stay slugs through posts.json and into each site's tag URLs;
+    tags.json's `display` map is what gives them their spaces and
+    capitals at the point they are rendered."""
+    display = load_tag_display(out)
+    return {tag: display_name(tag, display) for p in manifest.values()
+            for tag in p.get("tags") or []}
 
 
 def page_stems(manifest: dict) -> dict:

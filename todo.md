@@ -281,6 +281,57 @@ data loss here):
   triggers, a remove of a tag no matching post carries) abort
   (`src/medium_archive/tags.py`).
 
+- **tags.json: `display`, the name a tag is shown under** — Medium tags
+  are slugs, so an archive's tags render as `jupyter-notebook` and
+  `ipython` where a reader expects "Jupyter Notebook" and "IPython".
+  Spelling them correctly is a display concern, not an identity one, so
+  the new `"display"` section maps a tag to its name and nothing else
+  moves: a tag stays one slug through `posts.json`, through the rest of
+  `tags.json`, and through every `/tags/<tag>/` URL and per-tag feed. A
+  tag with no entry shows as itself with its hyphens as spaces
+  (`open-science` → "open science"), which is why the section only holds
+  the tags that need a proper name; an entry repeating that default, a
+  name two tags would share, and a name for a tag no post carries all
+  abort, like every other section's stale or contradictory entry.
+
+  Each exporter carries the name the way its generator wants it. Hugo
+  gets a term page per tag, `content/tags/<tag>/_index.md` with that
+  title, so cards, the tag page and its `<title>`, the chip index and
+  the per-tag RSS feed all pick it up — under a real theme as much as
+  the built-in one — while front matter keeps the slug. Pelican gets a
+  `TAG_DISPLAY` map in `pelicanconf.py`, which the site plugin sets on
+  the `Tag` objects once the tags are collected, with tags still
+  reaching Pelican as slugs so `tag.slug` is exact rather than whatever
+  its slugify makes of a name like "C++". Naming the objects rather than
+  filtering in the theme is what reaches the per-tag feed's title, which
+  Pelican builds in Python; and since Pelican makes a `Tag` object per
+  article while `generator.tags` is keyed on the slug — one object per
+  tag, every other article holding its own — each article's list is
+  pointed at the one named object, or a tag would be named on its own
+  page and on a single card and stay a slug everywhere else.
+  MyST has no tag pages, so its front matter simply carries the names
+  (`src/medium_archive/tags.py`, `sites.py`, `hugo.py`, `pelican.py`,
+  `myst.py`).
+
+- **The RSS mark, and a feed link per term** — the header's feed link
+  was the word "RSS" among the nav's other words, and the per-term feeds
+  both generators emit were reachable only through `<link
+  rel="alternate">`, which is to say through a browser that still
+  surfaces one. Both now use `shared/feed-icon.html`, the RSS mark as an
+  inline SVG in the same stroked style as the theme picker's icons: in
+  the header, and beside a tag's or an author's heading, linking that
+  term's own feed. Hugo draws the link from `.OutputFormats.Get "rss"`,
+  so it appears exactly where a feed exists and its `<link
+  rel="alternate">` was already per-page; pelican's comes from
+  `TAG_FEED_ATOM`/`AUTHOR_FEED_ATOM`. Both heads now declare the same
+  pair — the site-wide feed on every page, plus this page's own where it
+  has one — each `<link>` titled the way that feed titles itself, since
+  a reader files a subscription under the name the link gives it. Hugo
+  had been advertising a term's feed under the bare site title (so
+  subscribing from /tags/jupyterlab/ filed "Jupyter Blog", not
+  "JupyterLab · Jupyter Blog") and advertising nothing at all on a post
+  page (`templates/shared/feed-icon.html`, `card.css`, both themes).
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for

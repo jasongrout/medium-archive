@@ -6,7 +6,9 @@
 <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
 <meta name="description" content="{{ SITESUBTITLE }}">
 <link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
-<!-- @include shared/theme-init.html -->
+{% if tag and TAG_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ TAG_FEED_ATOM.format(slug=tag.slug) }}" title="{{ SITENAME }} - {{ tag }}">
+{% elif author and AUTHOR_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ AUTHOR_FEED_ATOM.format(slug=author.slug) }}" title="{{ SITENAME }} - {{ author }}">
+{% endif %}<!-- @include shared/theme-init.html -->
 {% if FAVICON %}<link rel="icon" href="{{ SITEURL }}/{{ FAVICON }}">
 {% endif %}<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
 </head>
@@ -21,7 +23,9 @@
 <a href="{{ SITEURL }}/authors/">Authors</a>
 <a href="{{ SITEURL }}/archives/">Archives</a>
 <a href="{{ SITEURL }}/search/">Search</a>
-<a href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}">RSS</a>
+<a class="feed-link" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" aria-label="RSS" title="RSS">
+<!-- @include shared/feed-icon.html -->
+</a>
 <!-- @include shared/theme-picker.html -->
 </nav>
 </div></header>

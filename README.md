@@ -60,7 +60,14 @@ It works in independent steps:
   — drop everywhere and re-add where deserved, or keep it and remove the
   handful of posts that only mention the project — reproducibly, with
   `raw/` keeping the originals; a stale entry that changes no post aborts
-  a full run, like a fixup that no longer applies.
+  a full run, like a fixup that no longer applies. `"display"` is the one
+  section that changes nothing about the tags themselves: it gives a tag
+  the name a site shows it under (`"ipython": "IPython"`,
+  `"jupyter-notebook": "Jupyter Notebook"`), so spaces and capitals are a
+  display concern and a tag stays one slug through `posts.json`, the rest
+  of `tags.json` and every `/tags/<tag>/` URL. Without an entry a tag
+  shows as itself with its hyphens as spaces (`open-science` → "open
+  science").
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
   `<out>/site-myst/` from the converted posts: one page per post, a
   cover-image gallery landing page (every post as a card, newest first,
@@ -156,7 +163,9 @@ It works in independent steps:
   plugin embedded in the generated config that turns the exported
   `redirects.csv` into the same stub pages after each build. Tag *and*
   author pages come with per-term RSS/Atom feeds on both
-  (`pelican`'s from Pelican's own tag/author machinery); every feed
+  (`pelican`'s from Pelican's own tag/author machinery), each linked
+  from its own page by the RSS mark that also serves as the header's
+  feed link; every feed
   carries the 20 most recent posts with their full content — like the
   publication's original Medium feed — with feed URLs absolutized
   against `base_url` and responsive `srcset` markup stripped, since a

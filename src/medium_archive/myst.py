@@ -33,6 +33,7 @@ from pathlib import Path
 
 from .sites import (ImagePlacer, LinkMap, by_year, clean_site,
                     link_or_copy, load_site_inputs, make_cover_thumbnail,
+                    tag_names,
                     page_stems, pick_cover, read_post_body,
                     retarget_images, rewrite_body as _rewrite, template_text,
                     write_redirects_csv)
@@ -122,12 +123,16 @@ def rewrite_body(markdown: str, links: LinkMap, prefix: str) -> str:
     return _rewrite(markdown, target_for, escape_prose)
 
 
-def page_front_matter(post: dict, cover: str | None = None) -> str:
+def page_front_matter(post: dict, cover: str | None = None,
+                      names: dict = None) -> str:
     """The post's front matter reshaped to MyST's schema. Archive
     provenance fields (original_url, medium_id, body_source, ...) stay in
     posts/ and posts.json; a site page carries only what MyST renders.
     cover is a page-relative image path; it becomes the page's thumbnail
-    (its landing-gallery card and its social-card image)."""
+    (its landing-gallery card and its social-card image). Tags are
+    written under the names tags.json gives them: MyST has no tag pages,
+    so nothing here derives a URL from a tag and the name is all a
+    reader ever sees."""
     lines = [f"title: {_yml(post['title'])}"]
     if post.get("description"):
         lines.append(f"description: {_yml(post['description'])}")
@@ -145,7 +150,8 @@ def page_front_matter(post: dict, cover: str | None = None) -> str:
         if post.get("author_url"):
             lines.append(f"    url: {_yml(post['author_url'])}")
     if post.get("tags"):
-        lines.append(f"tags: {_yml(post['tags'])}")
+        shown = [(names or {}).get(tag, tag) for tag in post["tags"]]
+        lines.append(f"tags: {_yml(shown)}")
     return "---\n" + "\n".join(lines) + "\n---\n\n"
 
 
@@ -213,6 +219,7 @@ def write_archive(site: Path, manifest: dict, stems: dict):
 
 def build_site(out: Path) -> Path:
     manifest, config = load_site_inputs(out)
+    names = tag_names(manifest, out)
     stems = page_stems(manifest)
     links = LinkMap(manifest, stems)
     # Rebuild from scratch, but keep mystmd's _build/ (its template cache
@@ -258,7 +265,8 @@ def build_site(out: Path) -> Path:
         (page_dir / f"{stems[url]}.md").write_text(
             retarget_images(
                 page_front_matter(p, cover and ("images/cover.jpg"
-                                                if have_pillow else cover))
+                                                if have_pillow else cover),
+                                  names)
                 + body, renames),
             encoding="utf-8")
         if cover and have_pillow:

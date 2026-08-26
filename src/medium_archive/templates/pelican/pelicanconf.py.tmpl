@@ -39,6 +39,12 @@ CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = $avatar
 FAVICON = $favicon
 ANNOUNCEMENT = $announcement
+# tag slug -> the name the tag is shown under. Tags reach Pelican as
+# slugs, so tag.slug and every /tags/<slug>/ URL are exact rather than
+# whatever Pelican's slugify would make of a name like "C++"; the site
+# plugin below names each Tag object from this map once the tags are
+# collected, which is what the theme and the feeds then render.
+TAG_DISPLAY = $tag_display
 
 FEED_ALL_ATOM = "feeds/all.atom.xml"
 FEED_MAX_ITEMS = 20             # a feed announces new posts; the site

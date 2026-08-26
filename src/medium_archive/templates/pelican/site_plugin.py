@@ -140,10 +140,53 @@ def _optimize_article_images(pelican_obj):
           "%(pages)d pages rewritten" % stats)
 
 
+def _name_tags(article_generator):
+    # A tag reaches Pelican as the archive's slug, so tag.slug -- what
+    # /tags/<slug>/, the per-tag feed's filename and the object's own
+    # hash are built from -- is exactly right, and only the name a
+    # reader sees is left to set. Pelican renders a tag from the Tag
+    # object everywhere, including the per-tag feed's title, which it
+    # builds in Python out of reach of any template; so the objects
+    # themselves are named here, the way the hugo exporter gives each
+    # term an _index.md title. Runs on article_generator_finalized: the
+    # tags are collected by then and nothing is written yet.
+    #
+    # Pelican builds a Tag object per article, from that article's own
+    # Tags: header, and generator.tags is a dict keyed on the slug -- so
+    # it holds one object per tag and every other article keeps its own.
+    # Naming the dict's keys alone would name a tag on its own page and
+    # on one article's card, and leave it a slug on all the others; so
+    # each article's list is pointed at the one named object instead,
+    # which leaves exactly one Tag per slug in the whole build.
+    canonical = {}
+
+    def name(tag):
+        got = canonical.get(tag.slug)
+        if got is None:
+            shown = TAG_DISPLAY.get(tag.slug)
+            if shown and shown != tag.name:
+                tag.slug = tag.slug     # pin it: setting a name otherwise
+                tag.name = shown        # re-slugifies, "C++" -> /tags/c/
+            canonical[tag.slug] = got = tag
+        return got
+
+    for tag in article_generator.tags:      # the dict's keys first, so
+        name(tag)                           # its objects are the shared ones
+    articles = 0
+    for group in ("articles", "translations", "hidden_articles",
+                  "hidden_translations", "drafts", "drafts_translations"):
+        for article in getattr(article_generator, group, ()):
+            if getattr(article, "tags", None):
+                article.tags = [name(tag) for tag in article.tags]
+                articles += 1
+    print(f"tag names: {len(canonical)} tags named across {articles} articles")
+
+
 class _SitePlugins:
     @staticmethod
     def register():
         from pelican import signals
+        signals.article_generator_finalized.connect(_name_tags)
         signals.finalized.connect(_optimize_article_images)
         signals.finalized.connect(_write_redirect_stubs)
 

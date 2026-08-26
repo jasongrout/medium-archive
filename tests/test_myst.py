@@ -248,3 +248,14 @@ def test_redirects_use_served_urls(tmp_path):
 def test_missing_manifest_exits(tmp_path):
     with pytest.raises(SystemExit):
         build_site(tmp_path)
+
+
+def test_tags_carry_their_display_names(archive):
+    """MyST has no tag pages, so nothing derives a URL from a tag and the
+    front matter carries the name a reader would see."""
+    out, manifest = archive
+    (out / "tags.json").write_text(json.dumps(
+        {"display": {"example": "Example Tag"}}), encoding="utf-8")
+    site = build_site(out)
+    text = (site / "posts/2021-03-01-second-post/second-post.md").read_text()
+    assert 'tags: ["Example Tag"]' in text

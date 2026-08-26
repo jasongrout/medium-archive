@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -188,6 +189,134 @@ def test_cover_thumbnails_crop_or_letterbox(tmp_path):
     assert len(corners) > 1
 
 
+def test_tag_display_names_reach_both_sites(archive):
+    """tags.json's display map names each tag on the rendered site while
+    the tag itself -- front matter, tag URL -- stays a slug."""
+    (archive / "tags.json").write_text(json.dumps(
+        {"display": {"example": "Example Tag"}}))
+    hugo_site = hugo.build_site(archive)
+    front = json.loads((hugo_site / "content/posts/second-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert front["tags"] == ["example"]           # the tag is still a slug
+    term = hugo_site / "content/tags/example/_index.md"
+    assert json.loads(term.read_text()) == {"title": "Example Tag"}
+
+    pelican_site = pelican.build_site(archive)
+    head = (pelican_site / "content/posts/second-post/index.md") \
+        .read_text().split("\n\n", 1)[0]
+    assert "Tags: example" in head                # the tag is still a slug
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert '"example": "Example Tag"' in config
+    assert "_name_tags" in config          # names the Tag objects, so the
+    assert "article_generator_finalized" in config   # feeds get it too
+
+
+def test_tags_display_as_slugs_with_spaces_by_default(archive):
+    """No tags.json at all: a tag still shows with its hyphens as spaces."""
+    manifest = json.loads((archive / "posts.json").read_text())
+    for post in manifest.values():
+        post["tags"] = ["open-science"]
+    (archive / "posts.json").write_text(json.dumps(manifest))
+    site = hugo.build_site(archive)
+    term = site / "content/tags/open-science/_index.md"
+    assert json.loads(term.read_text()) == {"title": "open science"}
+
+
+def test_feed_links_carry_the_rss_mark(archive):
+    """The header's feed link and the per-term ones on a tag's and an
+    author's page are the shared RSS mark, pointing at that term's own
+    feed."""
+    hugo_site = hugo.build_site(archive)
+    nav = (hugo_site / "layouts/_default/baseof.html").read_text()
+    assert '<a class="feed-link" href="{{ "index.xml" | relURL }}"' in nav
+    assert 'aria-label="RSS"' in nav and "feed-icon" in nav
+    term = (hugo_site / "layouts/_default/list.html").read_text()
+    assert '.OutputFormats.Get "rss"' in term    # only where a feed exists
+    assert 'aria-label="RSS feed for {{ $.Title }}"' in term
+
+    pelican_site = pelican.build_site(archive)
+    for page, setting, var in (("tag.html", "TAG_FEED_ATOM", "tag"),
+                               ("author.html", "AUTHOR_FEED_ATOM", "author")):
+        text = (pelican_site / "theme/templates" / page).read_text()
+        assert f"{setting}.format(slug={var}.slug)" in text
+        assert f'aria-label="RSS feed for {{{{ {var} }}}}"' in text
+        assert "feed-icon" in text
+    # the head declares the term's own feed beside the site-wide one
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    assert "TAG_FEED_ATOM.format(slug=tag.slug)" in base
+    assert "AUTHOR_FEED_ATOM.format(slug=author.slug)" in base
+    # ... and hugo's head has the same pair, each titled the way that
+    # feed titles itself, so a reader files it under the name it shows
+    assert 'site.Home.OutputFormats.Get "rss"' in nav
+    assert '{{ $.Title }} · {{ site.Title }}' in nav
+    css = (pelican_site / "theme/static/css/style.css").read_text()
+    assert ".feed-icon" in css and ".page-title .feed-link" in css
+
+
+class _FakeTag:
+    """pelican.urlwrappers.Tag's naming semantics: hash and equality are
+    the slug's, and setting a name re-slugifies unless a slug was set
+    explicitly first."""
+
+    def __init__(self, name):
+        self._name, self._slug, self._from_name = name, None, True
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+        if self._from_name:
+            self._slug = None
+
+    @property
+    def slug(self):
+        if self._slug is None:
+            self._slug = self._name.lower().replace(" ", "-")
+        return self._slug
+
+    @slug.setter
+    def slug(self, value):
+        self._from_name, self._slug = False, value
+
+    def __hash__(self):
+        return hash(self.slug)
+
+    def __eq__(self, other):
+        return self.slug == other.slug
+
+    def __str__(self):
+        return self.name
+
+
+def test_every_article_gets_the_named_tag_object(archive):
+    """Pelican builds a Tag object per article and keys generator.tags on
+    the slug, so it holds one object per tag while every other article
+    keeps its own. Naming only the dict's keys named a tag on its own
+    page and on one article's card, and left it a slug on the rest."""
+    (archive / "tags.json").write_text(json.dumps(
+        {"display": {"example": "Example Tag"}}))
+    site = pelican.build_site(archive)
+    namespace = {}
+    exec(compile((site / "pelicanconf.py").read_text(), "pelicanconf.py",
+                 "exec"), namespace)
+
+    # three articles, each with its own object for the one tag
+    articles = [SimpleNamespace(tags=[_FakeTag("example")]) for _ in range(3)]
+    generator = SimpleNamespace(tags={articles[0].tags[0]: articles},
+                                articles=articles, translations=[],
+                                hidden_articles=[], hidden_translations=[],
+                                drafts=[], drafts_translations=[])
+    namespace["_name_tags"](generator)
+
+    assert [str(a.tags[0]) for a in articles] == ["Example Tag"] * 3
+    # one object per slug now, and the slug is untouched
+    assert len({id(a.tags[0]) for a in articles}) == 1
+    assert articles[0].tags[0].slug == "example"
+
+
 def test_pelican_site(archive):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "icon.svg").write_bytes(b"SVG")
@@ -259,7 +388,7 @@ def test_theme_picker_and_dark_scheme(archive):
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "term-sort", "announcement",
-                 "nav-current", "image-zoom"):
+                 "nav-current", "image-zoom", "feed-icon"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid

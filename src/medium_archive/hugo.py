@@ -11,6 +11,13 @@ and per-term RSS feeds, and every old inbound path (Medium slug+id,
 /p/<id>, Ghost-era) becomes an alias, so Hugo emits redirect stubs for
 old links on any static host.
 
+Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
+are exactly the archive's tag; the name a tag is shown under (tags.json's
+`display`) arrives instead as a term page, content/tags/<tag>/_index.md
+with that title, which is how every place Hugo renders a term -- cards,
+the tag page and its <title>, the chip index, the per-tag feed -- picks
+it up at once, under a real theme as much as the built-in one.
+
 Hugo has no default theme. By default the exporter writes a small
 self-contained one (layouts/ + css, from the package's templates/hugo/
 and templates/shared/ files) with light and dark palettes and a
@@ -43,7 +50,7 @@ import sys
 from .sites import (ImagePlacer, bake_cover_thumbnails,  # noqa: F401
                     clean_site, export_content, fill_template, image_size,
                     load_site_inputs, old_paths, page_stems, pick_cover,
-                    template_text, write_redirects_csv)
+                    tag_names, template_text, write_redirects_csv)
 
 # The built-in theme, written when site.json names no real theme: file
 # in the site -> its templates/ source (see templates/README.md for the
@@ -123,6 +130,22 @@ def dream_params(manifest: dict, config: dict) -> dict:
     return params
 
 
+def write_tag_terms(site, names: dict):
+    """A branch bundle per tag, content/tags/<tag>/_index.md, carrying
+    the name the tag is shown under. Front matter keeps the slug, so the
+    term and its /tags/<tag>/ URL are unchanged and it is only the title
+    Hugo renders that gains its spaces and capitals -- which means every
+    place a term's title reaches (cards, the tag page heading and
+    <title>, the chip index, per-tag RSS) is covered at once, in a real
+    theme as much as in the built-in one."""
+    for tag, name in sorted(names.items()):
+        term = site / "content" / "tags" / tag
+        term.mkdir(parents=True, exist_ok=True)
+        (term / "_index.md").write_text(
+            json.dumps({"title": name}, ensure_ascii=False) + "\n",
+            encoding="utf-8")
+
+
 def build_site(out):
     manifest, config = load_site_inputs(out)
     stems = page_stems(manifest)
@@ -174,6 +197,7 @@ def build_site(out):
         placer=ImagePlacer(out, config))
     if have_pillow:
         bake_cover_thumbnails(out, site, manifest, stems, covers)
+    write_tag_terms(site, tag_names(manifest, out))
 
     params = {"description": config.get("description", "")}
     if dream:
