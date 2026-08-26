@@ -221,6 +221,33 @@ def test_tags_display_as_slugs_with_spaces_by_default(archive):
     assert json.loads(term.read_text()) == {"title": "open science"}
 
 
+def test_feed_links_carry_the_rss_mark(archive):
+    """The header's feed link and the per-term ones on a tag's and an
+    author's page are the shared RSS mark, pointing at that term's own
+    feed."""
+    hugo_site = hugo.build_site(archive)
+    nav = (hugo_site / "layouts/_default/baseof.html").read_text()
+    assert '<a class="feed-link" href="{{ "index.xml" | relURL }}"' in nav
+    assert 'aria-label="RSS"' in nav and "feed-icon" in nav
+    term = (hugo_site / "layouts/_default/list.html").read_text()
+    assert '.OutputFormats.Get "rss"' in term    # only where a feed exists
+    assert 'aria-label="RSS feed for {{ $.Title }}"' in term
+
+    pelican_site = pelican.build_site(archive)
+    for page, setting, var in (("tag.html", "TAG_FEED_ATOM", "tag"),
+                               ("author.html", "AUTHOR_FEED_ATOM", "author")):
+        text = (pelican_site / "theme/templates" / page).read_text()
+        assert f"{setting}.format(slug={var}.slug)" in text
+        assert f'aria-label="RSS feed for {{{{ {var} }}}}"' in text
+        assert "feed-icon" in text
+    # the head declares the term's own feed beside the site-wide one
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    assert "TAG_FEED_ATOM.format(slug=tag.slug)" in base
+    assert "AUTHOR_FEED_ATOM.format(slug=author.slug)" in base
+    css = (pelican_site / "theme/static/css/style.css").read_text()
+    assert ".feed-icon" in css and ".page-title .feed-link" in css
+
+
 def test_pelican_site(archive):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "icon.svg").write_bytes(b"SVG")
@@ -292,7 +319,7 @@ def test_theme_picker_and_dark_scheme(archive):
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "term-sort", "announcement",
-                 "nav-current", "image-zoom"):
+                 "nav-current", "image-zoom", "feed-icon"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid

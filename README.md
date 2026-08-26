@@ -163,7 +163,9 @@ It works in independent steps:
   plugin embedded in the generated config that turns the exported
   `redirects.csv` into the same stub pages after each build. Tag *and*
   author pages come with per-term RSS/Atom feeds on both
-  (`pelican`'s from Pelican's own tag/author machinery); every feed
+  (`pelican`'s from Pelican's own tag/author machinery), each linked
+  from its own page by the RSS mark that also serves as the header's
+  feed link; every feed
   carries the 20 most recent posts with their full content — like the
   publication's original Medium feed — with feed URLs absolutized
   against `base_url` and responsive `srcset` markup stripped, since a

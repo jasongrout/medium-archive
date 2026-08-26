@@ -21,7 +21,9 @@
 <a href="{{ "authors/" | relURL }}">Authors</a>
 <a href="{{ "archives/" | relURL }}">Archives</a>
 <a href="{{ "search/" | relURL }}">Search</a>
-<a href="{{ "index.xml" | relURL }}">RSS</a>
+<a class="feed-link" href="{{ "index.xml" | relURL }}" aria-label="RSS" title="RSS">
+<!-- @include shared/feed-icon.html -->
+</a>
 <!-- @include shared/theme-picker.html -->
 </nav>
 </div></header>

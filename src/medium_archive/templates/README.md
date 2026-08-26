@@ -47,6 +47,13 @@ These embed verbatim in both engines' pages, so they must carry no
   the home link catches post and pagination pages, `/tags/` catches
   every tag page, and so on. The feed link (no trailing slash) never
   matches.
+- `feed-icon.html` — the RSS mark, as an inline SVG in the same
+  stroked 24x24 style as the theme picker's icons. It is the header's
+  feed link, and the link beside a tag's or an author's heading where
+  that term has a feed of its own (`card.css` sizes both through
+  `.feed-icon`). Being a marker *line*, the `@include` sits on its own
+  line inside the anchor; the whitespace that leaves is not a flex item,
+  so the icon still centres.
 - `announcement.html` — the site-wide announcement banner. The base
   templates emit the `.announcement` div (above the header, hidden)
   only when site.json sets `"announcement"`; the script fills it from

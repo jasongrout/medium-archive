@@ -1,5 +1,8 @@
 {{ define "main" }}
-<h1 class="page-title">{{ .Title }}</h1>
+<h1 class="page-title">{{ .Title }}
+{{- with .OutputFormats.Get "rss" }}<a class="feed-link" href="{{ .RelPermalink }}" aria-label="RSS feed for {{ $.Title }}" title="RSS feed for {{ $.Title }}">
+<!-- @include shared/feed-icon.html -->
+</a>{{ end }}</h1>
 {{ .Content }}
 {{ $paginator := .Paginate .Pages.ByDate.Reverse }}
 <div class="card-grid">

@@ -306,6 +306,20 @@ data loss here):
   (`src/medium_archive/tags.py`, `sites.py`, `hugo.py`, `pelican.py`,
   `myst.py`).
 
+- **The RSS mark, and a feed link per term** — the header's feed link
+  was the word "RSS" among the nav's other words, and the per-term feeds
+  both generators emit were reachable only through `<link
+  rel="alternate">`, which is to say through a browser that still
+  surfaces one. Both now use `shared/feed-icon.html`, the RSS mark as an
+  inline SVG in the same stroked style as the theme picker's icons: in
+  the header, and beside a tag's or an author's heading, linking that
+  term's own feed. Hugo draws the link from `.OutputFormats.Get "rss"`,
+  so it appears exactly where a feed exists and its `<link
+  rel="alternate">` was already per-page; pelican's comes from
+  `TAG_FEED_ATOM`/`AUTHOR_FEED_ATOM`, and `base.html` now declares the
+  term's feed in the head beside the site-wide one
+  (`templates/shared/feed-icon.html`, `card.css`, both themes).
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
