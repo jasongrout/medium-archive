@@ -102,6 +102,17 @@ These embed verbatim in both engines' pages, so they must carry no
 - `card.css` — the card-grid look, written as both the hugo theme's and
   the pelican theme's stylesheet.
 
+Not shared, though both themes carry it: the Open Graph / `twitter:`
+head block each engine's base template (`hugo/layouts/_default/
+baseof.html`, `pelican/theme/templates/base.html`) writes for link
+previews — the card LinkedIn, Facebook, Mastodon and Bluesky build from
+a shared post, and so the other half of the share links at the foot of
+one. It cannot live in `shared/` because every value in it is the
+engine's own (`.Permalink` against `article.url`, `.Resources.Get`
+against `article.cover`), which is the same reason the share hrefs stay
+in the post templates. Keep the two in step: they are meant to emit the
+same tags, and a test checks that they do.
+
 ## hugo/
 
 The built-in theme (`hugo.TEMPLATES` maps each file into the site; the

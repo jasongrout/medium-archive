@@ -66,6 +66,10 @@ Medium. It has two layers:
   from the post's absolute URL, so `base_url` must be set for them to
   point anywhere real. The Mastodon one asks the reader for their
   server (remembered per browser) since a toot has no single address.
+  Both heads also carry the Open Graph tags those networks build a
+  shared link's preview card from (title, description, canonical URL
+  and the post's own cover image); without them a share is a bare
+  title, or on Mastodon and Bluesky no card at all.
   Both render redirect stubs at every old inbound path (hugo via
   aliases, pelican via a plugin embedded in its generated config) and
   add per-term feeds, each linked from its tag's or author's own page

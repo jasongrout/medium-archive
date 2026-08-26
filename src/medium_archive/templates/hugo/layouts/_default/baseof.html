@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
 {{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
+{{/* the link preview every network builds a shared post's card from:
+     LinkedIn, Facebook, Mastodon and Bluesky all read Open Graph, and
+     without it a share is a bare title (or, on the fediverse pair, no
+     card at all) -- the other half of the share links at the foot of a
+     post. Absolute URLs throughout, so these are only as real as
+     site.json's base_url, like the share links themselves. The image
+     is the post's own cover, the 640x360 thumbnail the cards already
+     bake; a post without one falls back to the smaller text card. */}}
+{{- $cover := "" }}{{ with .Params.cover }}{{ $cover = $.Resources.Get . }}{{ end }}
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }}{{ end }}">
+{{ with or .Description site.Params.description }}<meta property="og:description" content="{{ . }}">
+{{ end }}<meta property="og:url" content="{{ .Permalink }}">
+{{ with $cover }}{{ if eq .ResourceType "image" }}<meta property="og:image" content="{{ .Permalink }}">
+<meta property="og:image:width" content="{{ .Width }}">
+<meta property="og:image:height" content="{{ .Height }}">
+{{ end }}{{ end }}{{ if .IsPage }}{{ with .Date }}<meta property="article:published_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}">
+{{ end }}{{ range .GetTerms "authors" }}<meta property="article:author" content="{{ .LinkTitle }}">
+{{ end }}{{ end }}<meta name="twitter:card" content="{{ if $cover }}summary_large_image{{ else }}summary{{ end }}">
 {{/* the site-wide feed on every page, as the pelican theme's head has
      it, then this page's own feed where it has one (a tag's, an
      author's, a section's) -- each titled the way that feed titles

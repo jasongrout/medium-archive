@@ -357,6 +357,25 @@ data loss here):
   `templates/shared/share-mastodon.html`, `card.css`, both post
   templates).
 
+- **Link preview cards for shared posts** — the share links' other
+  half: a network does not render the URL it is handed, it sends a
+  crawler for the page and builds a card from the Open Graph tags in
+  the head, and both themes had none. A share was a bare title on
+  LinkedIn and Facebook, and no card at all on Mastodon and Bluesky,
+  which show one only when the tags are there. Both heads now carry
+  `og:type`/`og:site_name`/`og:title`/`og:description`/`og:url`, the
+  `article:` pair on a post, and a `twitter:card` for the platforms
+  still reading those. `og:image` is the post's own cover — the 640x360
+  thumbnail the landing-page cards already bake, so nothing new is
+  generated — and its absence is what drops the card from
+  `summary_large_image` to `summary` rather than leaving a broken
+  image. The tags cannot be a `shared/` snippet, since every value in
+  them is the engine's own; the two base templates spell out the same
+  block and a test holds them together. Absolute throughout, so like
+  the share links they are only as real as `base_url`
+  (`hugo/layouts/_default/baseof.html`,
+  `pelican/theme/templates/base.html`).
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for

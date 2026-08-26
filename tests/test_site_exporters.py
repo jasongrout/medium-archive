@@ -535,6 +535,41 @@ def test_post_share_links(archive):
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 
+def test_post_link_preview_metadata(archive):
+    """Both heads carry the Open Graph card a shared post is previewed
+    from -- the other half of the share links at the foot of it."""
+    hugo_head = (hugo.build_site(archive)
+                 / "layouts/_default/baseof.html").read_text()
+    pelican_head = (pelican.build_site(archive)
+                    / "theme/templates/base.html").read_text()
+    for head in (hugo_head, pelican_head):
+        for prop in ("og:type", "og:site_name", "og:title", "og:description",
+                     "og:url", "og:image", "article:published_time",
+                     "article:author"):
+            assert f'property="{prop}"' in head, prop
+    # a post is an article, everything else the site itself, and the
+    # card goes wide only when there is a cover to fill it -- each
+    # engine spelling the same two branches in its own syntax
+    assert ('content="{{ if .IsPage }}article{{ else }}website{{ end }}"'
+            in hugo_head)
+    assert ('content="{% if article %}article{% else %}website{% endif %}"'
+            in pelican_head)
+    assert 'content="{{ if $cover }}summary_large_image{{ else }}summary{{ end }}"' in hugo_head
+    assert ('content="{% if article and article.cover %}summary_large_image'
+            '{% else %}summary{% endif %}"' in pelican_head)
+    # pelican's Jinja does not autoescape (see the share links), so the
+    # theme escapes every value it interpolates into an attribute
+    for value in ("SITENAME", "SITESUBTITLE", "article.author"):
+        assert f"{{{{ {value}|e }}}}" in pelican_head, value
+    assert "article.title|striptags|e" in pelican_head
+    # a term page is as shareable as a post: it must name itself rather
+    # than fold into the home page's card, which hugo gets from
+    # .Permalink and pelican has to spell out
+    assert 'property="og:url" content="{{ .Permalink }}"' in hugo_head
+    assert "{% elif tag %}{{ tag.url }}" in pelican_head
+    assert "{% elif author %}{{ author.url }}" in pelican_head
+
+
 def test_missing_base_url_warns(archive, capsys):
     """Share links (like feeds and redirect stubs) are built from
     base_url; exporting without one must say so instead of silently
