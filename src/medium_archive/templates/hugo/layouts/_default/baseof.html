@@ -5,7 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
 {{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
-{{/* the site-wide feed on every page, as the pelican theme's head has
+{{/* Open Graph, which LinkedIn and Facebook read and nothing else
+     supplies: their share URLs carry only the page address, so the
+     headline, blurb and thumbnail of a share come from these tags --
+     a share link is only ever as good as this block. Bluesky, Mastodon
+     and mail carry the title in the link itself and need none of it.
+     Every URL here is absolute against baseURL, so they are as real as
+     site.json's base_url (which the exporter warns about when unset). */}}
+{{ $card := "" }}{{ with .Params.cover }}{{ with $.Resources.Get . }}{{ $card = .Permalink }}{{ end }}{{ end }}
+<link rel="canonical" href="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }}{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+{{ with or .Description site.Params.description }}<meta property="og:description" content="{{ . }}">
+{{ end }}{{ with $card }}<meta property="og:image" content="{{ . }}">
+{{ end }}<meta name="twitter:card" content="{{ if $card }}summary_large_image{{ else }}summary{{ end }}">
+{{ if .IsPage }}<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{ range .GetTerms "authors" }}<meta property="article:author" content="{{ .LinkTitle }}">
+{{ end }}{{ range .GetTerms "tags" }}<meta property="article:tag" content="{{ .LinkTitle }}">
+{{ end }}{{ end }}{{/* the site-wide feed on every page, as the pelican theme's head has
      it, then this page's own feed where it has one (a tag's, an
      author's, a section's) -- each titled the way that feed titles
      itself, so a reader files it under the name it will show */}}

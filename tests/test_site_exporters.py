@@ -388,7 +388,8 @@ def test_theme_picker_and_dark_scheme(archive):
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "term-sort", "announcement",
-                 "nav-current", "image-zoom", "feed-icon"):
+                 "nav-current", "image-zoom", "feed-icon", "share-icons",
+                 "share-mastodon"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -487,6 +488,153 @@ def test_image_zoom(archive):
     assert ".zoom-dialog::backdrop" in css
     assert "prefers-reduced-motion" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_post_share_links(archive):
+    """A post carries the five share links twice -- under the byline and
+    at the foot -- from one definition per engine, each mark coming from
+    the shared sprite."""
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    # each engine names the same three values, so the bars keep one shape
+    for bar, url, title, text in (
+            (hugo_site / "layouts/partials/share.html", "{{ .Permalink }}",
+             "{{ .Title }}", "{{ $text }}"),
+            (pelican_site / "theme/templates/macros.html", "{{ enc_url }}",
+             "{{ enc_title }}", "{{ enc_text }}")):
+        source = bar.read_text()
+        for network in ("linkedin", "facebook", "bluesky", "mastodon", "email"):
+            assert f'<use href="#share-{network}"></use>' in source, bar
+        assert '<div class="post-share" data-pagefind-ignore>' in source, bar
+        for target in (f"linkedin.com/sharing/share-offsite/?url={url}",
+                       f"facebook.com/sharer/sharer.php?u={url}",
+                       f"bsky.app/intent/compose?text={text}",
+                       f"mailto:?subject={title}&amp;body={url}"):
+            assert target in source, bar
+        # a toot goes to the reader's own server, which the page cannot
+        # know: the link hooks the prompt that asks for it and remembers
+        # the answer
+        assert 'class="share-link share-mastodon"' in source, bar
+        assert "data-share-text=" in source, bar
+
+    for page, call in ((hugo_site / "layouts/_default/single.html",
+                        '{{ partial "share.html" . }}'),
+                       (pelican_site / "theme/templates/article.html",
+                        "{{ share(post_url, post_title) }}")):
+        source = page.read_text()
+        # once under the byline and once after the body, both inside the
+        # post card, and the sprite they draw from ahead of the first
+        head, foot = source.index(call), source.rindex(call)
+        assert head != foot, page
+        assert source.index("share-sprite") < head, page
+        assert source.index("post-meta") < head < source.index("</article>"), page
+        assert foot < source.index("</article>"), page
+        # the script wires every bar on the page, not just the first
+        assert 'querySelectorAll(".share-mastodon")' in source, page
+        assert source.index("</article>") < source.index("mastodon-host"), page
+
+    # hugo escapes each value for its URL context on its own; pelican's
+    # Jinja does not, so the theme spells the encoding out -- on each
+    # value, which is what this pins: the check must fail when one of
+    # them loses its encoding, not merely when the file has none left
+    lines = {line.split()[2]: line for line
+             in (pelican_site / "theme/templates/macros.html").read_text()
+             .splitlines() if line.startswith("{% set ")}
+    for name in ("enc_url", "enc_title", "enc_text"):
+        assert lines[name].endswith('|urlencode|replace("/", "%2F") %}'), name
+
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert ".share-sprite { display: none; }" in css
+    assert ".share-icon { width: 1.05rem" in css
+    # the marks are the networks' logos: a hover may deepen them, but
+    # recoloring them to this site's accent is against most of those
+    # networks' brand guidelines
+    hover = next(line for line in css.splitlines()
+                 if line.startswith(".share-link:hover"))
+    assert "var(--accent)" not in hover, hover
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_share_targets_get_the_open_graph_tags_they_render_from(archive):
+    """LinkedIn's and Facebook's share URLs carry only the page address:
+    everything their share box shows comes from the page's Open Graph
+    tags, so the share links are worth no more than these."""
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for head in (hugo_site / "layouts/_default/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        source = head.read_text()
+        for prop in ("og:site_name", "og:type", "og:title", "og:url",
+                     "og:description", "og:image", "article:published_time"):
+            assert f'property="{prop}"' in source, (head, prop)
+        assert 'rel="canonical"' in source, head
+        # a post with no cover has no image to promise
+        assert "summary_large_image" in source and "summary" in source, head
+
+
+def test_a_title_is_plain_text_not_html(archive):
+    """Pelican renders only FORMATTED_FIELDS (summary) as markdown, so a
+    post's title reaches the theme as the plain text of its Title:
+    header. Stripping tags from it would delete any run shaped like one
+    -- "Using <script> tags safely" -> "Using tags safely" -- rather
+    than escape it, losing what hugo keeps."""
+    pelican_site = pelican.build_site(archive)
+    article = (pelican_site / "theme/templates/article.html").read_text()
+    assert "{% set post_title = article.title %}" in article
+    assert "article.title|striptags" not in article
+
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    og_title = next(line for line in base.splitlines()
+                    if 'property="og:title"' in line)
+    assert "{{ article.title|e }}" in og_title, og_title
+    assert "striptags" not in og_title, og_title
+    # the summary, though, really is HTML -- pelican formats that one,
+    # and an auto-generated summary is a fragment of the body -- so it
+    # keeps the stripping, here as in the card macro
+    og_desc = next(line for line in base.splitlines()
+                   if 'property="og:description"' in line)
+    assert "article.summary|striptags|e" in og_desc, og_desc
+
+
+def test_pelican_escapes_by_default(archive):
+    """Pelican's own default JINJA_ENVIRONMENT sets no autoescape and
+    jinja's default is off, so a theme emits every {{ }} raw -- which
+    makes a post title reading `<script>...` a running script on every
+    page that renders it, and titles, tag names and authors all come
+    from the archived publication. The generated config turns escaping
+    on; only the rendered body is marked safe."""
+    site = pelican.build_site(archive)
+    config = (site / "pelicanconf.py").read_text()
+    assert '"autoescape": True' in config
+    # the setting replaces pelican's defaults rather than merging, so
+    # the rest of them have to be restated with it
+    for key in ('"trim_blocks": True', '"lstrip_blocks": True',
+                '"extensions": []'):
+        assert key in config, key
+    # article.content is the one genuinely-HTML value in the theme
+    templates = site / "theme/templates"
+    safe = [(f.name, line.strip()) for f in sorted(templates.glob("*.html"))
+            for line in f.read_text().splitlines() if "|safe" in line]
+    assert safe == [("article.html", "{{ article.content|safe }}")], safe
+
+
+def test_missing_base_url_is_not_silent(tmp_path, capsys):
+    """Every absolute link -- feeds, redirect stubs, og:url, the share
+    links -- is built from base_url, and a share link with the wrong one
+    fails outright rather than degrading, so an unset base_url has to be
+    said out loud at build time."""
+    manifest = {}
+    make_post(tmp_path, manifest, "post", "aaa111aaa111",
+              "2020-01-05T10:00:00Z", "Hello.\n")
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (tmp_path / "site.json").write_text(json.dumps({"title": "Example"}))
+    sites.load_site_inputs(tmp_path)
+    assert "no base_url" in capsys.readouterr().err
+    # and stays quiet once it is set
+    (tmp_path / "site.json").write_text(json.dumps(
+        {"title": "Example", "base_url": "https://blog.example.org"}))
+    sites.load_site_inputs(tmp_path)
+    assert "base_url" not in capsys.readouterr().err
 
 
 def test_build_output_survives_regeneration(archive):

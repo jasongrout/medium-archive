@@ -1,0 +1,14 @@
+{{- /* The share bar, rendered twice per post (under the byline and at
+       the foot), so the marks come from the sprite share-icons.html
+       splices into the page once. Title and URL are said once here and
+       the contextual escaper encodes each for its own slot: a query
+       string in the hrefs, an attribute in data-share-text. */ -}}
+{{- $text := printf "%s %s" .Title .Permalink -}}
+<div class="post-share" data-pagefind-ignore>
+<span class="share-label">Share</span>
+<a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ .Permalink }}" aria-label="Share on LinkedIn" title="Share on LinkedIn"><svg class="share-icon" aria-hidden="true"><use href="#share-linkedin"></use></svg></a>
+<a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ .Permalink }}" aria-label="Share on Facebook" title="Share on Facebook"><svg class="share-icon" aria-hidden="true"><use href="#share-facebook"></use></svg></a>
+<a class="share-link" href="https://bsky.app/intent/compose?text={{ $text }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
+<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ $text }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
+<a class="share-link" href="mailto:?subject={{ .Title }}&amp;body={{ .Permalink }}" aria-label="Share by email" title="Share by email"><svg class="share-icon" aria-hidden="true"><use href="#share-email"></use></svg></a>
+</div>

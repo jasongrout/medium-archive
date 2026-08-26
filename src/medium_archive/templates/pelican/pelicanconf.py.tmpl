@@ -7,6 +7,25 @@ TIMEZONE = "UTC"
 DEFAULT_LANG = "en"
 DEFAULT_DATE_FORMAT = "%B %d, %Y"
 
+# Jinja emits every {{ }} raw unless told otherwise, and pelican leaves
+# it that way (its own default JINJA_ENVIRONMENT sets no autoescape) so
+# that a theme can render article.content, which really is HTML. But a
+# post title is not: it is the plain text of its Title: header, as are
+# tag names and author names -- and in an archived publication those
+# come from whoever wrote the post, not from whoever builds the site, so
+# a title reading `<script>...` would otherwise become a running script
+# in every page that renders it. The theme escapes by default instead and
+# marks the few values that are genuinely HTML with |safe. Hugo's
+# templates escape contextually, so this is what keeps the two engines
+# rendering the same title the same way. The other three keys are
+# pelican's own defaults, restated because this setting replaces them.
+JINJA_ENVIRONMENT = {
+    "autoescape": True,
+    "trim_blocks": True,
+    "lstrip_blocks": True,
+    "extensions": [],
+}
+
 PATH = "content"
 THEME = "theme"
 ARTICLE_PATHS = ["posts"]

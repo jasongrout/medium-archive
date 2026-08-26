@@ -80,6 +80,17 @@ def load_site_inputs(out: Path):
     config = {"title": "Blog archive", "description": "", "intro": ""}
     if (out / "site.json").exists():
         config.update(json.loads((out / "site.json").read_text()))
+    # Absolute links -- feed URLs, redirect stubs, the Open Graph tags
+    # and the share links a reader hands to LinkedIn or Facebook -- are
+    # built from base_url. Without it each exporter falls back to a
+    # placeholder, which every one of those silently points at someone
+    # else's domain, so say so once here rather than let the build look
+    # clean until a share link is clicked in the wild.
+    if not config.get("base_url"):
+        print("site.json has no base_url: absolute links (feeds, redirect "
+              "stubs, Open Graph tags, share links) will not point at this "
+              "site. Set it to the domain the site is served from and "
+              "re-run.", file=sys.stderr)
     return manifest, config
 
 

@@ -99,7 +99,7 @@ a:hover { text-decoration: underline; }
         padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem); max-width: 52rem;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
-.post-meta { color: var(--muted); margin: 0 0 2rem; }
+.post-meta { color: var(--muted); margin: 0 0 .9rem; }
 .post-meta .tag::before { content: "#"; opacity: .6; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
@@ -110,6 +110,30 @@ a:hover { text-decoration: underline; }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
 .post figcaption, .post em img + em { color: var(--muted); }
+
+/* The share bar, carried twice by a post: under the byline, where a
+   reader decides whether to read, and at the foot, where they have.
+   Each network's own mark, in the circles the header's theme picker
+   uses. The sprite the marks come from carries width/height 0 as well,
+   so it stays out of the flow even before the stylesheet lands. */
+.share-sprite { display: none; }
+.post-share { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem;
+              margin: 2.5rem 0 0; padding-top: 1.6rem;
+              border-top: 1px solid var(--line); }
+/* the byline copy takes no rule: one there would cut the head off the
+   article. .post-meta carries the tighter margin that pairs with it. */
+.post-meta + .post-share { margin: 0 0 2rem; padding-top: 0; border-top: 0; }
+.share-label { color: var(--muted); font-size: .9rem; margin-right: .2rem; }
+.share-link { display: inline-flex; align-items: center; justify-content: center;
+              width: 2.1rem; height: 2.1rem; border: 1px solid var(--line);
+              border-radius: 999px; color: var(--muted); }
+/* hover deepens the mark rather than coloring it: these are the
+   networks' logos, and most of their brand guidelines allow a
+   one-color rendering but not a recoloring, which the site accent
+   would be. Contrast carries the affordance instead. */
+.share-link:hover { color: var(--ink); border-color: var(--muted);
+                    text-decoration: none; }
+.share-icon { width: 1.05rem; height: 1.05rem; fill: currentColor; }
 
 /* Click-to-zoom, the one Medium reading affordance the archive would
    otherwise lose (its "click to view image in full size" hint is

@@ -60,6 +60,7 @@ from .sites import (ImagePlacer, bake_cover_thumbnails,  # noqa: F401
 TEMPLATES = {
     "layouts/_default/baseof.html": "hugo/layouts/_default/baseof.html",
     "layouts/partials/card.html": "hugo/layouts/partials/card.html",
+    "layouts/partials/share.html": "hugo/layouts/partials/share.html",
     "layouts/index.html": "hugo/layouts/index.html",
     "layouts/_default/single.html": "hugo/layouts/_default/single.html",
     "layouts/_default/list.html": "hugo/layouts/_default/list.html",

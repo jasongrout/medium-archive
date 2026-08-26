@@ -1,10 +1,14 @@
 {{ define "main" }}
+<!-- @include shared/share-icons.html -->
 <article class="post" data-pagefind-body>
 <h1>{{ .Title }}</h1>
 <p class="post-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>
 {{- range .GetTerms "authors" }} · <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
 {{- with .Params.tags }} ·{{ range $.GetTerms "tags" }} <a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}</p>
+{{ partial "share.html" . }}
 {{ .Content }}
+{{ partial "share.html" . }}
 </article>
+<!-- @include shared/share-mastodon.html -->
 <!-- @include shared/image-zoom.html -->
 {{ end }}

@@ -332,7 +332,95 @@ data loss here):
   "JupyterLab · Jupyter Blog") and advertising nothing at all on a post
   page (`templates/shared/feed-icon.html`, `card.css`, both themes).
 
+- **Share links on every post** — the archive's pages were read-only in
+  the other direction too: nothing on a post offered to pass it on. Both
+  card themes now close an article with five links — LinkedIn, Facebook,
+  Bluesky, Mastodon and email — under the networks' own logomarks, drawn
+  from one hidden `<symbol>` sprite (`shared/share-icons.html`) so the
+  marks are shared even though only each engine knows a post's URL. The
+  URLs are built at render time from the post's absolute permalink,
+  percent-encoded by Go's contextual escaping on hugo and by an explicit
+  `|urlencode` on pelican's Jinja, which does none of its own; they are
+  only as real as `site.json`'s `base_url`, like the feed URLs and
+  redirect stubs. Mastodon is the one network with no single address to
+  send a share to, so that link is the one piece of script
+  (`shared/share-mastodon.html`): it asks for the reader's server,
+  normalizes a pasted server URL or `@you@server` handle down to the
+  domain, remembers it per browser, and falls back without JS to the
+  server directory. The bar sits inside the post card under a rule, and
+  carries `data-pagefind-ignore` so "Share" never lands in the search
+  index (`templates/shared/share-icons.html`,
+  `templates/shared/share-mastodon.html`, `card.css`, both post
+  templates).
+
+- **Open Graph metadata, without which half the share links do
+  nothing** — the first share links shipped against pages carrying no
+  `og:` tags at all, and LinkedIn's and Facebook's share URLs pass only
+  the page address: everything their share box shows is read back off
+  the page, so a share of a post came up blank. Both card themes' heads
+  now carry `og:site_name`/`type`/`title`/`url`/`description`, the
+  post's baked 640x360 cover as `og:image` (with `twitter:card`
+  following whether there is one), `article:published_time`, its
+  authors and tags, and a canonical link. The other half of that same
+  failure was `base_url`: unset, hugo falls back to `example.org` and
+  pelican to an empty `SITEURL`, so every share link pointed at a
+  domain the archive does not own or at a relative path LinkedIn
+  rejects — and the build said nothing. `load_site_inputs` now warns
+  once, where both exporters already meet. Share links are the first
+  feature where a URL leaves the site, so a wrong one fails outright
+  instead of degrading (`sites.py`, both base templates).
+
+- **The share bar under the byline too, and monochrome marks** — a
+  reader who decides to pass a post on usually decides at the top,
+  where the byline tells them whose it is, not after scrolling to the
+  foot. The bar now renders in both places, which meant giving each
+  engine one definition of it rather than four copies: hugo gets
+  `partials/share.html`, the pelican theme a `share()` macro beside
+  `card()`, each called twice, with the `<symbol>` sprite still spliced
+  in once and the Mastodon script binding every anchor rather than the
+  first. The byline copy takes no rule above it — one there cuts the
+  head off the article — and `.post-meta` carries the tighter margin
+  that pairs with it. Hover no longer tints the marks with the site
+  accent: these are the networks' logos, and most of their brand
+  guidelines allow a one-color rendering but not a recoloring, so a
+  hover deepens the mark toward the ink instead (`partials/share.html`,
+  `macros.html`, `card.css`, `shared/share-mastodon.html`).
+
+- **The pelican theme escapes what it renders** — pelican's own default
+  `JINJA_ENVIRONMENT` sets no `autoescape` and jinja's default is off,
+  so a theme emits every `{{ }}` raw; the burden of escaping is the
+  theme author's, because `article.content` has to pass through as the
+  HTML it is. This theme had not been carrying it. A post titled
+  `<script>...` therefore ran as a script on its own page, its cards,
+  and its `<title>`, as did a tag's display name and an author's — none
+  of which the person building the archive writes, since they come from
+  the archived publication. Demonstrated in a browser before and after:
+  stock defaults executed all three payloads, and the fix executes
+  none. The generated config now turns `autoescape` on (restating
+  pelican's other three defaults, which the setting replaces) and the
+  theme marks the one genuinely-HTML value, `article.content`, `|safe`.
+  Hugo was never affected: Go's html/template escapes contextually,
+  which is also why the two engines had been rendering such a title
+  differently (`pelicanconf.py.tmpl`, `article.html`).
+
 ## Remaining
+
+- Take the share bar's marks and share URLs from each network's own
+  brand and developer material, rather than the reproductions and
+  community knowledge it runs on now. The logomarks come from Simple
+  Icons, which is a faithful reproduction but not the source -- and
+  which dropped LinkedIn's over that company's branding policy, so
+  that one is lifted from an old release. Per network, the two things
+  worth confirming at the source are the official logo file with its
+  usage rules (clear space, minimum size, which one-color renderings
+  are permitted -- the bar assumes a monochrome mark tinted by
+  `currentColor`, which is why hovering deepens it instead of coloring
+  it), and the current documented share URL with its parameters:
+  LinkedIn's `shareArticle` is already deprecated in favor of
+  `sharing/share-offsite/`, Facebook's `sharer.php` is long-lived but
+  undocumented, and the Bluesky and Mastodon intents are conventions
+  rather than specifications. Each network's guidelines may also
+  constrain the wording beside the mark.
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
   gist embeds, then `convert` + `lint` (the placeholders the 2026-08
