@@ -248,3 +248,36 @@ Remaining judgement calls, all optional:
   every post should carry; probably wants the parent-map/theme approach
   above rather than denormalized double-tagging. Idea only — not acted
   on.
+
+## 3b. Tag names (tags.json `display`)
+
+The tags are slugs, because Medium's are: the sites rendered
+`jupyter-notebook`, `ipython` and `jupyterhub` where a reader expects
+"Jupyter Notebook", "IPython" and "JupyterHub". Spelling them correctly
+is a display concern, not an identity one, so medium-archive's new
+`"display"` section names a tag and nothing else moves — a tag stays one
+slug through `posts.json`, through the rest of `tags.json`, and through
+every `/tags/<tag>/` URL and per-tag feed, so nothing in `redirects.csv`
+or the sites' link structure shifts. A tag with no entry shows as itself
+with its hyphens as spaces, which covers the plain topic tags
+(`open-science` → "open science", `cloud-computing` → "cloud
+computing"); the 26 entries are the ones with a proper name to get
+right.
+
+Those are the Jupyter projects (`jupyterlab` → "JupyterLab",
+`jupyter-notebook` → "Jupyter Notebook", `jupytercad` → "JupyterCAD",
+`tljh` → "The Littlest JupyterHub", `mystmd` → "MyST", `voila` →
+"Voilà", …), the outside projects and platforms (`github` → "GitHub",
+`kubernetes` → "Kubernetes", `docker` → "Docker", `javascript` →
+"JavaScript", `webassembly` → "WebAssembly", `devops` → "DevOps", `cpp`
+→ "C++", `ai` → "AI"), and `outreachy` → "Outreachy". The tool tags
+whose own projects spell themselves lowercase — `anywidget`,
+`ipycanvas`, `ipycytoscape`, `nbviewer`, `repo2docker`, `xeus` — are
+left alone deliberately: correct capitalization there *is* lowercase.
+
+Three run-together slugs were fixed at the same time, in the tag rather
+than its name. `jupyterenterprisegateway` → `jupyter-enterprise-gateway`
+("Jupyter Enterprise Gateway"), so it hyphenates like the rest;
+`3dslicer` and `itkwidgets`, one post each and both about interactive 3D
+rendering in a notebook, fold into `visualization` (15 → 17) rather than
+staying as two more one-post tool tags. 58 tags.

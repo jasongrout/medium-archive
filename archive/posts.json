@@ -2936,8 +2936,8 @@
     "ghost_url": null,
     "description": "Embed interactive itkwidgets 3D renderings into JupyterLite deployments A tutorial that demonstrates a zero-server, interactive 3D rendering notebook and walks through the quick and easy …",
     "tags": [
-      "itkwidgets",
-      "jupyterlite"
+      "jupyterlite",
+      "visualization"
     ],
     "images": [
       "images/001-0__zowwA1kefuHdpEX.gif"
@@ -5976,7 +5976,7 @@
     "ghost_url": null,
     "description": "On-demand Notebooks with JupyterHub, Jupyter Enterprise Gateway and Kubernetes by: Luciano Resende, Kevin Bates, Alan Chin Jupyter Notebook has become the “de facto” platform used by data …",
     "tags": [
-      "jupyterenterprisegateway",
+      "jupyter-enterprise-gateway",
       "jupyterhub",
       "kubernetes"
     ],
@@ -6298,9 +6298,9 @@
     "ghost_url": null,
     "description": "Use Jupyter and 3D Slicer kernel to implement biomedical data processing workflows in a notebook",
     "tags": [
-      "3dslicer",
       "kernels",
-      "science"
+      "science",
+      "visualization"
     ],
     "images": [
       "images/001-0_powLrWNrbtb0dRWs.png",

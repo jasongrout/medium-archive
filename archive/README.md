@@ -85,7 +85,11 @@ Medium. It has two layers:
   maps a tag to the tags it entails everywhere it appears; `"add"` and
   `"remove"` put tags on, and take them off, specific posts by slug --
   for a topic the Medium tags never named, and for a tag that does not
-  describe the post that inherited it.
+  describe the post that inherited it; and `"display"` gives a tag the
+  name a site shows it under (`"ipython": "IPython"`), so a tag stays a
+  slug everywhere it is stored, named or built into a URL while the
+  pages read correctly. A tag with no `"display"` entry shows as itself
+  with its hyphens as spaces (`open-science` -> "open science").
   `posts.json` and every derived site inherit the cleaned tags. An entry
   matching no post aborts a full `convert` run, like a fixup that no
   longer applies; `medium-archive stats --tags` lists every tag with its
@@ -156,7 +160,8 @@ raw/
 fixups/*.sub, *.patch         optional hand-written corrections, applied to
                                 raw files in memory by convert and compare
 tags.json                     optional hand-written tag cleanup ("drop",
-                                "rename", "imply", "add", "remove"), applied
+                                "rename", "imply", "add", "remove") plus the
+                                names tags display under ("display"), applied
                                 by convert to front matter
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
@@ -208,7 +213,7 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
 | `description`   | the subtitle (from the account export) or Medium's summary text |
-| `tags`          | tag slugs (RSS categories, scraped tag links, or page state), after `tags.json` cleanup when present |
+| `tags`          | tag slugs (RSS categories, scraped tag links, or page state), after `tags.json` cleanup when present; always slugs -- `tags.json`'s `"display"` names them at render time, in the sites, not here |
 | `images`        | relative paths of images used by the body |
 | `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML), `ghost` (Ghost page from a Wayback capture) or `state` (reconstructed from a shell page's embedded editor state) |
 
