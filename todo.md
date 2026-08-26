@@ -353,6 +353,23 @@ data loss here):
   `templates/shared/share-mastodon.html`, `card.css`, both post
   templates).
 
+- **Open Graph metadata, without which half the share links do
+  nothing** — the first share links shipped against pages carrying no
+  `og:` tags at all, and LinkedIn's and Facebook's share URLs pass only
+  the page address: everything their share box shows is read back off
+  the page, so a share of a post came up blank. Both card themes' heads
+  now carry `og:site_name`/`type`/`title`/`url`/`description`, the
+  post's baked 640x360 cover as `og:image` (with `twitter:card`
+  following whether there is one), `article:published_time`, its
+  authors and tags, and a canonical link. The other half of that same
+  failure was `base_url`: unset, hugo falls back to `example.org` and
+  pelican to an empty `SITEURL`, so every share link pointed at a
+  domain the archive does not own or at a relative path LinkedIn
+  rejects — and the build said nothing. `load_site_inputs` now warns
+  once, where both exporters already meet. Share links are the first
+  feature where a URL leaves the site, so a wrong one fails outright
+  instead of degrading (`sites.py`, both base templates).
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for

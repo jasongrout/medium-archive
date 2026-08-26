@@ -1,4 +1,8 @@
 {{ define "main" }}
+{{- /* title and URL, said once: the contextual escaper
+       encodes $text for a query string in the href and for
+       an attribute in data-share-text, from the one value */ -}}
+{{- $text := printf "%s %s" .Title .Permalink -}}
 <!-- @include shared/share-icons.html -->
 <article class="post" data-pagefind-body>
 <h1>{{ .Title }}</h1>
@@ -10,8 +14,8 @@
 <span class="share-label">Share</span>
 <a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ .Permalink }}" aria-label="Share on LinkedIn" title="Share on LinkedIn"><svg class="share-icon" aria-hidden="true"><use href="#share-linkedin"></use></svg></a>
 <a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ .Permalink }}" aria-label="Share on Facebook" title="Share on Facebook"><svg class="share-icon" aria-hidden="true"><use href="#share-facebook"></use></svg></a>
-<a class="share-link" href="https://bsky.app/intent/compose?text={{ .Title }}%20{{ .Permalink }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
-<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ .Title }} {{ .Permalink }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
+<a class="share-link" href="https://bsky.app/intent/compose?text={{ $text }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
+<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ $text }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
 <a class="share-link" href="mailto:?subject={{ .Title }}&amp;body={{ .Permalink }}" aria-label="Share by email" title="Share by email"><svg class="share-icon" aria-hidden="true"><use href="#share-email"></use></svg></a>
 </div>
 </article>

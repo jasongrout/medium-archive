@@ -495,11 +495,12 @@ def test_post_share_links(archive):
     own mark from the shared sprite."""
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
+    # each engine names the same three values, so the bars keep one shape
     for page, url, title, text in (
             (hugo_site / "layouts/_default/single.html", "{{ .Permalink }}",
-             "{{ .Title }}", "{{ .Title }}%20{{ .Permalink }}"),
-            (pelican_site / "theme/templates/article.html", "{{ share_url }}",
-             "{{ share_title }}", "{{ share_text }}")):
+             "{{ .Title }}", "{{ $text }}"),
+            (pelican_site / "theme/templates/article.html", "{{ enc_url }}",
+             "{{ enc_title }}", "{{ enc_text }}")):
         source = page.read_text()
         # the marks come from the shared sprite, spliced in ahead of them
         for network in ("linkedin", "facebook", "bluesky", "mastodon", "email"):
@@ -522,14 +523,54 @@ def test_post_share_links(archive):
         assert 'localStorage.setItem("mastodon-host", host)' in source, page
         assert source.index("</article>") < source.index("mastodon-host"), page
     # hugo escapes each value for its URL context on its own; pelican's
-    # Jinja does not, so the theme spells the encoding out
-    article = (pelican_site / "theme/templates/article.html").read_text()
-    for name in ("share_url", "share_title", "share_text"):
-        assert f"{{% set {name} = " in article and "|urlencode %}" in article
+    # Jinja does not, so the theme spells the encoding out -- on each
+    # value, which is what this pins: the check must fail when one of
+    # them loses its encoding, not merely when the file has none left
+    lines = {line.split()[2]: line for line
+             in (pelican_site / "theme/templates/article.html").read_text()
+             .splitlines() if line.startswith("{% set ")}
+    for name in ("enc_url", "enc_title", "enc_text"):
+        assert lines[name].endswith('|urlencode|replace("/", "%2F") %}'), name
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".share-sprite { display: none; }" in css
     assert ".share-icon { width: 1.05rem" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_share_targets_get_the_open_graph_tags_they_render_from(archive):
+    """LinkedIn's and Facebook's share URLs carry only the page address:
+    everything their share box shows comes from the page's Open Graph
+    tags, so the share links are worth no more than these."""
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for head in (hugo_site / "layouts/_default/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        source = head.read_text()
+        for prop in ("og:site_name", "og:type", "og:title", "og:url",
+                     "og:description", "og:image", "article:published_time"):
+            assert f'property="{prop}"' in source, (head, prop)
+        assert 'rel="canonical"' in source, head
+        # a post with no cover has no image to promise
+        assert "summary_large_image" in source and "summary" in source, head
+
+
+def test_missing_base_url_is_not_silent(tmp_path, capsys):
+    """Every absolute link -- feeds, redirect stubs, og:url, the share
+    links -- is built from base_url, and a share link with the wrong one
+    fails outright rather than degrading, so an unset base_url has to be
+    said out loud at build time."""
+    manifest = {}
+    make_post(tmp_path, manifest, "post", "aaa111aaa111",
+              "2020-01-05T10:00:00Z", "Hello.\n")
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (tmp_path / "site.json").write_text(json.dumps({"title": "Example"}))
+    sites.load_site_inputs(tmp_path)
+    assert "no base_url" in capsys.readouterr().err
+    # and stays quiet once it is set
+    (tmp_path / "site.json").write_text(json.dumps(
+        {"title": "Example", "base_url": "https://blog.example.org"}))
+    sites.load_site_inputs(tmp_path)
+    assert "base_url" not in capsys.readouterr().err
 
 
 def test_build_output_survives_regeneration(archive):

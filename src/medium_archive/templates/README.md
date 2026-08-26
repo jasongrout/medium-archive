@@ -79,9 +79,14 @@ These embed verbatim in both engines' pages, so they must carry no
   other network has one address to send a share to; a toot goes to the
   reader's own server, which the page cannot know, so the link asks for
   it and remembers the answer per browser, taking a pasted server URL
-  or `@you@server` handle as readily as a bare domain. Without JS the
-  link falls back to its href, the server directory. It follows the
-  article, so the anchor exists when the script runs (and it waits for
+  or `@you@server` handle as readily as a bare domain. What is left has
+  to look like a host before it is stored or navigated to: a bare
+  `@you` normalizes down to `you`, and following that would fail DNS
+  and leave junk as the next prompt's default. A modified click
+  (ctrl/cmd/shift/alt, or any button but the first) is left alone, so
+  "open in a new tab" still means that. Without JS the link falls back
+  to its href, the server directory. It follows the article, so the
+  anchor exists when the script runs (and it waits for
   DOMContentLoaded regardless).
 - `image-zoom.html` — click-to-zoom for body images, spliced into the
   post templates (not the base ones: only article pages have body

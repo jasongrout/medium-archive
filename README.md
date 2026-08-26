@@ -128,10 +128,16 @@ It works in independent steps:
   the foot of every article — LinkedIn, Facebook, Bluesky, Mastodon and
   email, under each network's own logomark — built from the post's
   absolute URL, so `base_url` has to be set for them to point anywhere
-  real; a toot has no single address to be sent to, so the Mastodon one
-  asks the reader for their server and remembers it per browser, taking
-  a pasted server URL or an `@you@server` handle as readily as a bare
-  domain; and a
+  real (the exporters say so on stderr when it is not); a toot has no
+  single address to be sent to, so the Mastodon one asks the reader for
+  their server and remembers it per browser, taking a pasted server URL
+  or an `@you@server` handle as readily as a bare domain; Open Graph
+  metadata on every page — `og:title`, `og:description`, `og:url` and
+  the baked 640×360 cover as `og:image`, plus `article:` dates and
+  authors and a canonical link — since LinkedIn's and Facebook's share
+  URLs carry only the page address and build their whole share box from
+  these tags, which makes them the difference between a share link that
+  works and one that posts a bare URL; and a
   `/search/` page
   wired to [Pagefind](https://pagefind.app) — run `pagefind --site
   public|output` after building for full-text search served as a results
