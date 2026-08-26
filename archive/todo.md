@@ -248,3 +248,42 @@ Remaining judgement calls, all optional:
   every post should carry; probably wants the parent-map/theme approach
   above rather than denormalized double-tagging. Idea only — not acted
   on.
+
+## 3b. Tag names (tags.json `display`)
+
+The tags are slugs, because Medium's are: the sites rendered
+`jupyter-notebook`, `ipython` and `jupyterhub` where a reader expects
+"Jupyter Notebook", "IPython" and "JupyterHub". Spelling them correctly
+is a display concern, not an identity one, so medium-archive's new
+`"display"` section names a tag and nothing else moves — a tag stays one
+slug through `posts.json`, through the rest of `tags.json`, and through
+every `/tags/<tag>/` URL and per-tag feed, so nothing in `redirects.csv`
+or the sites' link structure shifts. A tag with no entry shows as itself
+with its hyphens as spaces, which covers the plain topic tags
+(`open-science` → "open science", `cloud-computing` → "cloud
+computing"); the 26 entries are the ones with a proper name to get
+right.
+
+Those are the Jupyter projects (`jupyterlab` → "JupyterLab",
+`jupyter-notebook` → "Jupyter Notebook", `jupytercad` → "JupyterCAD",
+`mystmd` → "MyST", `voila` → "Voilà", and `tljh` → "TLJH", the acronym
+rather than "The Littlest JupyterHub", which is too long for a chip),
+the outside projects and platforms (`github` → "GitHub", `kubernetes` →
+"Kubernetes", `docker` → "Docker", `javascript` → "JavaScript",
+`webassembly` → "WebAssembly", `devops` → "DevOps", `cpp` → "C++", `ai`
+→ "AI"), and `outreachy` → "Outreachy". The tool tags whose own
+projects spell themselves lowercase — `anywidget`, `nbviewer`,
+`repo2docker`, `xeus` — are left alone deliberately: correct
+capitalization there *is* lowercase.
+
+Five tags changed in the tag rather than its name, while the file was
+open. `jupyterenterprisegateway` → `jupyter-enterprise-gateway`
+("Jupyter Enterprise Gateway"), so the one run-together slug hyphenates
+like the rest. Four one-post tool tags fold into the topic tag they sit
+under: `3dslicer` and `itkwidgets`, both about interactive 3D rendering
+in a notebook, into `visualization` (15 → 17); `ipycanvas` and
+`ipycytoscape`, both ipywidgets libraries, into `widgets` (11 → 14, the
+third being the `Jupyter Games` post that carried `ipycanvas` via
+`"add"`). The Medium tag `canvas` now renames straight to `widgets`,
+which left the `ipycanvas` rename with nothing to match — `convert`
+said so, and it went. 56 tags.

@@ -119,6 +119,7 @@
   ],
   "rename": {
     "jupyter-lab-3": "jupyterlab",
+    "jupyterenterprisegateway": "jupyter-enterprise-gateway",
     "cplusplus": "cpp",
     "c-plus-plus-language": "cpp",
     "data-visualization": "visualization",
@@ -133,6 +134,7 @@
     "widget": "widgets",
     "jupyter-widget": "widgets",
     "interactive-widgets": "widgets",
+    "ipycytoscape": "widgets",
     "virtual-events": "events",
     "conference": "events",
     "conférence": "events",
@@ -217,6 +219,8 @@
     "eslint-plugin": "javascript",
     "asyncawait": "ipython",
     "3d": "visualization",
+    "3dslicer": "visualization",
+    "itkwidgets": "visualization",
     "diagrams": "visualization",
     "graph": "visualization",
     "cytoscape": "visualization",
@@ -235,7 +239,7 @@
     "university-of-edinburgh": "education",
     "collaborative-editing": "collaboration",
     "cad": "jupytercad",
-    "canvas": "ipycanvas",
+    "canvas": "widgets",
     "gis": "geoscience"
   },
   "imply": {
@@ -468,7 +472,7 @@
     ],
     "jupyter-games": [
       "education",
-      "ipycanvas"
+      "widgets"
     ],
     "jupyter-kernel-gateway": [
       "kernels"
@@ -868,5 +872,33 @@
     "project-jupyter-joins-lf-charities": [
       "jupyterlab"
     ]
+  },
+  "display": {
+    "jupyterlab": "JupyterLab",
+    "jupyterhub": "JupyterHub",
+    "jupyter-notebook": "Jupyter Notebook",
+    "jupyter-server": "Jupyter Server",
+    "jupyter-book": "Jupyter Book",
+    "jupyter-enterprise-gateway": "Jupyter Enterprise Gateway",
+    "jupyter-foundation": "Jupyter Foundation",
+    "jupytercon": "JupyterCon",
+    "jupyterlite": "JupyterLite",
+    "jupytercad": "JupyterCAD",
+    "jupytergis": "JupyterGIS",
+    "tljh": "TLJH",
+    "ipython": "IPython",
+    "voila": "Voil\u00e0",
+    "mystmd": "MyST",
+    "binder": "Binder",
+    "elyra": "Elyra",
+    "github": "GitHub",
+    "docker": "Docker",
+    "kubernetes": "Kubernetes",
+    "javascript": "JavaScript",
+    "webassembly": "WebAssembly",
+    "outreachy": "Outreachy",
+    "devops": "DevOps",
+    "cpp": "C++",
+    "ai": "AI"
   }
 }
