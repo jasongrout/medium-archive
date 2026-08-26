@@ -56,10 +56,16 @@ Medium. It has two layers:
   (`"images": {"still_max_edge": N, "animated_max_edge": N}`,
   0 = off).
   Both close each post with share links -- LinkedIn, Facebook,
-  Bluesky, Mastodon and email, under the networks' own marks -- built
-  from the post's absolute URL, so `base_url` must be set for them to
-  point anywhere real. The Mastodon one asks the reader for their
-  server (remembered per browser) since a toot has no single address.
+  Bluesky, Mastodon and email, under the networks' own marks -- and
+  carry the Open Graph metadata LinkedIn and Facebook build their
+  share box from (their share URLs pass only the page address, so
+  og:title/description/url and the cover as og:image are what a share
+  actually shows). Both are built from the post's absolute URL, so
+  `base_url` must be set for them to point anywhere real; the
+  exporters warn on stderr when it is not. The Mastodon link asks the
+  reader for their server (remembered per browser) since a toot has no
+  single address. These live in the built-in card theme -- a real hugo
+  theme named in site.json supplies its own post page and head.
   Both render redirect stubs at every old inbound path (hugo via
   aliases, pelican via a plugin embedded in its generated config) and
   add per-term feeds, each linked from its tag's or author's own page
