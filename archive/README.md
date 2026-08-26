@@ -55,6 +55,11 @@ Medium. It has two layers:
   keep full resolution, and `site.json` tunes or disables the caps
   (`"images": {"still_max_edge": N, "animated_max_edge": N}`,
   0 = off).
+  Both close each post with share links -- LinkedIn, Facebook,
+  Bluesky, Mastodon and email, under the networks' own marks -- built
+  from the post's absolute URL, so `base_url` must be set for them to
+  point anywhere real. The Mastodon one asks the reader for their
+  server (remembered per browser) since a toot has no single address.
   Both render redirect stubs at every old inbound path (hugo via
   aliases, pelican via a plugin embedded in its generated config) and
   add per-term feeds, each linked from its tag's or author's own page
@@ -311,8 +316,8 @@ it), `npm install -g mystmd pagefind`.
 
 Before deploying, set `base_url` in `site.json` to the site's real
 domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
-exporter step: feed URLs, redirect stubs, and other absolute links are
-built from it.
+exporter step: feed URLs, redirect stubs, per-post share links, and
+other absolute links are built from it.
 
 hugo (preferred):
 

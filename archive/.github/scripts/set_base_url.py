@@ -2,9 +2,10 @@
 """Point site.json's base_url at one preview deployment's subpath.
 
 Used by the preview workflow before each site exporter runs, so the
-absolute links each generator bakes in (feeds, redirect stubs) land
-under that site's directory of the GitHub Pages deployment. Patches the
-file in place; the workflow never commits the change.
+absolute links each generator bakes in (feeds, redirect stubs, the
+per-post share links) land under that site's directory of the GitHub
+Pages deployment. Patches the file in place; the workflow never commits
+the change.
 """
 
 import json
