@@ -230,7 +230,29 @@ the front matter fields, and the caveats. If the archive lives in version
 control, the small derived files `posts.json` and `redirects.csv` are
 worth committing anyway: their diffs show what a `fixups/` or `tags.json`
 change did to every post, while the bulky derived trees (`posts/`, the
-site directories) are better gitignored and regenerated.
+site directories) are better gitignored and regenerated. The archive's
+own README describes the archive; what the generated sites contain is
+documented here, so that changing a theme does not oblige every archive
+downstream to regenerate its README.
+
+## `site.json`
+
+Hand-written, hand-versioned with the archive, and read by all three
+exporters — everything about a built site that is the publication's
+rather than the tool's. Every key is optional; the sections above give
+the detail behind each.
+
+| key | what it does |
+|-----|--------------|
+| `title` | site title: the header, `<title>`, and every feed's name |
+| `description` | tagline under the title, and the feeds' description |
+| `intro` | landing-page blurb (Markdown), rendered by the myst and hugo landing pages |
+| `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter; unset, the exporters warn and fall back to a placeholder, so the share links and social previews point at a domain you do not own |
+| `avatar` | archive-relative image path for the header logo |
+| `favicon` | archive-relative image path for the browser-tab icon |
+| `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
+| `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
+| `hugo` | hugo-specific settings, including a real theme to target instead of the built-in one |
 
 ## Installation
 

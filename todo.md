@@ -386,6 +386,23 @@ data loss here):
   hover deepens the mark toward the ink instead (`partials/share.html`,
   `macros.html`, `card.css`, `shared/share-mastodon.html`).
 
+- **The pelican theme escapes what it renders** — pelican's own default
+  `JINJA_ENVIRONMENT` sets no `autoescape` and jinja's default is off,
+  so a theme emits every `{{ }}` raw; the burden of escaping is the
+  theme author's, because `article.content` has to pass through as the
+  HTML it is. This theme had not been carrying it. A post titled
+  `<script>...` therefore ran as a script on its own page, its cards,
+  and its `<title>`, as did a tag's display name and an author's — none
+  of which the person building the archive writes, since they come from
+  the archived publication. Demonstrated in a browser before and after:
+  stock defaults executed all three payloads, and the fix executes
+  none. The generated config now turns `autoescape` on (restating
+  pelican's other three defaults, which the setting replaces) and the
+  theme marks the one genuinely-HTML value, `article.content`, `|safe`.
+  Hugo was never affected: Go's html/template escapes contextually,
+  which is also why the two engines had been rendering such a title
+  differently (`pelicanconf.py.tmpl`, `article.html`).
+
 ## Remaining
 
 - Take the share bar's marks and share URLs from each network's own

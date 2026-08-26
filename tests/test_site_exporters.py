@@ -596,6 +596,28 @@ def test_a_title_is_plain_text_not_html(archive):
     assert "article.summary|striptags|e" in og_desc, og_desc
 
 
+def test_pelican_escapes_by_default(archive):
+    """Pelican's own default JINJA_ENVIRONMENT sets no autoescape and
+    jinja's default is off, so a theme emits every {{ }} raw -- which
+    makes a post title reading `<script>...` a running script on every
+    page that renders it, and titles, tag names and authors all come
+    from the archived publication. The generated config turns escaping
+    on; only the rendered body is marked safe."""
+    site = pelican.build_site(archive)
+    config = (site / "pelicanconf.py").read_text()
+    assert '"autoescape": True' in config
+    # the setting replaces pelican's defaults rather than merging, so
+    # the rest of them have to be restated with it
+    for key in ('"trim_blocks": True', '"lstrip_blocks": True',
+                '"extensions": []'):
+        assert key in config, key
+    # article.content is the one genuinely-HTML value in the theme
+    templates = site / "theme/templates"
+    safe = [(f.name, line.strip()) for f in sorted(templates.glob("*.html"))
+            for line in f.read_text().splitlines() if "|safe" in line]
+    assert safe == [("article.html", "{{ article.content|safe }}")], safe
+
+
 def test_missing_base_url_is_not_silent(tmp_path, capsys):
     """Every absolute link -- feeds, redirect stubs, og:url, the share
     links -- is built from base_url, and a share link with the wrong one

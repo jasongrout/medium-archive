@@ -16,7 +16,7 @@
 {%- if article.author %} · <a href="{{ SITEURL }}/{{ article.author.url }}">{{ article.author }}</a>{% endif %}
 {%- if article.tags %} ·{% for t in article.tags %} <a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a>{% endfor %}{% endif %}</p>
 {{ share(post_url, post_title) }}
-{{ article.content }}
+{{ article.content|safe }}
 {{ share(post_url, post_title) }}
 </article>
 <!-- @include shared/share-mastodon.html -->
