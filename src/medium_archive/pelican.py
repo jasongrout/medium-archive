@@ -14,7 +14,12 @@ the hugo theme's render hook (480/736/1104, never upscaled,
 mtime-cached) and rewrites the article's img tags with srcset/sizes
 and real width/height. Metadata uses Pelican's `Key: value` header format; tags and
 authors are first-class in Pelican, so tag/author listing pages and
-Atom feeds (site-wide and per tag/author) come out of the box.
+Atom feeds (site-wide and per tag/author) come out of the box. Tags
+reach Pelican as slugs, so tag.slug and every /tags/<slug>/ URL are
+exactly the archive's tag rather than whatever Pelican's slugify would
+make of a name like "C++"; the names tags are shown under (tags.json's
+`display`) go into pelicanconf.py as TAG_DISPLAY, which the theme reads
+through a tag_name filter.
 
 The exporter writes its own theme, from the package's templates/pelican/
 and templates/shared/ files -- the card-grid blog shared with
@@ -45,7 +50,7 @@ import sys
 
 from .sites import (ImagePlacer, bake_cover_thumbnails, clean_site,
                     export_content, fill_template, load_site_inputs,
-                    page_stems, pick_cover, template_text,
+                    page_stems, pick_cover, tag_names, template_text,
                     write_redirects_csv)
 
 # The theme's files: file in the site -> its templates/ source (see
@@ -154,6 +159,8 @@ def build_site(out):
         # themes' html announcement option), or literal HTML
         announcement=(json.dumps(config["announcement"], ensure_ascii=False)
                       if config.get("announcement") else "None"),
+        tag_display=json.dumps(dict(sorted(tag_names(manifest, out).items())),
+                               ensure_ascii=False, indent=4),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")
 
     for rel, src in TEMPLATES.items():

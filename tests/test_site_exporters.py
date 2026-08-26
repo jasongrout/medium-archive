@@ -188,6 +188,40 @@ def test_cover_thumbnails_crop_or_letterbox(tmp_path):
     assert len(corners) > 1
 
 
+def test_tag_display_names_reach_both_sites(archive):
+    """tags.json's display map names each tag on the rendered site while
+    the tag itself -- front matter, tag URL -- stays a slug."""
+    (archive / "tags.json").write_text(json.dumps(
+        {"display": {"example": "Example Tag"}}))
+    hugo_site = hugo.build_site(archive)
+    front = json.loads((hugo_site / "content/posts/second-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert front["tags"] == ["example"]           # the tag is still a slug
+    term = hugo_site / "content/tags/example/_index.md"
+    assert json.loads(term.read_text()) == {"title": "Example Tag"}
+
+    pelican_site = pelican.build_site(archive)
+    head = (pelican_site / "content/posts/second-post/index.md") \
+        .read_text().split("\n\n", 1)[0]
+    assert "Tags: example" in head                # the tag is still a slug
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert '"example": "Example Tag"' in config
+    assert "JINJA_FILTERS" in config
+    assert "{{ tag|tag_name }}" in \
+        (pelican_site / "theme/templates/tag.html").read_text()
+
+
+def test_tags_display_as_slugs_with_spaces_by_default(archive):
+    """No tags.json at all: a tag still shows with its hyphens as spaces."""
+    manifest = json.loads((archive / "posts.json").read_text())
+    for post in manifest.values():
+        post["tags"] = ["open-science"]
+    (archive / "posts.json").write_text(json.dumps(manifest))
+    site = hugo.build_site(archive)
+    term = site / "content/tags/open-science/_index.md"
+    assert json.loads(term.read_text()) == {"title": "open science"}
+
+
 def test_pelican_site(archive):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "icon.svg").write_bytes(b"SVG")

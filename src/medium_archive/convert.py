@@ -419,7 +419,8 @@ def cmd_convert(args):
         print(f"tags: dropping {len(tag_map.drop)}, renaming "
               f"{len(tag_map.rename)}, implying from {len(tag_map.imply)}, "
               f"adding to {len(tag_map.add)} and removing from "
-              f"{len(tag_map.remove)} post(s) per {tag_map.path}",
+              f"{len(tag_map.remove)} post(s), naming "
+              f"{len(tag_map.display)} per {tag_map.path}",
               file=sys.stderr)
     ok = 0
     for n, url in enumerate(targets, 1):

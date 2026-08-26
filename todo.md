@@ -281,6 +281,31 @@ data loss here):
   triggers, a remove of a tag no matching post carries) abort
   (`src/medium_archive/tags.py`).
 
+- **tags.json: `display`, the name a tag is shown under** — Medium tags
+  are slugs, so an archive's tags render as `jupyter-notebook` and
+  `ipython` where a reader expects "Jupyter Notebook" and "IPython".
+  Spelling them correctly is a display concern, not an identity one, so
+  the new `"display"` section maps a tag to its name and nothing else
+  moves: a tag stays one slug through `posts.json`, through the rest of
+  `tags.json`, and through every `/tags/<tag>/` URL and per-tag feed. A
+  tag with no entry shows as itself with its hyphens as spaces
+  (`open-science` → "open science"), which is why the section only holds
+  the tags that need a proper name; an entry repeating that default, a
+  name two tags would share, and a name for a tag no post carries all
+  abort, like every other section's stale or contradictory entry.
+
+  Each exporter carries the name the way its generator wants it. Hugo
+  gets a term page per tag, `content/tags/<tag>/_index.md` with that
+  title, so cards, the tag page and its `<title>`, the chip index and
+  the per-tag RSS feed all pick it up — under a real theme as much as
+  the built-in one — while front matter keeps the slug. Pelican gets a
+  `TAG_DISPLAY` map in `pelicanconf.py` and a `tag_name` Jinja filter
+  beside it, with tags still reaching Pelican as slugs so `tag.slug` is
+  exact rather than whatever its slugify makes of a name like "C++".
+  MyST has no tag pages, so its front matter simply carries the names
+  (`src/medium_archive/tags.py`, `sites.py`, `hugo.py`, `pelican.py`,
+  `myst.py`).
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for

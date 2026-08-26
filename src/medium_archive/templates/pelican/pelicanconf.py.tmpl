@@ -39,6 +39,19 @@ CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = $avatar
 FAVICON = $favicon
 ANNOUNCEMENT = $announcement
+# tag slug -> the name the theme shows it under. Tags reach Pelican as
+# slugs, so tag.slug and every /tags/<slug>/ URL are exact rather than
+# whatever Pelican's slugify would make of a name like "C++"; the theme
+# looks each one up here when it renders a tag. (Pelican puts every
+# uppercase setting in the template context.)
+TAG_DISPLAY = $tag_display
+
+
+def _tag_name(tag):
+    return TAG_DISPLAY.get(getattr(tag, "slug", tag), str(tag))
+
+
+JINJA_FILTERS = {"tag_name": _tag_name}    # the theme's {{ tag|tag_name }}
 
 FEED_ALL_ATOM = "feeds/all.atom.xml"
 FEED_MAX_ITEMS = 20             # a feed announces new posts; the site

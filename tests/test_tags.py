@@ -7,7 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 from medium_archive.convert import cmd_convert, convert_post
-from medium_archive.tags import load_tag_map
+from medium_archive.sites import tag_names
+from medium_archive.tags import default_display, display_name, load_tag_map
 
 URL = "https://blog.example.com/my-post-0123456789ab"
 
@@ -96,6 +97,15 @@ def test_unused_entries_are_tracked(tmp_path):
     ({"drop": ["b"], "imply": {"a": ["b"]}}, "is dropped"),
     ({"rename": {"b": "c"}, "imply": {"a": ["b"]}}, "imply the final tag"),
     ({"imply": {"a": ["b"], "b": ["c"]}}, "do not chain"),
+    ({"display": ["a"]}, "must be an object"),
+    ({"display": {"a": ""}}, "non-empty"),
+    ({"display": {"a": 1}}, "non-empty"),
+    ({"display": {"a": " A"}}, "whitespace"),
+    ({"display": {" a": "A"}}, "whitespace"),
+    ({"drop": ["a"], "display": {"a": "A"}}, "never shown"),
+    ({"rename": {"a": "b"}, "display": {"a": "A"}}, "name the final tag"),
+    ({"display": {"a-b": "a b"}}, "without an entry"),
+    ({"display": {"a": "X", "b": "X"}}, "would both show as"),
 ])
 def test_malformed_config_aborts(tmp_path, config, message):
     write_config(tmp_path, config)
@@ -275,3 +285,44 @@ def test_remove_beats_an_implication_for_one_post(tmp_path):
     tag_map = load_tag_map(out)
     assert tag_map.apply(["workshops"], "my-post") == ["workshops"]
     assert tag_map.apply(["workshops"], "other") == ["events", "workshops"]
+
+
+def test_display_names_tags_without_touching_them(tmp_path):
+    out = write_config(tmp_path, {
+        "rename": {"notebook": "jupyter-notebook"},
+        "display": {"jupyter-notebook": "Jupyter Notebook",
+                    "ipython": "IPython"}})
+    tag_map = load_tag_map(out)
+    # the tags themselves stay slugs -- display is only a name for them
+    assert tag_map.apply(["notebook", "ipython", "open-science"]) \
+        == ["ipython", "jupyter-notebook", "open-science"]
+    assert display_name("ipython", tag_map.display) == "IPython"
+    assert display_name("jupyter-notebook", tag_map.display) \
+        == "Jupyter Notebook"
+    # no entry: the slug with its hyphens as spaces
+    assert display_name("open-science", tag_map.display) == "open science"
+    assert default_display("open-science") == "open science"
+
+
+def test_unused_display_entries_are_tracked(tmp_path):
+    out = write_config(tmp_path, {
+        "display": {"ipython": "IPython", "voila": "Voil\u00e0"}})
+    tag_map = load_tag_map(out)
+    assert tag_map.unused() == ["ipython as 'IPython'", "voila as 'Voil\u00e0'"]
+    tag_map.apply(["ipython"])
+    assert tag_map.unused() == ["voila as 'Voil\u00e0'"]
+    tag_map.apply(["voila"])
+    assert tag_map.unused() == []
+
+
+def test_tag_names_covers_every_tag_in_the_archive(tmp_path):
+    write_config(tmp_path, {"display": {"cpp": "C++"}})
+    manifest = {"a": {"tags": ["cpp", "open-science"]}, "b": {"tags": []},
+                "c": {}}
+    assert tag_names(manifest, tmp_path) == {"cpp": "C++",
+                                             "open-science": "open science"}
+
+
+def test_tag_names_without_a_tags_json(tmp_path):
+    assert tag_names({"a": {"tags": ["open-science"]}}, tmp_path) \
+        == {"open-science": "open science"}

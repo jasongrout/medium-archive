@@ -60,7 +60,14 @@ It works in independent steps:
   — drop everywhere and re-add where deserved, or keep it and remove the
   handful of posts that only mention the project — reproducibly, with
   `raw/` keeping the originals; a stale entry that changes no post aborts
-  a full run, like a fixup that no longer applies.
+  a full run, like a fixup that no longer applies. `"display"` is the one
+  section that changes nothing about the tags themselves: it gives a tag
+  the name a site shows it under (`"ipython": "IPython"`,
+  `"jupyter-notebook": "Jupyter Notebook"`), so spaces and capitals are a
+  display concern and a tag stays one slug through `posts.json`, the rest
+  of `tags.json` and every `/tags/<tag>/` URL. Without an entry a tag
+  shows as itself with its hyphens as spaces (`open-science` → "open
+  science").
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
   `<out>/site-myst/` from the converted posts: one page per post, a
   cover-image gallery landing page (every post as a card, newest first,
