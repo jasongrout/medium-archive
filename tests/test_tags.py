@@ -81,6 +81,21 @@ def test_unused_entries_are_tracked(tmp_path):
     ({"add": {"s": ["a", "a"]}}, "listed twice"),
     ({"add": {"s": [""]}}, "non-empty strings"),
     ({"rename": {"a": "b"}, "add": {"s": ["a"]}}, "add the final tag"),
+    ({"remove": ["a"]}, "must be an object"),
+    ({"remove": {"s": []}}, "non-empty list"),
+    ({"remove": {"s": ["a", "a"]}}, "listed twice"),
+    ({"rename": {"a": "b"}, "remove": {"s": ["a"]}}, "remove the final tag"),
+    ({"drop": ["a"], "remove": {"s": ["a"]}}, "already dropped"),
+    ({"add": {"s": ["a"]}, "remove": {"s": ["a"]}}, "both added and removed"),
+    ({"imply": ["a"]}, "must be an object"),
+    ({"imply": {"a": []}}, "non-empty list"),
+    ({"imply": {"a": ["b", "b"]}}, "listed twice"),
+    ({"imply": {"a": ["a"]}}, "implies itself"),
+    ({"drop": ["a"], "imply": {"a": ["b"]}}, "can never imply"),
+    ({"rename": {"a": "b"}, "imply": {"a": ["c"]}}, "final tag instead"),
+    ({"drop": ["b"], "imply": {"a": ["b"]}}, "is dropped"),
+    ({"rename": {"b": "c"}, "imply": {"a": ["b"]}}, "imply the final tag"),
+    ({"imply": {"a": ["b"], "b": ["c"]}}, "do not chain"),
 ])
 def test_malformed_config_aborts(tmp_path, config, message):
     write_config(tmp_path, config)
@@ -179,3 +194,84 @@ def test_only_run_skips_the_stale_check(tmp_path):
     cmd_convert(convert_args(tmp_path, only=[URL]))    # must not raise
     manifest = json.loads((tmp_path / "posts.json").read_text())
     assert manifest[URL]["tags"] == ["python"]
+
+
+def test_remove_subtracts_by_slug(tmp_path):
+    out = write_config(tmp_path, {
+        "rename": {"notebook": "jupyter-notebook"},
+        "remove": {"my-post": ["jupyter-notebook"]}})
+    tag_map = load_tag_map(out)
+    # the renamed tag is subtracted from this post only
+    assert tag_map.apply(["notebook", "python"], "my-post") == ["python"]
+    assert tag_map.apply(["notebook"], "other-post") == ["jupyter-notebook"]
+
+
+def test_remove_pairs_track_usage_per_tag(tmp_path):
+    out = write_config(tmp_path, {"remove": {"my-post": ["a", "b"]}})
+    tag_map = load_tag_map(out)
+    assert tag_map.unused() == ["my-post: -a", "my-post: -b"]
+    tag_map.apply(["a"], "my-post")           # b was never on the post
+    assert tag_map.unused() == ["my-post: -b"]
+
+
+def test_full_convert_aborts_on_remove_of_absent_tag(tmp_path):
+    write_raw_post(tmp_path, ["python"])
+    write_config(tmp_path, {"remove": {"my-post": ["releases"]}})
+    with pytest.raises(SystemExit, match=r"my-post: -releases"):
+        cmd_convert(convert_args(tmp_path))
+
+
+def test_convert_post_writes_removed_tags(tmp_path):
+    raw = write_raw_post(tmp_path, ["notebook", "python"])
+    tag_map = load_tag_map(write_config(tmp_path, {
+        "rename": {"notebook": "jupyter-notebook"},
+        "remove": {"my-post": ["python"]}}))
+    post = convert_post(URL, raw, tmp_path / "posts", prefer_page=False,
+                        tag_map=tag_map)
+    assert post["tags"] == ["jupyter-notebook"]
+
+
+def test_imply_adds_the_entailed_tag_everywhere(tmp_path):
+    out = write_config(tmp_path, {
+        "rename": {"workshop": "workshops"},
+        "imply": {"workshops": ["events"], "jupytercon": ["events"]}})
+    tag_map = load_tag_map(out)
+    # drawn on the renamed tag, and only once when both sources apply
+    assert tag_map.apply(["workshop", "jupytercon"]) \
+        == ["events", "jupytercon", "workshops"]
+    assert tag_map.apply(["python"]) == ["python"]
+
+
+def test_imply_sees_added_tags(tmp_path):
+    # a tag put on one post entails as much as an inherited one
+    out = write_config(tmp_path, {"imply": {"jupytercon": ["events"]},
+                                  "add": {"my-post": ["jupytercon"]}})
+    tag_map = load_tag_map(out)
+    assert tag_map.apply([], "my-post") == ["events", "jupytercon"]
+    assert tag_map.unused() == []
+
+
+def test_imply_pairs_track_usage(tmp_path):
+    out = write_config(tmp_path, {"imply": {"workshops": ["events"],
+                                            "jupytercon": ["events"]}})
+    tag_map = load_tag_map(out)
+    assert tag_map.unused() == ["jupytercon => events", "workshops => events"]
+    tag_map.apply(["workshops"])
+    # a post that already carries the entailed tag does not use the entry
+    tag_map.apply(["jupytercon", "events"])
+    assert tag_map.unused() == ["jupytercon => events"]
+
+
+def test_full_convert_aborts_on_stale_implication(tmp_path):
+    write_raw_post(tmp_path, ["python"])
+    write_config(tmp_path, {"imply": {"workshops": ["events"]}})
+    with pytest.raises(SystemExit, match="workshops => events"):
+        cmd_convert(convert_args(tmp_path))
+
+
+def test_remove_beats_an_implication_for_one_post(tmp_path):
+    out = write_config(tmp_path, {"imply": {"workshops": ["events"]},
+                                  "remove": {"my-post": ["events"]}})
+    tag_map = load_tag_map(out)
+    assert tag_map.apply(["workshops"], "my-post") == ["workshops"]
+    assert tag_map.apply(["workshops"], "other") == ["events", "workshops"]

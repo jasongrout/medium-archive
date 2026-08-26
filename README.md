@@ -52,12 +52,15 @@ It works in independent steps:
   Medium again. An optional hand-written `<out>/tags.json` cleans up the
   Medium tags on the way into front matter — `"drop"` removes tags that
   only made sense on medium.com, `"rename"` consolidates variants onto a
-  common tag, `"add"` puts tags on specific posts by slug when their
-  Medium tags never named the plain topic (combined with `"drop"` it
-  splits an over-applied tag: drop everywhere, re-add where deserved)
-  — reproducibly, with `raw/`
-  keeping the originals; a stale entry that changes no post aborts a
-  full run, like a fixup that no longer applies.
+  common tag, `"imply"` states that one tag entails another everywhere it
+  appears (every `jupytercon` post is an `events` post), and `"add"` /
+  `"remove"` adjust specific posts by slug: `"add"` names the plain topic
+  a post's Medium tags never did, `"remove"` subtracts a tag from the
+  posts it does not describe. An over-applied tag can be split either way
+  — drop everywhere and re-add where deserved, or keep it and remove the
+  handful of posts that only mention the project — reproducibly, with
+  `raw/` keeping the originals; a stale entry that changes no post aborts
+  a full run, like a fixup that no longer applies.
 * **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
   `<out>/site-myst/` from the converted posts: one page per post, a
   cover-image gallery landing page (every post as a card, newest first,
