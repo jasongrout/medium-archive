@@ -522,14 +522,35 @@ def test_post_share_links(archive):
         assert 'localStorage.setItem("mastodon-host", host)' in source, page
         assert source.index("</article>") < source.index("mastodon-host"), page
     # hugo escapes each value for its URL context on its own; pelican's
-    # Jinja does not, so the theme spells the encoding out
+    # Jinja does not, so the theme spells the encoding out -- and its
+    # urlencode leaves "/" bare, so a replace finishes the job (LinkedIn
+    # wants the whole value encoded)
     article = (pelican_site / "theme/templates/article.html").read_text()
     for name in ("share_url", "share_title", "share_text"):
-        assert f"{{% set {name} = " in article and "|urlencode %}" in article
+        assert f"{{% set {name} = " in article
+        assert article.count('|urlencode|replace("/", "%2F") %}') == 3
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".share-sprite { display: none; }" in css
     assert ".share-icon { width: 1.05rem" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_missing_base_url_warns(archive, capsys):
+    """Share links (like feeds and redirect stubs) are built from
+    base_url; exporting without one must say so instead of silently
+    pointing every absolute link at a placeholder."""
+    cfg = json.loads((archive / "site.json").read_text())
+    del cfg["base_url"]
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo.build_site(archive)
+    assert "base_url not set" in capsys.readouterr().err
+    pelican.build_site(archive)
+    assert "base_url not set" in capsys.readouterr().err
+    # and with it set, the exporters have nothing to warn about
+    cfg["base_url"] = "https://blog.example.org/"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo.build_site(archive)
+    assert "base_url not set" not in capsys.readouterr().err
 
 
 def test_build_output_survives_regeneration(archive):

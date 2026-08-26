@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ article.title }} · {{ SITENAME }}{% endblock %}
 {% block content %}
-{% set share_url = (SITEURL ~ "/" ~ article.url)|urlencode %}
-{% set share_title = article.title|striptags|urlencode %}
-{% set share_text = (article.title|striptags ~ " " ~ SITEURL ~ "/" ~ article.url)|urlencode %}
+{% set share_url = (SITEURL ~ "/" ~ article.url)|urlencode|replace("/", "%2F") %}
+{% set share_title = article.title|striptags|urlencode|replace("/", "%2F") %}
+{% set share_text = (article.title|striptags ~ " " ~ SITEURL ~ "/" ~ article.url)|urlencode|replace("/", "%2F") %}
 <!-- @include shared/share-icons.html -->
 <article class="post" data-pagefind-body>
 <h1>{{ article.title }}</h1>

@@ -80,6 +80,14 @@ def load_site_inputs(out: Path):
     config = {"title": "Blog archive", "description": "", "intro": ""}
     if (out / "site.json").exists():
         config.update(json.loads((out / "site.json").read_text()))
+    if not config.get("base_url"):
+        # feeds, redirect stubs and share links are absolute URLs built
+        # from it; a site exported without it carries links that point
+        # at a placeholder domain (or nowhere), which reads as the share
+        # buttons themselves being broken
+        print("base_url not set in site.json: feed URLs, redirect stubs "
+              "and share links will not point at the real site",
+              file=sys.stderr)
     return manifest, config
 
 

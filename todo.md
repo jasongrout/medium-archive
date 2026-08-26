@@ -340,9 +340,13 @@ data loss here):
   marks are shared even though only each engine knows a post's URL. The
   URLs are built at render time from the post's absolute permalink,
   percent-encoded by Go's contextual escaping on hugo and by an explicit
-  `|urlencode` on pelican's Jinja, which does none of its own; they are
-  only as real as `site.json`'s `base_url`, like the feed URLs and
-  redirect stubs. Mastodon is the one network with no single address to
+  `|urlencode` on pelican's Jinja, which does none of its own (plus a
+  `|replace` for the slashes its filter deliberately leaves bare —
+  LinkedIn wants the whole value encoded); they are only as real as
+  `site.json`'s `base_url`, like the feed URLs and redirect stubs — and
+  the exporters now warn when it is missing, since share links built
+  without it point at a placeholder and read as the buttons themselves
+  being broken. Mastodon is the one network with no single address to
   send a share to, so that link is the one piece of script
   (`shared/share-mastodon.html`): it asks for the reader's server,
   normalizes a pasted server URL or `@you@server` handle down to the
