@@ -57,8 +57,10 @@ Medium. It has two layers:
   0 = off).
   Both render redirect stubs at every old inbound path (hugo via
   aliases, pelican via a plugin embedded in its generated config) and
-  add per-term feeds; every feed carries the 20 most recent posts with
-  their full content, like the publication's original Medium feed.
+  add per-term feeds, each linked from its tag's or author's own page
+  by the RSS mark that is also the header's feed link; every feed
+  carries the 20 most recent posts with their full content, like the
+  publication's original Medium feed.
   Render with `hugo server` or `pelican -l`. The hugo step can instead
   target a real theme named in site.json's hugo section (first-class
   support for Dream, hugo-theme-dream, Hugo >= 0.158); clone the theme
