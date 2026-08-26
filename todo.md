@@ -299,9 +299,16 @@ data loss here):
   title, so cards, the tag page and its `<title>`, the chip index and
   the per-tag RSS feed all pick it up — under a real theme as much as
   the built-in one — while front matter keeps the slug. Pelican gets a
-  `TAG_DISPLAY` map in `pelicanconf.py` and a `tag_name` Jinja filter
-  beside it, with tags still reaching Pelican as slugs so `tag.slug` is
-  exact rather than whatever its slugify makes of a name like "C++".
+  `TAG_DISPLAY` map in `pelicanconf.py`, which the site plugin sets on
+  the `Tag` objects once the tags are collected, with tags still
+  reaching Pelican as slugs so `tag.slug` is exact rather than whatever
+  its slugify makes of a name like "C++". Naming the objects rather than
+  filtering in the theme is what reaches the per-tag feed's title, which
+  Pelican builds in Python; and since Pelican makes a `Tag` object per
+  article while `generator.tags` is keyed on the slug — one object per
+  tag, every other article holding its own — each article's list is
+  pointed at the one named object, or a tag would be named on its own
+  page and on a single card and stay a slug everywhere else.
   MyST has no tag pages, so its front matter simply carries the names
   (`src/medium_archive/tags.py`, `sites.py`, `hugo.py`, `pelican.py`,
   `myst.py`).

@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -250,6 +251,70 @@ def test_feed_links_carry_the_rss_mark(archive):
     assert '{{ $.Title }} · {{ site.Title }}' in nav
     css = (pelican_site / "theme/static/css/style.css").read_text()
     assert ".feed-icon" in css and ".page-title .feed-link" in css
+
+
+class _FakeTag:
+    """pelican.urlwrappers.Tag's naming semantics: hash and equality are
+    the slug's, and setting a name re-slugifies unless a slug was set
+    explicitly first."""
+
+    def __init__(self, name):
+        self._name, self._slug, self._from_name = name, None, True
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+        if self._from_name:
+            self._slug = None
+
+    @property
+    def slug(self):
+        if self._slug is None:
+            self._slug = self._name.lower().replace(" ", "-")
+        return self._slug
+
+    @slug.setter
+    def slug(self, value):
+        self._from_name, self._slug = False, value
+
+    def __hash__(self):
+        return hash(self.slug)
+
+    def __eq__(self, other):
+        return self.slug == other.slug
+
+    def __str__(self):
+        return self.name
+
+
+def test_every_article_gets_the_named_tag_object(archive):
+    """Pelican builds a Tag object per article and keys generator.tags on
+    the slug, so it holds one object per tag while every other article
+    keeps its own. Naming only the dict's keys named a tag on its own
+    page and on one article's card, and left it a slug on the rest."""
+    (archive / "tags.json").write_text(json.dumps(
+        {"display": {"example": "Example Tag"}}))
+    site = pelican.build_site(archive)
+    namespace = {}
+    exec(compile((site / "pelicanconf.py").read_text(), "pelicanconf.py",
+                 "exec"), namespace)
+
+    # three articles, each with its own object for the one tag
+    articles = [SimpleNamespace(tags=[_FakeTag("example")]) for _ in range(3)]
+    generator = SimpleNamespace(tags={articles[0].tags[0]: articles},
+                                articles=articles, translations=[],
+                                hidden_articles=[], hidden_translations=[],
+                                drafts=[], drafts_translations=[])
+    namespace["_name_tags"](generator)
+
+    assert [str(a.tags[0]) for a in articles] == ["Example Tag"] * 3
+    # one object per slug now, and the slug is untouched
+    assert len({id(a.tags[0]) for a in articles}) == 1
+    assert articles[0].tags[0].slug == "example"
 
 
 def test_pelican_site(archive):
