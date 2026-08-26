@@ -55,8 +55,9 @@ Medium. It has two layers:
   keep full resolution, and `site.json` tunes or disables the caps
   (`"images": {"still_max_edge": N, "animated_max_edge": N}`,
   0 = off).
-  Both close each post with share links -- LinkedIn, Facebook,
-  Bluesky, Mastodon and email, under the networks' own marks -- and
+  Both carry share links under each post's byline and again at its
+  foot -- LinkedIn, Facebook, Bluesky, Mastodon and email, under the
+  networks' own marks, which a hover deepens rather than recolors -- and
   carry the Open Graph metadata LinkedIn and Facebook build their
   share box from (their share URLs pass only the page address, so
   og:title/description/url and the cover as og:image are what a share
