@@ -25,61 +25,24 @@ Medium. It has two layers:
   the contract the new site's redirects are built from. The bulky derived
   trees (`posts/` and the site directories) are better left ignored and
   regenerated.
-* `site-myst/` (optional) is a **MyST site** derived from the converted
-  posts by `medium-archive myst`: one page per post, a cover-image landing
-  page (every post as a card, newest first, via the myst-listing plugin,
-  https://contrib.mystmd.org/myst-listing/), a chronological `archive`
-  page, a year-grouped table of contents, links between posts of the
-  publication rewritten to site pages, and a `site-myst/redirects.csv`
-  mapping every old inbound path to the page URL mystmd actually serves.
-  Regenerate it any time (`convert` then `myst`); render it with
-  `myst start` or `myst build --html` inside `site-myst/`
-  (https://mystmd.org). Site-wide text lives in a hand-written
-  `site.json` (title, description, landing-page intro, optional base_url),
-  versioned with the archive. `medium-archive hugo` and `pelican` build
-  the same site for those generators (same page URLs, link rewriting,
-  and `site.json`) into `site-hugo/` and `site-pelican/`. The hugo and
-  pelican sites are the preferred targets, carrying the full feature
-  set; the myst site is a simpler alternate. hugo and pelican share a
-  self-contained card-grid blog theme -- cover-image cards, tag/author
-  card listings, optimized images on both (640x360 cover thumbnails;
-  responsive, lazily-loaded webp srcset variants for still body images;
-  click-to-zoom, so an image with more detail than the column shows
-  opens full size in a modal, like Medium's), and a /search/ page wired
-  to Pagefind (`pagefind --site public|output` after building: full-text
-  search with highlighted in-context excerpts). Both can show a
-  site-wide announcement banner above the
-  header (site.json's "announcement": an http(s) URL fetched
-  client-side -- the mechanism behind Sphinx's announcement theme
-  option, with empty content hiding the banner -- or literal HTML;
-  dismissable per browser, and a changed announcement clears the
-  dismissal). All three sites carry display copies of the images, not
-  the archival originals: anything past a size cap is resized as it is
+* `site-myst/`, `site-hugo/` and `site-pelican/` (optional) are
+  **generated sites**, built from the converted posts by
+  `medium-archive myst`, `hugo` and `pelican`. Nothing in them is
+  checked in: like `posts/`, they are disposable and can be deleted and
+  rebuilt at any time. All three publish the same pages under the same
+  URLs, with the same links between posts rewritten to point at them;
+  hugo and pelican are the preferred targets and share one card-grid
+  theme, while the myst site is a simpler alternate. What a built page
+  actually carries is the exporters' and templates' business, and
+  changes with them -- see the medium-archive project's own README
+  rather than this file, which describes the archive. Build them as
+  "Building the sites" below shows.
+  All three place display copies of the images rather than the
+  archival originals: anything past a size cap is resized as it is
   placed (stills to a 1600 px longest edge via Pillow, animated gifs
   to 1104 px via gifsicle when installed), built once into
-  `.image-cache/` and hard-linked into every site; `raw/` and `posts/`
-  keep full resolution, and `site.json` tunes or disables the caps
-  (`"images": {{"still_max_edge": N, "animated_max_edge": N}}`,
-  0 = off).
-  Both close each post with share links -- LinkedIn, Facebook,
-  Bluesky, Mastodon and email, under the networks' own marks -- built
-  from the post's absolute URL, so `base_url` must be set for them to
-  point anywhere real. The Mastodon one asks the reader for their
-  server (remembered per browser) since a toot has no single address.
-  Both heads also carry the Open Graph tags those networks build a
-  shared link's preview card from (title, description, canonical URL
-  and the post's own cover image); without them a share is a bare
-  title, or on Mastodon and Bluesky no card at all.
-  Both render redirect stubs at every old inbound path (hugo via
-  aliases, pelican via a plugin embedded in its generated config) and
-  add per-term feeds, each linked from its tag's or author's own page
-  by the RSS mark that is also the header's feed link; every feed
-  carries the 20 most recent posts with their full content, like the
-  publication's original Medium feed.
-  Render with `hugo server` or `pelican -l`. The hugo step can instead
-  target a real theme named in site.json's hugo section (first-class
-  support for Dream, hugo-theme-dream, Hugo >= 0.158); clone the theme
-  once into site-hugo/themes/ -- regeneration preserves it.
+  `.image-cache/` and hard-linked into every site. `raw/` and `posts/`
+  keep full resolution regardless.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files, so defects
   authored into the sources themselves — a broken href, a typo, a mangled
@@ -188,28 +151,19 @@ posts/
   <YYYY-MM-DD>-<slug>/        one directory per converted post
     index.md                  front matter + Markdown body
     images/<filename>         images copied from raw/, referenced relatively
-site.json                     optional hand-written site text used by `myst`:
-                                title, description, intro (landing page)
-site-myst/                    optional MyST site built by `medium-archive
-                                myst` from posts/ + posts.json:
-  myst.yml                    project config, plugins, and year-grouped toc
-  index.md                    landing page: intro + cover-image post gallery
-  archive.md                  chronological post list, grouped by year
-  listing-covers.mjs          generated myst-listing companion plugin: makes
-                                the gallery serve the local cover thumbnails
-  posts/<YYYY-MM-DD>-<slug>/
-    <page>.md                 the post, MyST front matter + rewritten body;
-                                the page's URL slug is the filename, capped
-                                by mystmd at 50 characters
-    images/<filename>         hard links to the images in posts/, plus the
-                                baked cover.jpg gallery thumbnail
-  redirects.csv               old inbound path -> the page URL mystmd serves
-site-hugo/,                   optional Hugo/Pelican sites built by
-site-pelican/                   `medium-archive hugo|pelican`: the same
-                                posts as content/posts/<slug>/index.md with
-                                generator-native front matter, config, and
-                                the shared card-grid theme; each carries
-                                its own redirects.csv
+site.json                     optional hand-written site-wide text and
+                                settings the exporters read: title,
+                                description, intro (landing page), and
+                                base_url, which every absolute link in a
+                                built site is built from -- plus theme and
+                                image settings the medium-archive README
+                                documents in full
+site-myst/,                   optional generated sites, each built from
+site-hugo/,                     posts/ + posts.json by `medium-archive
+site-pelican/                   myst|hugo|pelican` and each carrying its own
+                                redirects.csv. Derived and disposable --
+                                delete and rebuild at will; nothing in them
+                                is checked in
 ```
 
 ## Front matter (posts/*/index.md)
@@ -326,8 +280,8 @@ it), `npm install -g mystmd pagefind`.
 
 Before deploying, set `base_url` in `site.json` to the site's real
 domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
-exporter step: feed URLs, redirect stubs, per-post share links, and
-other absolute links are built from it.
+exporter step: every absolute link a generator bakes in is built
+from it.
 
 hugo (preferred):
 

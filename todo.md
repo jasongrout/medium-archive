@@ -386,6 +386,16 @@ data loss here):
   the development sandbox could not reach medium.com — so verify the
   first live run's output.
 
+- Download the official brand icons for the share links. The sprite in
+  `templates/shared/share-icons.html` currently carries Simple Icons'
+  reproductions of the LinkedIn, Facebook, Bluesky and Mastodon marks,
+  hand-embedded as paths on their 24x24 grid; each network publishes
+  its own brand assets, with terms on how the mark may be shown
+  (LinkedIn and Facebook both restrict colour, spacing and alteration).
+  Take each mark from its own brand page, keep the sprite's single
+  hidden-`<symbol>` shape so nothing else has to change, and record
+  where each came from next to the entry in `templates/README.md`.
+
 - Link contrast in the card theme: links use `--accent` (#f37626,
   Jupyter Orange) directly, which is 2.8:1 against the light palette's
   white cards — below WCAG AA's 4.5:1 for normal-size text, let alone
