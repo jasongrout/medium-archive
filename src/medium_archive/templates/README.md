@@ -102,18 +102,17 @@ regular list and taxonomy pages share `list.html`), plus:
 
 - `pelicanconf.py.tmpl` — the generated config, including the
   `_LazyImages` Markdown extension (body images load lazily) and
-  `TAG_DISPLAY`, the tag-slug-to-name map the theme reads through the
-  `tag_name` filter defined beside it (tags reach Pelican as slugs so
-  their URLs are exact; see `tags.py`).
+  `TAG_DISPLAY`, the tag-slug-to-name map (tags reach Pelican as slugs
+  so their URLs are exact; see `tags.py`).
 - `site_plugin.py` — appended verbatim after the filled config: gives
-  Pelican the redirect stubs Hugo renders for aliases, and the
-  responsive body images the hugo theme's render hook produces. It
-  refers to names the config defines (`SITEURL`, `PATH`), so it is not
+  Pelican the redirect stubs Hugo renders for aliases, the responsive
+  body images the hugo theme's render hook produces, and the names tags
+  are shown under (from `TAG_DISPLAY`, set on the `Tag` objects so the
+  theme and the per-tag feeds both pick them up). It refers to names the
+  config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`), so it is not
   importable on its own.
 - `theme/templates/` — the Jinja theme. `author.html` is `tag.html`
-  with the `tag` variable swapped for `author`; keep them in step, bar
-  the `|tag_name` filter, which authors have no use for (an author is
-  already stored under the name it is shown under).
+  with the `tag` variable swapped for `author`; keep them in step.
 
 ## myst/
 

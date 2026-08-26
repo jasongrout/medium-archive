@@ -4,6 +4,6 @@
 <h1 class="page-title">Tags</h1>
 <!-- @include shared/term-sort.html -->
 <p class="term-list">
-{% for tag, articles in tags | sort %}<a class="chip" href="{{ SITEURL }}/{{ tag.url }}">{{ tag|tag_name }} <span>{{ articles | length }}</span></a>
+{% for tag, articles in tags | sort %}<a class="chip" href="{{ SITEURL }}/{{ tag.url }}">{{ tag }} <span>{{ articles | length }}</span></a>
 {% endfor %}</p>
 {% endblock %}

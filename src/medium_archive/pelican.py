@@ -18,8 +18,10 @@ Atom feeds (site-wide and per tag/author) come out of the box. Tags
 reach Pelican as slugs, so tag.slug and every /tags/<slug>/ URL are
 exactly the archive's tag rather than whatever Pelican's slugify would
 make of a name like "C++"; the names tags are shown under (tags.json's
-`display`) go into pelicanconf.py as TAG_DISPLAY, which the theme reads
-through a tag_name filter.
+`display`) go into pelicanconf.py as TAG_DISPLAY, from which the site
+plugin names the Tag objects once the tags are collected -- Pelican
+renders a tag from the object everywhere, the per-tag feed title
+included, and that one it builds in Python out of reach of a template.
 
 The exporter writes its own theme, from the package's templates/pelican/
 and templates/shared/ files -- the card-grid blog shared with

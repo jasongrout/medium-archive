@@ -206,9 +206,8 @@ def test_tag_display_names_reach_both_sites(archive):
     assert "Tags: example" in head                # the tag is still a slug
     config = (pelican_site / "pelicanconf.py").read_text()
     assert '"example": "Example Tag"' in config
-    assert "JINJA_FILTERS" in config
-    assert "{{ tag|tag_name }}" in \
-        (pelican_site / "theme/templates/tag.html").read_text()
+    assert "_name_tags" in config          # names the Tag objects, so the
+    assert "article_generator_finalized" in config   # feeds get it too
 
 
 def test_tags_display_as_slugs_with_spaces_by_default(archive):

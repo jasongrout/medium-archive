@@ -140,10 +140,33 @@ def _optimize_article_images(pelican_obj):
           "%(pages)d pages rewritten" % stats)
 
 
+def _name_tags(article_generator):
+    # A tag reaches Pelican as the archive's slug, so tag.slug -- what
+    # /tags/<slug>/, the per-tag feed's filename and the object's own
+    # hash are built from -- is exactly right, and only the name a
+    # reader sees is left to set. Pelican renders a tag from the Tag
+    # object everywhere, including the per-tag feed's title, which it
+    # builds in Python out of reach of any template; so the objects
+    # themselves are named here, once, the way the hugo exporter gives
+    # each term an _index.md title. Runs on article_generator_finalized:
+    # the tags are collected by then and nothing is written yet. The
+    # slug is pinned before the rename because setting a name otherwise
+    # re-slugifies from it, which is how "C++" would become /tags/c/.
+    named = 0
+    for tag in article_generator.tags:
+        name = TAG_DISPLAY.get(tag.slug)
+        if name and name != tag.name:
+            tag.slug = tag.slug
+            tag.name = name
+            named += 1
+    print(f"tag names: {named} of {len(article_generator.tags)} tags named")
+
+
 class _SitePlugins:
     @staticmethod
     def register():
         from pelican import signals
+        signals.article_generator_finalized.connect(_name_tags)
         signals.finalized.connect(_optimize_article_images)
         signals.finalized.connect(_write_redirect_stubs)
 
