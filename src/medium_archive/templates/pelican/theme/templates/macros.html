@@ -11,3 +11,26 @@
 </div>
 </article>
 {% endmacro %}
+
+{# The share bar, rendered twice per post (under the byline and at the
+   foot), so the marks come from the sprite share-icons.html splices
+   into the page once. Jinja does no contextual escaping of its own, so
+   each value spells out |urlencode for a query string or |e for an
+   attribute; urlencode quotes with safe="/", which would leave the
+   slashes of a nested URL raw, and LinkedIn documents its url param as
+   fully encoded, so the replace finishes the job -- and keeps this
+   emitting the same link hugo's escaper does. #}
+{% macro share(post_url, post_title) %}
+{% set share_text = post_title ~ " " ~ post_url %}
+{% set enc_url = post_url|urlencode|replace("/", "%2F") %}
+{% set enc_title = post_title|urlencode|replace("/", "%2F") %}
+{% set enc_text = share_text|urlencode|replace("/", "%2F") %}
+<div class="post-share" data-pagefind-ignore>
+<span class="share-label">Share</span>
+<a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ enc_url }}" aria-label="Share on LinkedIn" title="Share on LinkedIn"><svg class="share-icon" aria-hidden="true"><use href="#share-linkedin"></use></svg></a>
+<a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ enc_url }}" aria-label="Share on Facebook" title="Share on Facebook"><svg class="share-icon" aria-hidden="true"><use href="#share-facebook"></use></svg></a>
+<a class="share-link" href="https://bsky.app/intent/compose?text={{ enc_text }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
+<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ share_text|e }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
+<a class="share-link" href="mailto:?subject={{ enc_title }}&amp;body={{ enc_url }}" aria-label="Share by email" title="Share by email"><svg class="share-icon" aria-hidden="true"><use href="#share-email"></use></svg></a>
+</div>
+{% endmacro %}

@@ -124,9 +124,12 @@ It works in independent steps:
   original holds more detail than the article column shows opens it
   full size in a modal, the one Medium reading affordance the archive
   would otherwise lose, since Medium's own "click to view image in
-  full size" hint is stripped as chrome on conversion; share links at
-  the foot of every article — LinkedIn, Facebook, Bluesky, Mastodon and
-  email, under each network's own logomark — built from the post's
+  full size" hint is stripped as chrome on conversion; share links
+  under every article's byline and again at its foot — LinkedIn,
+  Facebook, Bluesky, Mastodon and email, under each network's own
+  logomark, which a hover deepens rather than recolors, since tinting a
+  logo to the site accent is against most of their brand guidelines —
+  built from the post's
   absolute URL, so `base_url` has to be set for them to point anywhere
   real (the exporters say so on stderr when it is not); a toot has no
   single address to be sent to, so the Mastodon one asks the reader for

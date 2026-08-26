@@ -1,35 +1,20 @@
 {% extends "base.html" %}
+{% from "macros.html" import share with context %}
 {% block title %}{{ article.title }} · {{ SITENAME }}{% endblock %}
 {% block content %}
-{# title and URL, said once; Jinja does no contextual escaping of its
-   own, so each use spells out |urlencode for a query string or |e for
-   an attribute. article.title is HTML here (hugo's .Title is not), so
-   it is stripped to text before either. #}
+{# title and URL, said once; the macro does the encoding. article.title
+   is HTML here (hugo's .Title is not), so it is stripped to text. #}
 {% set post_url = SITEURL ~ "/" ~ article.url %}
 {% set post_title = article.title|striptags %}
-{% set share_text = post_title ~ " " ~ post_url %}
-{# Jinja's urlencode quotes with safe="/", which would leave the slashes
-   of a nested URL raw; LinkedIn documents its url param as fully
-   encoded, and hugo's escaper encodes them, so finish the job here and
-   keep the two engines emitting the same link. #}
-{% set enc_url = post_url|urlencode|replace("/", "%2F") %}
-{% set enc_title = post_title|urlencode|replace("/", "%2F") %}
-{% set enc_text = share_text|urlencode|replace("/", "%2F") %}
 <!-- @include shared/share-icons.html -->
 <article class="post" data-pagefind-body>
 <h1>{{ article.title }}</h1>
 <p class="post-meta"><time>{{ article.locale_date }}</time>
 {%- if article.author %} · <a href="{{ SITEURL }}/{{ article.author.url }}">{{ article.author }}</a>{% endif %}
 {%- if article.tags %} ·{% for t in article.tags %} <a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a>{% endfor %}{% endif %}</p>
+{{ share(post_url, post_title) }}
 {{ article.content }}
-<div class="post-share" data-pagefind-ignore>
-<span class="share-label">Share</span>
-<a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ enc_url }}" aria-label="Share on LinkedIn" title="Share on LinkedIn"><svg class="share-icon" aria-hidden="true"><use href="#share-linkedin"></use></svg></a>
-<a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ enc_url }}" aria-label="Share on Facebook" title="Share on Facebook"><svg class="share-icon" aria-hidden="true"><use href="#share-facebook"></use></svg></a>
-<a class="share-link" href="https://bsky.app/intent/compose?text={{ enc_text }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
-<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ share_text|e }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
-<a class="share-link" href="mailto:?subject={{ enc_title }}&amp;body={{ enc_url }}" aria-label="Share by email" title="Share by email"><svg class="share-icon" aria-hidden="true"><use href="#share-email"></use></svg></a>
-</div>
+{{ share(post_url, post_title) }}
 </article>
 <!-- @include shared/share-mastodon.html -->
 <!-- @include shared/image-zoom.html -->

@@ -491,49 +491,67 @@ def test_image_zoom(archive):
 
 
 def test_post_share_links(archive):
-    """Post pages end in the five share links, each carrying its network's
-    own mark from the shared sprite."""
+    """A post carries the five share links twice -- under the byline and
+    at the foot -- from one definition per engine, each mark coming from
+    the shared sprite."""
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
     # each engine names the same three values, so the bars keep one shape
-    for page, url, title, text in (
-            (hugo_site / "layouts/_default/single.html", "{{ .Permalink }}",
+    for bar, url, title, text in (
+            (hugo_site / "layouts/partials/share.html", "{{ .Permalink }}",
              "{{ .Title }}", "{{ $text }}"),
-            (pelican_site / "theme/templates/article.html", "{{ enc_url }}",
+            (pelican_site / "theme/templates/macros.html", "{{ enc_url }}",
              "{{ enc_title }}", "{{ enc_text }}")):
-        source = page.read_text()
-        # the marks come from the shared sprite, spliced in ahead of them
+        source = bar.read_text()
         for network in ("linkedin", "facebook", "bluesky", "mastodon", "email"):
-            assert f'<symbol id="share-{network}"' in source, page
-            assert f'<use href="#share-{network}"></use>' in source, page
-        assert source.index("share-sprite") < source.index("post-share"), page
-        # the bar rides inside the post card, but out of the search index
-        assert '<div class="post-share" data-pagefind-ignore>' in source, page
-        assert source.index("post-share") < source.index("</article>"), page
+            assert f'<use href="#share-{network}"></use>' in source, bar
+        assert '<div class="post-share" data-pagefind-ignore>' in source, bar
         for target in (f"linkedin.com/sharing/share-offsite/?url={url}",
                        f"facebook.com/sharer/sharer.php?u={url}",
                        f"bsky.app/intent/compose?text={text}",
                        f"mailto:?subject={title}&amp;body={url}"):
-            assert target in source, page
+            assert target in source, bar
         # a toot goes to the reader's own server, which the page cannot
         # know: the link hooks the prompt that asks for it and remembers
-        # the answer, and follows the article, whose text it shares
-        assert 'class="share-link share-mastodon"' in source, page
-        assert "data-share-text=" in source, page
-        assert 'localStorage.setItem("mastodon-host", host)' in source, page
+        # the answer
+        assert 'class="share-link share-mastodon"' in source, bar
+        assert "data-share-text=" in source, bar
+
+    for page, call in ((hugo_site / "layouts/_default/single.html",
+                        '{{ partial "share.html" . }}'),
+                       (pelican_site / "theme/templates/article.html",
+                        "{{ share(post_url, post_title) }}")):
+        source = page.read_text()
+        # once under the byline and once after the body, both inside the
+        # post card, and the sprite they draw from ahead of the first
+        head, foot = source.index(call), source.rindex(call)
+        assert head != foot, page
+        assert source.index("share-sprite") < head, page
+        assert source.index("post-meta") < head < source.index("</article>"), page
+        assert foot < source.index("</article>"), page
+        # the script wires every bar on the page, not just the first
+        assert 'querySelectorAll(".share-mastodon")' in source, page
         assert source.index("</article>") < source.index("mastodon-host"), page
+
     # hugo escapes each value for its URL context on its own; pelican's
     # Jinja does not, so the theme spells the encoding out -- on each
     # value, which is what this pins: the check must fail when one of
     # them loses its encoding, not merely when the file has none left
     lines = {line.split()[2]: line for line
-             in (pelican_site / "theme/templates/article.html").read_text()
+             in (pelican_site / "theme/templates/macros.html").read_text()
              .splitlines() if line.startswith("{% set ")}
     for name in ("enc_url", "enc_title", "enc_text"):
         assert lines[name].endswith('|urlencode|replace("/", "%2F") %}'), name
+
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".share-sprite { display: none; }" in css
     assert ".share-icon { width: 1.05rem" in css
+    # the marks are the networks' logos: a hover may deepen them, but
+    # recoloring them to this site's accent is against most of those
+    # networks' brand guidelines
+    hover = next(line for line in css.splitlines()
+                 if line.startswith(".share-link:hover"))
+    assert "var(--accent)" not in hover, hover
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 

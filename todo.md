@@ -370,7 +370,40 @@ data loss here):
   feature where a URL leaves the site, so a wrong one fails outright
   instead of degrading (`sites.py`, both base templates).
 
+- **The share bar under the byline too, and monochrome marks** — a
+  reader who decides to pass a post on usually decides at the top,
+  where the byline tells them whose it is, not after scrolling to the
+  foot. The bar now renders in both places, which meant giving each
+  engine one definition of it rather than four copies: hugo gets
+  `partials/share.html`, the pelican theme a `share()` macro beside
+  `card()`, each called twice, with the `<symbol>` sprite still spliced
+  in once and the Mastodon script binding every anchor rather than the
+  first. The byline copy takes no rule above it — one there cuts the
+  head off the article — and `.post-meta` carries the tighter margin
+  that pairs with it. Hover no longer tints the marks with the site
+  accent: these are the networks' logos, and most of their brand
+  guidelines allow a one-color rendering but not a recoloring, so a
+  hover deepens the mark toward the ink instead (`partials/share.html`,
+  `macros.html`, `card.css`, `shared/share-mastodon.html`).
+
 ## Remaining
+
+- Take the share bar's marks and share URLs from each network's own
+  brand and developer material, rather than the reproductions and
+  community knowledge it runs on now. The logomarks come from Simple
+  Icons, which is a faithful reproduction but not the source -- and
+  which dropped LinkedIn's over that company's branding policy, so
+  that one is lifted from an old release. Per network, the two things
+  worth confirming at the source are the official logo file with its
+  usage rules (clear space, minimum size, which one-color renderings
+  are permitted -- the bar assumes a monochrome mark tinted by
+  `currentColor`, which is why hovering deepens it instead of coloring
+  it), and the current documented share URL with its parameters:
+  LinkedIn's `shareArticle` is already deprecated in favor of
+  `sharing/share-offsite/`, Facebook's `sharer.php` is long-lived but
+  undocumented, and the Bluesky and Mastodon intents are conventions
+  rather than specifications. Each network's guidelines may also
+  constrain the wording beside the mark.
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
   gist embeds, then `convert` + `lint` (the placeholders the 2026-08
