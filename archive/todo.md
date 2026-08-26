@@ -266,14 +266,15 @@ right.
 
 Those are the Jupyter projects (`jupyterlab` → "JupyterLab",
 `jupyter-notebook` → "Jupyter Notebook", `jupytercad` → "JupyterCAD",
-`tljh` → "The Littlest JupyterHub", `mystmd` → "MyST", `voila` →
-"Voilà", …), the outside projects and platforms (`github` → "GitHub",
-`kubernetes` → "Kubernetes", `docker` → "Docker", `javascript` →
-"JavaScript", `webassembly` → "WebAssembly", `devops` → "DevOps", `cpp`
-→ "C++", `ai` → "AI"), and `outreachy` → "Outreachy". The tool tags
-whose own projects spell themselves lowercase — `anywidget`,
-`ipycanvas`, `ipycytoscape`, `nbviewer`, `repo2docker`, `xeus` — are
-left alone deliberately: correct capitalization there *is* lowercase.
+`mystmd` → "MyST", `voila` → "Voilà", and `tljh` → "TLJH", the acronym
+rather than "The Littlest JupyterHub", which is too long for a chip),
+the outside projects and platforms (`github` → "GitHub", `kubernetes` →
+"Kubernetes", `docker` → "Docker", `javascript` → "JavaScript",
+`webassembly` → "WebAssembly", `devops` → "DevOps", `cpp` → "C++", `ai`
+→ "AI"), and `outreachy` → "Outreachy". The tool tags whose own
+projects spell themselves lowercase — `anywidget`, `ipycanvas`,
+`ipycytoscape`, `nbviewer`, `repo2docker`, `xeus` — are left alone
+deliberately: correct capitalization there *is* lowercase.
 
 Three run-together slugs were fixed at the same time, in the tag rather
 than its name. `jupyterenterprisegateway` → `jupyter-enterprise-gateway`
