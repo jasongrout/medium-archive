@@ -388,7 +388,8 @@ def test_theme_picker_and_dark_scheme(archive):
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "term-sort", "announcement",
-                 "nav-current", "image-zoom", "feed-icon"):
+                 "nav-current", "image-zoom", "feed-icon", "share-icons",
+                 "share-mastodon"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -486,6 +487,48 @@ def test_image_zoom(archive):
     assert "img.zoomable { cursor: zoom-in; }" in css
     assert ".zoom-dialog::backdrop" in css
     assert "prefers-reduced-motion" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_post_share_links(archive):
+    """Post pages end in the five share links, each carrying its network's
+    own mark from the shared sprite."""
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for page, url, title, text in (
+            (hugo_site / "layouts/_default/single.html", "{{ .Permalink }}",
+             "{{ .Title }}", "{{ .Title }}%20{{ .Permalink }}"),
+            (pelican_site / "theme/templates/article.html", "{{ share_url }}",
+             "{{ share_title }}", "{{ share_text }}")):
+        source = page.read_text()
+        # the marks come from the shared sprite, spliced in ahead of them
+        for network in ("linkedin", "facebook", "bluesky", "mastodon", "email"):
+            assert f'<symbol id="share-{network}"' in source, page
+            assert f'<use href="#share-{network}"></use>' in source, page
+        assert source.index("share-sprite") < source.index("post-share"), page
+        # the bar rides inside the post card, but out of the search index
+        assert '<div class="post-share" data-pagefind-ignore>' in source, page
+        assert source.index("post-share") < source.index("</article>"), page
+        for target in (f"linkedin.com/sharing/share-offsite/?url={url}",
+                       f"facebook.com/sharer/sharer.php?u={url}",
+                       f"bsky.app/intent/compose?text={text}",
+                       f"mailto:?subject={title}&amp;body={url}"):
+            assert target in source, page
+        # a toot goes to the reader's own server, which the page cannot
+        # know: the link hooks the prompt that asks for it and remembers
+        # the answer, and follows the article, whose text it shares
+        assert 'class="share-link share-mastodon"' in source, page
+        assert "data-share-text=" in source, page
+        assert 'localStorage.setItem("mastodon-host", host)' in source, page
+        assert source.index("</article>") < source.index("mastodon-host"), page
+    # hugo escapes each value for its URL context on its own; pelican's
+    # Jinja does not, so the theme spells the encoding out
+    article = (pelican_site / "theme/templates/article.html").read_text()
+    for name in ("share_url", "share_title", "share_text"):
+        assert f"{{% set {name} = " in article and "|urlencode %}" in article
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert ".share-sprite { display: none; }" in css
+    assert ".share-icon { width: 1.05rem" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 

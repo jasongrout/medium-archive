@@ -1,0 +1,28 @@
+<script>
+(function () {
+  function init() {
+    var link = document.querySelector(".share-mastodon");
+    if (!link) return;
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      var stored = "";
+      try { stored = localStorage.getItem("mastodon-host") || ""; } catch (e) {}
+      var answer = window.prompt(
+        "Your Mastodon server, e.g. fosstodon.org:", stored);
+      if (answer === null) return;
+      var host = answer.trim()
+        .replace(/^https?:\/\//i, "")   // a pasted server URL
+        .replace(/\/.*$/, "")
+        .replace(/^.*@/, "")            // a pasted @you@server handle
+        .toLowerCase();
+      if (!host) return;
+      try { localStorage.setItem("mastodon-host", host); } catch (e) {}
+      location.href = "https://" + host + "/share?text=" +
+        encodeURIComponent(link.dataset.shareText);
+    });
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>

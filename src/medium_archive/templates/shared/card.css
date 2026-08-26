@@ -111,6 +111,22 @@ a:hover { text-decoration: underline; }
                    border-left: 3px solid var(--accent); color: var(--soft); }
 .post figcaption, .post em img + em { color: var(--muted); }
 
+/* the share bar at the foot of a post: each network's own mark, in the
+   muted circles the header's theme picker uses. The sprite the marks
+   come from carries width/height 0 as well, so it stays out of the flow
+   even before the stylesheet lands. */
+.share-sprite { display: none; }
+.post-share { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem;
+              margin: 2.5rem 0 0; padding-top: 1.6rem;
+              border-top: 1px solid var(--line); }
+.share-label { color: var(--muted); font-size: .9rem; margin-right: .2rem; }
+.share-link { display: inline-flex; align-items: center; justify-content: center;
+              width: 2.1rem; height: 2.1rem; border: 1px solid var(--line);
+              border-radius: 999px; color: var(--muted); }
+.share-link:hover { color: var(--accent); border-color: var(--accent);
+                    text-decoration: none; }
+.share-icon { width: 1.05rem; height: 1.05rem; fill: currentColor; }
+
 /* Click-to-zoom, the one Medium reading affordance the archive would
    otherwise lose (its "click to view image in full size" hint is
    stripped as chrome on conversion). Only images the script finds

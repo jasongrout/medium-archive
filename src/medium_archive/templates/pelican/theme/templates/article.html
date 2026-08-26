@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 {% block title %}{{ article.title }} · {{ SITENAME }}{% endblock %}
 {% block content %}
+{% set share_url = (SITEURL ~ "/" ~ article.url)|urlencode %}
+{% set share_title = article.title|striptags|urlencode %}
+{% set share_text = (article.title|striptags ~ " " ~ SITEURL ~ "/" ~ article.url)|urlencode %}
+<!-- @include shared/share-icons.html -->
 <article class="post" data-pagefind-body>
 <h1>{{ article.title }}</h1>
 <p class="post-meta"><time>{{ article.locale_date }}</time>
 {%- if article.author %} · <a href="{{ SITEURL }}/{{ article.author.url }}">{{ article.author }}</a>{% endif %}
 {%- if article.tags %} ·{% for t in article.tags %} <a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a>{% endfor %}{% endif %}</p>
 {{ article.content }}
+<div class="post-share" data-pagefind-ignore>
+<span class="share-label">Share</span>
+<a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_url }}" aria-label="Share on LinkedIn" title="Share on LinkedIn"><svg class="share-icon" aria-hidden="true"><use href="#share-linkedin"></use></svg></a>
+<a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}" aria-label="Share on Facebook" title="Share on Facebook"><svg class="share-icon" aria-hidden="true"><use href="#share-facebook"></use></svg></a>
+<a class="share-link" href="https://bsky.app/intent/compose?text={{ share_text }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
+<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ article.title|striptags|e }} {{ SITEURL }}/{{ article.url }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
+<a class="share-link" href="mailto:?subject={{ share_title }}&amp;body={{ share_url }}" aria-label="Share by email" title="Share by email"><svg class="share-icon" aria-hidden="true"><use href="#share-email"></use></svg></a>
+</div>
 </article>
+<!-- @include shared/share-mastodon.html -->
 <!-- @include shared/image-zoom.html -->
 {% endblock %}

@@ -67,6 +67,22 @@ These embed verbatim in both engines' pages, so they must carry no
   corrects a changed announcement after the fact. Dismissal persists
   per browser keyed by the banner's content, so a changed announcement
   shows again.
+- `share-icons.html` — the five share marks as one hidden `<symbol>`
+  sprite the post templates `<use>`: LinkedIn's, Facebook's, Bluesky's
+  and Mastodon's own logomarks (Simple Icons' reproductions, at their
+  24x24 grid) plus an envelope drawn to match. The hrefs stay in each
+  engine's post template, since only the engine knows the post's URL;
+  the sprite is what the two share. It carries `width`/`height` 0 as
+  well as the stylesheet's `display: none`, so it is out of the flow
+  even before the CSS lands.
+- `share-mastodon.html` — the Mastodon link's click handler. Every
+  other network has one address to send a share to; a toot goes to the
+  reader's own server, which the page cannot know, so the link asks for
+  it and remembers the answer per browser, taking a pasted server URL
+  or `@you@server` handle as readily as a bare domain. Without JS the
+  link falls back to its href, the server directory. It follows the
+  article, so the anchor exists when the script runs (and it waits for
+  DOMContentLoaded regardless).
 - `image-zoom.html` — click-to-zoom for body images, spliced into the
   post templates (not the base ones: only article pages have body
   images). An image is marked zoomable, and given the cursor, the

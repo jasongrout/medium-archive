@@ -124,7 +124,14 @@ It works in independent steps:
   original holds more detail than the article column shows opens it
   full size in a modal, the one Medium reading affordance the archive
   would otherwise lose, since Medium's own "click to view image in
-  full size" hint is stripped as chrome on conversion; and a
+  full size" hint is stripped as chrome on conversion; share links at
+  the foot of every article — LinkedIn, Facebook, Bluesky, Mastodon and
+  email, under each network's own logomark — built from the post's
+  absolute URL, so `base_url` has to be set for them to point anywhere
+  real; a toot has no single address to be sent to, so the Mastodon one
+  asks the reader for their server and remembers it per browser, taking
+  a pasted server URL or an `@you@server` handle as readily as a bare
+  domain; and a
   `/search/` page
   wired to [Pagefind](https://pagefind.app) — run `pagefind --site
   public|output` after building for full-text search served as a results
