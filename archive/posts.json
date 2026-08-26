@@ -4620,7 +4620,7 @@
     "description": "Jupyter Games Ipycanvas + Box2D Motivation Making their own tiny video games can be a great way for kids to learn programming in a playful matter. While Jupyter is widely used as a scientific and …",
     "tags": [
       "education",
-      "ipycanvas"
+      "widgets"
     ],
     "images": [
       "images/001-1_gXbeqCDvKyaRySdAX6SnKg.png",
@@ -6599,8 +6599,8 @@
     "ghost_url": null,
     "description": "Interactive Graph Visualization in Jupyter with ipycytoscape The Jupyter widgets ecosystem offers a broad variety of data visualization tools for exploratory analysis in the notebook. However, we …",
     "tags": [
-      "ipycytoscape",
-      "visualization"
+      "visualization",
+      "widgets"
     ],
     "images": [
       "images/001-1_d9UZBB4OB3LXVm7fTHBHaw.png",
@@ -6805,8 +6805,8 @@
     "ghost_url": null,
     "description": "ipycanvas: A Python Canvas for Jupyter As you may already know, the Jupyter Notebook and JupyterLab are Browser-based applications. Browsers are incredibly powerful, they allow you to swap rich and …",
     "tags": [
-      "ipycanvas",
-      "visualization"
+      "visualization",
+      "widgets"
     ],
     "images": [
       "images/001-1_LHrtcPJMCWVMgsvNR6tR6w.png",

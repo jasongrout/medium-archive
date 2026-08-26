@@ -134,6 +134,7 @@
     "widget": "widgets",
     "jupyter-widget": "widgets",
     "interactive-widgets": "widgets",
+    "ipycytoscape": "widgets",
     "virtual-events": "events",
     "conference": "events",
     "conférence": "events",
@@ -238,7 +239,7 @@
     "university-of-edinburgh": "education",
     "collaborative-editing": "collaboration",
     "cad": "jupytercad",
-    "canvas": "ipycanvas",
+    "canvas": "widgets",
     "gis": "geoscience"
   },
   "imply": {
@@ -471,7 +472,7 @@
     ],
     "jupyter-games": [
       "education",
-      "ipycanvas"
+      "widgets"
     ],
     "jupyter-kernel-gateway": [
       "kernels"

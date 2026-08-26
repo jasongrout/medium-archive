@@ -272,13 +272,18 @@ the outside projects and platforms (`github` → "GitHub", `kubernetes` →
 "Kubernetes", `docker` → "Docker", `javascript` → "JavaScript",
 `webassembly` → "WebAssembly", `devops` → "DevOps", `cpp` → "C++", `ai`
 → "AI"), and `outreachy` → "Outreachy". The tool tags whose own
-projects spell themselves lowercase — `anywidget`, `ipycanvas`,
-`ipycytoscape`, `nbviewer`, `repo2docker`, `xeus` — are left alone
-deliberately: correct capitalization there *is* lowercase.
+projects spell themselves lowercase — `anywidget`, `nbviewer`,
+`repo2docker`, `xeus` — are left alone deliberately: correct
+capitalization there *is* lowercase.
 
-Three run-together slugs were fixed at the same time, in the tag rather
-than its name. `jupyterenterprisegateway` → `jupyter-enterprise-gateway`
-("Jupyter Enterprise Gateway"), so it hyphenates like the rest;
-`3dslicer` and `itkwidgets`, one post each and both about interactive 3D
-rendering in a notebook, fold into `visualization` (15 → 17) rather than
-staying as two more one-post tool tags. 58 tags.
+Five tags changed in the tag rather than its name, while the file was
+open. `jupyterenterprisegateway` → `jupyter-enterprise-gateway`
+("Jupyter Enterprise Gateway"), so the one run-together slug hyphenates
+like the rest. Four one-post tool tags fold into the topic tag they sit
+under: `3dslicer` and `itkwidgets`, both about interactive 3D rendering
+in a notebook, into `visualization` (15 → 17); `ipycanvas` and
+`ipycytoscape`, both ipywidgets libraries, into `widgets` (11 → 14, the
+third being the `Jupyter Games` post that carried `ipycanvas` via
+`"add"`). The Medium tag `canvas` now renames straight to `widgets`,
+which left the `ipycanvas` rename with nothing to match — `convert`
+said so, and it went. 56 tags.
