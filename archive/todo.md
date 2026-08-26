@@ -212,6 +212,23 @@ the pairing without another edit. 60 tags, still no untagged post — the
 2026 user-experience survey results post, which came off Medium with no
 tags at all, gets `community` like the other survey posts.
 
+`jupyter-foundation` is the one tag this pass added rather than
+removed. The Foundation is new — announced in the October 2024 LF
+Charities post — and the blog has covered it steadily since, but no
+post carries a Medium tag for it, so all eight uses come from `"add"`:
+its founding, the 2025 Executive Council election that explains its
+governing board, the three community-funding posts (both calls for
+proposals and the first round of awards), its community-manager hire,
+and the 2026 user survey it ran plus the results. The line drawn is
+"the Foundation is the actor", not "the Foundation is thanked": a
+dozen more posts credit it for sponsoring or funding the work they
+describe — the Plugin Playground and jupyter-builder proposals, the
+eslint plugin, JupyterLab 4.6, the workshop reports, and the Positron
+guest post from a member company — and those keep the tags for what
+they are about. The two workshop-program posts (`Workshops Are Back`,
+`Early 2026`) are the closest call: the program runs on Foundation
+money and LF Events logistics, but the posts are about the workshops.
+
 Remaining judgement calls, all optional:
 
 - The nested pairs (`geoscience` under `science`, `jupytercon` under

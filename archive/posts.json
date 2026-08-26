@@ -91,7 +91,8 @@
     "ghost_url": null,
     "description": "The Jupyter Executive Council and Jupyter Foundation are pleased to announce a new Call for Proposals (CFP) for funding the Jupyter…",
     "tags": [
-      "funding"
+      "funding",
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-0_jwHtZqyuA711MXw9.png"
@@ -207,7 +208,8 @@
     "ghost_url": null,
     "description": "The Jupyter Foundation is excited to gather your feedback on the Jupyter user experience through a brief survey. If you had a magic wand…",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [],
     "body_source": "export",
@@ -301,7 +303,8 @@
     "ghost_url": null,
     "description": "Our new Jupyter Foundation Community Manager The Jupyter Foundation is excited to announce that we have contracted with Jason Grout to be a part-time Jupyter Foundation Community Manager. The primary …",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [],
     "body_source": "state",
@@ -862,6 +865,7 @@
     "description": "We are thrilled to announce the results of our first round of Jupyter Community Funding proposals. This is the first funding call from the…",
     "tags": [
       "funding",
+      "jupyter-foundation",
       "sustainability"
     ],
     "images": [
@@ -910,7 +914,8 @@
     "ghost_url": null,
     "description": "The Jupyter Executive Council and Jupyter Foundation are pleased to announce a call for proposals for the Jupyter community. Visit the…",
     "tags": [
-      "funding"
+      "funding",
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-1_62F-8MV2IQQToNrR4GdU_g.png"
@@ -1298,7 +1303,8 @@
     "ghost_url": null,
     "description": "Project Jupyter recently completed its 2025 Executive Council (EC) election, marking an important transition in its leadership. The newly…",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [],
     "body_source": "export",
@@ -1609,7 +1615,8 @@
     "ghost_url": null,
     "description": "We are excited to announce that Project Jupyter is entering a new phase in our journey: we are joining LF Charities, a 501(c)(3) non-profit…",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-1_LKQqc8xdq6K7gCQderCHrA.jpeg"
@@ -8472,7 +8479,8 @@
     "ghost_url": null,
     "description": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey From time to time, Jupyter runs user surveys to understand how our communities use Jupyter technology …",
     "tags": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "images": [
       "images/001-1_EcfaS7-4u-hlCUlTaEBitQ.png",

@@ -247,6 +247,9 @@
     ]
   },
   "add": {
+    "2026-jupyter-community-call-for-funding-proposals": [
+      "jupyter-foundation"
+    ],
     "a-2019-retrospective-from-the-binder-project": [
       "binder"
     ],
@@ -278,6 +281,9 @@
     "announcing-jupyter-notebook-7": [
       "jupyter-notebook",
       "releases"
+    ],
+    "announcing-our-first-jupyter-community-funded-proposals": [
+      "jupyter-foundation"
     ],
     "announcing-the-new-jupyter-book": [
       "jupyter-book"
@@ -520,6 +526,9 @@
     "jupyter-server-2-0-is-released": [
       "releases"
     ],
+    "jupyter-user-survey": [
+      "jupyter-foundation"
+    ],
     "jupytercon-2018-call-for-proposal": [
       "jupytercon"
     ],
@@ -658,7 +667,8 @@
       "diversity"
     ],
     "our-new-jupyter-foundation-community-manager": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "outreachy-jupyter-supporting-diversity-in-open-communities": [
       "outreachy"
@@ -676,7 +686,11 @@
       "community"
     ],
     "project-jupyter-joins-lf-charities": [
-      "community"
+      "community",
+      "jupyter-foundation"
+    ],
+    "project-jupyters-2025-executive-council-elections": [
+      "jupyter-foundation"
     ],
     "public-notebooks-and-security": [
       "jupyter-notebook"
@@ -748,13 +762,17 @@
       "voila"
     ],
     "what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan": [
-      "community"
+      "community",
+      "jupyter-foundation"
     ],
     "xeus-is-now-a-jupyter-subproject": [
       "xeus"
     ],
     "xeus-lite": [
       "xeus"
+    ],
+    "your-ideas-our-support-jupyter-community-call-for-funding-proposals": [
+      "jupyter-foundation"
     ],
     "zero-to-jupyterhub-helm-chart-0-8": [
       "jupyterhub"
