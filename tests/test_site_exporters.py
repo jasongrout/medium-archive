@@ -244,6 +244,10 @@ def test_feed_links_carry_the_rss_mark(archive):
     base = (pelican_site / "theme/templates/base.html").read_text()
     assert "TAG_FEED_ATOM.format(slug=tag.slug)" in base
     assert "AUTHOR_FEED_ATOM.format(slug=author.slug)" in base
+    # ... and hugo's head has the same pair, each titled the way that
+    # feed titles itself, so a reader files it under the name it shows
+    assert 'site.Home.OutputFormats.Get "rss"' in nav
+    assert '{{ $.Title }} · {{ site.Title }}' in nav
     css = (pelican_site / "theme/static/css/style.css").read_text()
     assert ".feed-icon" in css and ".page-title .feed-link" in css
 

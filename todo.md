@@ -316,9 +316,14 @@ data loss here):
   term's own feed. Hugo draws the link from `.OutputFormats.Get "rss"`,
   so it appears exactly where a feed exists and its `<link
   rel="alternate">` was already per-page; pelican's comes from
-  `TAG_FEED_ATOM`/`AUTHOR_FEED_ATOM`, and `base.html` now declares the
-  term's feed in the head beside the site-wide one
-  (`templates/shared/feed-icon.html`, `card.css`, both themes).
+  `TAG_FEED_ATOM`/`AUTHOR_FEED_ATOM`. Both heads now declare the same
+  pair — the site-wide feed on every page, plus this page's own where it
+  has one — each `<link>` titled the way that feed titles itself, since
+  a reader files a subscription under the name the link gives it. Hugo
+  had been advertising a term's feed under the bare site title (so
+  subscribing from /tags/jupyterlab/ filed "Jupyter Blog", not
+  "JupyterLab · Jupyter Blog") and advertising nothing at all on a post
+  page (`templates/shared/feed-icon.html`, `card.css`, both themes).
 
 ## Remaining
 
