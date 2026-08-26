@@ -103,6 +103,8 @@ def test_unused_entries_are_tracked(tmp_path):
     ({"display": {"a": " A"}}, "whitespace"),
     ({"display": {" a": "A"}}, "whitespace"),
     ({"drop": ["a"], "display": {"a": "A"}}, "never shown"),
+    ({"drop": ["a"], "add": {"s": ["b"]}, "display": {"a": "A"}},
+     "never shown"),
     ({"rename": {"a": "b"}, "display": {"a": "A"}}, "name the final tag"),
     ({"display": {"a-b": "a b"}}, "without an entry"),
     ({"display": {"a": "X", "b": "X"}}, "would both show as"),
@@ -326,3 +328,18 @@ def test_tag_names_covers_every_tag_in_the_archive(tmp_path):
 def test_tag_names_without_a_tags_json(tmp_path):
     assert tag_names({"a": {"tags": ["open-science"]}}, tmp_path) \
         == {"open-science": "open science"}
+
+
+def test_display_names_a_dropped_then_re_added_tag(tmp_path):
+    """Splitting an over-applied tag drops it everywhere and re-asserts it
+    where it belongs, so a dropped tag with an `add` still reaches pages
+    and can be named."""
+    out = write_config(tmp_path, {
+        "drop": ["jupyter-notebook"],
+        "add": {"my-post": ["jupyter-notebook"]},
+        "display": {"jupyter-notebook": "Jupyter Notebook"}})
+    tag_map = load_tag_map(out)
+    assert tag_map.apply(["jupyter-notebook"], "my-post") \
+        == ["jupyter-notebook"]
+    assert display_name("jupyter-notebook", tag_map.display) \
+        == "Jupyter Notebook"

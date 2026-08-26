@@ -65,7 +65,10 @@ entry a tag displays as itself with its hyphens as spaces
 ("open-science" -> "open science"), which is why the section holds only
 the tags that need a proper name; an entry repeating that default aborts
 at load like any other entry that changes nothing, and two tags may not
-share a name, which would make a site's tag index ambiguous.
+share a name, which would make a site's tag index ambiguous. Only a tag
+that can reach a page may be named, so a dropped tag aborts unless an
+`add` puts it back -- the split-an-over-applied-tag case above, where
+the tag does still reach the posts that deserve it.
 
 The config fails loudly, like a fixup that no longer applies: unknown
 top-level keys, malformed entries, a tag both dropped and renamed, a
@@ -288,6 +291,7 @@ def load_tag_map(out: Path) -> TagMap | None:
     if not isinstance(display, dict):
         _fail(path, "'display' must be an object of {tag: name} entries")
     named = {}                                # name -> the tag claiming it
+    readded = {tag for tags in add.values() for tag in tags}
     for tag, name in display.items():
         _check_tag(path, tag, "display")
         if not isinstance(name, str) or not name.strip():
@@ -296,7 +300,7 @@ def load_tag_map(out: Path) -> TagMap | None:
         if name != name.strip():
             _fail(path, f"display {tag!r}: {name!r} has leading/trailing "
                         "whitespace")
-        if tag in drop:
+        if tag in drop and tag not in readded:     # dropped-then-re-added
             _fail(path, f"display: {tag!r} is dropped, so it is never shown")
         if tag in rename:
             _fail(path, f"display: {tag!r} is renamed to {rename[tag]!r}; "
