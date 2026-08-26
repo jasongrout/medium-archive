@@ -572,6 +572,30 @@ def test_share_targets_get_the_open_graph_tags_they_render_from(archive):
         assert "summary_large_image" in source and "summary" in source, head
 
 
+def test_a_title_is_plain_text_not_html(archive):
+    """Pelican renders only FORMATTED_FIELDS (summary) as markdown, so a
+    post's title reaches the theme as the plain text of its Title:
+    header. Stripping tags from it would delete any run shaped like one
+    -- "Using <script> tags safely" -> "Using tags safely" -- rather
+    than escape it, losing what hugo keeps."""
+    pelican_site = pelican.build_site(archive)
+    article = (pelican_site / "theme/templates/article.html").read_text()
+    assert "{% set post_title = article.title %}" in article
+    assert "article.title|striptags" not in article
+
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    og_title = next(line for line in base.splitlines()
+                    if 'property="og:title"' in line)
+    assert "{{ article.title|e }}" in og_title, og_title
+    assert "striptags" not in og_title, og_title
+    # the summary, though, really is HTML -- pelican formats that one,
+    # and an auto-generated summary is a fragment of the body -- so it
+    # keeps the stripping, here as in the card macro
+    og_desc = next(line for line in base.splitlines()
+                   if 'property="og:description"' in line)
+    assert "article.summary|striptags|e" in og_desc, og_desc
+
+
 def test_missing_base_url_is_not_silent(tmp_path, capsys):
     """Every absolute link -- feeds, redirect stubs, og:url, the share
     links -- is built from base_url, and a share link with the wrong one
