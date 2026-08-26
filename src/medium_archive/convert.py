@@ -417,8 +417,10 @@ def cmd_convert(args):
     tag_map = load_tag_map(args.out)
     if tag_map:
         print(f"tags: dropping {len(tag_map.drop)}, renaming "
-              f"{len(tag_map.rename)} and adding to {len(tag_map.add)} "
-              f"post(s) per {tag_map.path}", file=sys.stderr)
+              f"{len(tag_map.rename)}, implying from {len(tag_map.imply)}, "
+              f"adding to {len(tag_map.add)} and removing from "
+              f"{len(tag_map.remove)} post(s) per {tag_map.path}",
+              file=sys.stderr)
     ok = 0
     for n, url in enumerate(targets, 1):
         entry = index.get(url)

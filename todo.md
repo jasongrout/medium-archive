@@ -265,6 +265,22 @@ data loss here):
   `myst` build exactly as before. The archive's `site-zola/` directory,
   if one was built, is now stale output and can be deleted.
 
+- **tags.json: `imply` and per-post `remove`** — curating an archive's
+  tags needs both directions, and the file only had one. `"imply"`
+  states that one tag entails another everywhere it appears (every
+  `jupytercon` or `workshops` post is also an `events` post) instead of
+  repeating the pairing per post; `"remove"` subtracts a tag from the
+  posts it does not describe, keyed by slug like `"add"`, which is the
+  cheaper half of splitting an over-applied tag when most of its uses
+  are right (drop-then-re-add stays the right move when most are
+  wrong). The passes run drop, rename, add, imply, remove — so an added
+  tag entails as much as an inherited one, and a remove has the last
+  word even over an implication — and both new sections fail as loudly
+  as the old ones: chained or dropped implications, a tag both added
+  and removed on one post, and stale entries (an implication no post
+  triggers, a remove of a tag no matching post carries) abort
+  (`src/medium_archive/tags.py`).
+
 ## Remaining
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
