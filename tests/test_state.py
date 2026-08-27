@@ -177,6 +177,19 @@ def test_convert_post_recovers_shell_from_state(tmp_path):
     assert "Recovered body text." in out.read_text()
 
 
+def test_state_subtitle_repeating_the_title_loses_it(tmp_path):
+    # the stored preview subtitle is built from the body, so on a post
+    # that opens with its title the subtitle repeats it; the description
+    # written to front matter is the summary alone
+    raw = tmp_path / MID
+    raw.mkdir()
+    state = make_state([para(0, "H3", "My Post"), para(1, "P", "Body text.")],
+                       previewContent={"subtitle": "My Post Body text."})
+    (raw / "page.html").write_text(shell_html(state))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["description"] == "Body text."
+
+
 def test_shell_without_state_still_fails(tmp_path):
     raw = tmp_path / MID
     raw.mkdir()
