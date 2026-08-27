@@ -398,6 +398,17 @@ longer lists — work through the steps in order:
   Code fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's Medium
   profile.
+* A post's `description` is its summary and nothing else. Medium writes
+  the summary it puts in JSON-LD and `<meta name="description">` as
+  `<title> <excerpt>` and caps the result, so the title arrives twice and
+  the excerpt is cut short; `og:description` carries the excerpt by
+  itself, and is preferred. On posts that open with their own title in
+  the body — Medium's early years, and the Ghost-era posts migrated into
+  it — the title leads even that excerpt, so `convert` drops a repeated
+  title from whichever summary it uses, whatever the source (an account
+  export's subtitle already arrives clean). A title that is itself
+  ellipsis-truncated is left alone: there is no telling where it ended,
+  so cutting it would strand its tail at the front of the description.
 * Every Medium page carries its post twice: rendered into the visible
   HTML, and as data in its embedded editor state
   (`window.__APOLLO_STATE__`) — the ordered paragraph list with markup

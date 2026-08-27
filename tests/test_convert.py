@@ -1,12 +1,14 @@
-"""to_markdown fence sizing, canonical-URL resolution, page chrome removal."""
+"""to_markdown fence sizing, canonical-URL resolution, page chrome and
+title removal."""
 
+import json
 from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
 
 from medium_archive.convert import convert_post, to_markdown
-from medium_archive.pages import collapse_br_pairs, page_body
+from medium_archive.pages import collapse_br_pairs, extract_metadata, page_body
 from medium_archive.urls import resolve_canonical, slug_of
 
 URL = "https://blog.example.com/my-post-0123456789ab"
@@ -263,3 +265,93 @@ def test_gist_script_inlines_archived_files():
     markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
     assert "```python\nx = 1\n```" in markdown
     assert "gist.github.com" not in markdown
+
+
+def medium_page(*, og_description=None, ld_description=None,
+                meta_description=None, title="Widgets for everyone") -> str:
+    """A Medium post page carrying the summary tags a test cares about."""
+    tags = [f'<meta property="og:title" content="{title}" />']
+    if og_description is not None:
+        tags.append(f'<meta property="og:description" content="{og_description}" />')
+    if meta_description is not None:
+        tags.append(f'<meta name="description" content="{meta_description}" />')
+    ld = {"@type": "NewsArticle", "headline": title,
+          "datePublished": "2020-01-02T03:04:05.000Z"}
+    if ld_description is not None:
+        ld["description"] = ld_description
+    tags.append('<script type="application/ld+json">'
+                f"{json.dumps(ld)}</script>")
+    return (f'<html><head><link rel="canonical" href="{URL}" />'
+            + "".join(tags) + "</head><body><article>"
+            "<h1>Widgets for everyone</h1><p>Real content.</p>"
+            "</article></body></html>")
+
+
+def described(**kwargs) -> str:
+    soup = BeautifulSoup(medium_page(**kwargs), "html.parser")
+    return extract_metadata(soup, URL)["description"]
+
+
+def test_description_drops_the_title_medium_repeats():
+    # Medium writes its summary as "<title> <excerpt>" and caps it; the
+    # description is the excerpt alone, which og:description carries
+    assert described(
+        og_description="We shipped it, and here is what it does for you.",
+        ld_description="Widgets for everyone We shipped it, and here is what it",
+        meta_description="Widgets for everyone We shipped it, and here is what it",
+    ) == "We shipped it, and here is what it does for you."
+
+
+def test_title_is_dropped_from_whichever_summary_is_used():
+    # no og:description: the JSON-LD text serves, minus the repeat
+    assert described(
+        ld_description="Widgets for everyone. We shipped it.",
+        meta_description="Widgets for everyone. We shipped it.",
+    ) == "We shipped it."
+
+
+def test_title_leading_the_open_graph_summary_is_dropped_too():
+    # older posts open with the title in the body, so it leads the
+    # excerpt Medium built from that body
+    assert described(
+        og_description="Widgets for everyone We shipped it.",
+    ) == "We shipped it."
+
+
+def test_summary_that_is_only_the_title_falls_through():
+    # a post titled with its own first sentence: og:description repeats
+    # it exactly and would strip to nothing, so the next summary serves
+    assert described(
+        og_description="Widgets for everyone",
+        meta_description="Widgets for everyone We shipped it.",
+    ) == "We shipped it."
+
+
+def test_summary_that_only_resembles_the_title_is_kept():
+    # the shared opening words are not a repeat: the title is not a
+    # prefix of this sentence, which takes its own turn after them
+    assert described(
+        title="Widgets for everyone 2016",
+        og_description="Widgets for everyone is a one-day workshop.",
+    ) == "Widgets for everyone is a one-day workshop."
+
+
+def test_truncated_title_leaves_the_summary_alone():
+    # there is no telling where an ellipsis-truncated title ended, so
+    # cutting it would strand its tail at the front of the description
+    soup = BeautifulSoup(medium_page(
+        title="Widgets for everyone, and for every…",
+        og_description="Widgets for everyone, and for every kind of work.",
+    ), "html.parser")
+    assert extract_metadata(soup, URL)["description"] \
+        == "Widgets for everyone, and for every kind of work."
+
+
+def test_converted_front_matter_description_has_no_title(tmp_path):
+    raw = tmp_path / "0123456789ab"
+    raw.mkdir()
+    (raw / "page.html").write_text(medium_page(
+        og_description="Widgets for everyone  We shipped it."))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=True)
+    assert front["title"] == "Widgets for everyone"
+    assert front["description"] == "We shipped it."

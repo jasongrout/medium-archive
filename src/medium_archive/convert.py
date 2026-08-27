@@ -23,7 +23,7 @@ from .fixup import load_fixups, read_raw
 from .images import image_source, sniff_image_ext
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
-                    parse_ld_json)
+                    parse_ld_json, strip_title_prefix)
 from .state import (apollo_post_state, gist_code_blocks, state_body,
                     state_metadata)
 from .readme import write_readme
@@ -294,9 +294,16 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         if exp["date"]:
             info["date"] = exp["date"]      # exact first-publish timestamp
         if exp["subtitle"]:
-            info["description"] = exp["subtitle"]   # the real subtitle, no title mashed in
+            info["description"] = exp["subtitle"]   # the real subtitle
         if soup is None and exp["canonical_url"]:
             info["url"] = exp["canonical_url"]
+
+    # Whichever source the title and the description came from, the
+    # description is the summary alone: a page-scraped or state-read one
+    # may still open with the title (see strip_title_prefix), and the
+    # title is only final here, after the feed and the export have had
+    # their say.
+    info["description"] = strip_title_prefix(info["description"], info["title"])
 
     info["url"], external_canonical = resolve_canonical(url, info["url"])
 

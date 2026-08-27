@@ -31,6 +31,11 @@ ZOOM_HINT = "Press enter or click to view image in full size"
 APOLLO_TAGS_RE = re.compile(r'"tags":\[((?:\{"__ref":"Tag:[^"]+"\},?)+)\]')
 TAG_REF_RE = re.compile(r'"Tag:([^"]+)"')
 
+# What a title leaves behind when it is cut off the front of a summary:
+# the space after it, and the sentence or clause punctuation Medium wrote
+# between the two halves.
+TITLE_TAIL_RE = re.compile(r"^[\s.,:;|\u00b7\u2013\u2014-]+")
+
 
 def parse_ld_json(soup) -> dict:
     for tag in soup.find_all("script", type="application/ld+json"):
@@ -75,6 +80,50 @@ def meta(soup, **attrs) -> str | None:
     return tag.get("content") if tag else None
 
 
+def strip_title_prefix(description: str, title: str) -> str:
+    """A description with the post title dropped from the front of it.
+
+    Medium composes its summary text as "<title> <excerpt>", so the
+    title arrives twice: once as the title, once at the head of the
+    description. The account export's subtitle is the excerpt alone,
+    which is what a description should be everywhere -- every page
+    already renders the title above it, and a search result or a share
+    card that repeats it spends its one line saying nothing.
+
+    Matching ignores case and the whitespace Medium varies (non-breaking
+    spaces, line breaks), and eats the punctuation left behind. A title
+    that is itself ellipsis-truncated is left alone: there is no telling
+    where it ended, so cutting it would strand the tail of the title at
+    the front of the description.
+    """
+    description, title = (description or "").strip(), (title or "").strip()
+    if not description or not title or title.endswith(("\u2026", "...")):
+        return description
+    m = re.match(r"\s+".join(map(re.escape, title.split())), description, re.I)
+    return TITLE_TAIL_RE.sub("", description[m.end():]) if m else description
+
+
+def _description(soup, ld: dict, title: str) -> str:
+    """The post's summary, without the title it repeats.
+
+    Medium caps its JSON-LD and <meta name=description> text, and spends
+    the first of those characters on the title, so og:description -- the
+    excerpt alone -- is both cleaner and longer; prefer it. The title
+    still leads the excerpt on posts that open with it in the body
+    (Medium's own early years, and the Ghost-era posts migrated into
+    it), hence the strip on every candidate. A candidate that is nothing
+    but the title says nothing the title doesn't, so fall through to the
+    next one rather than describing the post with an empty string.
+    """
+    for text in (meta(soup, property="og:description"),
+                 ld.get("description"),
+                 meta(soup, name="description")):
+        summary = strip_title_prefix(text or "", title)
+        if summary:
+            return summary
+    return ""
+
+
 def extract_metadata(soup, url: str) -> dict:
     ld = parse_ld_json(soup)
     author = ld.get("author")
@@ -83,15 +132,16 @@ def extract_metadata(soup, url: str) -> dict:
     author_name = author.get("name") if isinstance(author, dict) else author
     author_url = author.get("url") if isinstance(author, dict) else None
     canon = soup.find("link", rel="canonical")
+    title = (ld.get("headline") or meta(soup, property="og:title")
+             or (soup.h1.get_text(strip=True) if soup.h1 else ""))
     return {
         "url": canonical_url(canon["href"]) if canon and canon.get("href") else url,
-        "title": ld.get("headline") or meta(soup, property="og:title")
-                 or (soup.h1.get_text(strip=True) if soup.h1 else ""),
+        "title": title,
         "author": author_name or meta(soup, name="author") or "",
         "author_url": author_url,
         "date": ld.get("datePublished") or meta(soup, property="article:published_time") or "",
         "updated": ld.get("dateModified"),
-        "description": ld.get("description") or meta(soup, name="description") or "",
+        "description": _description(soup, ld, title),
         "tags": apollo_tags(soup) or anchor_tags(soup),
     }
 
@@ -111,8 +161,6 @@ def ghost_metadata(soup, url: str) -> dict:
         t = soup.find("time", datetime=True)
         if t:
             info["date"] = t["datetime"]
-    if not info["description"]:
-        info["description"] = meta(soup, property="og:description") or ""
     if not info["author"]:
         # Casper-style footer: <section class="author"><h4><a href="/author/x">
         for a in soup.select('.author h4 a, .author-card-name a, a[href*="/author/"]'):
