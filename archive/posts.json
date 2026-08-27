@@ -11,7 +11,7 @@
     "slug": "positron-server-available-for-academic-use-via-jupyterhub",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Positron Server available for academic use via JupyterHub Editor’s note: This is a guest blog post from Posit, a Jupyter Foundation member Academic institutions can now offer Positron directly …",
+    "description": "Editor’s note: This is a guest blog post from Posit, a Jupyter Foundation member",
     "tags": [
       "jupyterhub"
     ],
@@ -33,7 +33,7 @@
     "slug": "jupyterlite-0-8-is-released",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLite 0.8 is released! 🎉 JupyterLite is a Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as JupyterLite sites are …",
+    "description": "JupyterLite is a Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy…",
     "tags": [
       "jupyterlite",
       "releases",
@@ -63,7 +63,7 @@
     "slug": "navigating-the-post-workshop-fog-a-path-to-myst",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Navigating the Post-Workshop Fog: a Path to Myst by Chiara Marmo and Serena Bonaretti From June 15th to 17th 2026 a Jupyter Workshop took place at Paris-Saclay University : “Demystifying MyST …",
+    "description": "by Chiara Marmo and Serena Bonaretti",
     "tags": [
       "events",
       "jupyter-book",
@@ -112,7 +112,7 @@
     "slug": "jupyterlab-4-6-and-notebook-7-6-are-out",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 4.6 and Notebook 7.6 are out! JupyterLab 4.6 features new interface customization options, improved file browser and debugger, an easy way to jump between recently edited cells, and …",
+    "description": "JupyterLab 4.6 features new interface customization options, improved file browser and debugger, an easy way to jump between recently…",
     "tags": [
       "jupyter-notebook",
       "jupyterlab",
@@ -157,7 +157,7 @@
     "slug": "congratulations-distinguished-contributors",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2025 cohort of contributors. Project Jupyter …",
+    "description": "We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2025 cohort of contributors.",
     "tags": [
       "community"
     ],
@@ -183,7 +183,7 @@
     "slug": "announcing-jupyter-builder-a-standalone-build-system-for-jupyterlab-extensions",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Announcing jupyter-builder: A Standalone Build System for JupyterLab Extensions We’re excited to announce the first stable release of jupyter-builder on PyPI and @jupyter/builder on npm. A …",
+    "description": "We’re excited to announce the first stable release of jupyter-builder on PyPI and @jupyter/builder on npm. A standalone, configurable build…",
     "tags": [
       "extensions",
       "jupyterlab"
@@ -227,7 +227,7 @@
     "slug": "becoming-the-new-jupyterhub-and-jupyter-book-community-manager",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Becoming the new JupyterHub and Jupyter Book community manager There are moments in life when things, simply, converge. You work and study, study and work, and then, simply, it happens. It starts one …",
+    "description": "There are moments in life when things, simply, converge. You work and study, study and work, and then, simply, it happens. It starts one…",
     "tags": [
       "community",
       "jupyter-book",
@@ -251,7 +251,7 @@
     "slug": "catching-jupyter-specific-bugs-before-ci-does-announcing-jupyter-eslint-plugin",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Catching Jupyter-specific bugs before CI does: announcing jupyter eslint plugin We’re excited to announce the release of the first version of the Jupyter ESLint plugin @jupyter/eslint-plugin, now …",
+    "description": "We’re excited to announce the release of the first version of the Jupyter ESLint plugin @jupyter/eslint-plugin, now available on npm. It's…",
     "tags": [
       "javascript"
     ],
@@ -273,7 +273,7 @@
     "slug": "a-users-journey-with-plugin-playground-from-first-idea-to-installable-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A User’s Journey with Plugin Playground: From First Idea to Installable JupyterLab Extension. We are excited to announce the 1.0 release of JupyterLab Plugin Playground, allowing you to seamlessly …",
+    "description": "We are excited to announce the 1.0 release of JupyterLab Plugin Playground, allowing you to seamlessly experiment with the creation of…",
     "tags": [
       "ai",
       "extensions",
@@ -301,7 +301,7 @@
     "slug": "our-new-jupyter-foundation-community-manager",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Our new Jupyter Foundation Community Manager The Jupyter Foundation is excited to announce that we have contracted with Jason Grout to be a part-time Jupyter Foundation Community Manager. The primary …",
+    "description": "The Jupyter Foundation is excited to announce that we have contracted with Jason Grout to be a part-time Jupyter Foundation Community…",
     "tags": [
       "community",
       "jupyter-foundation"
@@ -322,7 +322,7 @@
     "slug": "nb-cli-a-command-line-interface-for-ai-agents-and-notebook-automation",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "nb-cli: A Command-Line Interface for AI Agents and Notebook Automation The rise of AI coding agents has transformed how we think about developer tools. Large language models like Claude, GPT, and …",
+    "description": "The rise of AI coding agents has transformed how we think about developer tools. Large language models like Claude, GPT, and others are…",
     "tags": [
       "ai"
     ],
@@ -348,7 +348,7 @@
     "slug": "a-jupyter-workshop-demystifying-myst-markdown-in-education",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A Jupyter Workshop: Demystifying MyST Markdown in Education A new Jupyter Workshop is happening June 15–17, 2026 in Orsay, France. Demystifying MyST Markdown in Education is a three-day workshop …",
+    "description": "A new Jupyter Workshop is happening June 15–17, 2026 in Orsay, France. Demystifying MyST Markdown in Education is a three-day workshop…",
     "tags": [
       "events",
       "jupyter-book",
@@ -394,7 +394,7 @@
     "slug": "exploring-petabytes-of-the-night-sky-jupyter-notebooks-at-noirlabs-astro-data-la",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Exploring Petabytes of the Night Sky — Jupyter Notebooks at NOIRLab’s Astro Data Lab Science Platform By Robert Nikutta & Stéphanie Juneau (NSF NOIRLab) Imagine querying 420+ billion rows of …",
+    "description": "By Robert Nikutta & Stéphanie Juneau (NSF NOIRLab)",
     "tags": [
       "open-science",
       "science"
@@ -421,7 +421,7 @@
     "slug": "the-myst-anywidget-directive",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The MyST AnyWidget Directive Authors of MyST Markdown can now embed interactive JavaScript widgets directly in content using the new {anywidget} directive. What this means You can now add any …",
+    "description": "Authors of MyST Markdown can now embed interactive JavaScript widgets directly in content using the new {anywidget} directive.",
     "tags": [
       "anywidget",
       "jupyter-book",
@@ -445,7 +445,7 @@
     "slug": "better-sharing-ux-with-nbgitpuller-and-contextual-error-handling",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Better sharing UX with nbgitpuller and contextual error handling TL;DR nbgitpuller now has improved UX context-aware error handling. Update to version 1.3.0 and let us know what you think by opening …",
+    "description": "TL;DR nbgitpuller now has improved UX context-aware error handling. Update to version 1.3.0 and let us know what you think by opening …",
     "tags": [
       "jupyterhub"
     ],
@@ -473,7 +473,7 @@
     "slug": "berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Berkeley Institute for Data Science (BIDS) joins the mybinder.org federation in partnership with 2i2c The Berkeley Institute for Data Science (BIDS) is the birthplace of the current iteration of …",
+    "description": "The Berkeley Institute for Data Science (BIDS) is now a part of the mybinder.org federation!",
     "tags": [
       "binder"
     ],
@@ -495,7 +495,7 @@
     "slug": "ibm-brings-jupyter-and-spark-to-the-mainframe",
     "canonical_url": "https://blog.jupyter.org/ibm-brings-jupyter-and-spark-to-the-mainframe",
     "ghost_url": "https://blog.jupyter.org/2017/03/30/ibm-brings-jupyter-and-spark-to-the-mainframe",
-    "description": "IBM Brings Jupyter and Spark to the Mainframe For the past few years, Project Jupyter has been collaborating with IBM on a number of initiatives. Much of this work has happened in the Jupyter …",
+    "description": "For the past few years, Project Jupyter has been collaborating with IBM on a number of initiatives. Much of this work has happened in the Jupyter …",
     "tags": [
       "community"
     ],
@@ -517,7 +517,7 @@
     "slug": "whats-new-in-myst-markdown-1-8-2",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "What’s New in MyST Markdown 1.8.2 The Jupyter Book team just released mystmd 1.8.2 and a new version of the MyST react theme! Below are a few things that stand out. Interactive widgets with the …",
+    "description": "The Jupyter Book team just released mystmd 1.8.2 and a new version of the MyST react theme! Below are a few things that stand out.",
     "tags": [
       "mystmd",
       "publishing"
@@ -540,7 +540,7 @@
     "slug": "jupyter-security-sprint-march-31st",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Security Sprint March 31st This is a critical moment for open source software. AI enables new contributors in new ways, but maintainers are also faced with an unprecedented volume of …",
+    "description": "This is a critical moment for open source software. AI enables new contributors in new ways, but maintainers are also faced with an…",
     "tags": [
       "security"
     ],
@@ -562,7 +562,7 @@
     "slug": "700-jupyterlab-4-extensions",
     "canonical_url": "https://taletskiy.com/blogs/700-jupyterlab-extensions",
     "ghost_url": null,
-    "description": "The JupyterLab extension ecosystem hit 700. AI agents, reproducibility tooling, and accessibility extensions show where notebooks are heading.",
+    "description": "The JupyterLab extension ecosystem just crossed 700 extensions compatible with JupyterLab 4!",
     "tags": [
       "community",
       "extensions",
@@ -592,7 +592,7 @@
     "slug": "call-for-applications-community-manager-for-jupyterhub-and-jupyter-book",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Call for applications: Community Manager for JupyterHub and Jupyter Book The JupyterHub and Jupyter Book communities are hiring a community manager. In JupyterHub, we are democratizing access to …",
+    "description": "The JupyterHub and Jupyter Book communities are hiring a community manager.",
     "tags": [
       "community",
       "jupyter-book",
@@ -616,7 +616,7 @@
     "slug": "mybinder-org-adding-request-origin-to-events-archive",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "mybinder.org adding request Origin to events archive In February, the mybinder.org service will start tracking the “origin” of requests that launch a Binder session. The website that created a …",
+    "description": "In February, the mybinder.org service will start tracking the “origin” of requests that launch a Binder session. The website that created a…",
     "tags": [
       "binder"
     ],
@@ -638,7 +638,7 @@
     "slug": "expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Expanding Geospatial Workflows in JupyterGIS: STAC Browsing and Story Maps Since its initial announcement less than two years ago, JupyterGIS has been a growing effort to bring interactive geospatial …",
+    "description": "Since its initial announcement less than two years ago, JupyterGIS has been a growing effort to bring interactive geospatial workflows into…",
     "tags": [
       "geoscience",
       "jupytergis",
@@ -692,7 +692,7 @@
     "slug": "jupyter-community-call-february-2026",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Call: February 2026 Hey Jovyans, we’d love for you to join us on our final community call of the year! We want to learn all about the great things you’re doing with Jupyter. The …",
+    "description": "Hey Jovyans, we’d love for you to join us on our final community call of the year! We want to learn all about the great things you’re doing…",
     "tags": [
       "community"
     ],
@@ -714,7 +714,7 @@
     "slug": "instantly-view-parquet-files-in-jupyterlab-with-arbalister",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Instantly view Parquet files in JupyterLab with Arbalister A colleague sends you a SQLite file, a Parquet dataset, or an Avro snapshot. You need to explore the content, but you're not sure what's …",
+    "description": "A colleague sends you a SQLite file, a Parquet dataset, or an Avro snapshot.\nYou need to explore the content, but you're not sure what's…",
     "tags": [
       "jupyterlab",
       "visualization"
@@ -739,7 +739,7 @@
     "slug": "jupyterlite-0-7-is-released",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLite 0.7 is released! 🎉 JupyterLite is a Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as JupyterLite sites are …",
+    "description": "JupyterLite is a Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy…",
     "tags": [
       "jupyterlite",
       "releases",
@@ -769,7 +769,7 @@
     "slug": "jupyterlab-4-5-and-notebook-7-5-are-available",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 4.5 and Notebook 7.5 are available! JupyterLab 4.5 has been released! This new minor release of JupyterLab includes 51 new features and enhancements, 81 bug fixes, 44 maintenance tasks and …",
+    "description": "JupyterLab 4.5 has been released! This new minor release of JupyterLab includes 51 new features and enhancements, 81 bug fixes, 44…",
     "tags": [
       "ai",
       "jupyter-notebook",
@@ -819,7 +819,7 @@
     "slug": "scaling-maintainer-intuition-with-pull-request-triage-boards",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Scaling “Maintainer Intuition” with Pull Request Triage Boards When I helped start 2i2c.org, one of my goals for the non-profit was to experiment with new and different ways of supporting the …",
+    "description": "When I helped start 2i2c.org, one of my goals for the non-profit was to experiment with new and different ways of supporting the Jupyter…",
     "tags": [
       "community",
       "jupyterhub"
@@ -840,7 +840,7 @@
     "slug": "jupyter-community-call-december-2025",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Hey Jovyans, we’d love for you to join us on our final community call of the year! We want to learn all about the great things you’re doing with Jupyter. The Community Building working group is …",
+    "description": "We want to learn all about the great things you’re doing with Jupyter. The Community Building working group is …",
     "tags": [
       "community"
     ],
@@ -886,7 +886,7 @@
     "slug": "gnu-octave-meets-jupyterlite-compute-anywhere-anytime",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "GNU Octave Meets JupyterLite: Compute Anywhere, Anytime! We are thrilled to announce the newest member of our JupyterLite kernel ecosystem: Xeus-Octave. Xeus-Octave allows you to run GNU Octave code …",
+    "description": "We are thrilled to announce the newest member of our JupyterLite kernel ecosystem: Xeus-Octave. Xeus-Octave allows you to run GNU Octave…",
     "tags": [
       "jupyterlite",
       "kernels",
@@ -956,7 +956,7 @@
     "slug": "jupyter-community-call-september-2025",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Call: September 2025 Hey Jovyans, we want to learn about the great things you’re doing with Jupyter! The Community Building working group is holding an open call with the …",
+    "description": "Hey Jovyans, we want to learn about the great things you’re doing with Jupyter! The Community Building working group is holding an open…",
     "tags": [
       "community"
     ],
@@ -978,7 +978,7 @@
     "slug": "real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Collaborative editing for GIS workflows with Jupyter and QGIS The QGIS open-source project is a cornerstone in the geosciences ecosystem, providing robust tools for spatial data analysis and …",
+    "description": "The QGIS open-source project is a cornerstone in the geosciences ecosystem, providing robust tools for spatial data analysis and…",
     "tags": [
       "geoscience",
       "science"
@@ -1009,7 +1009,7 @@
     "slug": "c-in-jupyter-interpreting-c-in-the-web",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "C++ in Jupyter — Interpreting C++ in the Web A Jupyter kernel for C++ running in the Web browser Scientists and engineers utilize programming languages not only to build software systems but also …",
+    "description": "A Jupyter kernel for C++ running in the Web browser",
     "tags": [
       "cpp",
       "webassembly"
@@ -1047,7 +1047,7 @@
     "slug": "jupyterlite-0-6-0-is-released",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLite 0.6.0 is released! 🎉 JupyterLite is an unofficial Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as …",
+    "description": "JupyterLite 0.6.0 includes a number of new features, bug fixes, and enhancements and significant improvements to the user interface.",
     "tags": [
       "jupyterlite",
       "releases"
@@ -1079,7 +1079,7 @@
     "slug": "jupyter-community-call-june-2025",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Call: June 2025 Hey Jovyans, we want to learn about the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing committee is holding an open …",
+    "description": "Hey Jovyans, we want to learn about the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing…",
     "tags": [
       "community"
     ],
@@ -1101,7 +1101,7 @@
     "slug": "jupyterlab-4-4-and-notebook-7-4-are-available",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 4.4 and Notebook 7.4 are available! JupyterLab 4.4 has been released! This new minor release of JupyterLab includes 28 new features and enhancements, 76 bug fixes, 63 maintenance tasks and …",
+    "description": "JupyterLab 4.4 has been released! This new minor release of JupyterLab includes many new features and bug fixes.",
     "tags": [
       "ai",
       "jupyter-notebook",
@@ -1130,7 +1130,7 @@
     "slug": "congratulations-distinguished-contributors",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2024 cohort of contributors. Project Jupyter …",
+    "description": "We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2024 cohort of contributors.",
     "tags": [
       "community"
     ],
@@ -1158,7 +1158,7 @@
     "slug": "r-in-the-browser-announcing-our-webassembly-distribution",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "R in the Browser: Announcing Our WebAssembly Distribution R is now available in emscripten-forge, enabling the Xeus-R kernel in JupyterLite In the past few months, QuantStack has received funding …",
+    "description": "R is now available in emscripten-forge, enabling the Xeus-R kernel in JupyterLite",
     "tags": [
       "jupyterlite",
       "kernels",
@@ -1189,7 +1189,7 @@
     "slug": "exploring-open-access-art-using-the-deno-jupyter-kernel",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Exploring Open Access Art Using the Deno Jupyter Kernel Jupyter notebooks are the de facto standard for interactive computing and data analysis, combining code, prose, and visualizations in a single …",
+    "description": "Jupyter notebooks are the de facto standard for interactive computing and data analysis, combining code, prose, and visualizations in a…",
     "tags": [
       "javascript",
       "kernels"
@@ -1227,7 +1227,7 @@
     "slug": "benjamin-ragan-kelley",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Benjamin Ragan-Kelley JupyterCon 2020 keynote speaker announcement It all started in April 2005 when freshman Min RK reached out to his physics professor, Brian Granger, Dr. Granger,  Talking to you …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "events",
       "jupytercon"
@@ -1252,7 +1252,7 @@
     "slug": "voila-gridstack-template",
     "canonical_url": "https://blog.jupyter.org/configure-your-dashboards-with-voilà-gridstack-template-8a431c2b353e",
     "ghost_url": null,
-    "description": "Configure your dashboards with Voilà gridstack template Voilà is a new dashboarding solution from Jupyter ecosystem. It provides an easy-to-use tool to convert your Jupyter notebooks into …",
+    "description": "The new Voilà gridstack template simplifies creating dynamic and flexible dashboard layouts.",
     "tags": [
       "dashboards",
       "voila"
@@ -1278,7 +1278,7 @@
     "slug": "jupytercon-2025",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2025! We’re excited to host this year’s JupyterCon in sunny San Diego, California, from November 3–6, 2025. From its beginnings as IPython in 2001, Project Jupyter has grown to a …",
+    "description": "The Call for Proposals for JupyterCon 2025 is officially open!",
     "tags": [
       "events",
       "jupytercon"
@@ -1347,7 +1347,7 @@
     "slug": "building-ai-agents-for-jupyterlab-using-notebook-intelligence",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Building AI Agents for JupyterLab using Notebook Intelligence Please note that this is not an official Jupyter subproject but an independent open-source tool for JupyterLab users who want to use …",
+    "description": "It is now possible to build AI Agents for JupyterLab and access from Copilot Chat UI, using Notebook Intelligence!",
     "tags": [
       "ai",
       "jupyterlab"
@@ -1374,7 +1374,7 @@
     "slug": "announcing-jupytercad-3-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Announcing JupyterCAD 3.0 The latest iteration of the web-based collaborative CAD editor We are thrilled to introduce JupyterCAD 3.0, the newest version of the collaborative CAD modeler designed for …",
+    "description": "The latest iteration of the web-based collaborative CAD editor",
     "tags": [
       "collaboration",
       "jupytercad"
@@ -1402,7 +1402,7 @@
     "slug": "join-jupyterhub-on-zulip-chat",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Join JupyterHub on Zulip chat! The JupyterHub team have just moved all their chat to a Zulip channel! The Jupyter Zulip instance is a Jupyter-wide chat space allowing cross-team communication in …",
+    "description": "The JupyterHub team have just moved all their chat to a Zulip channel!",
     "tags": [
       "community",
       "jupyterhub"
@@ -1425,7 +1425,7 @@
     "slug": "jupyter-community-call-february-2025",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Call: February 2025 Hey Jovyans, we want to see the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing committee is holding an open call …",
+    "description": "Hey Jovyans, we want to see the great things you’re doing with Jupyter! The Diversity, Equity, and Inclusion (DEI) standing committee is…",
     "tags": [
       "community"
     ],
@@ -1445,7 +1445,7 @@
     "slug": "introducing-notebook-intelligence",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing Notebook Intelligence! Please note that this is not an official Jupyter subproject but an independent open-source tool for JupyterLab users who want to use GitHub Copilot as an AI coding …",
+    "description": "I am thrilled to announce the release of Notebook Intelligence! NBI is an AI coding assistant for JupyterLab powered by GitHub Copilot…",
     "tags": [
       "ai",
       "jupyterlab"
@@ -1481,7 +1481,7 @@
     "slug": "build-your-jupyter-dashboard-using-solara",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Build your Jupyter dashboard using Solara Welcome to the first part of a series of articles showing you how to create a dashboard in Jupyter and deploy it as a standalone web app. Importantly, you …",
+    "description": "Welcome to the first part of a series of articles showing you how to create a dashboard in Jupyter and deploy it as a standalone web app…",
     "tags": [
       "dashboards",
       "visualization"
@@ -1512,7 +1512,7 @@
     "slug": "jupyterlab-4-3-and-notebook-7-3-are-available",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 4.3 and Notebook 7.3 are available! JupyterLab 4.3.0 has been released! This new minor release of JupyterLab includes 1 new feature, 42 enhancements, 62 bug fixes, 48 maintenance tasks and …",
+    "description": "JupyterLab 4.3.0 and Notebook 7.3.0 have been released! These new minor releases include many enhancements and bug fixes.",
     "tags": [
       "jupyter-notebook",
       "jupyterlab",
@@ -1539,7 +1539,7 @@
     "slug": "jupyterlite-terminal",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLite Terminal JupyterLite is an unofficial Jupyter distribution that runs entirely in the web browser without any server components. Deployment and hosting are easy as JupyterLite sites are …",
+    "description": "JupyterLite is an unofficial Jupyter distribution that runs entirely in the web browser without any server components. Deployment and…",
     "tags": [
       "jupyterlite"
     ],
@@ -1568,7 +1568,7 @@
     "slug": "november-2024-jupyter-community-call",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "November 2024 Jupyter Community Call Hey, Jupyter community! We want to see the cool things you’re doing with Jupyter, so the Diversity, Equity, and Inclusion (DEI) standing committee is holding an …",
+    "description": "Hey, Jupyter community! We want to see the cool things you’re doing with Jupyter, so the Diversity, Equity, and Inclusion (DEI) standing…",
     "tags": [
       "community"
     ],
@@ -1588,7 +1588,7 @@
     "slug": "automate-your-releases-with-the-jupyter-releaser",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Automate your releases with the Jupyter Releaser 🚀 In the world of open-source software, releases ensure that the latest features, bug fixes, and improvements reach users promptly. However, the …",
+    "description": "Jupyter Releaser is a tool developed by the Jupyter team to streamline and standardize the release process across Jupyter projects",
     "tags": [
       "devops",
       "releases"
@@ -1636,7 +1636,7 @@
     "slug": "exploring-a-documents-timeline-in-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Exploring a Document’s Timeline in JupyterLab Introducing a document timeline component for JupyterLab In collaborative environments, keeping track of changes and understanding the evolution of a …",
+    "description": "Introducing a document timeline component for JupyterLab",
     "tags": [
       "collaboration",
       "jupyterlab"
@@ -1660,7 +1660,7 @@
     "slug": "interactive-mapping-with-ipyopenlayers",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Interactive Mapping with ipyopenlayers Bringing the Power of OpenLayers to Jupyter. Interactive maps play a crucial role in presenting complex geospatial information in a clear and engaging manner …",
+    "description": "Bringing the Power of OpenLayers to Jupyter.",
     "tags": [
       "geoscience",
       "science",
@@ -1689,7 +1689,7 @@
     "slug": "announcing-the-2023-jupyter-distinguished-contributor-award-recipients",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Announcing the 2023 Jupyter Distinguished Contributor Award Recipients We are delighted to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2023 cohort. Project …",
+    "description": "We are delighted to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2023 cohort.",
     "tags": [
       "community"
     ],
@@ -1711,7 +1711,7 @@
     "slug": "binderhub-is-out-of-beta",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "BinderHub is out of Beta! Nearly two years ago, the Binder Project released the beta version of BinderHub, the technology behind mybinder.org. Since then, mybinder.org has grown to serve nearly …",
+    "description": "Today we are proud to announce that we now consider BinderHub a stable tool with a track record of operating in production.",
     "tags": [
       "binder",
       "kubernetes",
@@ -1735,7 +1735,7 @@
     "slug": "mybinder-org-serves-two-million-launches",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "MyBinder.org serves two million launches by the Binder Team Since the beginning of 2018, the Binder community has been hosting a BinderHub at https://mybinder.org as a free public service. Today, we …",
+    "description": "by the Binder Team",
     "tags": [
       "binder",
       "kubernetes"
@@ -1760,7 +1760,7 @@
     "slug": "automating-mybinder-org-dependency-upgrades-in-10-steps",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "How we automated mybinder.org dependency upgrades in 10 steps BinderHub and repo2docker are key components of the service at mybinder.org. In order to give Binder users the best experience, the …",
+    "description": "BinderHub and repo2docker are key components of the service mybinder.org; depending on them for the latest functionality demands that…",
     "tags": [
       "binder",
       "devops",
@@ -1786,7 +1786,7 @@
     "slug": "community-building-report-project-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Community Building Report: Project Jupyter The Jupyter Community Building Working Group would like to share a report and community building recommendations from interviews with members of Project …",
+    "description": "The Jupyter Community Building Working Group would like to share a report and community building recommendations from interviews with…",
     "tags": [
       "community"
     ],
@@ -1808,7 +1808,7 @@
     "slug": "ipydatagrid-is-now-part-of-project-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "ipydatagrid is now part of Project Jupyter Today, we are proud to announce that the ipydatagrid open source project has been incorporated into Project Jupyter as part of the Jupyter Widgets …",
+    "description": "Today, we are proud to announce that the ipydatagrid open source project has been incorporated into Project Jupyter as part of the Jupyter…",
     "tags": [
       "visualization",
       "widgets"
@@ -1834,7 +1834,7 @@
     "slug": "ipywidgets-5-0",
     "canonical_url": "https://blog.jupyter.org/ipywidgets5",
     "ghost_url": "https://blog.jupyter.org/2016/04/22/ipywidgets5",
-    "description": "ipywidgets 5.0 On April 19, 2016, we released ipywidgets 5.0. The ipywidgets package provides interactive HTML & JavaScript widgets (such as sliders, checkboxes, text boxes, charts, and more) for the …",
+    "description": "On April 19, 2016, we released ipywidgets 5.0. The ipywidgets package provides interactive HTML & JavaScript widgets (such as sliders, checkboxes, text boxes, charts, and more) for the …",
     "tags": [
       "releases",
       "widgets"
@@ -1875,7 +1875,7 @@
     "slug": "ipython-3-2-released",
     "canonical_url": "https://blog.jupyter.org/ipython-3-2-release-security-update",
     "ghost_url": "https://blog.jupyter.org/2015/06/22/ipython-3-2-release-security-update",
-    "description": "IPython 3.2 released Hello Jovyans, We just release a few hours a ago a new minor version of IPython. Please upgrade your IPython notebook installation to 3.2 as soon as possible. There are important …",
+    "description": "Hello Jovyans, We just release a few hours a ago a new minor version of IPython. Please upgrade your IPython notebook installation to 3.2 as soon as possible. There are important …",
     "tags": [
       "ipython",
       "releases"
@@ -1919,7 +1919,7 @@
     "slug": "jupytergis",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterGIS Pioneering Web-based, Collaborative, and Open-source GIS Tools By Sylvain Corlay [1], Anne Fouilloux [2], and Monika Weissschnur [3] We are thrilled to announce that the European Space …",
+    "description": "Pioneering Web-based, Collaborative, and Open-source GIS Tools",
     "tags": [
       "collaboration",
       "geoscience",
@@ -1944,7 +1944,7 @@
     "slug": "jupyterlab-4-2-and-notebook-7-2-are-available",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 4.2 and Notebook 7.2 are available! JupyterLab 4.2.0 has been released! This new minor release of JupyterLab includes 3 new features, 20 enhancements, 33 bug fixes and 29 maintenance …",
+    "description": "JupyterLab 4.2.0 has been released! This new minor release of JupyterLab includes 3 new features, 20 enhancements, 33 bug fixes and 29…",
     "tags": [
       "jupyter-notebook",
       "jupyterlab",
@@ -1971,7 +1971,7 @@
     "slug": "cuda-enabled-jupyter-docker-images",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "CUDA enabled Jupyter Docker Images I am happy to announce that Jupyter Docker Stacks project now provides GPU accelerated Docker images. This allows PyTorch or TensorFlow operations to use compatible …",
+    "description": "I am happy to announce that Jupyter Docker Stacks project now provides GPU accelerated Docker images. This allows PyTorch or TensorFlow…",
     "tags": [
       "docker",
       "machine-learning"
@@ -1992,7 +1992,7 @@
     "slug": "make-your-pandas-or-polars-dataframes-interactive-with-itables-2-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Make your Pandas or Polars DataFrames Interactive with ITables 2.0 ITables, or Interactive Tables, is a MIT-licensed Python package that renders Python DataFrames using the DataTables JavaScript …",
+    "description": "ITables, or Interactive Tables, is a MIT-licensed Python package that renders Python DataFrames using the DataTables JavaScript library…",
     "tags": [
       "widgets"
     ],
@@ -2017,7 +2017,7 @@
     "slug": "security-release-jupyter-notebook-4-3-1",
     "canonical_url": "https://blog.jupyter.org/jupyter-notebook-4-3-1",
     "ghost_url": "https://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1",
-    "description": "Security release: Jupyter Notebook 4.3.1 We have just released Jupyter Notebook 4.3.0 and 4.3.1 with some important security fixes. You can check out the changelog for more details on the many fixes …",
+    "description": "We have just released Jupyter Notebook 4.3.0 and 4.3.1 with some important security fixes. You can check out the changelog for more details on the many fixes …",
     "tags": [
       "jupyter-notebook",
       "releases",
@@ -2041,7 +2041,7 @@
     "slug": "jupyterlab-desktop-ui-modes",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab Desktop UI Modes We are pleased to announce UI Mode features recently added to JupyterLab Desktop (JLD). JupyterLab Desktop now provides a convenient way to set the JupyterLab UI layout …",
+    "description": "We are pleased to announce UI Mode features recently added to JupyterLab Desktop (JLD). JupyterLab Desktop now provides a convenient way to…",
     "tags": [
       "jupyterlab"
     ],
@@ -2068,7 +2068,7 @@
     "slug": "python-environment-management-using-jupyterlab-desktop-cli",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Python environment management using JupyterLab Desktop CLI JupyterLab Desktop (JLD) CLI provides several commands and options to manage Python environments for use in the application. In my previous …",
+    "description": "JupyterLab Desktop CLI provides several commands and options to manage Python environments for use in the application…",
     "tags": [
       "jupyterlab"
     ],
@@ -2123,7 +2123,7 @@
     "slug": "curvenote-joins-the-mybinder-org-federation",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Curvenote joins the mybinder.org federation Curvenote is now a part of the mybinder.org federation. By hosting a BinderHub instance running on the company’s infrastructure, additional capacity is …",
+    "description": "Curvenote is now a part of the mybinder.org federation. By hosting a BinderHub instance running on the company’s infrastructure, additional…",
     "tags": [
       "binder",
       "open-science"
@@ -2167,7 +2167,7 @@
     "slug": "python-environment-management-in-jupyterlab-desktop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Python environment management in JupyterLab Desktop We are pleased to announce Python environment management features recently added to JupyterLab Desktop (JLD). Now you can create new Python …",
+    "description": "We are pleased to announce Python environment management features recently added to JupyterLab Desktop. Now you can create new Python env…",
     "tags": [
       "jupyterlab"
     ],
@@ -2200,7 +2200,7 @@
     "slug": "bringing-modern-javascript-to-the-jupyter-notebook",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Deno brings TypeScript, JavaScript, npm, and ES Modules to Jupyter with an easy to install kernel. We go from TSV/CSV to Polars DataFrames to D3, Canvas, and SVG. There's a lot of power built into Deno, TypeScript, and web standards. Tested in Jupyterlab, VS Code, and Noteable.",
+    "description": "The Deno kernel is the freshest runtime for Jupyter",
     "tags": [
       "javascript"
     ],
@@ -2229,7 +2229,7 @@
     "slug": "the-jupytext-menu-is-back",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The Jupytext Menu is back! A few weeks back, jupytext==1.16.0 went out. That release included multiple amazing contributions by Mahendra Paipuri, this post will go over the new features, and thank …",
+    "description": "A few weeks back, jupytext==1.16.0 went out. That release included multiple amazing contributions by Mahendra Paipuri, this post will go…",
     "tags": [
       "documentation"
     ],
@@ -2257,7 +2257,7 @@
     "slug": "meet-xeus-r-a-future-proof-jupyter-kernel-for-r",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Meet Xeus-R: a future-proof Jupyter kernel for R The Jupyter ecosystem provides a versatile and user-friendly platform for data analysis and scientific computing, it has democratised access to …",
+    "description": "The Jupyter ecosystem provides a versatile and user-friendly platform for data analysis and scientific computing, it has democratised…",
     "tags": [
       "kernels",
       "xeus"
@@ -2330,7 +2330,7 @@
     "slug": "open-community-call",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Open Community Call We want to see all the cool things you’re doing with Jupyter, so we’re holding an open call with the community for people to chat, and share their creations and work. Think of …",
+    "description": "We want to see all the cool things you’re doing with Jupyter, so we’re holding an open call with the community for people to chat, and…",
     "tags": [
       "community",
       "events"
@@ -2351,7 +2351,7 @@
     "slug": "and-voici",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "And Voici! Scaling Jupyter dashboards up to the millions. Voici (meaning “here is” in French) is a novel project reshaping Jupyter-based interactive dashboards by combining Voilà and JupyterLite …",
+    "description": "Scaling Jupyter dashboards up to the millions.",
     "tags": [
       "dashboards"
     ],
@@ -2399,7 +2399,7 @@
     "slug": "plug-your-application-into-the-jupyter-world",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Plug your application into the Jupyter world Kernels are a simple but powerful abstraction in the Jupyter architecture. They encapsulate language interpreters and make them accessible through a …",
+    "description": "Kernels are a simple but powerful abstraction in the Jupyter architecture. They encapsulate language interpreters and make them accessible…",
     "tags": [
       "kernels"
     ],
@@ -2455,7 +2455,7 @@
     "slug": "generative-ai-in-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Generative AI in Jupyter Jupyter AI brings generative artificial intelligence to Jupyter notebooks, giving users the power to explain and generate code, fix errors, summarize content, ask questions …",
+    "description": "Jupyter AI, a new open source project, brings generative artificial intelligence to notebooks with magic commands and a chat interface.",
     "tags": [
       "ai"
     ],
@@ -2495,7 +2495,7 @@
     "slug": "desktop-gis-software-in-the-cloud-with-jupyterhub",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Desktop GIS software in the cloud with JupyterHub: A QGreenland workshop success story 👋 We are Trey Stafford and Matt Fisher, co-authors of the QGreenland data package’s source code. This year …",
+    "description": "A QGreenland workshop success story",
     "tags": [
       "accessibility",
       "cloud-computing",
@@ -2552,7 +2552,7 @@
     "slug": "european-commission-funds-jupyter-bug-bounty-program",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "European Commission Funds Jupyter Bug Bounty Program Three Jupyter Subprojects – Jupyter Server, JupyterLab, and JupyterHub –are participating in a bug bounty program sponsored by the European …",
+    "description": "Three Jupyter Subprojects – Jupyter Server, JupyterLab, and JupyterHub –are participating in a bug bounty program sponsored by the European…",
     "tags": [
       "funding",
       "security"
@@ -2598,7 +2598,7 @@
     "slug": "anywidget-jupyter-widgets-made-easy",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "anywidget: Jupyter Widgets Made Easy anywidget is a Python library that makes it simple and enjoyable to create custom Jupyter Widgets that run in classic Jupyter notebooks, JupyterLite, JupyterLab …",
+    "description": "anywidget is a Python library that makes it simple and enjoyable to create custom Jupyter Widgets that run in classic Jupyter notebooks…",
     "tags": [
       "anywidget",
       "javascript",
@@ -2630,7 +2630,7 @@
     "slug": "nbviewer-and-githubs-rate-limit",
     "canonical_url": "https://blog.jupyter.org/nbviewer-and-githubs-rate-limit",
     "ghost_url": "https://blog.jupyter.org/2017/03/01/nbviewer-and-githubs-rate-limit",
-    "description": "nbviewer and GitHub’s rate limit If you’ve been using nbviewer recently, you may have seen this message more often than you would like: It turns out that some overzealous SEO bots were eating up …",
+    "description": "If you’ve been using nbviewer recently, you may have seen this message more often than you would like: It turns out that some overzealous SEO bots were eating up …",
     "tags": [
       "nbviewer"
     ],
@@ -2657,7 +2657,7 @@
     "slug": "introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes",
     "canonical_url": "https://blog.jupyter.org/introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes",
     "ghost_url": "https://blog.jupyter.org/2017/06/29/introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes",
-    "description": "Introducing the Helm Chart for JupyterHub Deployment with Kubernetes The JupyterHub team proudly announces the release of a helm chart for deploying JupyterHub on Kubernetes clusters. We’ve …",
+    "description": "The JupyterHub team proudly announces the release of a helm chart for deploying JupyterHub on Kubernetes clusters. We’ve …",
     "tags": [
       "jupyterhub",
       "kubernetes"
@@ -2678,7 +2678,7 @@
     "slug": "a-theme-editor-for-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A theme editor for JupyterLab JupyterLab is a comprehensive web user interface for scientific and technical computing providing tools such as notebooks, text editors, consoles, and terminals. Like …",
+    "description": "JupyterLab is a comprehensive web user interface for scientific and technical computing providing tools such as notebooks, text editors…",
     "tags": [
       "accessibility",
       "extensions",
@@ -2704,7 +2704,7 @@
     "slug": "from-intern-to-mentor",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "From intern to mentor Four years ago, Project Jupyter participated for the first time in the Outreachy program. And at the end of last year, during the December round, three more awesome interns …",
+    "description": "Four years ago, Project Jupyter participated for the first time in the Outreachy program. And at the end of last year, during the December…",
     "tags": [
       "community",
       "jupyterhub",
@@ -2726,7 +2726,7 @@
     "slug": "collaborative-cad-in-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Collaborative CAD in JupyterLab We are thrilled to introduce JupyterCAD, a tool that integrates Computer-Aided Design (CAD) capabilities into JupyterLab. With its JupyterLab extension, dedicated …",
+    "description": "We are thrilled to introduce JupyterCAD, a tool that integrates Computer-Aided Design (CAD) capabilities into JupyterLab. With its…",
     "tags": [
       "collaboration",
       "jupytercad",
@@ -2759,7 +2759,7 @@
     "slug": "jupyterlab-4-0-is-here",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 4.0 is Here The Jupyter contributor community is proud to announce JupyterLab 4.0, the next major release of our full-featured development environment. The package is now available on PyPI …",
+    "description": "The Jupyter contributor community is proud to announce JupyterLab 4.0, the next major release of our full-featured development environment…",
     "tags": [
       "jupyterlab",
       "releases"
@@ -2784,7 +2784,7 @@
     "slug": "congratulations-distinguished-contributors",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2022 cohort of contributors. Project Jupyter …",
+    "description": "We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2022 cohort of contributors.",
     "tags": [
       "community"
     ],
@@ -2844,7 +2844,7 @@
     "slug": "introducing-learn-python-with-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing “Learn Python with Jupyter” A free course book to develop computational thinking while learning to code Learning a programming language is about learning a language. When learning a …",
+    "description": "A free course book to develop computational thinking while learning to code",
     "tags": [
       "education"
     ],
@@ -2866,7 +2866,7 @@
     "slug": "mybinder-org-reducing-capacity",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Mybinder.org reducing capacity Funding is running out for the largest member of mybinder.org, which has been sponsored by the Google Open Source Program Office. gke.mybinder.org will shut down and …",
+    "description": "Funding is running out for the largest member of mybinder.org, which will be shutdown this week, reducing overall capacity",
     "tags": [
       "binder"
     ],
@@ -2886,7 +2886,7 @@
     "slug": "jupyter-notebook-format-workshop-outcomes",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook format workshop outcomes The Jupyter Community Workshop on the notebook file format took place at the Safran Campus near Paris from February 28th to March 2nd. It was a great …",
+    "description": "The Jupyter Community Workshop on the notebook file format took place near Paris. Here are the great subjects we worked on.",
     "tags": [
       "community",
       "events",
@@ -2911,7 +2911,7 @@
     "slug": "accurately-counting-daily-weekly-monthly-active-users-on-jupyterhub",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Accurately counting Daily, Weekly & Monthly active users on JupyterHub Being able to say ‘we served X unique users over the last month’ (the Monthly Active User metric) is very helpful when …",
+    "description": "Being able to say ‘we served X unique users over the last month’ (the Monthly Active User metric) is very helpful when advocating for…",
     "tags": [
       "devops",
       "jupyterhub"
@@ -2934,7 +2934,7 @@
     "slug": "embed-interactive-itkwidgets-3d-renderings-into-jupyterlite-deployments",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Embed interactive itkwidgets 3D renderings into JupyterLite deployments A tutorial that demonstrates a zero-server, interactive 3D rendering notebook and walks through the quick and easy …",
+    "description": "A tutorial that demonstrates a zero-server, interactive 3D rendering notebook and walks through the quick and easy …",
     "tags": [
       "jupyterlite",
       "visualization"
@@ -2957,7 +2957,7 @@
     "slug": "updating-defaults-on-mybinder-org",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Updating defaults on mybinder.org This week, we are deploying some updates to repo2docker, the image-building tool that underpins mybinder.org. This may affect your repos. Please get in touch if you …",
+    "description": "This week, we are deploying some updates to repo2docker, the image-building tool that underpins mybinder.org. This may affect your repos…",
     "tags": [
       "binder",
       "docker",
@@ -3006,7 +3006,7 @@
     "slug": "improving-the-accessibility-of-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Improving the accessibility of Jupyter Towards a more accessible Jupyter notebook The adoption of Jupyter has grown significantly in the past few years — especially in education contexts. The …",
+    "description": "Towards a more accessible Jupyter notebook",
     "tags": [
       "accessibility"
     ],
@@ -3029,7 +3029,7 @@
     "slug": "jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2023 is just around the corner, and it promises to be an exciting and action-packed event that you won’t want to miss. With a lineup of world-renowned keynote speakers, including Alyssa …",
+    "description": "The three-day conference will be packed with talks, tutorials, and a full schedule of community events. From May 10th to May 12th…",
     "tags": [
       "community",
       "events",
@@ -3054,7 +3054,7 @@
     "slug": "introducing-the-new-jupyterlab-desktop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing the new JupyterLab Desktop! We are pleased to announce a major update to JupyterLab Desktop which adds many new features with main focus on the user experience. JupyterLab Desktop is the …",
+    "description": "We are pleased to announce a major update to JupyterLab Desktop which adds many new features with main focus on the user experience…",
     "tags": [
       "jupyterlab"
     ],
@@ -3090,7 +3090,7 @@
     "slug": "introducing-jupyter-scheduler",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing Jupyter Scheduler The Open Source Jupyter team at AWS is proud to announce the release of Jupyter Scheduler, a JupyterLab extension that can run your Jupyter notebooks in the background …",
+    "description": "The Open Source Jupyter team at AWS is proud to announce the release of Jupyter Scheduler, a JupyterLab extension that can run your Jupyter…",
     "tags": [
       "devops",
       "jupyter-server",
@@ -3125,7 +3125,7 @@
     "slug": "report-on-the-jupyterlite-community-workshop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Report on the JupyterLite Community Workshop 💡 The JupyterLite Community Workshop, held at the OVHcloud headquarters in Paris, France from December 7th to December 9th, 2022, brought together a …",
+    "description": "The JupyterLite Community Workshop, held at the OVHcloud headquarters in Paris, France from December 7th to December 9th, 2022, brought…",
     "tags": [
       "community",
       "events",
@@ -3151,7 +3151,7 @@
     "slug": "jupytercon-2023-keynotes",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2023 keynotes We are excited to announce the keynote speakers for JupyterCon 2023! First up, we have Alyssa Goodman from Harvard University. Alyssa is a professor of astronomy at Harvard …",
+    "description": "We are excited to announce the keynote speakers for JupyterCon 2023!",
     "tags": [
       "events",
       "jupytercon"
@@ -3175,7 +3175,7 @@
     "slug": "announcing-a-new-jupyter-governance-model-and-our-first-executive-council",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Project Jupyter is proud to announce its new governance model, including an Executive Council and Software Steering Council (SSC).",
+    "description": "Project Jupyter is proud to announce its new governance model, including an Executive Council and Software Steering Council.",
     "tags": [
       "community"
     ],
@@ -3197,7 +3197,7 @@
     "slug": "a-jupyter-kernel-for-gnu-octave",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "We are happy to announce the xeus-octave project, a Jupyter kernel for GNU Octave. Xeus-octave was created by Giulio Girardi, recently joined by Antoine Prouvost - and has been incorporated into the Project Jupyter governance.",
+    "description": "Today, we are happy to announce the xeus-octave project, a Jupyter kernel for GNU Octave.",
     "tags": [
       "kernels"
     ],
@@ -3229,7 +3229,7 @@
     "slug": "an-sql-solution-for-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "An SQL solution for Jupyter xeus-sql: A xeus-sqlite sequel A few months ago we released xeus-sqlite, a Jupyter kernel that allows users to make SQLite queries directly from the notebook. With the …",
+    "description": "xeus-sql: A xeus-sqlite sequel",
     "tags": [
       "kernels"
     ],
@@ -3256,7 +3256,7 @@
     "slug": "openness-diversity-and-dignity-a-foundation-for-global-collaboration",
     "canonical_url": "https://blog.jupyter.org/openness-diversity-and-dignity",
     "ghost_url": "https://blog.jupyter.org/2017/01/31/openness-diversity-and-dignity",
-    "description": "Openness, Diversity and Dignity: a Foundation for Global Collaboration A statement from Project Jupyter regarding the January 27 United States Executive Order on immigration A statement of …",
+    "description": "A statement from Project Jupyter regarding the January 27 United States Executive Order on immigration A statement of …",
     "tags": [
       "diversity"
     ],
@@ -3276,7 +3276,7 @@
     "slug": "jupytercon-nyc-august-22nd-25th",
     "canonical_url": "https://blog.jupyter.org/jupytercon-nyc-august-22nd-25th",
     "ghost_url": "https://blog.jupyter.org/2017/07/14/jupytercon-nyc-august-22nd-25th",
-    "description": "JupyterCon NYC: August 22nd-25th Dear fellow Jovyans, We’re just weeks away our first Jupyter community conference, JupyterCon. It will take place from August 22nd to 25th (and Sprints 26th), in …",
+    "description": "Dear fellow Jovyans, We’re just weeks away our first Jupyter community conference, JupyterCon. It will take place from August 22nd to 25th (and Sprints 26th), in …",
     "tags": [
       "events",
       "jupytercon"
@@ -3325,7 +3325,7 @@
     "slug": "elyra-reaches-1-0-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Elyra reaches 1.0.0 Building on a Jupyter Notebooks foundation, the de facto tool for data scientists, machine learning engineers and AI developers, Elyra is an open-source project that provides a …",
+    "description": "Building on a Jupyter Notebooks foundation, the de facto tool for data scientists, machine learning engineers and AI developers, Elyra is…",
     "tags": [
       "elyra",
       "jupyterlab",
@@ -3361,7 +3361,7 @@
     "slug": "jupyter-community-workshop-jupyter-for-education",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: Jupyter for Education We are excited to announce the next in-person Jupyter Community Workshop! It will focus on the use of Jupyter for Education. The event will be held …",
+    "description": "We are excited to announce the next in-person Jupyter Community Workshop! It will focus on the use of Jupyter for Education.",
     "tags": [
       "community",
       "education",
@@ -3386,7 +3386,7 @@
     "slug": "jupyterlab-desktop-2022-recap",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab Desktop — 2022 recap JupyterLab Desktop is the cross-platform desktop application distribution of JupyterLab. It is the quickest and easiest way to get started with Jupyter notebooks …",
+    "description": "JupyterLab Desktop is the cross-platform desktop application distribution of JupyterLab. It is the quickest and easiest way to get started…",
     "tags": [
       "jupyterlab"
     ],
@@ -3414,7 +3414,7 @@
     "slug": "jupyter-community-workshop-the-notebook-file-format",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: The notebook file format We are excited to announce the next in-person Jupyter Community Workshop! It will focus on the Notebook file format. Jupyter Community Workshops …",
+    "description": "We are excited to announce the next in-person Jupyter Community Workshop! It will focus on the Notebook file format.",
     "tags": [
       "events",
       "jupyter-notebook",
@@ -3436,7 +3436,7 @@
     "slug": "introducing-jupyterhubs-outreachy-interns-december-2022-cohort",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing JupyterHub’s Outreachy interns! — December 2022 Cohort As part of the community strategic support project funded by CZI’s EOSS grant series, the JupyterHub sub-project has funding …",
+    "description": "As part of the community strategic support project funded by CZI’s EOSS grant series, the JupyterHub sub-project has funding to support…",
     "tags": [
       "accessibility",
       "documentation",
@@ -3461,7 +3461,7 @@
     "slug": "disc-sprint-nyc-2018",
     "canonical_url": "https://blog.jupyter.org/contribute-to-your-first-open-source-project-548780d0f40",
     "ghost_url": null,
-    "description": "Contribute to your first open source project This Friday, 10/26, NumFOCUS DISC is excited to host a first of its kind Open Source Inclusion Sprint — no prior experience necessary! Register Now …",
+    "description": "This Friday, 10/26, NumFOCUS DISC is excited to host a first of its kind Open Source Inclusion Sprint — no prior experience necessary!",
     "tags": [
       "diversity",
       "events"
@@ -3485,7 +3485,7 @@
     "slug": "jupyter-notebook-5-1-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook 5.1.0 We are pleased to announce the release of Jupyter Notebook 5.1.0. This is a minor release that includes mostly bug fixes and improvements with the notable addition of i18n …",
+    "description": "We are pleased to announce the release of Jupyter Notebook 5.1.0. This is a minor release that includes mostly bug fixes and improvements…",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -3506,7 +3506,7 @@
     "slug": "jupyter-server-2-0-is-released",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Server 2.0 is released! We are thrilled to announce the release of Jupyter Server 2.0! Jupyter Server provides the core web server that powers JupyterLab and Jupyter Notebook. This release …",
+    "description": "This release brings many new features and lays groundwork for a more multi-user, (real-time) collaborative Jupyter experience.",
     "tags": [
       "jupyter-server",
       "releases"
@@ -3590,7 +3590,7 @@
     "slug": "jupyter-notebooks-for-post-election-audits",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter notebooks for post-election audits The following is a guest blog post authored by Kellie Ottoboni, describing her recent work where they used Jupyter to support statistical audits of election …",
+    "description": "The following is a guest blog post authored by Kellie Ottoboni, describing her recent work where they used Jupyter to support statistical…",
     "tags": [
       "science"
     ],
@@ -3613,7 +3613,7 @@
     "slug": "report-on-the-jupyter-community-workshop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Report on the Jupyter Community Workshop “Building the Jupyter Community in Musculoskeletal Imaging Research” Authors: Serena Bonaretti, Donnie Cameron, Michael Kuczynski, and Gianluca Iori, on …",
+    "description": "“Building the Jupyter Community in Musculoskeletal Imaging Research”",
     "tags": [
       "events",
       "workshops"
@@ -3636,7 +3636,7 @@
     "slug": "the-superheros-and-the-magic-wand",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The superheroes and the magic wand This is the first of a series of posts describing tools in the JupyterHub ecosystem, written by our wonderful Contributor in Residence, Georgiana. For our first …",
+    "description": "In a place far, far away, on a planet called Jupyter, magic  happens every day. This land is special because it’s full of magical tools…",
     "tags": [
       "jupyterhub",
       "kubernetes"
@@ -3662,7 +3662,7 @@
     "slug": "juan-klopper",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Juan Klopper JupyterCon 2020 keynote speaker announcement Juan Klopper is a medical doctor and surgeon at Groote Schuur Hospital, the academic hospital complex of the University of Cape Town, South …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "education",
       "events",
@@ -3687,7 +3687,7 @@
     "slug": "mybinder-ovhcloud",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "MyBinder @ OVHcloud OVHcloud is a long-time supporter of the Jupyter project. In the past few years, they have provided computing resources to several Jupyter-related endeavors to support its …",
+    "description": "OVHcloud is a long-time supporter of the Jupyter project. In the past few years, they have provided computing resources to several…",
     "tags": [
       "binder"
     ],
@@ -3709,7 +3709,7 @@
     "slug": "community-workshop-jupyterlite",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: JupyterLite We are thrilled to announce the next in-person Jupyter Community Workshop, which will focus on the JupyterLite project! The event will be held at the OVHCloud …",
+    "description": "We are thrilled to announce the next in-person Jupyter Community Workshop, which will focus on the JupyterLite project!",
     "tags": [
       "community",
       "events",
@@ -3735,7 +3735,7 @@
     "slug": "jupytercon-is-back-in-2023",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon is back in 2023 We are thrilled to announce the next location and date for next year’s global conference on Jupyter. JupyterCon 2023 will be held May 10–12 (Thursday to Friday) in the …",
+    "description": "We are thrilled to announce the next location and date for next year’s global conference on Jupyter.",
     "tags": [
       "events",
       "jupytercon"
@@ -3758,7 +3758,7 @@
     "slug": "jupyter-community-workshops-update-current-round-review-and-a-sneak-peek-into-ro",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshops Update — Current Round Review & Sneak Peek into Round 4 We are excited to share an update on round three of the Jupyter Community Workshops! This comes just as our round …",
+    "description": "Round three of the Jupyter Community Workshops have gone through a long and winding road. As round 4 workshops start to be announced. This…",
     "tags": [
       "community",
       "events",
@@ -3782,7 +3782,7 @@
     "slug": "accelerating-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Accelerating JupyterLab How JupyterLab is switching to second gear for Version 4 The next major release of JupyterLab will be significantly faster than previous versions. This was achieved both …",
+    "description": "How JupyterLab is switching to second gear for Version 4",
     "tags": [
       "jupyterlab"
     ],
@@ -3809,7 +3809,7 @@
     "slug": "lucy-dagostino-mcgowan",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Lucy D’Agostino McGowan JupyterCon 2020 keynote speaker announcement Lucy is an assistant professor of statistics at Wake Forest University in North Carolina. She previously was a postdoctoral …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "events",
       "jupytercon"
@@ -3833,7 +3833,7 @@
     "slug": "jupyter-community-workshop-the-future-of-jupyter-widgets",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: The Future of Jupyter Widgets After a long break from in-person events, we are excited to announce an in-person Jupyter Community Workshop! Jupyter Community Workshops is …",
+    "description": "After a long break from in-person events, we are excited to announce an in-person Jupyter Community Workshop!",
     "tags": [
       "events",
       "widgets",
@@ -3857,7 +3857,7 @@
     "slug": "jupyter-notebook-6-5-0-release-candidate",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook 6.5.0 Release Candidate We’d like to announce the Notebook 6.5.0 release candidate which is available on PyPI. Notebook 6 vs Notebook 7 Jupyter Notebook is a longstanding project …",
+    "description": "We’d like to announce the Notebook 6.5.0 release candidate which is available on PyPI.",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -3880,7 +3880,7 @@
     "slug": "upgrading-nbgrader",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Upgrading Nbgrader Project Jupyter provides a broad collection of open-source tools for interactive computing that has become ubiquitous in data science and scientific computing, and is very popular …",
+    "description": "Project Jupyter provides a broad collection of open-source tools for interactive computing that has become ubiquitous in data science and…",
     "tags": [
       "education"
     ],
@@ -3906,7 +3906,7 @@
     "slug": "packaging-for-jupyter-in-2022",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Packaging for Jupyter in 2022 Packaging has been difficult and changing over time in the Python ecosystem, and packaging extensions for Jupyter has been especially troublesome. Jupyter extensions …",
+    "description": "Packaging has been difficult and changing over time in the Python ecosystem, and packaging extensions for Jupyter has been especially…",
     "tags": [
       "extensions"
     ],
@@ -3928,7 +3928,7 @@
     "slug": "xeus-is-now-a-jupyter-subproject",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Xeus is now a Jupyter subproject It is a great pleasure to announce that the Xeus project has been incorporated as a Jupyter subproject. Xeus will now be subject to the Jupyter governance and code of …",
+    "description": "The Xeus project has been incorporated as a Jupyter subproject.",
     "tags": [
       "cpp",
       "xeus"
@@ -3953,7 +3953,7 @@
     "slug": "zero-to-jupyterhub-helm-chart-0-8",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Zero to JupyterHub helm chart 0.8 We’ve just released version 0.8 of the jupyterhub helm chart. For those who may not know, Zero to JupyterHub is a guide and helm chart for deploying JupyterHub on …",
+    "description": "We’ve just released version 0.8 of the jupyterhub helm chart.",
     "tags": [
       "jupyterhub",
       "kubernetes"
@@ -4000,7 +4000,7 @@
     "slug": "jupytercon-nyc-august-2017",
     "canonical_url": "https://blog.jupyter.org/jupytercon-2017",
     "ghost_url": "https://blog.jupyter.org/2017/01/26/jupytercon-2017",
-    "description": "JupyterCon NYC, August 2017 Dear Jupyter Community, It is my pleasure to announce that this year, we’ll be having our first Jupyter community conference, JupyterCon. It will take place in late …",
+    "description": "Dear Jupyter Community, It is my pleasure to announce that this year, we’ll be having our first Jupyter community conference, JupyterCon. It will take place in late …",
     "tags": [
       "events",
       "jupytercon"
@@ -4023,7 +4023,7 @@
     "slug": "requiring-2fa-for-jupyter-github-organizations",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Requiring 2FA for Jupyter GitHub Organizations This requirement and the outlined plan was discussed and agreed upon at the Jupyter Governance meeting on Friday, July 1, 2022. By October 1, 2022 …",
+    "description": "This requirement and the outlined plan was discussed and agreed upon at the Jupyter Governance meeting on Friday, July 1, 2022.",
     "tags": [
       "github",
       "security"
@@ -4044,7 +4044,7 @@
     "slug": "jupyter-notebook-5-0",
     "canonical_url": "https://blog.jupyter.org/jupyter-notebook-5-0",
     "ghost_url": "https://blog.jupyter.org/2017/04/04/jupyter-notebook-5-0",
-    "description": "Jupyter Notebook 5.0 We are pleased to announce the release of Jupyter Notebook version 5.0. This is the first major release of the Jupyter Notebook since version 4.0 and the “Big Split” of …",
+    "description": "We are pleased to announce the release of Jupyter Notebook version 5.0. This is the first major release of the Jupyter Notebook since version 4.0 and the “Big Split” of …",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -4071,7 +4071,7 @@
     "slug": "visual-programming-in-jupyterlab-with-blockly",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Visual programming in JupyterLab with Blockly Block-based programming has become ubiquitous in school curricula for early computer science education. It is an excellent means to teach basic …",
+    "description": "Block-based programming has become ubiquitous in school curricula for early computer science education. It is an excellent means to teach…",
     "tags": [
       "extensions",
       "jupyterlab"
@@ -4097,7 +4097,7 @@
     "slug": "mamba-meets-jupyterlite",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Mamba meets JupyterLite Introducing a mamba-based distribution for WebAssembly, and deploying scalable computing environments with JupyterLite. JupyterLite is a Jupyter distribution that runs …",
+    "description": "Introducing a mamba-based distribution for WebAssembly, and deploying scalable computing environments with JupyterLite.",
     "tags": [
       "jupyterlite",
       "webassembly"
@@ -4123,7 +4123,7 @@
     "slug": "jupyter-community-workshops",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshops: Call for Proposals Call for Proposals for July 2022 — April 2023 We are pleased to announce that the next call for proposals for Jupyter Community Workshops is now …",
+    "description": "Call for Proposals for July 2022 — April 2023",
     "tags": [
       "community",
       "education",
@@ -4148,7 +4148,7 @@
     "slug": "national-scale-interactive-computing",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "National Scale Interactive Computing This is an invited post from Jim Colliander, Professor of Mathematics at UBC and Director of the Pacific Institute for the Mathematical Sciences.¹ In 2017, the …",
+    "description": "Delivering  interactive computing to universities at a national scale with a Jupyter stack.",
     "tags": [
       "cloud-computing",
       "science"
@@ -4171,7 +4171,7 @@
     "slug": "elife-sprint-integrating-stencila-and-binder",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "elife sprint: Integrating Stencila and Binder This article reports on a project, integrating Stencila and Binder, which started at the eLife Innovation Sprint 2018 (#eLifeSprint). A longer version …",
+    "description": "Short report on the project nbstencilaproxy for integrating Stencila and Binder.",
     "tags": [
       "binder",
       "open-science",
@@ -4199,7 +4199,7 @@
     "slug": "securely-pushing-to-github-from-a-jupyterhub",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Push to GitHub from your JupyterHub (or HPC system) securely with gh-scoped-creds!",
+    "description": "Many JupyterHub users want to push and pull their content from GitHub in order to collaborate and share their work. However, working on a…",
     "tags": [
       "github",
       "jupyterhub"
@@ -4223,7 +4223,7 @@
     "slug": "jupyter-events-update",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Events Update New Role: Jupyter Community Events Manager Hello Jupyter Community! My name is Gayle Ollington, and I am the new Jupyter Community Events Manager. I am thrilled to be joining …",
+    "description": "New Role: Jupyter Community Events Manager",
     "tags": [
       "community",
       "events"
@@ -4246,7 +4246,7 @@
     "slug": "inspector-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Inspector JupyterLab JupyterLab provides multiple ways to improve your coding workflow: code highlighting, code completion, theming, debugger with rich variable rendering and more. The JupyterLab …",
+    "description": "JupyterLab provides multiple ways to improve your coding workflow: code highlighting, code completion, theming, debugger with rich variable…",
     "tags": [
       "documentation",
       "jupyterlab"
@@ -4272,7 +4272,7 @@
     "slug": "jupyter-hackathon-series-in-hawaii",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Hackathon Series in Hawaii PyHawaii hosted a three-part Jupyter Hackathon as part of a workshop grant, generously offered by Bloomberg. PyHawaii, a user group in Hawaii, led the three-part …",
+    "description": "PyHawaii hosted a three-part Jupyter Hackathon as part of a workshop grant, generously offered by Bloomberg. PyHawaii, a Python meetup…",
     "tags": [
       "events",
       "hackathons"
@@ -4297,7 +4297,7 @@
     "slug": "jupyter-for-science-user-facilities-and-high-performance-computing",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter for Science User Facilities and High Performance Computing Jupyter is the “Google Docs” of data science. It provides that same kind of easy-to-use ecosystem, but for interactive data …",
+    "description": "Jupyter is the “Google Docs” of data science. It provides that same kind of easy-to-use ecosystem, but for interactive data exploration…",
     "tags": [
       "jupyterhub",
       "science"
@@ -4320,7 +4320,7 @@
     "slug": "jupyter-accessibility-workshops-wrap-up",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Accessibility Workshops Wrap Up All good things must come to an end, and Jupyter accessibility workshops are no exception. While I may be sad that this series is over, there are many, many …",
+    "description": "All good things must come to an end, and Jupyter accessibility workshops are no exception. While I may be sad that this series is over…",
     "tags": [
       "accessibility",
       "events",
@@ -4344,7 +4344,7 @@
     "slug": "please-dont-disable-authentication-in-jupyter-servers",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Please don’t disable authentication in Jupyter servers We are aware of ransomware attacks specifically targeting Jupyter servers. First off: we have no evidence of a vulnerability in Jupyter …",
+    "description": "We are aware of ransomware attacks specifically targeting Jupyter servers.",
     "tags": [
       "security"
     ],
@@ -4364,7 +4364,7 @@
     "slug": "introducing-templates-for-jupyter-widget-layouts",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing templates for Jupyter widgets layouts Notebooks come alive with Jupyter widgets, which allow users to produce interactive GUIs inline in the Jupyter notebook or JupyterLab. You can either …",
+    "description": "Creating complex layouts of widgets (button, sliders, maps, graphs etc.) can be cumbersome. New layout templates make this task a breeze.",
     "tags": [
       "dashboards",
       "widgets"
@@ -4391,7 +4391,7 @@
     "slug": "congratulations-distinguished-contributors",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2021 cohort of contributors. Project Jupyter …",
+    "description": "We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2021 cohort of contributors.",
     "tags": [
       "community"
     ],
@@ -4423,7 +4423,7 @@
     "slug": "jupyter-everywhere",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Everywhere Easily embed a console, a notebook, or a fully-fledged IDE on any web page. In a previous blog post, we announced JupyterLite, a JupyterLab distribution that runs entirely in the …",
+    "description": "Easily embed a console, a notebook, or a fully-fledged IDE on any web page.",
     "tags": [
       "jupyterlite"
     ],
@@ -4455,7 +4455,7 @@
     "slug": "join-us-for-the-jupyter-accessibility-workshops-part-2",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Join us for the Jupyter Accessibility Workshops (Part 2) I’m happy to announce the next pair of Jupyter accessibility workshops happening this March! As a part of the third community workshop …",
+    "description": "I’m happy to announce the next pair of Jupyter accessibility workshops happening this March! As a part of the third community workshop…",
     "tags": [
       "accessibility",
       "events",
@@ -4479,7 +4479,7 @@
     "slug": "jupyterlab-the-next-generation-of-the-jupyter-notebook",
     "canonical_url": "https://blog.jupyter.org/jupyter-lab-alpha",
     "ghost_url": "https://blog.jupyter.org/2016/07/14/jupyter-lab-alpha",
-    "description": "JupyterLab: the next generation of the Jupyter Notebook Learning the lessons of the Jupyter Notebook It’s been a long time in the making, but today we want to start engaging our community with an …",
+    "description": "Learning the lessons of the Jupyter Notebook It’s been a long time in the making, but today we want to start engaging our community with an …",
     "tags": [
       "jupyterlab"
     ],
@@ -4502,7 +4502,7 @@
     "slug": "jupyterlab-desktop-app-now-available",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab Desktop App now available! We are pleased to announce the release of desktop application for JupyterLab! Standalone and self-contained JupyterLab App is the cross-platform standalone …",
+    "description": "We are pleased to announce the release of desktop application for JupyterLab!",
     "tags": [
       "jupyterlab"
     ],
@@ -4571,7 +4571,7 @@
     "slug": "join-us-for-the-jupyter-accessibility-workshops-part-1",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Join us for the Jupyter Accessibility Workshops (Part 1) At long last, Jupyter accessibility workshops are here! This is a series of Jupyter community workshops aimed at increasing accessibility …",
+    "description": "At long last, Jupyter accessibility workshops are here! This is a series of Jupyter community workshops aimed at increasing accessibility…",
     "tags": [
       "accessibility",
       "events",
@@ -4595,7 +4595,7 @@
     "slug": "jupyter-community-2021-update",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community 2021 Update New committee announcement Project Jupyter is happy to share some exciting news in key efforts to connect the global Jupyter community. First, we’d like to introduce a …",
+    "description": "New committee announcement Project Jupyter is happy to share some exciting news in key efforts to connect the global Jupyter community. First, we’d like to introduce a …",
     "tags": [
       "community"
     ],
@@ -4617,7 +4617,7 @@
     "slug": "jupyter-games",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Games Ipycanvas + Box2D Motivation Making their own tiny video games can be a great way for kids to learn programming in a playful matter. While Jupyter is widely used as a scientific and …",
+    "description": "Ipycanvas + Box2D",
     "tags": [
       "education",
       "widgets"
@@ -4679,7 +4679,7 @@
     "slug": "jupyterhub-2-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterHub 2.0 Hubs and roles and scopes, oh my! We’ve just published JupyterHub 2.0, our biggest release in a while. Roles and scopes (RBAC) Thanks to the work of Omar Richardson and Ivana Huskova …",
+    "description": "Hubs and roles and scopes, oh my!",
     "tags": [
       "jupyterhub"
     ],
@@ -4699,7 +4699,7 @@
     "slug": "ipython-parallel-in-2021",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "IPython Parallel in 2021 This post describes work funded by Bodo, Inc. IPython Parallel’s a bit of an odd duck in the parallel computing space. In a world with dask, ray, bodo, pyspark, and other …",
+    "description": "Updates on IPython Parallel; new features, future direction",
     "tags": [
       "ipython"
     ],
@@ -4721,7 +4721,7 @@
     "slug": "how-i-automated-authorised-cloud-deployments-from-pull-requests-with-github-acti",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "How I automated authorised cloud deployments from Pull Requests with GitHub Actions I recently did some work on the mybinder.org deployment infrastructure to solve a problem with testing Pull …",
+    "description": "I recently did some work on the mybinder.org deployment infrastructure to solve a problem with testing Pull Requests before deployment. It…",
     "tags": [
       "devops"
     ],
@@ -4744,7 +4744,7 @@
     "slug": "jupyter-notebook-5-5-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook 5.5.0 We are pleased to announce the release of Jupyter Notebook 5.5.0. This is a minor release that introduces some new features such as: Dynamic Download as… menu for nbconvert …",
+    "description": "We are pleased to announce the release of Jupyter Notebook 5.5.0. This is a minor release that introduces some new features such as:",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -4765,7 +4765,7 @@
     "slug": "ploomber-maintainable-and-collaborative-pipelines-in-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Ploomber: Maintainable and Collaborative Pipelines in Jupyter Ploomber is an open-source framework that allows teams to develop maintainable pipelines in Jupyter. Jupyter is a fantastic tool for data …",
+    "description": "Ploomber is an open-source framework that allows teams to develop maintainable pipelines in Jupyter.",
     "tags": [
       "machine-learning"
     ],
@@ -4799,7 +4799,7 @@
     "slug": "xeus-lite",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Xeus-Lite JupyterLite + Xeus = ❤️️ JupyterLite is a JupyterLab distribution that runs entirely in the web browser, backed by in-browser language kernels. Xeus is C++ library for writing Jupyter …",
+    "description": "JupyterLite + Xeus = ❤️️",
     "tags": [
       "kernels",
       "webassembly",
@@ -4856,7 +4856,7 @@
     "slug": "diving-into-leadership-to-build-push-button-code",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Diving into Leadership to Build Push-Button Code “Hi everyone, I’m Sarah! I’m a Research Data Scientist at the Alan Turing Institute and I’m also an operator of mybinder.org. It’s really …",
+    "description": "“Hi everyone, I’m Sarah! I’m a Research Data Scientist at the Alan Turing Institute and I’m also an operator of mybinder.org. It’s really…",
     "tags": [
       "community",
       "hackathons"
@@ -4881,7 +4881,7 @@
     "slug": "looking-at-notebooks-from-a-new-perspective",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Looking at notebooks from a new perspective How to better communicate with Jupyter notebooks Jupyter notebooks are a great tool for practitioners of scientific computing from the research phase of …",
+    "description": "How to better communicate with Jupyter notebooks",
     "tags": [
       "visualization",
       "voila"
@@ -4911,7 +4911,7 @@
     "slug": "xeus-2-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Xeus 2.0 Announcing a major release of the Xeus library We have just released Xeus 2. This is a major release of the library. While it includes backward-incompatible changes, they are very limited …",
+    "description": "Announcing a major release of the Xeus library",
     "tags": [
       "xeus"
     ],
@@ -4935,7 +4935,7 @@
     "slug": "from-jupyter-to-the-moon",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "From Jupyter to the Moon A new Jupyter kernel for Lua based on Xeus A key principle in Jupyter’s design is language agnosticism, and one of the main extension points of the Jupyter ecosystem is the …",
+    "description": "A new Jupyter kernel for Lua based on Xeus",
     "tags": [
       "kernels",
       "xeus"
@@ -4971,7 +4971,7 @@
     "slug": "connect-to-a-jupyterhub-from-visual-studio-code",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Connect to a JupyterHub from Visual Studio Code Visual Studio Code has pretty good support for running Jupyter Notebooks. But what if your organization has a JupyterHub running remotely, with more …",
+    "description": "Visual Studio Code has pretty good support\nfor running Jupyter Notebooks. But what if your organization has a JupyterHub running remotely…",
     "tags": [
       "jupyterhub"
     ],
@@ -5000,7 +5000,7 @@
     "slug": "trusted-ci-cybersecurity-engagement-with-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Trusted CI Cybersecurity Engagement with Jupyter Trusted CI is the US National Science Foundation Cybersecurity Center of Excellence, staffed by cybersecurity experts who have spent decades working …",
+    "description": "Trusted CI is the US National Science Foundation Cybersecurity Center of Excellence, staffed by cybersecurity experts who have spent…",
     "tags": [
       "security"
     ],
@@ -5062,7 +5062,7 @@
     "slug": "field-report-on-the-kernel-community-workshop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Field Report on the Kernel Community Workshop From May 27th to May 29th 2019, thirty developers from the Jupyter community met in Paris for a three-days workshop on the Jupyter kernel protocol. For …",
+    "description": "From May 27th to May 29th, thirty developers from the Jupyter community met in Paris for a three-days workshop on the Jupyter kernel…",
     "tags": [
       "cpp",
       "events",
@@ -5090,7 +5090,7 @@
     "slug": "report-on-the-jupyter-community-workshop-on-dashboarding",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Report on the Jupyter Community Workshop on Dashboarding From June 3rd to June 6th 2019, thirty-five developers from the Jupyter community met in Paris for a four-day workshop on dashboarding with …",
+    "description": "This report is long overdue! From June 3rd to June 6th 2019, thirty-five developers from the Jupyter community met in Paris for a…",
     "tags": [
       "dashboards",
       "events",
@@ -5143,7 +5143,7 @@
     "slug": "south-america-jupyter-community-workshop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "South America Jupyter Community Workshop Earlier this summer a workshop to gather the Jupyter community in South America was held in Córdoba, Argentina, from Jun 22nd to Jun 23rd, 2019. We enjoyed …",
+    "description": "The workshop was held in Córdoba, Argentina, from Jun 22nd to Jun 23rd, 2019. We had attendees from different regions of Argentina, Chile…",
     "tags": [
       "events",
       "workshops"
@@ -5189,7 +5189,7 @@
     "slug": "build-a-jupyter-widget-with-react-and-typescript",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Build a Jupyter Widget with React and TypeScript When using a Jupyter Notebook to work on data science projects, I’ve found small user interface abstractions to be very useful. Scrubbing a slider …",
+    "description": "When using a Jupyter Notebook to work on data science projects, I’ve found small user interface abstractions to be very useful. Scrubbing a…",
     "tags": [
       "javascript",
       "widgets"
@@ -5213,7 +5213,7 @@
     "slug": "nbviewer-has-a-new-host-ovhcloud",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "nbviewer has a new host: OVHcloud For several years, nbviewer has been generously hosted by Rackspace. That sponsorship program appears to be ending, so nbviewer needed a new home; it has found one …",
+    "description": "nbviewer has moved from Rackspace to OVHcloud. That means moving from Docker to Kubernetes+Helm",
     "tags": [
       "kubernetes",
       "nbviewer"
@@ -5234,7 +5234,7 @@
     "slug": "jupyterlab-3-0-is-out",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterLab 3.0 is released! The 3.0 release of JupyterLab brings many new features to users and substantial improvements to the extension system. Installation To install JupyterLab with pip: pip …",
+    "description": "The 3.0 release of JupyterLab brings many new features to users and substantial improvements to the extension distribution system.",
     "tags": [
       "jupyterlab",
       "releases"
@@ -5304,7 +5304,7 @@
     "slug": "how-we-made-jupyter-notebooks-collaborative-with-yjs",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "How we made Jupyter Notebooks collaborative with Yjs Collaborative editing — à la Google Docs — is a feature that you still rarely find in applications. One of the few good things that came out …",
+    "description": "Collaborative editing — à la Google Docs — is a feature that you still rarely find in applications. One of the few good things that came…",
     "tags": [
       "collaboration"
     ],
@@ -5327,7 +5327,7 @@
     "slug": "congratulations-distinguished-contributors",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations, Distinguished Contributors! We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2020 cohort of contributors. Project Jupyter …",
+    "description": "We are proud to announce the recipients of the Jupyter Distinguished Contributor (JDC) award for the 2020 cohort of contributors.",
     "tags": [
       "community"
     ],
@@ -5358,7 +5358,7 @@
     "slug": "setting-up-a-production-ready-tljh-deployment",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Setting up a “Production Ready” TLJH deployment The Littlest JupyterHub is an extremely capable hub distribution that I’d recommend for situations where you expect, on average, under 100 active …",
+    "description": "The Littlest JupyterHub is an extremely capable hub distribution that I’d recommend for situations where you expect, on average, under 100…",
     "tags": [
       "jupyterhub",
       "tljh"
@@ -5381,7 +5381,7 @@
     "slug": "enabling-the-jupyterlab-debugger-with-ipykernel",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Enabling the JupyterLab debugger with ipykernel Support for the Jupyter Debugger Protocol just landed in ipykernel JupyterLab 3.0 includes a visual debugger that allows to interactively set …",
+    "description": "Support for the Jupyter Debugger Protocol just landed in ipykernel",
     "tags": [
       "ipython",
       "jupyterlab",
@@ -5408,7 +5408,7 @@
     "slug": "retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "RetroLab — A JupyterLab distribution with a retro look and feel RetroLab is an alternative JupyterLab distribution, built from the ground-up, providing a notebook interface with a retro look and …",
+    "description": "RetroLab is an alternative JupyterLab distribution, built from the ground-up, providing a notebook interface with a retro look and feel.",
     "tags": [
       "jupyter-notebook",
       "jupyterlab"
@@ -5444,7 +5444,7 @@
     "slug": "outreachy-jupyter-supporting-diversity-in-open-communities",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Outreachy & Jupyter: Supporting diversity in open communities Project Jupyter has accepted 2 interns through the Outreachy program, which supports open community members from under-represented …",
+    "description": "Project Jupyter has accepted 2 interns through the Outreachy program, which supports open community members from under-represented…",
     "tags": [
       "community",
       "diversity",
@@ -5468,7 +5468,7 @@
     "slug": "nbterm-jupyter-notebooks-in-the-terminal",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "nbterm: Jupyter Notebooks in the terminal Jupyter notebooks are mostly known for their web-based user interface, such as JupyterLab or the Classic Notebook. They offer a great user experience, allow …",
+    "description": "Jupyter notebooks are mostly known for their web-based user interface, such as JupyterLab or the Classic Notebook. They offer a great user…",
     "tags": [
       "jupyter-notebook"
     ],
@@ -5491,7 +5491,7 @@
     "slug": "lessons-learned-from-jupyters-contributor-in-residence-pilot",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Lessons learned from Jupyter’s Contributor in Residence pilot By Georgiana Dolocan and Chris Holdgraf Project Jupyter, like most open source communities, often lacks the time and people power to …",
+    "description": "By Chris Holdgraf and Georgiana Dolocan",
     "tags": [
       "community",
       "diversity"
@@ -5515,7 +5515,7 @@
     "slug": "abracadabra-bringing-the-magics-to-xeus-python",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Abracadabra! Bringing the magics to xeus-python Last year, we set ourselves to implement a visual debugger for JupyterLab. This endeavor required major developments in the JupyterLab front-end, in …",
+    "description": "Last year, we set ourselves to implement a visual debugger for JupyterLab. This endeavor required major developments in the JupyterLab…",
     "tags": [
       "ipython",
       "kernels",
@@ -5545,7 +5545,7 @@
     "slug": "genomic-data-representation-in-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Genomic data visualization in Jupyter If there is one thing that recent events tell us, it is that genomics is a large source of data, and that its manipulation and understanding allow for the quick …",
+    "description": "If there is one thing that recent events tell us, it is that genomic is a large source of data, and that its manipulation and…",
     "tags": [
       "science",
       "visualization"
@@ -5570,7 +5570,7 @@
     "slug": "simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Simpler authentication for small scale JupyterHubs with NativeAuthenticator NativeAuthenticator adds traditional username / password based sign up, login, & user management features to JupyterHub In …",
+    "description": "NativeAuthenticator adds traditional username / password based sign up, login, & user management features to JupyterHub",
     "tags": [
       "jupyterhub",
       "outreachy"
@@ -5600,7 +5600,7 @@
     "slug": "a-curiously-recurring-widget-library",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A Curiously Recurring Widget Library Diving into the implementation of xwidgets Interactive widgets allow Jupyter users to create user interfaces inline in their notebooks, and to turn them into …",
+    "description": "Diving into the implementation of xwidgets",
     "tags": [
       "cpp",
       "widgets"
@@ -5627,7 +5627,7 @@
     "slug": "robotic-process-automation-with-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Robotic Process Automation with JupyterLab Introducing a new Jupyter kernel for Robot Framework Robotic Process Automation (RPA) differs from classical automation tools in that the actions to …",
+    "description": "Introducing a new Jupyter kernel for Robot Framework",
     "tags": [
       "jupyterlab"
     ],
@@ -5658,7 +5658,7 @@
     "slug": "dashboarding-with-jupyterlab-3",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Dashboarding with JupyterLab 3 Project Jupyter offers a complete suite of open-source tools for the scientific computing community, reaching from the exploratory phase of a project to the …",
+    "description": "Project Jupyter offers a complete suite of open-source tools for the scientific computing community, reaching from the exploratory phase…",
     "tags": [
       "dashboards",
       "jupyterlab"
@@ -5687,7 +5687,7 @@
     "slug": "survey-jupyterlab-and-beyond",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Survey — JupyterLab and beyond The 2020 end-user survey is live! https://www.surveymonkey.com/r/LCB7GBF Survey Goals The purpose of this survey is to gather information from the community in order …",
+    "description": "The 2020 end-user survey is live!",
     "tags": [
       "community",
       "jupyterlab"
@@ -5710,7 +5710,7 @@
     "slug": "a-c-backend-for-vega-lite",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A C++ API for Vega-Lite In this post, we present the first public release of XVega, a C++ library for producing Vega-Lite charts. Data science workflows differ from traditional software development …",
+    "description": "In this post, we present the first public release of XVega, a C++ library for producing vega-lite charts.",
     "tags": [
       "cpp",
       "visualization"
@@ -5738,7 +5738,7 @@
     "slug": "teaching-and-learning-with-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Teaching and Learning with Jupyter From the early days — even before the Jupyter name — many of us foresaw that the IPython Notebook and the ecosystem of tools growing around it would be a …",
+    "description": "From the early days — even before the Jupyter name — many of us foresaw that the IPython Notebook and the ecosystem of tools growing…",
     "tags": [
       "education"
     ],
@@ -5760,7 +5760,7 @@
     "slug": "tema-okun",
     "canonical_url": "https://www.notion.so/Tema-Okun-17a14bd73358480bac91ff85c01c1255",
     "ghost_url": null,
-    "description": "Tema Okun JupyterCon 2020 keynote speaker announcement JupyerCon Keynote Talk  Tackling Toxic Culture in Tech: Racism and Its Legacy Tema Okun has spent over 30 years working with and for …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "diversity"
     ],
@@ -5783,7 +5783,7 @@
     "slug": "congratulations-distinguished-contributors",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations, Distinguished Contributors! Last month at JupyterCon’s final keynote, we proudly announced the recipients of the Jupyter Distinguished Contributor (JDC) award for the special …",
+    "description": "Last month at JupyterCon’s final keynote, we proudly announced the recipients of the Jupyter Distinguished Contributor (JDC) award for the…",
     "tags": [
       "community"
     ],
@@ -5824,7 +5824,7 @@
     "slug": "reusable-code-snippets-in-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Reusable code snippets in JupyterLab by Patrick Titzler, Luciano Resende In this blog post, we will introduce the Elyra code snippet extension, which enables us to reuse arbitrary snippets of code in …",
+    "description": "by Patrick Titzler, Luciano Resende",
     "tags": [
       "elyra",
       "jupyterlab",
@@ -5855,7 +5855,7 @@
     "slug": "jupyter-meets-the-earth",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter meets the Earth By Lindsey Heagy and Fernando Pérez We are thrilled to announce that the NSF is funding our EarthCube proposal “Jupyter meets the Earth: Enabling discovery in geoscience …",
+    "description": "By Lindsey Heagy and Fernando Pérez",
     "tags": [
       "geoscience",
       "open-science",
@@ -5880,7 +5880,7 @@
     "slug": "devops-intelligence",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "DevOps Intelligence A JupyterHub Showcase DevOps Intelligence turns data from software development and delivery processes into actionable insight, just like BI does for the business side. Jupyter is …",
+    "description": "A JupyterHub Showcase",
     "tags": [
       "devops"
     ],
@@ -5931,7 +5931,7 @@
     "slug": "jupyter-notebook-5-2-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook 5.2.0 We are pleased to announce the release of Jupyter Notebook 5.2.0. This is a minor release that includes mostly bug fixes and improvements with the notable addition of RTL …",
+    "description": "We are pleased to announce the release of Jupyter Notebook 5.2.0. This is a minor release that includes mostly bug fixes and improvements…",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -5952,7 +5952,7 @@
     "slug": "jupyterday-in-the-triangle",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterDay in the Triangle We’re excited to announce the next JupyterDay event! Please join us for JupyterDay in the Triangle on November 13, 2018 at the Carolina Club on the University of North …",
+    "description": "We’re excited to announce the next JupyterDay event! Please join us for JupyterDay in the Triangle on November 13, 2018 at the Carolina…",
     "tags": [
       "events"
     ],
@@ -5974,7 +5974,7 @@
     "slug": "on-demand-notebooks-with-jupyterhub-jupyter-enterprise-gateway-and-kubernetes",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "On-demand Notebooks with JupyterHub, Jupyter Enterprise Gateway and Kubernetes by: Luciano Resende, Kevin Bates, Alan Chin Jupyter Notebook has become the “de facto” platform used by data …",
+    "description": "by: Luciano Resende, Kevin Bates, Alan Chin",
     "tags": [
       "jupyter-enterprise-gateway",
       "jupyterhub",
@@ -5998,7 +5998,7 @@
     "slug": "jupyter-notebook-security-fixes",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook security fixes Two security issues have been found and fixed this week, where untrusted javascript could be executed if malicious files could be delivered to the users system and the …",
+    "description": "Two security issues have been found and fixed this week, where untrusted javascript could be executed if malicious files could be…",
     "tags": [
       "jupyter-notebook",
       "security"
@@ -6019,7 +6019,7 @@
     "slug": "jupyter-notebook-xssi-security-fix",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter notebook XSSI security fix We have just released Jupyter notebook 5.7.6 with a security fix for a cross-site inclusion (XSSI) vulnerability, where content from a Jupyter server could be …",
+    "description": "We have just released Jupyter notebook 5.7.6 with a security fix for a cross-site inclusion (XSSI) vulnerability, where content from a…",
     "tags": [
       "jupyter-notebook",
       "security"
@@ -6040,7 +6040,7 @@
     "slug": "jupyter-community-workshop-jupyter-server-design-and-roadmap-workshop",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: Jupyter Server Design and Roadmap Workshop We have some exciting news to share regarding the Jupyter Server Design and Roadmap Workshop as part of the Jupyter Community …",
+    "description": "We have some exciting news to share regarding the Jupyter Server Design and Roadmap Workshop as part of the Jupyter Community Workshop…",
     "tags": [
       "events",
       "jupyter-server",
@@ -6063,7 +6063,7 @@
     "slug": "integrating-output-in-documentation-with-jupyter-sphinx",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Integrating output in documentation with jupyter-sphinx The problem We love Jupyter notebooks for accommodating a computational narrative — a combination of explanation, code, and the output of …",
+    "description": "The problem",
     "tags": [
       "documentation"
     ],
@@ -6087,7 +6087,7 @@
     "slug": "https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackat",
     "canonical_url": "https://blog.jupyter.org/university-of-edinburgh-jupyter-community-nbgrader-hackathon-2eff14df298a",
     "ghost_url": null,
-    "description": "University of Edinburgh Jupyter Community nbgrader Hackathon The University of Edinburgh is happy to announce our upcoming event as part of the Jupyter Community Workshop series funded by Bloomberg …",
+    "description": "The University of Edinburgh is happy to announce our upcoming event as part of the Jupyter Community Workshop series funded by Bloomberg…",
     "tags": [
       "education",
       "hackathons"
@@ -6108,7 +6108,7 @@
     "slug": "kellie-ottoboni-receives-award-for-post-election-auditing-notebook",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Kellie Ottoboni Receives Award for Post-Election Auditing Notebook On Thursday, March 14th at their annual conference in Washington DC, Kellie Ottoboni received the Innovation Award from the Election …",
+    "description": "On Thursday, March 14th at their annual conference in Washington DC, Kellie Ottoboni received the Innovation Award from the Election…",
     "tags": [
       "science"
     ],
@@ -6128,7 +6128,7 @@
     "slug": "introducing-traefikproxy-a-new-jupyterhub-proxy-based-on-traefik",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing TraefikProxy — a scalable and highly available proxy for JupyterHub In the JupyterHub context, the proxy is the unit in charge of directing the user requests to their notebook …",
+    "description": "Removing the single point of failure from your JupyterHub infrastructure with traefik, etcd and Outreachy",
     "tags": [
       "jupyterhub",
       "kubernetes",
@@ -6154,7 +6154,7 @@
     "slug": "notebook-4-1-release",
     "canonical_url": "https://blog.jupyter.org/notebook-4-1-release",
     "ghost_url": "https://blog.jupyter.org/2016/01/08/notebook-4-1-release",
-    "description": "Notebook 4.1 release We are excited to announce the release of the latest minor revision of the Jupyter Notebook, version 4.1. As usual, you can update using pip: pip install notebook --upgrade If …",
+    "description": "We are excited to announce the release of the latest minor revision of the Jupyter Notebook, version 4.1. As usual, you can update using pip: pip install notebook --upgrade If …",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -6181,7 +6181,7 @@
     "slug": "ipygany-jupyter-into-the-third-dimension",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "ipygany: Jupyter into the third dimension Scientific visualization in the Jupyter notebook From Paraview to Mayavi, there are multiple solutions for data analysis on 3D meshes on the desktop. Most of …",
+    "description": "Scientific visualization in the Jupyter Notebook",
     "tags": [
       "visualization"
     ],
@@ -6209,7 +6209,7 @@
     "slug": "jupyter-meets-the-earth-earthcube-community-meeting",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter meets the Earth: EarthCube Community Meeting By: Lindsey Heagy, Fernando Pérez, Joe Hamman and the Jupyter meets the Earth team (cross-posted on the Pangeo Blog) As a part of the 2020 …",
+    "description": "Summary of the EarthCube community meeting on July 27, 2020",
     "tags": [
       "geoscience",
       "open-science",
@@ -6242,7 +6242,7 @@
     "slug": "omoju-miller",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Omoju Miller JupyterCon 2020 keynote speaker announcement Omoju Miller is Technical Advisor to the CEO at GitHub, where she was previously a Senior Machine Learning Engineer. She has a PhD in …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "events",
       "jupytercon"
@@ -6266,7 +6266,7 @@
     "slug": "the-templating-system-of-nbconvert-6",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The templating system of nbconvert 6 One of the main changes in nbconvert 6 is the refactor of the template system, which should be easier to extend and build upon. In this article, we dive into the …",
+    "description": "One of the main changes in nbconvert 6 is the refactor of the template system, which should be easier to extend and build upon.",
     "tags": [
       "publishing"
     ],
@@ -6360,7 +6360,7 @@
     "slug": "jupyterlab-ros",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Building the next generation of robotics cloud computing using ROS and JupyterLab",
+    "description": "Building a cloud robotics development platform using JupyterLab and ROS",
     "tags": [
       "jupyterlab",
       "robotics"
@@ -6418,7 +6418,7 @@
     "slug": "anima-anandkumar",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Anima Anandkumar JupyterCon 2020 keynote speaker announcement Anima Anandkumar is Bren Professor of Computing and Mathematical Sciences at Caltech, and the Director of Machine Learning at NVIDIA. She …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "events",
       "jupytercon"
@@ -6442,7 +6442,7 @@
     "slug": "jeremy-howard",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jeremy Howard JupyterCon 2020 keynote speaker announcement Jeremy Howard is co-founder of fast.ai, and researcher in residence on medical data science at the University of San Francisco. He is Chief …",
+    "description": "JupyterCon 2020 keynote speaker announcement",
     "tags": [
       "events",
       "jupytercon"
@@ -6466,7 +6466,7 @@
     "slug": "jupytercon-online-more-than-a-conference",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon Online is a world-wide learning fest for the Jupyter community, happening 5–17 October: tutorials, keynotes, general presentations, panels of speakers, digital posters, lighting talks, birds-of-a-feather events, and sprints! ",
+    "description": "With glee, on February 7, we announced the return of the Jupyter community conference as a global event to be held in Berlin, Germany, in…",
     "tags": [
       "events",
       "jupytercon"
@@ -6490,7 +6490,7 @@
     "slug": "a-jupyter-kernel-for-sqlite",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A Jupyter kernel for SQLite While it is well known in the Python scientific computing community, Jupyter is in fact a language-agnostic development environment. High-quality language kernels exist …",
+    "description": "While it is well known in the Python scientific computing community, Jupyter is in fact a language-agnostic development environment…",
     "tags": [
       "kernels"
     ],
@@ -6517,7 +6517,7 @@
     "slug": "plasma-a-learning-platform-powered-by-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Plasma: A learning platform powered by Jupyter Jupyter has been a great choice for education for many years. The Jupyter Notebook has become one of the most popular tools to conduct workshops …",
+    "description": "Jupyter has been a great choice for education for many years. The Jupyter Notebook has become one of the most popular tools to conduct…",
     "tags": [
       "education",
       "jupyterhub"
@@ -6547,7 +6547,7 @@
     "slug": "cir-report-i",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The Jupyter Contributor In Residence, update 1 This year Jupyter was awarded a one-year “Essential Open Source Software for Science” grant from the Chan Zuckerberg Initiative, which we are using …",
+    "description": "JupyterHub and Binder Contributor in Residence. The first keepalive message.",
     "tags": [
       "community",
       "outreachy"
@@ -6573,7 +6573,7 @@
     "slug": "jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: Building upon the Jupyter Kernel Protocol We have some exciting news about the Jupyter Community Workshop on kernels! The workshop will be held in Paris, France, from May …",
+    "description": "We have some exciting news about the Jupyter Community Workshop on kernels!",
     "tags": [
       "events",
       "kernels",
@@ -6597,7 +6597,7 @@
     "slug": "interactive-graph-visualization-in-jupyter-with-ipycytoscape",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Interactive Graph Visualization in Jupyter with ipycytoscape The Jupyter widgets ecosystem offers a broad variety of data visualization tools for exploratory analysis in the notebook. However, we …",
+    "description": "The Jupyter widgets ecosystem offers a broad variety of data visualization tools for exploratory analysis in the notebook. However, we…",
     "tags": [
       "visualization",
       "widgets"
@@ -6664,7 +6664,7 @@
     "slug": "jupytercon-2020-is-a-go",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2020 is a go! UPDATE: Please read the announcement (June 29, 2020) on JupyterCon Online: “JupyterCon: more than a conference.” Just over a year ago, Project Jupyter announced it was …",
+    "description": "The announcement that the Jupyter community was eagerly anticipating!",
     "tags": [
       "events",
       "jupytercon"
@@ -6687,7 +6687,7 @@
     "slug": "jupyter-ascending",
     "canonical_url": "https://blog.jupyter.org/first-release-of-jupyter",
     "ghost_url": "https://blog.jupyter.org/2015/08/12/first-release-of-jupyter",
-    "description": "Jupyter Ascending Today is an exciting day! We have just finished releasing IPython 4.0, the last piece of the first release of Jupyter and IPython after The Big Split™. The quick way to get …",
+    "description": "Today is an exciting day! We have just finished releasing IPython 4.0, the last piece of the first release of Jupyter and IPython after The Big Split™. The quick way to get …",
     "tags": [
       "ipython",
       "releases"
@@ -6708,7 +6708,7 @@
     "slug": "jupyter-community-workshop-jupyter-for-scientific-user-facilities-and-high-perfo",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: Jupyter for Scientific User Facilities and High-Performance Computing We are excited to share more news about the Jupyter Community Workshop for Scientific User Facilities …",
+    "description": "We are excited to share more news about the Jupyter Community Workshop for Scientific User Facilities and High-Performance Computing! This…",
     "tags": [
       "events",
       "workshops"
@@ -6729,7 +6729,7 @@
     "slug": "the-jupyterhub-and-binder-contributor-in-residence",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The JupyterHub and Binder Contributor in Residence! Thanks to funding from the CZI Essential Open Source Software for Science initiative we are welcoming Georgiana Elena as our first Contributor in …",
+    "description": "Thanks to funding from the CZI Essential Open Source Software for Science initiative we are welcoming Georgiana Elena as our first…",
     "tags": [
       "binder",
       "community",
@@ -6782,7 +6782,7 @@
     "slug": "jupyter-community-workshops-call-for-proposals",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshops: Call for Proposals The large majority of Jupyter’s work is accomplished through remote, online collaboration; yet, over the years, we have found deep value in focused …",
+    "description": "The large majority of Jupyter’s work is accomplished through remote, online collaboration; yet, over the years, we have found deep value…",
     "tags": [
       "events",
       "workshops"
@@ -6803,7 +6803,7 @@
     "slug": "ipycanvas-a-python-canvas-for-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "ipycanvas: A Python Canvas for Jupyter As you may already know, the Jupyter Notebook and JupyterLab are Browser-based applications. Browsers are incredibly powerful, they allow you to swap rich and …",
+    "description": "As you may already know, the Jupyter Notebook and JupyterLab are Browser-based applications. Browsers are incredibly powerful, they allow…",
     "tags": [
       "visualization",
       "widgets"
@@ -6835,7 +6835,7 @@
     "slug": "interactive-gis-in-jupyter-with-ipyleaflet",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Interactive GIS in Jupyter with ipyleaflet As Jupyter grew in popularity, a broad ecosystem of visualization packages based on Jupyter widgets has been developed, bringing even more interactivity to …",
+    "description": "As Jupyter grew in popularity, a broad ecosystem of data visualization packages based on Jupyter widgets has arisen, bringing even more…",
     "tags": [
       "geoscience",
       "science",
@@ -6876,7 +6876,7 @@
     "slug": "building-a-calculator-jupyter-kernel",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Building a Calculator Jupyter Kernel A step-by-step guide for authoring language kernels with Xeus In order to provide a language-agnostic scientific development environment, the Jupyter project is …",
+    "description": "A step-by-step guide for authoring language kernels with Xeus",
     "tags": [
       "cpp",
       "kernels",
@@ -6904,7 +6904,7 @@
     "slug": "99-ways-to-extend-the-jupyter-ecosystem",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "99 ways to extend the Jupyter ecosystem Whenever someone says ‘You can do that with an extension’ in the Jupyter ecosystem, it is often not clear what kind of extension they are talking about …",
+    "description": "Whenever someone says ‘You can do that with an extension’ in the Jupyter ecosystem, it is often not clear what kind of extension they are…",
     "tags": [
       "jupyterlab"
     ],
@@ -6932,7 +6932,7 @@
     "slug": "jupyter-community-workshop-dashboarding-with-project-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: Dashboarding with Project Jupyter We have some exciting news about the Jupyter Community Workshop on dashboarding! The workshop will be held in Paris, France, from June …",
+    "description": "We have some exciting news about the Jupyter Community Workshop on dashboarding!",
     "tags": [
       "dashboards",
       "events",
@@ -6989,7 +6989,7 @@
     "slug": "jupyter-community-workshop-south-america",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Community Workshop: South America I would like to share some exciting news about a Jupyter Community Workshop in South America! The workshop will be held in Córdoba, Argentina, from Jun 22nd …",
+    "description": "We have some exciting news about the Jupyter Community Workshop in South America!",
     "tags": [
       "events",
       "workshops"
@@ -7010,7 +7010,7 @@
     "slug": "jupyter-qtconsole-4-4",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter QtConsole 4.4 We’re pleased to announce the release of QtConsole 4.4, along with a follow-on bugfix update, 4.4.1. QtConsole, which melds the feel of a lightweight terminal and the …",
+    "description": "Now with editor integration (build your own IDE!), selectable color schemes, block indent, smart select and delete, and more!",
     "tags": [
       "releases"
     ],
@@ -7036,7 +7036,7 @@
     "slug": "how-to-deploy-jupyterhub-with-kubernetes-on-openstack",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Deploying JupyterHub with Kubernetes on OpenStack Jupyter is now widely used for teaching and research. The use of Kubernetes for deploying a JupyterHub has enabled reliable setups scaling to …",
+    "description": "Jupyter is now widely used for teaching and research. The use of Kubernetes for JupyterHub deployment enabled reliable setups scaling to…",
     "tags": [
       "jupyterhub",
       "kubernetes"
@@ -7070,7 +7070,7 @@
     "slug": "announcing-jupyterhub-1-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Announcing JupyterHub 1.0 Today, we are pleased to announce the 1.0 release of JupyterHub. We’ve come a long way since our first release in March, 2015. There are loads of new features and …",
+    "description": "Today, we are pleased to announce the 1.0 release of JupyterHub. We’ve come a long way since our first release in March, 2015. There are…",
     "tags": [
       "jupyterhub"
     ],
@@ -7093,7 +7093,7 @@
     "slug": "ros-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "ROS @ Jupyter Project Jupyter is a huge hit in data science, but it has not yet found widespread adoption in robotics. Today, we are releasing the first version of jupyter-ros, a collection of …",
+    "description": "Project Jupyter is a huge hit in data science, but it has not yet found widespread adoption in robotics. Today, we are releasing the first…",
     "tags": [
       "robotics",
       "visualization"
@@ -7119,7 +7119,7 @@
     "slug": "open-redirect-vulnerability-in-jupyter-jupyterhub",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Open Redirect Vulnerability in Jupyter notebook, JupyterHub Update: notebook 5.7.7 and JupyterHub 0.9.5 contained incomplete fixes for this issue. 5.7.8 and 0.9.6 are released with more complete …",
+    "description": "JupyterHub ≤ 0.9.4 and Notebook ≤ 5.7.6 are affected. Versions 0.9.5 and 5.7.7 are released today with fixes. Upgrade with pip or conda:",
     "tags": [
       "jupyter-notebook",
       "jupyterhub",
@@ -7141,7 +7141,7 @@
     "slug": "authoring-custom-jupyter-widgets",
     "canonical_url": "https://gist.github.com/6698e8a16f7fccb121ef239d123c1495",
     "ghost_url": null,
-    "description": "Authoring Custom Jupyter Widgets A Hands-On Guide Guest post authored by Olivier Borderies, Olivier Coudray, and Pierre Marion Jupyter interactive widgets enhance the notebook experience by allowing …",
+    "description": "A Hands-On Guide",
     "tags": [
       "widgets"
     ],
@@ -7237,7 +7237,7 @@
     "slug": "a-new-python-kernel-for-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A new Python kernel for Jupyter Project Jupyter aims at providing a consistent set of tools for interactive computing workflows across multiple programming languages. Jupyter projects are popular at …",
+    "description": "Project Jupyter aims at providing a consistent set of tools for interactive computing workflows across multiple programming languages…",
     "tags": [
       "cpp",
       "kernels"
@@ -7324,7 +7324,7 @@
     "slug": "introducing-jupyter-enterprise-gateway",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Introducing Jupyter Enterprise Gateway by Luciano Resende, Kevin Bates, Alan Chin Yesterday, the Jupyter Steering Council voted to make Jupyter Enterprise Gateway a top-level Jupyter Project. I want …",
+    "description": "by Luciano Resende, Kevin Bates, Alan Chin",
     "tags": [
       "kernels",
       "kubernetes"
@@ -7350,7 +7350,7 @@
     "slug": "synopsis-jupytercon-2018-education-track",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Synopsis: JupyterCon 2018 Education Track I’m on the train to NY, giddy in anticipation of the Jupyter community celebrating together for the second year. It was a privilege for me to be invited to …",
+    "description": "I’m on the train to NY, giddy in anticipation of the Jupyter community celebrating together for the second year. It was a privilege for me…",
     "tags": [
       "education",
       "events",
@@ -7419,7 +7419,7 @@
     "slug": "security-fix-for-jupyter-notebook",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Security fix for Jupyter Notebook We have just released Jupyter Notebook 5.6.0. This release fixes a vulnerability that could allow a maliciously crafted notebook to execute JavaScript when it is …",
+    "description": "We have just released Jupyter Notebook 5.6.0. This release fixes a vulnerability that could allow a maliciously crafted notebook to execute…",
     "tags": [
       "jupyter-notebook",
       "security"
@@ -7440,7 +7440,7 @@
     "slug": "the-big-split",
     "canonical_url": "https://blog.jupyter.org/the-big-split",
     "ghost_url": "https://blog.jupyter.org/2015/04/15/the-big-split",
-    "description": "The Big Split™ IPython has grown a great deal over the years. As of 3.0, IPython includes: an interactive shell a REPL protocol a notebook document fromat a notebook document conversion tool a …",
+    "description": "IPython has grown a great deal over the years. As of 3.0, IPython includes: an interactive shell a REPL protocol a notebook document fromat a notebook document conversion tool a …",
     "tags": [
       "ipython"
     ],
@@ -7462,7 +7462,7 @@
     "slug": "jupyterday-paris",
     "canonical_url": "https://blog.jupyter.org/jupyterday-paris",
     "ghost_url": "https://blog.jupyter.org/2016/12/03/jupyterday-paris",
-    "description": "JupyterDay Paris Cross-posted from OpenDreamKit Sold out: the room is full for this event. See you next time! The LoOPS network, DevLog and OpenDreamKit are organising a day for the various tools …",
+    "description": "Cross-posted from OpenDreamKit Sold out: the room is full for this event. See you next time! The LoOPS network, DevLog and OpenDreamKit are organising a day for the various tools …",
     "tags": [
       "events"
     ],
@@ -7484,7 +7484,7 @@
     "slug": "jupyterday-atlanta-2016",
     "canonical_url": "https://blog.jupyter.org/jupyterday-atlanta",
     "ghost_url": "https://blog.jupyter.org/2016/07/28/jupyterday-atlanta",
-    "description": "JupyterDay Atlanta 2016 Jupyter is coming to the Southeast: get ready for JupyterDay Atlanta, Saturday, August 13th! We are pleased to announce the fifth JupyterDay which will be hosted at Georgia …",
+    "description": "Jupyter is coming to the Southeast: get ready for JupyterDay Atlanta, Saturday, August 13th! We are pleased to announce the fifth JupyterDay which will be hosted at Georgia …",
     "tags": [
       "events"
     ],
@@ -7506,7 +7506,7 @@
     "slug": "announcing-jupyter-day-atlanta-spring-2018",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "The Atlanta Jupyter User Group is excited to announce Early Bird Tickets and the Call for Proposals to the second Jupyter Day Atlanta on March 31, 2018. Join us at the Georgia Tech Research Institute …",
+    "description": "Jupyter Day Atlanta is a single-day conference to showcasing the talented work by the Jupyter community and users.",
     "tags": [
       "events"
     ],
@@ -7528,7 +7528,7 @@
     "slug": "jupyterdays-boston-2016",
     "canonical_url": "https://blog.jupyter.org/jupyterdays-boston-2016",
     "ghost_url": "https://blog.jupyter.org/2016/02/16/jupyterdays-boston-2016",
-    "description": "JupyterDays Boston 2016 We’re excited to announce our next event! Join us for JupyterDays Boston in Cambridge, MA on March 17–18, 2016. The event will be hosted at the Harvard Law School …",
+    "description": "We’re excited to announce our next event! Join us for JupyterDays Boston in Cambridge, MA on March 17–18, 2016. The event will be hosted at the Harvard Law School …",
     "tags": [
       "events"
     ],
@@ -7548,7 +7548,7 @@
     "slug": "jupyterday-nyc",
     "canonical_url": "https://blog.jupyter.org/jupyterday-nyc-oct-24-9-5",
     "ghost_url": "https://blog.jupyter.org/2015/10/19/jupyterday-nyc-oct-24-9-5",
-    "description": "JupyterDay NYC We are excited to announce the first JupyterDay Conference in New York City on October 24, 2015 from 9:00am-5:00pm (EST). The event will be held at ImpactHub and registration can be …",
+    "description": "We are excited to announce the first JupyterDay Conference in New York City on October 24, 2015 from 9:00am-5:00pm (EST). The event will be held at ImpactHub and registration can be …",
     "tags": [
       "events"
     ],
@@ -7570,7 +7570,7 @@
     "slug": "jupyterday-hawaii-2016",
     "canonical_url": "https://blog.jupyter.org/jupyterday-hawaii-2016",
     "ghost_url": "https://blog.jupyter.org/2016/09/26/jupyterday-hawaii-2016",
-    "description": "JupyterDay Hawaii 2016 Aloha! Project Jupyter and PyHawaii are pleased to announce the first JupyterDay in Hawaii on Saturday, October 29, 2016 from 12:00pm-4pm at the Manoa Innovation …",
+    "description": "Aloha! Project Jupyter and PyHawaii are pleased to announce the first JupyterDay in Hawaii on Saturday, October 29, 2016 from 12:00pm-4pm at the Manoa Innovation …",
     "tags": [
       "events"
     ],
@@ -7592,7 +7592,7 @@
     "slug": "jupytercon-2018-nyc-august-21-25",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterCon 2018, NYC August 21–25 Discover how data-driven organizations are using Jupyter to analyze data, share insights, and foster practices for dynamic, reproducible data science. I’m …",
+    "description": "Discover how data-driven organizations are using Jupyter to analyze data, share insights, and foster practices for dynamic, reproducible…",
     "tags": [
       "events",
       "jupytercon",
@@ -7617,7 +7617,7 @@
     "slug": "jupyterhub-0-9",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterHub 0.9 We are pleased to announce the latest release of JupyterHub. JupyterHub is the multi-user server for Jupyter notebooks, allowing students or researchers to have their own workspace …",
+    "description": "We are pleased to announce the latest release of JupyterHub. JupyterHub is the multi-user server for Jupyter notebooks, allowing students…",
     "tags": [
       "jupyterhub"
     ],
@@ -7662,7 +7662,7 @@
     "slug": "new-funding-for-jupyter",
     "canonical_url": "https://blog.jupyter.org/jupyter-funding-2015",
     "ghost_url": "https://blog.jupyter.org/2015/07/07/jupyter-funding-2015",
-    "description": "New funding for Jupyter We are pleased to announce that the Jupyter/IPython project has received $6M in funding from three organisations: The Leona M. and Harry B. Helmsley Charitable Trust The …",
+    "description": "We are pleased to announce that the Jupyter/IPython project has received $6M in funding from three organisations: The Leona M. and Harry B. Helmsley Charitable Trust The …",
     "tags": [
       "funding"
     ],
@@ -7710,7 +7710,7 @@
     "slug": "interpreted-c-for-gis-with-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Interpreted C++ for GIS with Jupyter The recent release of the Jupyter kernel for C++, based on the Cling interpreter enabled a number of new workflows for the users of the C++ programming …",
+    "description": "The recent release of the Jupyter kernel for C++, based on the Cling interpreter enabled a number of new workflows for the users of the C++…",
     "tags": [
       "cpp",
       "geoscience",
@@ -7746,7 +7746,7 @@
     "slug": "release-of-ipython-5-0",
     "canonical_url": "https://blog.jupyter.org/ipython-5-0-released",
     "ghost_url": "https://blog.jupyter.org/2016/07/08/ipython-5-0-released",
-    "description": "Release of IPython 5.0 IPython 5.0-LTS is out! We are pleased to announce the release of IPython 5.0 LTS (or Long Term Support). IPython is the Python kernel for Jupyter and the interactive Python …",
+    "description": "IPython 5.0-LTS is out! We are pleased to announce the release of IPython 5.0 LTS (or Long Term Support). IPython is the Python kernel for Jupyter and the interactive Python …",
     "tags": [
       "ipython",
       "releases"
@@ -7769,7 +7769,7 @@
     "slug": "rendering-notebooks-on-github",
     "canonical_url": "https://blog.jupyter.org/rendering-notebooks-on-github",
     "ghost_url": "https://blog.jupyter.org/2015/05/07/rendering-notebooks-on-github",
-    "description": "Rendering Notebooks on GitHub We are pleased to announce that, starting today, and as announced on the GitHub blog, Jupyter/IPython notebook (.ipynb) files will render directly on GitHub. This …",
+    "description": "We are pleased to announce that, starting today, and as announced on the GitHub blog, Jupyter/IPython notebook (.ipynb) files will render directly on GitHub. This …",
     "tags": [
       "github",
       "nbviewer",
@@ -7793,7 +7793,7 @@
     "slug": "we-analyzed-1-million-jupyter-notebooks-now-you-can-too-guest-post",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "We Analyzed 1 Million Jupyter Notebooks — Now You Can Too [Guest Post] This is a guest post on how members of the Jupyter community publish code, visualizations, and text using Jupyter Notebooks …",
+    "description": "This is a guest post on how members of the Jupyter community publish code, visualizations, and text using Jupyter Notebooks. We’re excited…",
     "tags": [
       "github"
     ],
@@ -7817,7 +7817,7 @@
     "slug": "reproducible-data-dependencies-for-python-guest-post",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Reproducible Data Dependencies for Python [Guest Post] This article is the first in a series of guest blog posts about open source projects in the Jupyter ecosystem and the problems they attempt to …",
+    "description": "This article is the first in a series of guest blog posts about open source projects in the Jupyter ecosystem and the problems they attempt…",
     "tags": [
       "reproducibility"
     ],
@@ -7841,7 +7841,7 @@
     "slug": "a-diagram-editor-for-jupyterlab",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "A Diagram Editor for JupyterLab With the success of the notebook file format as a medium for communicating scientific results, more than an interactive development environment, Jupyter is turning …",
+    "description": "With the success of the notebook file format as a medium for communicating scientific results, more than an interactive development…",
     "tags": [
       "jupyterlab",
       "visualization"
@@ -7889,7 +7889,7 @@
     "slug": "security-fix-for-jupyterhub-gitlab-oauthenticator",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Security fix for JupyterHub GitLab OAuthenticator Group Whitelists This vulnerability has been assigned CVE-2018–7206 If you are using JupyterHub with the GitLab OAuthenticator and its …",
+    "description": "This vulnerability has been assigned CVE-2018–7206",
     "tags": [
       "jupyterhub",
       "security"
@@ -7933,7 +7933,7 @@
     "slug": "congratulations-to-the-ligo-and-virgo-collaborations-from-project-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Congratulations to the LIGO and VIRGO Collaborations from Project Jupyter This blog post was co-authored by Jessica Forde. On behalf of the entire Project Jupyter team, we’d like to say …",
+    "description": "This blog post was co-authored by Jessica Forde.",
     "tags": [
       "science"
     ],
@@ -8001,7 +8001,7 @@
     "slug": "jupyter-notebook-5-3-0",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Jupyter Notebook 5.3.0 We are pleased to announce the release of Jupyter Notebook 5.3.0. This is a minor release that introduces some notable improvements, such as terminal support for Windows and …",
+    "description": "We are pleased to announce the release of Jupyter Notebook 5.3.0. This is a minor release that introduces some notable improvements, such…",
     "tags": [
       "jupyter-notebook",
       "releases"
@@ -8022,7 +8022,7 @@
     "slug": "the-continued-existence-of-the-emacs-ipython-notebook",
     "canonical_url": "https://blog.jupyter.org/the-continued-existence-of-the-emacs-ipython-notebook",
     "ghost_url": "https://blog.jupyter.org/2017/02/23/the-continued-existence-of-the-emacs-ipython-notebook",
-    "description": "The Continued Existence of the Emacs IPython Notebook This is a guest post by John, who initially sent it to our mailing list; we believe that it’s an interesting story, so we wanted to share it on …",
+    "description": "This is a guest post by John, who initially sent it to our mailing list; we believe that it’s an interesting story, so we wanted to share it on …",
     "tags": [
       "ipython",
       "jupyter-notebook"
@@ -8043,7 +8043,7 @@
     "slug": "public-notebooks-and-security",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Public Notebooks and Security tl;dr: don’t disable notebook authentication! Let’s chat a little bit about public Jupyter notebook servers and security. A lot of folks run notebook servers that …",
+    "description": "tl;dr: don’t disable notebook authentication!",
     "tags": [
       "jupyter-notebook",
       "security"
@@ -8093,7 +8093,7 @@
     "slug": "interactive-workflows-for-c-with-jupyter",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "Interactive Workflows for C++ with Jupyter Scientists, educators and engineers not only use programming languages to build software systems, but also in interactive workflows, using the tools …",
+    "description": "Scientists, educators and engineers not only use programming languages to build software systems, but also in interactive workflows, using…",
     "tags": [
       "cpp",
       "science"
@@ -8131,7 +8131,7 @@
     "slug": "jupyterhub-0-8",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterHub 0.8 We are pleased to announce the release of JupyterHub 0.8. This is a big release with many fixes and improvements, and some major changes. To upgrade from jupyterhub 0.7: Stop …",
+    "description": "We are pleased to announce the release of JupyterHub 0.8. This is a big release with many fixes and improvements, and some major changes.",
     "tags": [
       "jupyterhub"
     ],
@@ -8236,7 +8236,7 @@
     "slug": "hiring-project-manager",
     "canonical_url": null,
     "ghost_url": "https://blog.jupyter.org/2015/12/22/hiring-project-manager",
-    "description": "Project Jupyter is announcing the opening of a position for a full-time project manager, who will help us coordinate our technical development, engage the open source community and work with our multiple stakeholders in academia and industry. If you have experience leading technical teams in open source communities, we&#x27;d love",
+    "description": "Project Jupyter is announcing the opening of a position for a full-time project manager, who will help us coordinate our technical development, engage the open source community and work with our multiple stakeholders in academia and industry. If you have experience leading technical teams in open source communities, we'd love",
     "tags": [
       "community"
     ],
@@ -8277,7 +8277,7 @@
     "slug": "jdboston16-speaker-announcement",
     "canonical_url": null,
     "ghost_url": "https://blog.jupyter.org/2016/02/29/jdboston16-speaker-announcement",
-    "description": "Cambridge, MA.  A dynamic group of data scientists, software developers, and educators is converging on March 17 and 18 in Cambridge, MA to present at the third Jupyter Day. Sponsored by Project Jupyter, the Harvard-Smithsonian Center for Astrophysics, the Harvard Law School Library, and O&#x27;Reilly Media, the event is the",
+    "description": "Cambridge, MA.  A dynamic group of data scientists, software developers, and educators is converging on March 17 and 18 in Cambridge, MA to present at the third Jupyter Day. Sponsored by Project Jupyter, the Harvard-Smithsonian Center for Astrophysics, the Harvard Law School Library, and O'Reilly Media, the event is the",
     "tags": [
       "events"
     ],
@@ -8447,7 +8447,7 @@
     "slug": "jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "JupyterGIS 0.16: New visualization capabilities, collaborative Story Maps, and more Read this article in Notebook.link, as a live story-map …",
+    "description": "Read this article in Notebook.link, as a live story-map! https://notebook.link/@martinRenou/jupytergis-announcement",
     "tags": [
       "geoscience",
       "jupytergis",
@@ -8477,7 +8477,7 @@
     "slug": "what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan",
     "canonical_url": null,
     "ghost_url": null,
-    "description": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey From time to time, Jupyter runs user surveys to understand how our communities use Jupyter technology …",
+    "description": "From time to time, Jupyter runs user surveys to understand how our communities use Jupyter technology (or alternatives) and how they feel…",
     "tags": [
       "community",
       "jupyter-foundation"
