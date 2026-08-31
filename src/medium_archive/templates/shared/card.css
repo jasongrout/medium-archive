@@ -44,19 +44,7 @@
                             --mono: var(--source-code); }
 body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
-       font: 1rem/1.65 var(--body-font);
-       /* Medium renders its pages this way, and it is why the same
-          Source Serif at the same size looks lighter there than an
-          untreated page here: on macOS the default is subpixel
-          antialiasing, which thickens stems, and `antialiased` asks for
-          greyscale instead. Affects WebKit/Blink on macOS only -- a
-          no-op on Windows and Linux -- so it changes how the choices
-          are rendered, never which glyphs or metrics they get.
-          Medium's `text-rendering: optimizeLegibility` is deliberately
-          not copied: modern engines already kern and ligate by
-          default, and it carries layout and performance costs. */
-       -webkit-font-smoothing: antialiased;
-       -moz-osx-font-smoothing: grayscale; }
+       font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
