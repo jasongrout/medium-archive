@@ -17,9 +17,34 @@
   }
 }
 * { box-sizing: border-box; }
+/* The typography choices the header's font picker cycles through
+   (pinned as data-font on <html>, persisted like the theme choice):
+   the jupyter.org sans the site launched with, Open Sans (the humanist
+   sans nearest the Myriad Pro of the Jupyter logo), and Source -- the
+   superfamily Medium set blog.jupyter.org's article text in.
+
+   --body-font is what the page is set in and --mono what its code is,
+   so a choice swaps both by redefining them; the rules downstream name
+   the roles, never the families. Source, being a superfamily, sets all
+   three faces: the serif for running text, its sibling sans for
+   headings and chrome, its sibling mono for code. */
+:root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --open-sans: "Open Sans", "Helvetica Neue", Helvetica, Arial,
+                     sans-serif;
+        --source-serif: "Source Serif Pro", Georgia, Cambria,
+                        "Times New Roman", Times, serif;
+        --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
+                       Arial, sans-serif;
+        --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
+                       Menlo, Consolas, monospace;
+        --body-font: var(--sans);
+        --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+:root[data-font="open-sans"] { --body-font: var(--open-sans); }
+:root[data-font="source"] { --body-font: var(--source-sans);
+                            --mono: var(--source-code); }
 body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
-       font: 1rem/1.65 "Helvetica Neue", Helvetica, Arial, sans-serif; }
+       font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -54,16 +79,31 @@ a:hover { text-decoration: underline; }
 /* the current page's nav item, in the accent like jupyter.org's navbar */
 .site-header nav a[aria-current="page"] { color: var(--accent); }
 
-.theme-picker { display: inline-flex; vertical-align: middle;
-                margin-left: 1.25rem; }
-.theme-picker[hidden] { display: none; }
-.theme-picker button { display: inline-flex; align-items: center;
-                       justify-content: center; width: 1.9rem; height: 1.9rem;
+.theme-picker, .font-picker { display: inline-flex; vertical-align: middle;
+                              margin-left: 1.25rem; }
+/* the font picker pairs with the theme button beside it */
+.font-picker { margin-left: .45rem; }
+.theme-picker[hidden], .font-picker[hidden] { display: none; }
+.theme-picker button, .font-picker button {
+                       display: inline-flex; align-items: center;
+                       justify-content: center; height: 1.9rem;
                        padding: 0; border: 1px solid var(--line);
                        border-radius: 999px; background: none;
                        color: var(--muted); cursor: pointer; }
-.theme-picker button:hover { color: var(--accent); }
+.theme-picker button { width: 1.9rem; }
+.theme-picker button:hover, .font-picker button:hover { color: var(--accent); }
 .theme-picker svg { width: 1rem; height: 1rem; }
+/* The font button names the choice it is on and sets that name in the
+   family it names, so it both says and shows what you are reading. A
+   name is wider than the theme picker's icon, so this button is a pill
+   rather than a circle; min-width holds it steady across the three
+   names, which would otherwise shift the nav on every click. */
+.font-picker button { min-width: 6.2rem; padding: 0 .75rem;
+                      font-size: .8rem; }
+.font-sample { line-height: 1; }
+.font-picker [data-set-font="sans"] { font-family: var(--sans); }
+.font-picker [data-set-font="open-sans"] { font-family: var(--open-sans); }
+.font-picker [data-set-font="source"] { font-family: var(--source-serif); }
 
 /* the feed mark, in the header nav and beside a tag's or author's
    heading where that term has a feed of its own */
@@ -95,11 +135,18 @@ a:hover { text-decoration: underline; }
 .card-excerpt { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
 .card-meta { margin: 1rem 0 0; color: var(--muted); font-size: .85rem; }
 
+/* The article column reads at Medium's own measure -- 15pt (1.25rem)
+   on a 1.6 line -- rather than the 1rem the rest of the page uses. It
+   sits here, on the column itself, not with any one font choice: at
+   this size the picker's choices differ only in family, which is what
+   the picker is for, and running text wants the larger size whichever
+   family wins. Headings and byline keep their own scale below. */
 .post { background: var(--card); border-radius: 8px; margin: 2rem auto 3rem;
         padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem); max-width: 52rem;
+        font-size: 1.25rem; line-height: 1.6;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
-.post-meta { color: var(--muted); margin: 0 0 .9rem; }
+.post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
 .post-meta .tag { display: inline-flex; align-items: center;
                   background: var(--code-bg); border: 1px solid var(--line);
                   border-radius: 999px; padding: .05rem .65rem;
@@ -109,9 +156,20 @@ a:hover { text-decoration: underline; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
+/* Code names the --mono role, so the font picker's Source choice can
+   put the superfamily's own mono under it. The size is em, so code
+   tracks the reading size of the column it sits in rather than
+   shrinking away from it when a choice sets the article larger; it is
+   stated at all (rather than left to the UA) because a stack ending in
+   the generic `monospace` otherwise triggers the browsers' 13px
+   monospace default. A block has already stepped down once, so the
+   code inside it must not step again. */
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
-            border-radius: 6px; font-size: .9rem; }
-.post code { background: var(--code-bg); }
+            border-radius: 6px; font-family: var(--mono);
+            font-size: .9em; }
+.post code { background: var(--code-bg); font-family: var(--mono);
+             font-size: .9em; }
+.post pre code { font-size: inherit; background: none; }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
 /* the UA default indents figures 40px each side; the column is narrow.
@@ -120,10 +178,29 @@ a:hover { text-decoration: underline; }
    caption Goldmark renders as a paragraph. */
 .post figure { margin: 1rem 0; }
 .post figure > p { margin: 0; }
-.post figcaption { font-size: .9rem; font-style: italic;
-                   margin-top: .35rem; }
+/* Centred under the image, as Medium sets its captions. The size is
+   em, so a caption stays in proportion to the column it annotates
+   rather than shrinking against it when the reading size grows: .9rem
+   was 0.9x the body when the body was 1rem, and only 0.72x once the
+   article moved to 1.25rem. */
+.post figcaption { font-size: .8em; font-style: italic;
+                   margin-top: .35rem; text-align: center; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
+
+/* The Source choice is the only one that sets the article in something
+   other than --body-font, so it is the only one with rules here. Only
+   the running text is serif -- Medium keeps its headings, byline,
+   captions and chrome in a sans -- so those pieces opt back out to
+   --body-font, which under this choice is the superfamily's own Source
+   Sans. Medium's -0.004rem tracking is not reproduced: it works out to
+   0.064px per character, which no reader can see, and leaving it off
+   keeps every choice on the browser's default tracking. */
+:root[data-font="source"] .post { font-family: var(--source-serif); }
+:root[data-font="source"] .post :is(h1, h2, h3, h4, h5, h6),
+:root[data-font="source"] .post-meta,
+:root[data-font="source"] .post-share,
+:root[data-font="source"] .post figcaption { font-family: var(--body-font); }
 
 /* The share bar, carried twice by a post: under the byline, where a
    reader decides whether to read, and at the foot, where they have.

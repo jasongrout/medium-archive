@@ -1,0 +1,9 @@
+<script>
+(function () {
+  try {
+    var font = localStorage.getItem("font");
+    if (font === "open-sans" || font === "source")
+      document.documentElement.setAttribute("data-font", font);
+  } catch (e) {}
+})();
+</script>

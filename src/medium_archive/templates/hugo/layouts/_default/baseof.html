@@ -31,8 +31,12 @@
 {{ if not .IsHome }}{{ with site.Home.OutputFormats.Get "rss" }}<link rel="alternate" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
 {{ end }}{{ end }}{{ range .AlternativeOutputFormats }}<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ if $.IsHome }}{{ site.Title }}{{ else }}{{ $.Title }} · {{ site.Title }}{{ end }}">
 {{ end }}<!-- @include shared/theme-init.html -->
+<!-- @include shared/font-init.html -->
 {{ with site.Params.favicon }}<link rel="icon" href="{{ . | relURL }}">
-{{ end }}<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+{{ end }}<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
 {{ with site.Params.announcement }}<div class="announcement" data-source="{{ . }}" hidden></div>
@@ -49,6 +53,7 @@
 <!-- @include shared/feed-icon.html -->
 </a>
 <!-- @include shared/theme-picker.html -->
+<!-- @include shared/font-picker.html -->
 </nav>
 </div></header>
 <!-- @include shared/nav-current.html -->

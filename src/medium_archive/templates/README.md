@@ -35,6 +35,29 @@ These embed verbatim in both engines' pages, so they must carry no
   until its script runs, since without JS a choice could not apply
   anyway; picking "system" clears the stored choice so
   `prefers-color-scheme` rules again. The choice persists per browser.
+- `font-init.html` — the theme-init of the font experiment: runs before
+  the stylesheet loads so a stored choice cannot flash the default
+  family first. A stored choice pins `data-font` on `<html>`; no
+  attribute means the jupyter.org sans (see `card.css`).
+- `font-picker.html` — the header's body-font switch, beside the theme
+  picker and built like it: one cycling button, the choice persisted
+  per browser. Where the theme button draws its state as an icon, this
+  one names it — "Helvetica", "Open Sans", "Source" — and sets the name
+  in the family it names, so the button says and shows what the reader
+  is on. The names are the button's own text, which the script reads
+  back for the tooltip and `aria-label`; a fixed `min-width` in
+  `card.css` keeps the three from shifting the nav as they cycle.
+  It exists to let reviewers compare candidate typography before the
+  blog settles on one — the jupyter.org Helvetica stack the site
+  launched with, Open Sans (the humanist sans nearest the logo's Myriad
+  Pro), and Source, the superfamily Medium set the publication in
+  (Source Serif Pro running text, Source Sans Pro headings and chrome,
+  Source Code Pro code). The article's reading size belongs to `.post`
+  rather than to any one choice, so the three differ in family alone.
+  The losing styles, and the picker with them, come out once that is
+  decided. `card.css` states the choices as `--body-font` / `--mono`,
+  so a new candidate is a `:root[data-font=...]` block redefining those
+  rather than another pass over the rules that use them.
 - `term-sort.html` — the tag/author chip indexes' sort control: by name
   (A-Z, the order the generators emit, so the no-JS page reads the
   same) or by count, most posts first. Hidden until its script runs;

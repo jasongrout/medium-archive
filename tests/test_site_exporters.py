@@ -456,9 +456,18 @@ def test_theme_picker_and_dark_scheme(archive):
         text = base.read_text()
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
-        # the stored choice applies before the stylesheet loads, so a
-        # page cannot flash the wrong scheme
+        for choice in ("sans", "open-sans", "source"):
+            assert f'data-set-font="{choice}"' in text, base
+        # every family the picker offers beyond the launch stack is a
+        # webfont: unlinked, those choices degrade to their fallbacks
+        # silently, looking like a styling bug rather than a missing file
+        for family in ("Open+Sans", "Source+Serif+Pro", "Source+Sans+Pro",
+                       "Source+Code+Pro"):
+            assert f"family={family}" in text, (base, family)
+        # the stored choices apply before the stylesheet loads, so a
+        # page cannot flash the wrong scheme or font
         assert text.index("localStorage.getItem") < text.index("stylesheet")
+        assert text.index('localStorage.getItem("font")') < text.index("stylesheet")
     # redirect stubs load no stylesheet, so they must paint the palette
     # themselves -- following a redirect must not flash white in dark mode
     for stub_source in ((hugo_site / "layouts/alias.html").read_text(),
@@ -467,7 +476,8 @@ def test_theme_picker_and_dark_scheme(archive):
         assert 'localStorage.getItem("theme")' in stub_source
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
-    for name in ("theme-init", "theme-picker", "term-sort", "announcement",
+    for name in ("theme-init", "theme-picker", "font-init", "font-picker",
+                 "term-sort", "announcement",
                  "nav-current", "image-zoom", "feed-icon", "share-icons",
                  "share-mastodon"):
         snippet = sites.template_text(f"shared/{name}.html")
