@@ -1,0 +1,45 @@
+<span class="font-picker" hidden>
+<button type="button">
+<span class="font-sample" data-set-font="sans" aria-hidden="true">Aa</span>
+<span class="font-sample" data-set-font="open-sans" aria-hidden="true">Aa</span>
+<span class="font-sample" data-set-font="source" aria-hidden="true">Aa</span>
+</button>
+</span>
+<script>
+(function () {
+  var root = document.documentElement;
+  var picker = document.querySelector(".font-picker");
+  var button = picker.querySelector("button");
+  var samples = button.querySelectorAll("[data-set-font]");
+  var order = ["sans", "open-sans", "source"];
+  var names = {
+    "sans": "Helvetica Neue",
+    "open-sans": "Open Sans",
+    "source": "Source Serif Pro"
+  };
+  var current;
+  function apply(choice) {
+    current = choice;
+    if (choice === "sans") root.removeAttribute("data-font");
+    else root.setAttribute("data-font", choice);
+    try {
+      if (choice === "sans") localStorage.removeItem("font");
+      else localStorage.setItem("font", choice);
+    } catch (e) {}
+    samples.forEach(function (sample) {
+      sample.style.display = sample.dataset.setFont === choice ? "" : "none";
+    });
+    var next = order[(order.indexOf(choice) + 1) % order.length];
+    var label = "Body font: " + names[choice] +
+                " (switch to " + names[next] + ")";
+    button.title = label;
+    button.setAttribute("aria-label", label);
+  }
+  button.addEventListener("click", function () {
+    apply(order[(order.indexOf(current) + 1) % order.length]);
+  });
+  apply(names[root.getAttribute("data-font")] ? root.getAttribute("data-font")
+                                              : "sans");
+  picker.hidden = false;
+})();
+</script>

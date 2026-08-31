@@ -30,8 +30,12 @@
 {% if tag and TAG_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ TAG_FEED_ATOM.format(slug=tag.slug) }}" title="{{ SITENAME }} - {{ tag }}">
 {% elif author and AUTHOR_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ AUTHOR_FEED_ATOM.format(slug=author.slug) }}" title="{{ SITENAME }} - {{ author }}">
 {% endif %}<!-- @include shared/theme-init.html -->
+<!-- @include shared/font-init.html -->
 {% if FAVICON %}<link rel="icon" href="{{ SITEURL }}/{{ FAVICON }}">
-{% endif %}<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
+{% endif %}<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
 </head>
 <body>
 {% if ANNOUNCEMENT %}<div class="announcement" data-source="{{ ANNOUNCEMENT|e }}" hidden></div>
@@ -48,6 +52,7 @@
 <!-- @include shared/feed-icon.html -->
 </a>
 <!-- @include shared/theme-picker.html -->
+<!-- @include shared/font-picker.html -->
 </nav>
 </div></header>
 <!-- @include shared/nav-current.html -->
