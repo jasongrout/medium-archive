@@ -1,8 +1,8 @@
 <span class="font-picker" hidden>
 <button type="button">
-<span class="font-sample" data-set-font="sans" aria-hidden="true">Aa</span>
-<span class="font-sample" data-set-font="open-sans" aria-hidden="true">Aa</span>
-<span class="font-sample" data-set-font="source" aria-hidden="true">Aa</span>
+<span class="font-sample" data-set-font="sans">Helvetica</span>
+<span class="font-sample" data-set-font="open-sans">Open Sans</span>
+<span class="font-sample" data-set-font="source">Source</span>
 </button>
 </span>
 <script>
@@ -12,11 +12,10 @@
   var button = picker.querySelector("button");
   var samples = button.querySelectorAll("[data-set-font]");
   var order = ["sans", "open-sans", "source"];
-  var names = {
-    "sans": "Helvetica Neue",
-    "open-sans": "Open Sans",
-    "source": "Source Serif Pro"
-  };
+  var names = {};
+  samples.forEach(function (sample) {
+    names[sample.dataset.setFont] = sample.textContent;
+  });
   var current;
   function apply(choice) {
     current = choice;

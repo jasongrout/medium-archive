@@ -86,14 +86,21 @@ a:hover { text-decoration: underline; }
 .theme-picker[hidden], .font-picker[hidden] { display: none; }
 .theme-picker button, .font-picker button {
                        display: inline-flex; align-items: center;
-                       justify-content: center; width: 1.9rem; height: 1.9rem;
+                       justify-content: center; height: 1.9rem;
                        padding: 0; border: 1px solid var(--line);
                        border-radius: 999px; background: none;
                        color: var(--muted); cursor: pointer; }
+.theme-picker button { width: 1.9rem; }
 .theme-picker button:hover, .font-picker button:hover { color: var(--accent); }
 .theme-picker svg { width: 1rem; height: 1rem; }
-/* the button's sample previews the family it stands for */
-.font-sample { font-size: .9rem; line-height: 1; }
+/* The font button names the choice it is on and sets that name in the
+   family it names, so it both says and shows what you are reading. A
+   name is wider than the theme picker's icon, so this button is a pill
+   rather than a circle; min-width holds it steady across the three
+   names, which would otherwise shift the nav on every click. */
+.font-picker button { min-width: 6.2rem; padding: 0 .75rem;
+                      font-size: .8rem; }
+.font-sample { line-height: 1; }
 .font-picker [data-set-font="sans"] { font-family: var(--sans); }
 .font-picker [data-set-font="open-sans"] { font-family: var(--open-sans); }
 .font-picker [data-set-font="source"] { font-family: var(--source-serif); }
@@ -128,11 +135,18 @@ a:hover { text-decoration: underline; }
 .card-excerpt { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
 .card-meta { margin: 1rem 0 0; color: var(--muted); font-size: .85rem; }
 
+/* The article column reads at Medium's own measure -- 15pt (1.25rem)
+   on a 1.6 line -- rather than the 1rem the rest of the page uses. It
+   sits here, on the column itself, not with any one font choice: at
+   this size the picker's choices differ only in family, which is what
+   the picker is for, and running text wants the larger size whichever
+   family wins. Headings and byline keep their own scale below. */
 .post { background: var(--card); border-radius: 8px; margin: 2rem auto 3rem;
         padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem); max-width: 52rem;
+        font-size: 1.25rem; line-height: 1.6;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
-.post-meta { color: var(--muted); margin: 0 0 .9rem; }
+.post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
 .post-meta .tag { display: inline-flex; align-items: center;
                   background: var(--code-bg); border: 1px solid var(--line);
                   border-radius: 999px; padding: .05rem .65rem;
@@ -169,22 +183,19 @@ a:hover { text-decoration: underline; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
-/* Medium's reading typography, as blog.jupyter.org served it: article
-   text in source-serif-pro at 15pt (1.25rem) on a 1.6 line with
-   -0.004rem tracking, regular weight. Only the running text is serif:
-   Medium keeps its headings, byline, captions and chrome in a sans,
-   and --body-font is Source Sans under this choice, so those pieces
-   opt back out to it and stay within the superfamily. */
-:root[data-font="source"] .post { font-family: var(--source-serif);
-                                  font-size: 1.25rem; line-height: 1.6;
-                                  letter-spacing: -0.004rem; }
+/* The Source choice is the only one that sets the article in something
+   other than --body-font, so it is the only one with rules here. Only
+   the running text is serif -- Medium keeps its headings, byline,
+   captions and chrome in a sans -- so those pieces opt back out to
+   --body-font, which under this choice is the superfamily's own Source
+   Sans. Medium's -0.004rem tracking is not reproduced: it works out to
+   0.064px per character, which no reader can see, and leaving it off
+   keeps every choice on the browser's default tracking. */
+:root[data-font="source"] .post { font-family: var(--source-serif); }
 :root[data-font="source"] .post :is(h1, h2, h3, h4, h5, h6),
 :root[data-font="source"] .post-meta,
 :root[data-font="source"] .post-share,
-:root[data-font="source"] .post figcaption { font-family: var(--body-font);
-                                             letter-spacing: normal; }
-/* the byline keeps its 1rem size rather than the serif column's 1.25 */
-:root[data-font="source"] .post-meta { font-size: 1rem; }
+:root[data-font="source"] .post figcaption { font-family: var(--body-font); }
 
 /* The share bar, carried twice by a post: under the byline, where a
    reader decides whether to read, and at the foot, where they have.
