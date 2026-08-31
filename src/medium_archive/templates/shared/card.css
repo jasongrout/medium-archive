@@ -178,8 +178,13 @@ a:hover { text-decoration: underline; }
    caption Goldmark renders as a paragraph. */
 .post figure { margin: 1rem 0; }
 .post figure > p { margin: 0; }
-.post figcaption { font-size: .9rem; font-style: italic;
-                   margin-top: .35rem; }
+/* Centred under the image, as Medium sets its captions. The size is
+   em, so a caption stays in proportion to the column it annotates
+   rather than shrinking against it when the reading size grows: .9rem
+   was 0.9x the body when the body was 1rem, and only 0.72x once the
+   article moved to 1.25rem. */
+.post figcaption { font-size: .8em; font-style: italic;
+                   margin-top: .35rem; text-align: center; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
