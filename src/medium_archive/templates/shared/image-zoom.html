@@ -18,14 +18,21 @@
     function source(img) {
       return parseInt(img.getAttribute("width"), 10) || img.naturalWidth;
     }
+    function describe(img) {
+      if (img.alt) return img.alt;
+      var figure = img.closest("figure");
+      var cap = figure && figure.querySelector("figcaption");
+      return cap ? cap.textContent.trim() : "";
+    }
     function mark(img) {
       var zoomable = source(img) > img.clientWidth + 4;
       img.classList.toggle("zoomable", zoomable);
       if (zoomable) {
         img.tabIndex = 0;
         img.setAttribute("role", "button");
+        var text = describe(img);
         img.setAttribute("aria-label",
-          (img.alt ? img.alt + ": " : "") + "view full size");
+          (text ? text + ": " : "") + "view full size");
       } else {
         img.removeAttribute("tabindex");
         img.removeAttribute("role");
@@ -36,8 +43,9 @@
       if (!img.classList.contains("zoomable")) return;
       full.src = img.src;
       full.alt = img.alt;
-      caption.textContent = img.alt;
-      caption.hidden = !img.alt;
+      var text = describe(img);
+      caption.textContent = text;
+      caption.hidden = !text;
       opened = window.scrollY;
       dialog.showModal();
     }

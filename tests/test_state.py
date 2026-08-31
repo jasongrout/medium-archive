@@ -140,7 +140,8 @@ def test_iframe_embed_with_caption():
     md = md_of_state(state)
     # the embedly wrapper unwraps to the canonical watch URL
     assert "[embed: https://www.youtube.com/watch?v=abc]" in md
-    assert "*Watch the demo.*" in md
+    # the caption rides in the figure shell, unstyled (CSS styles it)
+    assert "<figcaption>\n\nWatch the demo.\n\n</figcaption>" in md
 
 
 def test_mixtape_card_becomes_a_link():
@@ -161,7 +162,7 @@ def test_image_paragraph_with_caption_and_link():
              metadata={"id": "1*abc.png"}, href="https://demo.example")
     md = md_of_state(make_state([p]))
     assert "[![](https://miro.medium.com/v2/1*abc.png)](https://demo.example)" in md
-    assert "*A caption.*" in md
+    assert "<figcaption>\n\nA caption.\n\n</figcaption>" in md
 
 
 def test_convert_post_recovers_shell_from_state(tmp_path):

@@ -94,6 +94,82 @@ def test_hugo_site(archive):
     assert (site / "redirects.csv").read_text().count("/posts/first-post/") == 3
 
 
+FIGURE_BODY = ("<figure>\n\n![Alt text](images/001-fig.gif)\n\n"
+               "<figcaption>\n\nThe caption, with a "
+               "[link](https://example.com).\n\n</figcaption>\n\n"
+               "</figure>\n")
+
+
+def captioned_archive(archive):
+    manifest = json.loads((archive / "posts.json").read_text())
+    make_post(archive, manifest, "captioned-post", "ccc333ccc333",
+              "2022-06-01T10:00:00Z", FIGURE_BODY,
+              images=["images/001-fig.gif"])
+    d = archive / "posts/2022-06-01-captioned-post"
+    (d / "images").mkdir()
+    (d / "images" / "001-fig.gif").write_bytes(b"GIF")
+    (archive / "posts.json").write_text(json.dumps(manifest))
+    return archive
+
+
+def test_hugo_page_keeps_caption_in_its_figure(archive):
+    site = hugo.build_site(captioned_archive(archive))
+    # the shell becomes a call to the shipped figure shortcode, the
+    # caption as inner content so its Markdown still renders
+    page = (site / "content/posts/captioned-post/index.md").read_text()
+    assert ('{{< figure src="images/001-fig.gif" alt="Alt text" >}}'
+            "The caption, with a [link](https://example.com)."
+            "{{< /figure >}}") in page
+    # shortcode and image partial ship with every site, real theme or
+    # not: a theme's own figure shortcode would drop the inner caption
+    assert (site / "layouts/shortcodes/figure.html").exists()
+    assert (site / "layouts/partials/post-image.html").exists()
+
+
+def test_pelican_page_renders_the_figure_shell_as_one_block(archive):
+    site = pelican.build_site(captioned_archive(archive))
+    page = (site / "content/posts/captioned-post/index.md").read_text()
+    assert ('<figure markdown="span">\n'
+            '<img alt="Alt text" src="{attach}images/001-fig.gif" '
+            'loading="lazy">\n'
+            '<figcaption markdown="span">The caption, with a '
+            "[link](https://example.com).</figcaption>\n"
+            "</figure>") in page
+    # python-markdown's md_in_html (span mode) renders the caption's
+    # Markdown inline: no <p> wrappers around the img or the caption,
+    # matching the markup Medium serves
+    import markdown as md_mod
+    body = page.split("\n\n", 1)[1]
+    html = md_mod.markdown(body, extensions=["extra"])
+    assert "<p><img" not in html and "<figcaption><p>" not in html
+    assert ('<figcaption>The caption, with a '
+            '<a href="https://example.com">link</a>.</figcaption>') in html
+
+
+def test_link_wrapped_figures_keep_their_link():
+    shell = ("<figure>\n\n[![Alt](images/a.png)](https://demo.example)\n\n"
+             "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>")
+    assert hugo.figure_shortcodes(shell) == (
+        '{{< figure src="images/a.png" alt="Alt" '
+        'link="https://demo.example" >}}Cap.{{< /figure >}}')
+    assert pelican.figure_blocks(shell) == (
+        '<figure markdown="span">\n'
+        '<a href="https://demo.example">'
+        '<img alt="Alt" src="images/a.png" loading="lazy"></a>\n'
+        '<figcaption markdown="span">Cap.</figcaption>\n</figure>')
+
+
+def test_non_image_figure_shells_stay_raw_html():
+    shell = ("<figure>\n\n[embed: https://u](https://u)\n\n<figcaption>\n\n"
+             "Cap.\n\n</figcaption>\n\n</figure>")
+    # hugo leaves them to Goldmark's unsafe renderer as they are;
+    # pelican opts the tag lines into markdown so the content renders
+    assert hugo.figure_shortcodes(shell) == shell
+    assert pelican.figure_blocks(shell) == shell.replace(
+        "<figure>", '<figure markdown="1">').replace(
+        "<figcaption>", '<figcaption markdown="1">')
+
+
 def test_hugo_dream_theme(archive):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "site.json").write_text(json.dumps(
@@ -109,11 +185,15 @@ def test_hugo_dream_theme(archive):
     assert 'motto = "hello"' in config          # user params merge last
     assert 'avatar = "img/avatar.png"' in config
     assert (site / "static/img/avatar.png").read_bytes() == b"IMG"
-    # the theme brings its own layouts -- except the feed override, which
-    # is content policy, not styling; Dream's extra pages are created
+    # the theme brings its own layouts -- except the content-policy
+    # files: the feed override, and the figure shortcode (with its
+    # image partial) that the pages' figure calls resolve to; Dream's
+    # extra pages are created
     layouts = [str(p.relative_to(site)) for p in (site / "layouts").rglob("*")
                if p.is_file()]
-    assert layouts == ["layouts/_default/rss.xml"]
+    assert sorted(layouts) == ["layouts/_default/rss.xml",
+                               "layouts/partials/post-image.html",
+                               "layouts/shortcodes/figure.html"]
     assert (site / "content/search/_index.md").exists()
     assert "Archives" in (site / "content/posts/_index.md").read_text()
     front = json.loads((site / "content/posts/second-post/index.md")

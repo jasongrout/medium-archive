@@ -1,0 +1,13 @@
+{{- /* A captioned body image, as the <figure>/<figcaption> Medium
+       served: the image through the same partial as the image render
+       hook (so it carries the same srcset ladder and dimensions), the
+       caption rendered inline -- links and emphasis, no <p> wrapper.
+       The hugo exporter writes this for every site, real theme or not:
+       the caption arrives as inner content, which a theme's own figure
+       shortcode (or Hugo's built-in) would silently drop. */ -}}
+<figure>
+{{ with .Get "link" }}<a href="{{ . }}">{{ end }}{{- partial "post-image.html" (dict "page" .Page "src" (.Get "src") "alt" (.Get "alt" | default "")) -}}{{ with .Get "link" }}</a>{{ end }}
+{{- with trim .Inner "\n" }}
+<figcaption>{{ . | $.Page.RenderString }}</figcaption>
+{{- end }}
+</figure>
