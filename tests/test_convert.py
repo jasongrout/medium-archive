@@ -139,10 +139,36 @@ def test_non_medium_source_param_survives():
     assert md == "[link](https://example.com/?source=rss&x=1)\n"
 
 
-def test_figcaption_renders_italic():
+def test_captioned_figure_keeps_its_shell():
+    # the caption stays associated with its picture: the shell tags go
+    # out as blank-line-separated raw HTML blocks, so CommonMark
+    # renderers still process the image and caption Markdown between
+    # them -- and the caption carries no styling markup: like Medium,
+    # the sites style figcaption with CSS
     md = md_of('<figure><img src="https://x.com/a.png"/>'
                '<figcaption>A robot in the browser</figcaption></figure>')
-    assert "*A robot in the browser*" in md
+    assert md == ("<figure>\n\n![](https://x.com/a.png)\n\n"
+                  "<figcaption>\n\nA robot in the browser\n\n"
+                  "</figcaption>\n\n</figure>\n")
+
+
+def test_uncaptioned_figure_gets_no_shell():
+    md = md_of('<figure><img src="https://x.com/a.png"/></figure>')
+    assert "figure" not in md
+
+
+def test_caption_without_content_to_caption_stays_plain():
+    # some captures never hydrate the figure's image element
+    md = md_of("<figure><figcaption>Orphan caption</figcaption></figure>")
+    assert md == "*Orphan caption*\n"
+
+
+def test_captioned_embed_keeps_its_shell():
+    md = md_of('<figure><iframe src="https://youtu.be/x"></iframe>'
+               "<figcaption>Watch it</figcaption></figure>")
+    assert md == ("<figure>\n\n[embed: https://youtu.be/x](https://youtu.be/x)"
+                  "\n\n<figcaption>\n\nWatch it\n\n</figcaption>\n\n"
+                  "</figure>\n")
 
 
 def test_already_italic_figcaption_is_not_double_wrapped():

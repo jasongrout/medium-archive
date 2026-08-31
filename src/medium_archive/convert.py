@@ -35,13 +35,36 @@ EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
 
 
 class _Converter(MarkdownConverter):
-    """markdownify, with two code-fence tweaks. Each fence is sized to
-    its content: a <pre> whose text itself contains ``` lines (a post
-    showing Markdown) would close a three-backtick fence early, spilling
-    the rest of the block -- and everything after it -- into broken
-    structure. And the opening fence carries the block's language when a
-    nested <code class="language-..."> names one (the editor state's
-    codeBlockMetadata, gist files, Ghost highlighting classes)."""
+    """markdownify, with two code-fence tweaks and figure preservation.
+
+    Each fence is sized to its content: a <pre> whose text itself
+    contains ``` lines (a post showing Markdown) would close a
+    three-backtick fence early, spilling the rest of the block -- and
+    everything after it -- into broken structure. And the opening fence
+    carries the block's language when a nested <code
+    class="language-..."> names one (the editor state's
+    codeBlockMetadata, gist files, Ghost highlighting classes).
+
+    A captioned figure keeps its <figure>/<figcaption> shell as raw
+    HTML: flattening it to an image paragraph plus a text paragraph
+    would lose the association Medium's markup gives a caption and its
+    picture (a screen reader would hear an image and an unrelated
+    paragraph). The shell lines go out blank-line separated, so
+    CommonMark renderers (GitHub, Hugo's Goldmark) treat each tag as
+    its own HTML block and still render the image and caption Markdown
+    between them; the site exporters rewrite the shell to their native
+    figure form, which is regular enough to match exactly (see
+    hugo.figure_shortcodes, pelican.figure_blocks, myst.myst_figures)."""
+
+    def convert_figure(self, el, text, parent_tags):
+        if not _captioned_figure(el):
+            return text
+        return f"\n\n<figure>\n\n{text.strip()}\n\n</figure>\n\n"
+
+    def convert_figcaption(self, el, text, parent_tags):
+        if not _captioned_figure(el.find_parent("figure")):
+            return text
+        return f"\n\n<figcaption>\n\n{text.strip()}\n\n</figcaption>\n\n"
 
     def convert_pre(self, el, text, parent_tags):
         md = super().convert_pre(el, text, parent_tags)
@@ -60,6 +83,22 @@ class _Converter(MarkdownConverter):
             m = re.match(r"\s*`{3,}", md)
             md = md[:m.end()] + lang + md[m.end():]
         return md
+
+
+def _captioned_figure(figure) -> bool:
+    """figure (or None) has a non-empty caption and, outside it,
+    something to caption -- an image, an embed in any of the shapes it
+    passes through to_markdown in (iframe or gist script on the way in,
+    link or inlined code on the way out) -- so its <figure>/<figcaption>
+    shell survives conversion. A caption alone does not: some captures
+    never hydrate the figure's image element."""
+    if figure is None:
+        return False
+    cap = figure.find("figcaption")
+    return bool(cap and cap.get_text(strip=True)
+                and any(t.find_parent("figcaption") is None
+                        for t in figure.find_all(["img", "a", "iframe",
+                                                  "script", "pre"])))
 
 
 def _strip_tracking(url: str) -> str:
@@ -143,11 +182,16 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         for br in pre.find_all("br"):
             br.replace_with("\n")
 
-    # Medium styles figure captions as small gray text under the image;
-    # italics is the Markdown idiom that keeps them visually distinct
-    # from body prose (including captions whose figure lost its image --
-    # some captures never hydrate the image element).
+    # Medium styles figure captions with CSS, not markup, and so do the
+    # site themes, off the <figcaption> in the shell _Converter
+    # preserves -- so a caption's text stays clean of styling. Only a
+    # caption whose figure lost its image (some captures never hydrate
+    # the element) has no shell to hang styling on: it stays a plain
+    # paragraph, and italics is the Markdown idiom that keeps it
+    # visually distinct from body prose.
     for cap in body.find_all("figcaption"):
+        if _captioned_figure(cap.find_parent("figure")):
+            continue
         if cap.get_text(strip=True) and not (
                 len(cap.contents) == 1 and cap.contents[0].name in ("em", "i")):
             em = doc.new_tag("em")

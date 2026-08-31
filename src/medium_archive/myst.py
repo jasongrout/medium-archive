@@ -109,9 +109,37 @@ def escape_prose(line: str) -> str:
                    for i, p in enumerate(parts))
 
 
+# The <figure> shell convert writes around a captioned image, in the
+# exact shape _Converter emits it: tag lines and the single image and
+# caption lines between them, all blank-line separated.
+FIGURE_BLOCK_RE = re.compile(
+    r"<figure>\n\n(!\[[^\]\n]*\]\([^)\s]+\))\n\n"
+    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
+FIGURE_TAG_LINE_RE = re.compile(r"^</?fig(?:ure|caption)>\n\n?", re.M)
+ALT_RE = re.compile(r"!\[([^\]\n]*)\]\(([^)\s]+)\)")
+
+
+def myst_figures(markdown: str) -> str:
+    """The <figure>/<figcaption> shells convert writes around captioned
+    images, rendered the MyST way: a captioned image becomes a
+    {figure} directive, whose body mystmd renders as a real
+    <figcaption> under the image. Anything else the shell wraps (the
+    link an embed became) falls back to dropping the shell lines,
+    leaving the paragraphs they wrapped -- mystmd is not guaranteed to
+    render raw HTML, so no shell may survive."""
+    def directive(m):
+        alt, src = ALT_RE.match(m.group(1)).groups()
+        opt = f":alt: {alt}\n" if alt else ""
+        return f":::{{figure}} {src}\n{opt}\n{m.group(2)}\n:::"
+    markdown = FIGURE_BLOCK_RE.sub(directive, markdown)
+    markdown = FIGURE_TAG_LINE_RE.sub("", markdown)
+    return re.sub(r"\n{3,}", "\n\n", markdown)
+
+
 def rewrite_body(markdown: str, links: LinkMap, prefix: str) -> str:
     """Point links at other posts of the publication to their site pages
-    instead of Medium, and escape prose MyST would misparse. prefix is
+    instead of Medium, rewrite convert's figure shells to MyST's own
+    figure form, and escape prose MyST would misparse. prefix is
     the path from the referring page's directory to site-myst/posts/ ("../"
     for a post page, "posts/" for the landing page)."""
     def target_for(url):
@@ -120,7 +148,7 @@ def rewrite_body(markdown: str, links: LinkMap, prefix: str) -> str:
             return None
         d, stem, frag = hit
         return f"{prefix}{d}/{stem}.md" + (f"#{frag}" if frag else "")
-    return _rewrite(markdown, target_for, escape_prose)
+    return _rewrite(myst_figures(markdown), target_for, escape_prose)
 
 
 def page_front_matter(post: dict, cover: str | None = None,

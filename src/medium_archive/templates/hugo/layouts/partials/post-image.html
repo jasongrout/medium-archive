@@ -1,0 +1,24 @@
+{{- /* One body image (ctx: page, src, alt): the bundle resource with a
+       responsive variant ladder when it is a photograph, the raw path
+       otherwise. Shared by the image render hook and the figure
+       shortcode, so a captioned and a bare image carry the same markup.
+       Only photographs get the ladder: png and webp here are line art
+       the placer kept whole (see ImagePlacer), whose 9 px text does not
+       survive a 736 px variant, and an animated gif loses its frames
+       through the image pipeline. */ -}}
+{{- $img := .page.Resources.Get .src -}}
+{{- $alt := .alt -}}
+{{- if and $img (eq $img.MediaType.MainType "image") (ne $img.MediaType.SubType "svg") -}}
+{{- $srcset := slice -}}
+{{- if not (in (slice "gif" "webp" "png") $img.MediaType.SubType) -}}
+{{- range $w := slice 480 736 1104 -}}
+{{- if ge $img.Width $w -}}
+{{- $v := $img.Resize (printf "%dx q75 webp" $w) -}}
+{{- $srcset = $srcset | append (printf "%s %dw" $v.RelPermalink $v.Width) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+<img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ $alt }}">
+{{- else -}}
+<img src="{{ .src | safeURL }}" alt="{{ $alt }}" loading="lazy">
+{{- end -}}

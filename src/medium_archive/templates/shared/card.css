@@ -114,6 +114,15 @@ a:hover { text-decoration: underline; }
 .post code { background: var(--code-bg); }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
+/* the UA default indents figures 40px each side; the column is narrow.
+   Captions carry no styling markup of their own (like Medium's): the
+   muted italic look lives here. The p rules cover embed figures, whose
+   caption Goldmark renders as a paragraph. */
+.post figure { margin: 1rem 0; }
+.post figure > p { margin: 0; }
+.post figcaption { font-size: .9rem; font-style: italic;
+                   margin-top: .35rem; }
+.post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
 /* The share bar, carried twice by a post: under the byline, where a

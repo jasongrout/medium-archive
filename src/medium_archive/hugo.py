@@ -5,7 +5,13 @@ sites.py); render with `hugo` or `hugo server` inside <out>/site-hugo/
 
 Each post becomes a Hugo leaf bundle, content/posts/<stem>/index.md with
 its images beside it, so the bundle directory name is the page URL
-(/posts/<stem>/). Front matter is JSON (Hugo reads it natively): tags and
+(/posts/<stem>/). The <figure>/<figcaption> shells convert writes
+around captioned images become calls to a figure shortcode the
+exporter ships with every site (see figure_shortcodes), so the
+rendered page carries the same markup Medium served -- a <figure>
+holding the img (with the responsive srcset ladder body images get)
+and its <figcaption>, no paragraph wrappers, caption styled by CSS --
+and the caption stays programmatically associated with its picture. Front matter is JSON (Hugo reads it natively): tags and
 authors feed Hugo's taxonomies, which give the tag/author listing pages
 and per-term RSS feeds, and every old inbound path (Medium slug+id,
 /p/<id>, Ghost-era) becomes an alias, so Hugo emits redirect stubs for
@@ -44,6 +50,7 @@ author taxonomy, and siteStartYear is derived from the oldest post.
 """
 
 import json
+import re
 import shutil
 import sys
 
@@ -73,6 +80,38 @@ TEMPLATES = {
         "hugo/layouts/_default/_markup/render-image.html",
     "static/css/style.css": "shared/card.css",
 }
+
+
+# The <figure> shell convert writes around a captioned image
+# (link-wrapped or not), in the exact shape _Converter emits it: tag
+# lines and the single image and caption lines between them, all
+# blank-line separated.
+FIGURE_BLOCK_RE = re.compile(
+    r"<figure>\n\n(\[)?!\[([^\]\n]*)\]\(([^)\s]+)\)(?(1)\]\(([^)\s]+)\))\n\n"
+    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
+
+
+def figure_shortcodes(markdown: str) -> str:
+    """Convert's figure shells as calls to the exported figure
+    shortcode, the caption as inner content -- an attribute could not
+    carry its Markdown (links, emphasis). Rendering via the shortcode
+    rather than the raw shell keeps the img and the caption out of
+    Goldmark's <p> wrappers and gives the img the render hook's srcset
+    ladder, which raw HTML would bypass. A shell around anything else
+    (the link an embed became, an inlined gist) stays raw HTML, which
+    Goldmark renders as-is: the unsafe renderer stays on in the
+    generated config for it, and for the old bodies that carry HTML
+    fragments of their own."""
+    def call(m):
+        _, alt, src, link, caption = m.groups()
+        q = lambda v: v.replace(chr(92), "").replace(chr(34), chr(92) + chr(34))
+        args = f'src="{src}"'
+        if alt:
+            args += f' alt="{q(alt)}"'
+        if link:
+            args += f' link="{q(link)}"'
+        return "{{< figure %s >}}%s{{< /figure >}}" % (args, caption)
+    return FIGURE_BLOCK_RE.sub(call, markdown)
 
 
 def front_matter(url: str, post: dict, cover: str | None = None) -> str:
@@ -195,7 +234,7 @@ def build_site(out):
                                     cover=("images/cover.jpg" if have_pillow
                                            else covers.get(url))
                                     if url in covers else None),
-        placer=ImagePlacer(out, config))
+        placer=ImagePlacer(out, config), transform=figure_shortcodes)
     if have_pillow:
         bake_cover_thumbnails(out, site, manifest, stems, covers)
     write_tag_terms(site, tag_names(manifest, out))
@@ -248,12 +287,17 @@ def build_site(out):
             path = site / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(template_text(src), encoding="utf-8")
-    # the feed override is written even under a real theme: feed policy
-    # is content policy, not styling (see templates/README.md)
-    rss = site / "layouts" / "_default" / "rss.xml"
-    rss.parent.mkdir(parents=True, exist_ok=True)
-    rss.write_text(template_text("hugo/layouts/_default/rss.xml"),
-                   encoding="utf-8")
+    # written even under a real theme -- content policy, not styling
+    # (see templates/README.md): the feed override, and the figure
+    # shortcode the pages' figure calls resolve to (a theme's own
+    # would drop the caption, passed as inner content) with the image
+    # partial it and the render hook share
+    for rel in ("layouts/_default/rss.xml",
+                "layouts/shortcodes/figure.html",
+                "layouts/partials/post-image.html"):
+        path = site / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(template_text("hugo/" + rel), encoding="utf-8")
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     if theme and not (site / "themes" / theme).is_dir():

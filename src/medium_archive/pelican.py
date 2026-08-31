@@ -83,6 +83,42 @@ def attach_images(line: str) -> str:
     return IMAGE_RE.sub(r"]({attach}\1)", line)
 
 
+# The <figure> shell convert writes around a captioned image
+# (link-wrapped or not), in the exact shape _Converter emits it (the
+# image reference already carries the {attach} prefix: escape runs
+# first).
+FIGURE_BLOCK_RE = re.compile(
+    r"<figure>\n\n(\[)?!\[([^\]\n]*)\]\(([^)\s]+)\)(?(1)\]\(([^)\s]+)\))\n\n"
+    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
+FIGURE_TAG_RE = re.compile(r"^<(figure|figcaption)>$", re.M)
+
+
+def figure_blocks(markdown: str) -> str:
+    """Convert's figure shells in the form python-markdown renders the
+    way Medium served them: one HTML block, the img a literal tag (the
+    site plugin's post-build pass gives any body <img> its srcset and
+    dimensions), the caption opted in to inline processing -- both
+    markdown="span", which python-markdown's md_in_html (part of the
+    `extra` extension the generated config enables) needs to render the
+    caption's Markdown at all, and which keeps img and caption out of
+    <p> wrappers. A shell around anything but a single image (the link
+    an embed became) keeps its blank-line-separated lines instead,
+    opted in with markdown="1" so the Markdown between them renders."""
+    def block(m):
+        _, alt, src, link, caption = m.groups()
+        esc = lambda v: (v.replace("&", "&amp;").replace('"', "&quot;")
+                         .replace("<", "&lt;"))
+        img = f'<img alt="{esc(alt)}" src="{src}" loading="lazy">'
+        if link:
+            img = f'<a href="{esc(link)}">{img}</a>'
+        return ('<figure markdown="span">\n'
+                f"{img}\n"
+                f'<figcaption markdown="span">{caption}</figcaption>\n'
+                "</figure>")
+    markdown = FIGURE_BLOCK_RE.sub(block, markdown)
+    return FIGURE_TAG_RE.sub(r'<\1 markdown="1">', markdown)
+
+
 def _meta(key: str, value: str) -> str:
     return f"{key}: {' '.join(value.split())}\n"    # headers are one line
 
@@ -125,7 +161,8 @@ def build_site(out):
 
     pages = export_content(out, site, manifest, stems, front_matter,
                            escape=attach_images,
-                           placer=ImagePlacer(out, config))
+                           placer=ImagePlacer(out, config),
+                           transform=figure_blocks)
     if have_pillow:
         bake_cover_thumbnails(out, site, manifest, stems, covers)
 

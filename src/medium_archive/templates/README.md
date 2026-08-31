@@ -102,7 +102,10 @@ These embed verbatim in both engines' pages, so they must carry no
   srcset variant's width density-corrected to the layout size. The
   modal loads the `src` — always the full-size original, never a
   srcset variant — into a `<dialog>`, captioned with the image's alt
-  text. Images inside a link are skipped, so a linked image still
+  text, or with its figure's `<figcaption>` when the alt is empty (most
+  Medium images carry no alt, but both exporters keep the
+  `<figure>`/`<figcaption>` shell convert writes around a captioned
+  image). Images inside a link are skipped, so a linked image still
   follows its link. Closes on a click anywhere, on Esc (the dialog's
   own) and on a page scroll, like Medium's. Re-measured on resize.
 - `dark-palette.css` — included twice by `card.css`: once for an
@@ -127,9 +130,21 @@ regular list and taxonomy pages share `list.html`), plus:
   stripped. Written for site and per-term feeds alike, and also when a
   real theme is configured — feed policy is content policy, not
   styling.
-- `layouts/_default/_markup/render-image.html` — body images: serve
-  responsive, lazily-loaded variants (webp encodes of the still
-  originals; gif/svg/webp sources pass through untouched).
+- `layouts/partials/post-image.html` — one body image: responsive,
+  lazily-loaded variants (webp encodes of the still originals;
+  gif/svg/webp sources pass through untouched). Shared by the render
+  hook and the figure shortcode, so captioned and bare images carry
+  the same markup.
+- `layouts/_default/_markup/render-image.html` — body images from
+  Markdown image syntax, delegated to the partial.
+- `layouts/shortcodes/figure.html` — a captioned (and possibly
+  linked) body image as the `<figure>`/`<figcaption>` Medium served:
+  the image through the same partial, the caption rendered inline with
+  no `<p>` wrapper, styling left to CSS. The exporter rewrites
+  convert's raw figure shells into calls to this shortcode
+  (`hugo.figure_shortcodes`), and writes it even under a real theme —
+  a theme's own figure shortcode would drop the caption, which is
+  passed as inner content.
 
 ## pelican/
 

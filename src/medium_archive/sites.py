@@ -727,11 +727,14 @@ def read_post_body(src: Path):
 
 
 def export_content(out: Path, site: Path, manifest: dict, stems: dict,
-                   front_matter, escape=None, placer=None) -> int:
+                   front_matter, escape=None, placer=None,
+                   transform=None) -> int:
     """The shared page loop for the /posts/<stem>/ exporters (hugo,
     pelican): one content/posts/<stem>/index.md per post -- front matter
     from front_matter(url, post), body with in-publication links rewritten
-    to /posts/<stem>/ -- plus the post's images beside it (through
+    to /posts/<stem>/ and then through transform() when given (a
+    generator-specific whole-body rewrite, like pelican's figure
+    markdown="1" opt-in) -- plus the post's images beside it (through
     placer, when given -- see ImagePlacer). Returns the page count."""
     links = LinkMap(manifest, stems)
     if placer:
@@ -752,6 +755,8 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
                   file=sys.stderr)
             continue
         body = rewrite_body(body, target_for, escape)
+        if transform is not None:
+            body = transform(body)
         page_dir = site / "content" / "posts" / stems[url]
         page_dir.mkdir(parents=True)
         # images first: a display copy can change format, and the page

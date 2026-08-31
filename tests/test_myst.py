@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from medium_archive.myst import (LinkMap, build_site, escape_prose,
-                                 myst_slug, page_paths, page_stems,
-                                 rewrite_body)
+                                 myst_figures, myst_slug, page_paths,
+                                 page_stems, rewrite_body)
 
 BASE = "https://blog.example.com"
 
@@ -166,6 +166,29 @@ def test_redirects_and_site_json(archive):
     assert rows[0] == "old_path,new_path,original_url"
     assert f"/first-post-aaa111aaa111,/first-post,{BASE}/first-post-aaa111aaa111" in rows
     assert f"/p/aaa111aaa111,/first-post,{BASE}/first-post-aaa111aaa111" in rows
+
+
+def test_figure_shell_becomes_a_figure_directive():
+    md = ("Intro.\n\n<figure>\n\n![Alt text](images/001-a.gif)\n\n"
+          "<figcaption>\n\n*A caption with a [link](https://e.com).*\n\n"
+          "</figcaption>\n\n</figure>\n\nAfter.\n")
+    assert myst_figures(md) == (
+        "Intro.\n\n:::{figure} images/001-a.gif\n:alt: Alt text\n\n"
+        "*A caption with a [link](https://e.com).*\n:::\n\nAfter.\n")
+    # no alt, no :alt: option line
+    md = ("<figure>\n\n![](images/a.png)\n\n<figcaption>\n\n*Cap.*\n\n"
+          "</figcaption>\n\n</figure>\n")
+    assert myst_figures(md) == ":::{figure} images/a.png\n\n*Cap.*\n:::\n"
+
+
+def test_non_image_figure_shell_is_dropped_for_myst():
+    # mystmd is not guaranteed to render raw HTML: a shell that is not a
+    # single captioned image loses the tags but keeps what they wrapped
+    md = ("<figure>\n\n[embed: https://u](https://u)\n\n<figcaption>\n\n"
+          "*Cap.*\n\n</figcaption>\n\n</figure>\n")
+    out = myst_figures(md)
+    assert "<" not in out
+    assert "[embed: https://u](https://u)\n\n*Cap.*" in out
 
 
 def test_escape_prose_for_myst():

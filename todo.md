@@ -34,8 +34,11 @@ clean `lint` run, and the offline test suite):
   space the wrap stood for (`collapse_br_pairs`). Posts authored in
   Medium's own editor keep `<br><br>` as an intentional paragraph
   break.
-- **Readability** — figure captions render in italics, matching
-  Medium's caption styling; a leading heading repeating the post title
+- **Readability** — captioned figures keep their
+  `<figure>`/`<figcaption>` shell (the sites render it as Medium did:
+  caption under its picture, styled by CSS, programmatically
+  associated for assistive tech); a caption whose figure lost its
+  image renders in italics instead; a leading heading repeating the post title
   is dropped; a body never opens with the divider left by the removed
   subtitle block; whitespace-only hard-break lines normalize to blank
   lines outside code fences; iframes render as `[embed: url](url)`;
