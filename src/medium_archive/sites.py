@@ -234,12 +234,13 @@ def retarget_images(text: str, renames: dict) -> str:
 
 
 def image_size(path):
-    """(width, height) read from a PNG/GIF/JPEG header, or None."""
+    """(width, height) read from a PNG/GIF/JPEG header, or None (an
+    unknown format, or a header cut short)."""
     with open(path, "rb") as fh:
         head = fh.read(24)
-        if head[:8] == b"\x89PNG\r\n\x1a\n":
+        if head[:8] == b"\x89PNG\r\n\x1a\n" and len(head) >= 24:
             return struct.unpack(">II", head[16:24])
-        if head[:3] == b"GIF":
+        if head[:3] == b"GIF" and len(head) >= 10:
             return struct.unpack("<HH", head[6:10])
         if head[:2] == b"\xff\xd8":              # JPEG: find an SOF marker
             fh.seek(2)
@@ -256,30 +257,35 @@ def image_size(path):
 
 
 # What a summary-card cover may be: the raster formats every card
-# template and Pillow decode. Not gif (animated ones are busy in a card
-# grid and cost an animated encode per build), not svg (a badge from
-# shields.io re-hosted by Medium is the usual one), not the .bin of
-# unrecognized bytes. Names are trusted: convert already typed the
-# extensionless downloads by their bytes.
+# template and Pillow decode. Stills first; a gif only when the post has
+# no still, since the bake keeps just its first frame (a still cover.jpg
+# like any other, and og:image must be a still anyway) and a real still
+# composes a card better than frame one of an animation. Not svg (a
+# badge from shields.io re-hosted by Medium is the usual one), not the
+# .bin of unrecognized bytes. Names are trusted: convert already typed
+# the extensionless downloads by their bytes.
 COVER_EXTS = (".png", ".jpg", ".jpeg", ".webp")
+COVER_FALLBACK_EXTS = (".gif",)
 
 
 def pick_cover(post: dict, post_dir) -> str | None:
     """The post's first raster still of sane size, for its summary card
-    -- see COVER_EXTS; an enormous still is passed over too (slow or
-    worse, see MAX_COVER_PIXELS). Only decodable formats qualify: the
-    baked cover is served as cover.jpg whatever it was, and Hugo's card
-    template rasterizes it (.Fill), which aborts the whole build on an
-    svg it cannot decode."""
-    for image in post.get("images", ()):
-        if not image.lower().endswith(COVER_EXTS):
-            continue
-        try:
-            size = image_size(post_dir / image)
-        except OSError:
-            continue
-        if size is None or size[0] * size[1] <= MAX_COVER_PIXELS:
-            return image
+    -- see COVER_EXTS -- else its first gif (COVER_FALLBACK_EXTS: the
+    cover is the gif's first frame); an enormous one is passed over
+    either way (slow or worse, see MAX_COVER_PIXELS). Only decodable
+    formats qualify: the baked cover is served as cover.jpg whatever it
+    was, and Hugo's card template rasterizes it (.Fill), which aborts
+    the whole build on an svg it cannot decode."""
+    for exts in (COVER_EXTS, COVER_FALLBACK_EXTS):
+        for image in post.get("images", ()):
+            if not image.lower().endswith(exts):
+                continue
+            try:
+                size = image_size(post_dir / image)
+            except OSError:
+                continue
+            if size is None or size[0] * size[1] <= MAX_COVER_PIXELS:
+                return image
     return None
 
 
@@ -377,10 +383,11 @@ def make_cover_thumbnail(src, dst) -> bool:
 
 class Covers:
     """The summary-card cover of every post that has one -- its first
-    raster still of sane size (pick_cover) -- as the pages reference it
-    and as it is baked beside them. With Pillow the reference is the
-    640x360 images/cover.jpg bake() writes; without it (noted once) the
-    card uses the full-size image under its own name."""
+    raster still of sane size, else its first gif (pick_cover) -- as the
+    pages reference it and as it is baked beside them. With Pillow the
+    reference is the 640x360 images/cover.jpg bake() writes (a gif's
+    first frame); without it (noted once) the card uses the full-size
+    image under its own name, an animated gif included."""
 
     def __init__(self, out: Path, manifest: dict, shown_as="card covers"):
         self.out, self.manifest = out, manifest

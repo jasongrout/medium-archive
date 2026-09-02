@@ -200,21 +200,40 @@ def test_hugo_site_config_and_front_matter(archive, capsys):
     assert "authorlink" not in front
 
 
-def test_cover_skips_gifs_and_huge_stills(tmp_path):
+def test_cover_prefers_stills_falls_back_to_gifs_skips_huge(tmp_path):
     import struct
     images = tmp_path / "images"
     images.mkdir()
     png = lambda w, h: (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
                         + struct.pack(">II", w, h) + b"\x00" * 8)
+    gif = lambda w, h: b"GIF89a" + struct.pack("<HH", w, h)
     (images / "big.png").write_bytes(png(7532, 3464))
     (images / "small.png").write_bytes(png(800, 600))
-    (images / "anim.gif").write_bytes(b"GIF89a" + struct.pack("<HH", 400, 300))
+    (images / "anim.gif").write_bytes(gif(400, 300))
+    (images / "huge.gif").write_bytes(gif(5000, 4000))
     assert sites.image_size(images / "big.png") == (7532, 3464)
     assert sites.image_size(images / "anim.gif") == (400, 300)
+    # a still anywhere in the post beats a gif ahead of it
     post = {"images": ["images/anim.gif", "images/big.png", "images/small.png"]}
     assert sites.pick_cover(post, tmp_path) == "images/small.png"
-    assert sites.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
+    # gif-only posts get their first sane-size gif (its first frame bakes)
+    assert sites.pick_cover({"images": ["images/anim.gif"]}, tmp_path) == "images/anim.gif"
+    assert sites.pick_cover({"images": ["images/huge.gif", "images/anim.gif"]},
+                            tmp_path) == "images/anim.gif"
+    assert sites.pick_cover({"images": ["images/huge.gif"]}, tmp_path) is None
     assert sites.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
+
+
+def test_cover_bakes_first_gif_frame(tmp_path):
+    from PIL import Image
+    frames = [Image.new("RGB", (400, 225), c) for c in ("red", "blue")]
+    src = tmp_path / "anim.gif"
+    frames[0].save(src, save_all=True, append_images=frames[1:], duration=100)
+    dst = tmp_path / "cover.jpg"
+    assert sites.make_cover_thumbnail(src, dst)
+    with Image.open(dst) as im:
+        assert im.format == "JPEG" and im.size == sites.COVER_SIZE
+        assert im.getpixel((320, 180))[0] > 200        # frame one, red
 
 
 def test_cover_skips_svgs_and_untyped_images(tmp_path):
@@ -227,8 +246,7 @@ def test_cover_skips_svgs_and_untyped_images(tmp_path):
     (images / "badge.svg").write_bytes(b'<svg xmlns="http://www.w3.org/2000/svg"/>')
     (images / "blob.bin").write_bytes(b"?")
     (images / "photo.JPG").write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 16)
-    post = {"images": ["images/anim.gif", "images/badge.svg",
-                       "images/blob.bin", "images/photo.JPG"]}
+    post = {"images": ["images/badge.svg", "images/blob.bin", "images/photo.JPG"]}
     assert sites.pick_cover(post, tmp_path) == "images/photo.JPG"
     assert sites.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
 

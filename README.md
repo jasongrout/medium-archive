@@ -189,7 +189,9 @@ originals. `raw/` and `posts/` keep full resolution. Copies are built
 once into `<out>/.image-cache/` and hard-linked into every site.
 
 - Card covers are 640×360 thumbnails baked at export time through
-  Pillow (`pip install pillow`, or the `covers` extra). A source near
+  Pillow (`pip install pillow`, or the `covers` extra). The source is
+  the post's first still (png, jpeg, webp); a post with only animated
+  gifs uses the first frame of its first gif. A source near
   16:9 is center-cropped. A source far from it, such as a wide wordmark
   or a square logo, is letterboxed instead so its content survives:
   padded with the image's own border color when the border is uniform,
