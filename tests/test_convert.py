@@ -8,6 +8,7 @@ import pytest
 from bs4 import BeautifulSoup
 
 from medium_archive.convert import convert_post, to_markdown
+from medium_archive.images import sniff_image_ext
 from medium_archive.pages import collapse_br_pairs, extract_metadata, page_body
 from medium_archive.urls import resolve_canonical, slug_of
 
@@ -268,6 +269,26 @@ def test_bin_image_gets_sniffed_extension(tmp_path):
                            {"https://miro.medium.com/y": "002-y.bin"},
                            tmp_path, tmp_path / "out2")
     assert used == ["images/002-y.bin"]
+
+
+@pytest.mark.parametrize("head", [
+    b'<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1">',
+    b'<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg">',
+    b'\xef\xbb\xbf<?xml version="1.0"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n'
+    b' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<!-- badge -->\n<svg>',
+])
+def test_sniff_image_ext_recognizes_svg(tmp_path, head):
+    # Medium re-hosts badge images (shields.io and the like) as SVG
+    # under extensionless URLs; the text has no magic bytes to match
+    (tmp_path / "x.bin").write_bytes(head + b"</svg>\n")
+    assert sniff_image_ext(tmp_path / "x.bin") == ".svg"
+
+
+def test_sniff_image_ext_rejects_other_xml(tmp_path):
+    (tmp_path / "x.bin").write_bytes(b'<?xml version="1.0"?><html><svg/></html>')
+    assert sniff_image_ext(tmp_path / "x.bin") is None
+    (tmp_path / "y.bin").write_bytes(b"<svgfoo>")
+    assert sniff_image_ext(tmp_path / "y.bin") is None
 
 GIST_SCRIPT = ('<figure><script src="https://gist.github.com/ann/'
                'abcdef0123456789abcdef0123456789.js"></script></figure>')

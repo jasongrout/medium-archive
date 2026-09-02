@@ -93,13 +93,18 @@ def collect_image_urls(page_html: str, feed_item: dict | None) -> list:
     return urls
 
 
+SVG_HEAD_RE = re.compile(
+    rb"\s*(?:<\?xml[^>]*\?>\s*|<!DOCTYPE[^>]*>\s*|<!--.*?-->\s*)*<svg[\s>]",
+    re.DOTALL)
+
+
 def sniff_image_ext(path) -> str | None:
     """The extension the file's magic bytes call for -- for images
     fetched from an extensionless URL and stored as .bin, so the derived
     layers can carry a usable name. None if unrecognized."""
     try:
         with open(path, "rb") as fh:
-            head = fh.read(12)
+            head = fh.read(512)
     except OSError:
         return None
     if head[:8] == b"\x89PNG\r\n\x1a\n":
@@ -110,4 +115,9 @@ def sniff_image_ext(path) -> str | None:
         return ".jpg"
     if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
         return ".webp"
+    # SVG is text: an <svg> root, possibly behind an XML declaration,
+    # a DOCTYPE, comments and a UTF-8 BOM (Medium re-hosts badge images
+    # from shields.io and the like this way)
+    if SVG_HEAD_RE.match(head.removeprefix(b"\xef\xbb\xbf")):
+        return ".svg"
     return None
