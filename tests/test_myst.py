@@ -10,9 +10,6 @@ from medium_archive.myst import (LinkMap, build_site, escape_prose,
                                  page_stems, rewrite_body)
 
 BASE = "https://blog.example.com"
-PNG_HEADER = (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
-              + (800).to_bytes(4, "big") + (450).to_bytes(4, "big")
-              + b"\x00" * 8)
 
 
 def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
@@ -47,9 +44,7 @@ def archive(tmp_path):
               "An image:\n\n![pic](images/001-pic.png)\n",
               images=["images/001-pic.png"])
     (second / "images").mkdir()
-    # a png header with no pixel data: a cover has to sniff as a raster
-    # format, and Pillow cannot decode this, so it is copied in unchanged
-    (second / "images" / "001-pic.png").write_bytes(PNG_HEADER)
+    (second / "images" / "001-pic.png").write_bytes(b"PNG")
     (tmp_path / "posts.json").write_text(json.dumps(manifest))
     return tmp_path, manifest
 
@@ -65,11 +60,11 @@ def test_pages_images_and_toc(archive):
     assert 'authors:\n  - name: "Ada Lovelace"\n    url: "https://medium.com/@ada"' in text
     assert 'tags: ["example"]' in text
     assert "![pic](images/001-pic.png)" in text
-    assert (page.parent / "images/001-pic.png").read_bytes() == PNG_HEADER
+    assert (page.parent / "images/001-pic.png").read_bytes() == b"PNG"
     # the first image becomes the page's thumbnail (its gallery card);
-    # bytes that defeat the Pillow bake make cover.jpg a plain copy
+    # junk bytes defeat the Pillow bake, so cover.jpg is a plain copy
     assert 'thumbnail: "images/cover.jpg"' in text
-    assert (page.parent / "images/cover.jpg").read_bytes() == PNG_HEADER
+    assert (page.parent / "images/cover.jpg").read_bytes() == b"PNG"
     first = (site / "posts/2020-01-05-first-post/first-post.md").read_text()
     assert "thumbnail" not in first            # no images, no cover card
     # archive provenance stays out of site front matter

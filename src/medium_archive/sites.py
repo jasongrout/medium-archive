@@ -31,7 +31,6 @@ from pathlib import Path
 from string import Template
 from urllib.parse import unquote, urlsplit
 
-from .images import sniff_image_ext
 from .lint import split_post
 from .tags import display_name, load_tag_display
 from .urls import medium_id
@@ -212,24 +211,24 @@ def image_size(path):
 # What a summary-card cover may be: the raster formats every card
 # template and Pillow decode. Not gif (animated ones are busy in a card
 # grid and cost an animated encode per build), not svg (a badge from
-# shields.io re-hosted by Medium is the usual one), not unrecognized
-# bytes.
-COVER_FORMATS = (".png", ".jpg", ".webp")
+# shields.io re-hosted by Medium is the usual one), not the .bin of
+# unrecognized bytes. Names are trusted: convert already typed the
+# extensionless downloads by their bytes.
+COVER_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
 
 def pick_cover(post: dict, post_dir) -> str | None:
     """The post's first raster still of sane size, for its summary card
-    -- see COVER_FORMATS; an enormous still is passed over too (slow or
-    worse, see MAX_COVER_PIXELS). The bytes decide, not the name: the
+    -- see COVER_EXTS; an enormous still is passed over too (slow or
+    worse, see MAX_COVER_PIXELS). Only decodable formats qualify: the
     baked cover is served as cover.jpg whatever it was, and Hugo's card
     template rasterizes it (.Fill), which aborts the whole build on an
-    svg or junk it cannot decode; a gif renamed .png is still a gif."""
+    svg it cannot decode."""
     for image in post.get("images", ()):
-        path = post_dir / image
-        if sniff_image_ext(path) not in COVER_FORMATS:
+        if not image.lower().endswith(COVER_EXTS):
             continue
         try:
-            size = image_size(path)
+            size = image_size(post_dir / image)
         except OSError:
             continue
         if size is None or size[0] * size[1] <= MAX_COVER_PIXELS:
