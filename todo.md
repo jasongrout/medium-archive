@@ -402,6 +402,19 @@ Feeds and sharing:
   html/template escapes contextually, which is also why the two engines
   had been rendering such a title differently (`pelicanconf.py.tmpl`,
   `article.html`).
+- **Truncated titles completed.** Medium titles a post whose author set
+  none with its opening heading, cut to about a hundred characters with
+  an ellipsis, and that cut form is all the stored title, the JSON-LD
+  headline and `og:title` carry. Such a post converted with the
+  truncated title in its front matter and, since the body's opening
+  heading no longer matched it, the full heading left in the body
+  right under the title. `convert` now completes the title from the
+  heading (the rendered `<h1>`, or the state's opening heading
+  paragraph) and matches an ellipsis-truncated title as a prefix when
+  dropping the body's repeat (`heading_is_title` and
+  `untruncated_title` in `src/medium_archive/pages.py`, used by
+  `page_body`, `extract_metadata` and `state.py`). One post in the
+  test archive was affected; no other post's output changed.
 
 ## Remaining
 

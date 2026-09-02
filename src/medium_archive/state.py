@@ -20,6 +20,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from bs4 import BeautifulSoup
 
+from .pages import heading_is_title, untruncated_title
+
 APOLLO_RE = re.compile(r"window\.__APOLLO_STATE__\s*=\s*")
 
 IMG_BASE = "https://miro.medium.com/v2/"
@@ -119,7 +121,7 @@ def state_metadata(state: dict, medium_id: str) -> dict:
     username = creator.get("username")
     return {
         "url": post.get("canonicalUrl") or post.get("mediumUrl") or "",
-        "title": post.get("title") or "",
+        "title": state_title(state, medium_id, post.get("title") or ""),
         "author": creator.get("name") or "",
         "author_url": f"https://medium.com/@{username}" if username else None,
         "date": iso(first) if first else "",
@@ -284,7 +286,29 @@ def _mixtape(p) -> str:
 
 
 def _norm(s: str) -> str:
-    return re.sub(r"\s+", " ", (s or "").replace(" ", " ")).strip().lower()
+    return re.sub(r"\s+", " ", (s or "").replace("\u200a", " ")).strip().lower()
+
+
+def _lead_heading(paragraphs: list) -> int | None:
+    """Index of the post's opening heading: the first paragraph, or the
+    first after the hero images and embeds that may precede it."""
+    i = 0
+    while i < len(paragraphs) and paragraphs[i].get("type") in ("IMG", "IFRAME"):
+        i += 1
+    if i < len(paragraphs) and paragraphs[i].get("type") in HEADINGS:
+        return i
+    return None
+
+
+def state_title(state: dict, medium_id: str, title: str) -> str:
+    """The title, completed from the post's opening heading when Medium
+    stored it truncated (pages.untruncated_title); the state keeps that
+    heading's full text as a paragraph."""
+    post = state[f"Post:{medium_id}"]
+    paragraphs = _paragraphs(state, post)
+    i = _lead_heading(paragraphs)
+    heading = (paragraphs[i].get("text") or "") if i is not None else ""
+    return untruncated_title(title, heading)
 
 
 def _lead_skips(paragraphs: list, post: dict, title: str) -> set:
@@ -292,15 +316,13 @@ def _lead_skips(paragraphs: list, post: dict, title: str) -> set:
     rendered as the leading heading (sometimes after a hero image) and
     the subtitle as the heading right after it; both live in the front
     matter, so the repeats are dropped (page_body does the same via
-    <h1> and .pw-subtitle-paragraph). The stored subtitle may be
-    truncated with a trailing ellipsis."""
-    titles = {_norm(title), _norm(post.get("title") or "")} - {""}
+    <h1> and .pw-subtitle-paragraph). The stored title and subtitle may
+    be truncated with a trailing ellipsis."""
+    titles = {title or "", post.get("title") or ""} - {""}
     skips = set()
-    i = 0
-    while i < len(paragraphs) and paragraphs[i].get("type") in ("IMG", "IFRAME"):
-        i += 1                       # hero images may precede the title
-    if i < len(paragraphs) and paragraphs[i].get("type") in HEADINGS \
-            and _norm(paragraphs[i].get("text") or "") in titles:
+    i = _lead_heading(paragraphs)
+    if i is not None and any(heading_is_title(paragraphs[i].get("text") or "", t)
+                             for t in titles):
         skips.add(i)
         sub = _norm(((post.get("extendedPreviewContent") or {}).get("subtitle")
                      or (post.get("previewContent") or {}).get("subtitle")

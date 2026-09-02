@@ -25,7 +25,7 @@ from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json, strip_title_prefix)
 from .state import (apollo_post_state, gist_code_blocks, state_body,
-                    state_metadata)
+                    state_metadata, state_title)
 from .readme import write_readme
 from .tags import load_tag_map
 from .urls import canonical_url, medium_id, resolve_canonical, slug_of
@@ -306,6 +306,9 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         if page_shell and state is not None:
             info.update(state_metadata(state, raw.name))
             info["url"] = info["url"] or url
+        elif state is not None:
+            # a title Medium truncated, completed from the opening heading
+            info["title"] = state_title(state, raw.name, info["title"])
     else:
         info = {"url": url, **EMPTY_INFO}
 

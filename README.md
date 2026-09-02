@@ -447,6 +447,15 @@ no longer lists, work through the steps in order:
   arrives clean. A title that is itself ellipsis-truncated is left
   alone: there is no telling where it ended, so cutting it would strand
   its tail at the front of the description.
+* A post whose author set no title gets one from Medium: the text of
+  its opening heading, cut to about a hundred characters with an
+  ellipsis. That cut form is what the stored title, the JSON-LD headline
+  and `og:title` all carry, while the heading itself keeps the full
+  text, so the post used to convert with a truncated title and the full
+  heading left in the body under it. `convert` completes the title from
+  the heading (the rendered `<h1>`, or the state's opening heading
+  paragraph) and treats a heading the truncated title is a prefix of as
+  the title's repeat, dropping it from the body like an exact one.
 * Every Medium page carries its post twice: rendered into the visible
   HTML, and as data in its embedded editor state
   (`window.__APOLLO_STATE__`), the ordered paragraph list with markup
