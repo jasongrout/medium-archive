@@ -40,14 +40,12 @@ section tunes the generated config: `locale`, `avatar` and `favicon`
 """
 
 import json
-import re
-import shutil
 import sys
 
-from .sites import (ImagePlacer, bake_cover_thumbnails,  # noqa: F401
-                    clean_site, export_content, fill_template, image_size,
-                    load_site_inputs, old_paths, page_stems, pick_cover,
-                    tag_names, template_text, write_redirects_csv)
+from .sites import (Covers, ImagePlacer, clean_site, copy_site_asset,
+                    export_content, fill_template, load_site_inputs,
+                    old_paths, page_stems, rewrite_figures, tag_names,
+                    write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
 # templates/README.md for the rationale behind the individual files).
@@ -79,14 +77,6 @@ TEMPLATES = {
 }
 
 
-# The <figure> shell convert writes around a captioned image
-# (link-wrapped or not), in the exact shape _Converter emits it: tag
-# lines and the single image and caption lines between them, all
-# blank-line separated.
-FIGURE_BLOCK_RE = re.compile(
-    r"<figure>\n\n(\[)?!\[([^\]\n]*)\]\(([^)\s]+)\)(?(1)\]\(([^)\s]+)\))\n\n"
-    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
-
 
 def figure_shortcodes(markdown: str) -> str:
     """Convert's figure shells as calls to the exported figure
@@ -99,8 +89,7 @@ def figure_shortcodes(markdown: str) -> str:
     Goldmark renders as-is: the unsafe renderer stays on in the
     generated config for it, and for the old bodies that carry HTML
     fragments of their own."""
-    def call(m):
-        _, alt, src, link, caption = m.groups()
+    def call(alt, src, link, caption):
         q = lambda v: v.replace(chr(92), "").replace(chr(34), chr(92) + chr(34))
         args = f'src="{src}"'
         if alt:
@@ -108,7 +97,7 @@ def figure_shortcodes(markdown: str) -> str:
         if link:
             args += f' link="{q(link)}"'
         return "{{< figure %s >}}%s{{< /figure >}}" % (args, caption)
-    return FIGURE_BLOCK_RE.sub(call, markdown)
+    return rewrite_figures(markdown, call)
 
 
 def front_matter(url: str, post: dict, cover: str | None = None) -> str:
@@ -186,54 +175,29 @@ def build_site(out):
     (site / "content" / "archives.md").write_text(
         json.dumps({"title": "Archives", "layout": "archives",
                     "url": "/archives/"}) + "\n", encoding="utf-8")
-    try:
-        from PIL import Image                      # noqa: F401
-        have_pillow = True
-    except ImportError:
-        have_pillow = False
-        print("pillow not installed: card covers keep full-size images "
-              "(`pip install pillow` and re-run for 640x360 thumbnails)",
-              file=sys.stderr)
-    covers = {url: cover for url, p in manifest.items()
-              if (cover := pick_cover(p, out / p["dir"]))}
+    covers = Covers(out, manifest)
     pages = export_content(
         out, site, manifest, stems,
-        lambda url, p: front_matter(url, p,
-                                    cover=("images/cover.jpg" if have_pillow
-                                           else covers.get(url))
-                                    if url in covers else None),
-        placer=ImagePlacer(out, config), transform=figure_shortcodes)
-    if have_pillow:
-        bake_cover_thumbnails(out, site, manifest, stems, covers)
+        lambda url, p: front_matter(url, p, cover=covers.path(url)),
+        placer=ImagePlacer(out, config), transform=figure_shortcodes,
+        covers=covers)
     write_tag_terms(site, tag_names(manifest, out))
 
     params = {"description": config.get("description", "")}
-    # "avatar" (site.json top level, or hugo section): archive-relative
-    # path of a hand-picked site logo, shown in the header; copied into
-    # the site so the site stays self-contained
-    avatar = hugo_config.get("avatar") or config.get("avatar")
+    # "avatar" (site.json top level, or hugo section): a hand-picked site
+    # logo, shown in the header; "favicon" likewise: the tab icon, at the
+    # site root so browsers that ask for /favicon.ico by convention are
+    # covered when it is an .ico
+    avatar = copy_site_asset(
+        out, hugo_config.get("avatar") or config.get("avatar"),
+        site / "static" / "img", "avatar")
     if avatar:
-        src = out / avatar
-        if src.is_file():
-            dst = site / "static" / "img" / ("avatar" + src.suffix)
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
-            params["avatar"] = f"img/{dst.name}"
-        else:
-            print(f"avatar not found, skipped: {src}", file=sys.stderr)
-    # "favicon" (site.json top level, or hugo section): archive-relative
-    # path of the tab icon; copied to the site root so browsers that ask
-    # for /favicon.ico by convention are covered when it is an .ico
-    favicon = hugo_config.get("favicon") or config.get("favicon")
+        params["avatar"] = f"img/{avatar}"
+    favicon = copy_site_asset(
+        out, hugo_config.get("favicon") or config.get("favicon"),
+        site / "static", "favicon")
     if favicon:
-        src = out / favicon
-        if src.is_file():
-            dst = site / "static" / ("favicon" + src.suffix)
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
-            params["favicon"] = dst.name
-        else:
-            print(f"favicon not found, skipped: {src}", file=sys.stderr)
+        params["favicon"] = favicon
     # "announcement": a site-wide banner above the header -- an http(s)
     # URL the theme fetches client-side (empty content hides the banner,
     # like Sphinx themes' html announcement option), or literal HTML
@@ -247,10 +211,7 @@ def build_site(out):
         locale=json.dumps(hugo_config.get("locale", "en")),
         params=_toml_params(params),
     ), encoding="utf-8")
-    for rel, src in TEMPLATES.items():
-        path = site / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(template_text(src), encoding="utf-8")
+    write_templates(site, TEMPLATES)
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "

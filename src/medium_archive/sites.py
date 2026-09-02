@@ -58,6 +58,53 @@ def fill_template(rel: str, **values) -> str:
     every value must arrive already serialized for the config's format."""
     return Template(template_text(rel)).substitute(values)
 
+
+def write_templates(site: Path, templates: dict):
+    """A theme into the site: file in the site -> its templates/ source."""
+    for rel, src in templates.items():
+        path = site / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(template_text(src), encoding="utf-8")
+
+
+def copy_site_asset(out: Path, rel, dst_dir: Path, stem: str):
+    """An archive-relative image site.json names (the header avatar,
+    the tab icon) copied into the site as dst_dir/<stem><its
+    extension>, so the site stays self-contained; the file name written,
+    or None when rel is unset or the file is missing (noted)."""
+    if not rel:
+        return None
+    src = out / rel
+    if not src.is_file():
+        print(f"{stem} not found, skipped: {src}", file=sys.stderr)
+        return None
+    dst = dst_dir / (stem + src.suffix)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
+    return dst.name
+
+
+# The <figure> shell convert writes around a captioned image
+# (link-wrapped or not), in the exact shape _Converter emits it: tag
+# lines and the single image and caption lines between them, all
+# blank-line separated. Groups: link-open marker, alt, src, link,
+# caption.
+FIGURE_SHELL_RE = re.compile(
+    r"<figure>\n\n(\[)?!\[([^\]\n]*)\]\(([^)\s]+)\)(?(1)\]\(([^)\s]+)\))\n\n"
+    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
+
+
+def rewrite_figures(markdown: str, render) -> str:
+    """Each captioned-image shell as render(alt, src, link, caption)
+    returns it -- link is None when the image is not wrapped in one --
+    or left as it is when render returns None. A shell around anything
+    else (the link an embed became, an inlined gist) is not touched."""
+    def sub(m):
+        _, alt, src, link, caption = m.groups()
+        out = render(alt, src, link, caption)
+        return m.group(0) if out is None else out
+    return FIGURE_SHELL_RE.sub(sub, markdown)
+
 # Covers above this are skipped in favor of the post's next image: themes
 # and exporters thumbnail or encode each cover, and Medium archives carry
 # the odd 25-megapixel screenshot, which is slow to process (or, past an
@@ -328,15 +375,43 @@ def make_cover_thumbnail(src, dst) -> bool:
         return False
 
 
-def bake_cover_thumbnails(out: Path, site: Path, manifest: dict,
-                          stems: dict, covers: dict):
-    """Each covered post's baked images/cover.jpg, beside the page that
-    export_content wrote. An image that defeats Pillow is copied in
-    unchanged -- the extension is cosmetic."""
-    for url, cover in covers.items():
-        src = out / manifest[url]["dir"] / cover
-        dst = site / "content" / "posts" / stems[url] / "images" / "cover.jpg"
-        if dst.parent.is_dir() and not make_cover_thumbnail(src, dst):
+class Covers:
+    """The summary-card cover of every post that has one -- its first
+    raster still of sane size (pick_cover) -- as the pages reference it
+    and as it is baked beside them. With Pillow the reference is the
+    640x360 images/cover.jpg bake() writes; without it (noted once) the
+    card uses the full-size image under its own name."""
+
+    def __init__(self, out: Path, manifest: dict, shown_as="card covers"):
+        self.out, self.manifest = out, manifest
+        try:
+            from PIL import Image                      # noqa: F401
+            self.pillow = True
+        except ImportError:
+            self.pillow = False
+            print(f"pillow not installed: {shown_as} keep full-size images "
+                  "(`pip install pillow` and re-run for 640x360 thumbnails)",
+                  file=sys.stderr)
+        self.picked = {url: cover for url, p in manifest.items()
+                       if (cover := pick_cover(p, out / p["dir"]))}
+
+    def path(self, url: str) -> str | None:
+        """The page-relative cover path a post's front matter carries."""
+        cover = self.picked.get(url)
+        if cover and self.pillow:
+            return "images/cover.jpg"
+        return cover
+
+    def bake(self, url: str, page_dir: Path):
+        """The post's images/cover.jpg beside its page, once the page's
+        images are placed. An image that defeats Pillow is copied in
+        unchanged -- the extension is cosmetic."""
+        if not (self.pillow and url in self.picked):
+            return
+        src = self.out / self.manifest[url]["dir"] / self.picked[url]
+        dst = page_dir / "images" / "cover.jpg"
+        dst.parent.mkdir(exist_ok=True)
+        if not make_cover_thumbnail(src, dst):
             shutil.copy2(src, dst)
 
 
@@ -730,23 +805,47 @@ def clean_site(site: Path, keep=()):
 
 def read_post_body(src: Path):
     """The converted body of posts/<dir>/, without its front matter, or
-    None when index.md is missing (re-run convert)."""
+    None (noted) when index.md is missing -- re-run convert."""
     if not (src / "index.md").exists():
+        print(f"skipping (no index.md; re-run convert): {src}",
+              file=sys.stderr)
         return None
     _, body = split_post((src / "index.md").read_text(encoding="utf-8"))
     return body
 
 
+def place_images(out: Path, post: dict, page_dir: Path, placer=None) -> dict:
+    """The post's images beside its page, under page_dir/images/ --
+    through placer when given (see ImagePlacer), else as they are.
+    Returns the names that changed on the way (a display copy in a new
+    format), for retarget_images to point the page at."""
+    renames = {}
+    images = out / post["dir"] / "images"
+    if not images.is_dir():
+        return renames
+    (page_dir / "images").mkdir()
+    for img in sorted(images.iterdir()):
+        dst = page_dir / "images" / img.name
+        if placer:
+            dst = placer.place(img, dst)
+        else:
+            link_or_copy(img, dst)
+        if dst.name != img.name:
+            renames[img.name] = dst.name
+    return renames
+
+
 def export_content(out: Path, site: Path, manifest: dict, stems: dict,
                    front_matter, escape=None, placer=None,
-                   transform=None) -> int:
+                   transform=None, covers=None) -> int:
     """The shared page loop for the /posts/<stem>/ exporters (hugo,
     pelican): one content/posts/<stem>/index.md per post -- front matter
     from front_matter(url, post), body with in-publication links rewritten
     to /posts/<stem>/ and then through transform() when given (a
     generator-specific whole-body rewrite, like pelican's figure
     markdown="1" opt-in) -- plus the post's images beside it (through
-    placer, when given -- see ImagePlacer). Returns the page count."""
+    placer, when given -- see ImagePlacer) and its baked card cover
+    (covers, when given -- see Covers). Returns the page count."""
     links = LinkMap(manifest, stems)
     if placer:
         placer.warm(out, manifest)
@@ -762,8 +861,6 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
     for url, p in manifest.items():
         body = read_post_body(out / p["dir"])
         if body is None:
-            print(f"skipping (no index.md; re-run convert): {p['dir']}",
-                  file=sys.stderr)
             continue
         body = rewrite_body(body, target_for, escape)
         if transform is not None:
@@ -772,21 +869,12 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
         page_dir.mkdir(parents=True)
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed
-        renames = {}
-        images = out / p["dir"] / "images"
-        if images.is_dir():
-            (page_dir / "images").mkdir()
-            for img in sorted(images.iterdir()):
-                dst = page_dir / "images" / img.name
-                if placer:
-                    dst = placer.place(img, dst)
-                else:
-                    link_or_copy(img, dst)
-                if dst.name != img.name:
-                    renames[img.name] = dst.name
+        renames = place_images(out, p, page_dir, placer)
         (page_dir / "index.md").write_text(
             retarget_images(front_matter(url, p) + body, renames),
             encoding="utf-8")
+        if covers:
+            covers.bake(url, page_dir)
         pages += 1
     if placer:
         placer.report()

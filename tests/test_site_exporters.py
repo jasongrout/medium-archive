@@ -170,10 +170,10 @@ def test_non_image_figure_shells_stay_raw_html():
         "<figcaption>", '<figcaption markdown="1">')
 
 
-def test_hugo_site_config_and_front_matter(archive):
+def test_hugo_site_config_and_front_matter(archive, capsys):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "site.json").write_text(json.dumps(
-        {"title": "Example Blog",
+        {"title": "Example Blog", "favicon": "missing.ico",
          "hugo": {"avatar": "logo.png", "params": {"motto": "hello"}}}))
     site = hugo.build_site(archive)
     config = (site / "hugo.toml").read_text()
@@ -181,6 +181,9 @@ def test_hugo_site_config_and_front_matter(archive):
     assert 'motto = "hello"' in config          # user params merge last
     assert 'avatar = "img/avatar.png"' in config
     assert (site / "static/img/avatar.png").read_bytes() == b"IMG"
+    # an asset site.json names but the archive lacks is skipped, noted
+    assert "favicon" not in config
+    assert "favicon not found, skipped" in capsys.readouterr().err
     assert (site / "layouts/_default/baseof.html").exists()
     assert (site / "content/search.md").exists()
     assert (site / "content/archives.md").exists()
@@ -206,12 +209,12 @@ def test_cover_skips_gifs_and_huge_stills(tmp_path):
     (images / "big.png").write_bytes(png(7532, 3464))
     (images / "small.png").write_bytes(png(800, 600))
     (images / "anim.gif").write_bytes(b"GIF89a" + struct.pack("<HH", 400, 300))
-    assert hugo.image_size(images / "big.png") == (7532, 3464)
-    assert hugo.image_size(images / "anim.gif") == (400, 300)
+    assert sites.image_size(images / "big.png") == (7532, 3464)
+    assert sites.image_size(images / "anim.gif") == (400, 300)
     post = {"images": ["images/anim.gif", "images/big.png", "images/small.png"]}
-    assert hugo.pick_cover(post, tmp_path) == "images/small.png"
-    assert hugo.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
-    assert hugo.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
+    assert sites.pick_cover(post, tmp_path) == "images/small.png"
+    assert sites.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
+    assert sites.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
 
 
 def test_cover_skips_svgs_and_untyped_images(tmp_path):
@@ -226,8 +229,8 @@ def test_cover_skips_svgs_and_untyped_images(tmp_path):
     (images / "photo.JPG").write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 16)
     post = {"images": ["images/anim.gif", "images/badge.svg",
                        "images/blob.bin", "images/photo.JPG"]}
-    assert hugo.pick_cover(post, tmp_path) == "images/photo.JPG"
-    assert hugo.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
+    assert sites.pick_cover(post, tmp_path) == "images/photo.JPG"
+    assert sites.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
 
 
 def test_cover_thumbnails_crop_or_letterbox(tmp_path):

@@ -169,7 +169,14 @@ clean `lint` run, and the offline test suite):
   sections, byline links). The archive settled on the built-in card
   theme, so that path is gone: the exporter always writes its own
   layouts, and the `hugo` section keeps only `locale`, `avatar`,
-  `favicon` and `params`.
+  `favicon` and `params`. The three exporters were consolidated on
+  `sites.py` in the same pass: one `Covers` object picks, references
+  and bakes card covers (Pillow detection once), one `place_images`
+  loop places a post's images beside its page, one `copy_site_asset`
+  ships the avatar and favicon (a missing file is now noted by every
+  exporter, not just hugo), one `write_templates` writes a theme, and
+  one `FIGURE_SHELL_RE`/`rewrite_figures` pair parses convert's figure
+  shells for all three figure rewrites.
 
 From the 2026-08 review of other Medium-to-Markdown tools (medium-2-md,
 mediumexporter — the latter's media-resource handling exposed a silent
