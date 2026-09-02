@@ -68,6 +68,41 @@ def test_leading_title_heading_is_dropped():
     assert md == "Body text.\n"
 
 
+def test_truncated_title_is_completed_from_the_opening_heading(tmp_path):
+    # Medium titles a post whose author set none with its opening
+    # heading, cut to about a hundred characters with an ellipsis; the
+    # heading keeps the full text. The title is the full text, and the
+    # heading is still the title's repeat, dropped from the body.
+    full = ("Exploring Petabytes of the Night Sky: Notebooks at the "
+            "Astro Data Lab Science Platform")
+    cut = ("Exploring Petabytes of the Night Sky: Notebooks at the "
+           "Astro Data Lab Science\u2026")
+    state = make_state([para(0, "H3", full), para(1, "P", "Body text.")],
+                       title=cut)
+    assert state_metadata(state, MID)["title"] == full
+    body = state_body(state, MID, cut)
+    markdown, _ = to_markdown(body, URL, {}, None)
+    assert markdown == "Body text.\n"
+
+    raw = tmp_path / MID
+    raw.mkdir()
+    (raw / "page.html").write_text(shell_html(state))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["title"] == full
+    out = tmp_path / "posts" / "2019-12-29-my-post" / "index.md"
+    assert full not in out.read_text().split("\n}\n", 1)[1]
+
+
+def test_unrelated_heading_does_not_complete_a_truncated_title():
+    state = make_state([para(0, "H3", "Some other heading"),
+                        para(1, "P", "Body text.")],
+                       title="A title cut short\u2026")
+    assert state_metadata(state, MID)["title"] == "A title cut short\u2026"
+    body = state_body(state, MID, "A title cut short\u2026")
+    markdown, _ = to_markdown(body, URL, {}, None)
+    assert markdown == "## Some other heading\n\nBody text.\n"
+
+
 def test_paragraph_types_render():
     md = md_of_state(make_state([
         para(0, "H4", "Section"),

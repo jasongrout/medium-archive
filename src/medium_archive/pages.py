@@ -80,6 +80,44 @@ def meta(soup, **attrs) -> str | None:
     return tag.get("content") if tag else None
 
 
+ELLIPSIS = "\u2026"
+
+
+def norm_title(s: str) -> str:
+    """A title or heading in comparable form: case-folded, with the
+    whitespace Medium varies (non-breaking and hair spaces, line breaks)
+    collapsed to single spaces."""
+    return re.sub(r"\s+", " ", s or "").strip().lower()
+
+
+def heading_is_title(heading: str, title: str) -> bool:
+    """Whether a body heading is the post title.
+
+    Medium gives an untitled post the text of its opening heading as its
+    title, cut to about a hundred characters with an ellipsis; the
+    truncated form is what the stored title, the JSON-LD headline and
+    og:title all carry, while the heading itself keeps the full text.
+    So a title ending in an ellipsis matches a heading it is a prefix
+    of, as well as an exact repeat.
+    """
+    h, t = norm_title(heading), norm_title(title)
+    if not h or not t:
+        return False
+    if h == t:
+        return True
+    return t.endswith(ELLIPSIS) and h.startswith(t[:-1].rstrip())
+
+
+def untruncated_title(title: str, heading: str) -> str:
+    """The title, completed from the post's opening heading when Medium
+    truncated it (see heading_is_title); otherwise the title as given."""
+    title = (title or "").strip()
+    heading = re.sub(r"\s+", " ", heading or "").strip()
+    if title.endswith(ELLIPSIS) and heading_is_title(heading, title):
+        return heading
+    return title
+
+
 def strip_title_prefix(description: str, title: str) -> str:
     """A description with the post title dropped from the front of it.
 
@@ -143,8 +181,13 @@ def extract_metadata(soup, url: str) -> dict:
     if not authors and meta(soup, name="author"):
         authors = [{"name": meta(soup, name="author"), "url": None}]
     canon = soup.find("link", rel="canonical")
-    title = (ld.get("headline") or meta(soup, property="og:title")
-             or (soup.h1.get_text(strip=True) if soup.h1 else ""))
+    # The rendered title heading keeps the full text of a title Medium
+    # truncated in the headline and og:title (see untruncated_title).
+    h1 = soup.find("h1", attrs={"data-testid": "storyTitle"}) or soup.h1
+    h1_text = h1.get_text(" ", strip=True) if h1 else ""
+    title = untruncated_title(
+        ld.get("headline") or meta(soup, property="og:title") or "", h1_text
+    ) or h1_text
     return {
         "url": canonical_url(canon["href"]) if canon and canon.get("href") else url,
         "title": title,
@@ -313,8 +356,8 @@ def page_body(soup, tags=(), title=""):
     # matter, so a leading heading that repeats it is a duplicate.
     first = article.find(["h1", "h2", "h3", "h4", "p", "figure", "pre",
                           "ul", "ol", "blockquote"])
-    if (first is not None and first.name.startswith("h") and title
-            and first.get_text(strip=True) == title.strip()):
+    if (first is not None and first.name.startswith("h")
+            and heading_is_title(first.get_text(" ", strip=True), title)):
         first.decompose()
     split_pre_paragraphs(article)
     strip_tracking_pixels(article)

@@ -334,6 +334,32 @@ def medium_page(*, og_description=None, ld_description=None,
             "</article></body></html>")
 
 
+def test_truncated_headline_is_completed_from_the_title_heading():
+    # the JSON-LD headline and og:title carry Medium's ellipsis-cut title;
+    # the rendered <h1> has the whole of it
+    full = ("Exploring Petabytes of the Night Sky: Notebooks at the "
+            "Astro Data Lab Science Platform")
+    cut = ("Exploring Petabytes of the Night Sky: Notebooks at the "
+           "Astro Data Lab Science\u2026")
+    html = medium_page(title=cut).replace(
+        "<h1>Widgets for everyone</h1>",
+        f'<h1 data-testid="storyTitle">{full}</h1>')
+    soup = BeautifulSoup(html, "html.parser")
+    assert extract_metadata(soup, URL)["title"] == full
+    # an <h1> that isn't the headline's continuation leaves it alone
+    soup = BeautifulSoup(medium_page(title=cut), "html.parser")
+    assert extract_metadata(soup, URL)["title"] == cut
+
+
+def test_page_body_drops_a_heading_repeating_a_truncated_title():
+    soup = BeautifulSoup(
+        "<article><h3>The whole title of the post</h3><p>Body.</p></article>",
+        "html.parser")
+    body = page_body(soup, title="The whole title of the\u2026")
+    assert body.find("h3") is None
+    assert body.get_text(strip=True) == "Body."
+
+
 def described(**kwargs) -> str:
     soup = BeautifulSoup(medium_page(**kwargs), "html.parser")
     return extract_metadata(soup, URL)["description"]
