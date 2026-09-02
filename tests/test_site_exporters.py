@@ -120,8 +120,8 @@ def test_hugo_page_keeps_caption_in_its_figure(archive):
     assert ('{{< figure src="images/001-fig.gif" alt="Alt text" >}}'
             "The caption, with a [link](https://example.com)."
             "{{< /figure >}}") in page
-    # shortcode and image partial ship with every site, real theme or
-    # not: a theme's own figure shortcode would drop the inner caption
+    # the shortcode the figure calls resolve to, and the image partial
+    # it shares with the render hook
     assert (site / "layouts/shortcodes/figure.html").exists()
     assert (site / "layouts/partials/post-image.html").exists()
 
@@ -170,42 +170,34 @@ def test_non_image_figure_shells_stay_raw_html():
         "<figcaption>", '<figcaption markdown="1">')
 
 
-def test_hugo_dream_theme(archive):
+def test_hugo_site_config_and_front_matter(archive, capsys):
     (archive / "logo.png").write_bytes(b"IMG")
     (archive / "site.json").write_text(json.dumps(
-        {"title": "Example Blog",
-         "hugo": {"theme": "dream", "theme_repo": "https://example.org/d.git",
-                  "avatar": "logo.png", "params": {"motto": "hello"}}}))
+        {"title": "Example Blog", "favicon": "missing.ico",
+         "hugo": {"avatar": "logo.png", "params": {"motto": "hello"}}}))
     site = hugo.build_site(archive)
     config = (site / "hugo.toml").read_text()
-    assert 'theme = "dream"' in config
-    assert 'headerTitle = "Example Blog"' in config and "rss = true" in config
-    assert "siteStartYear = 2020" in config
-    assert 'authors = { href = "/authors", icon = "people", title = "Authors" }' in config
+    assert "theme" not in config                # always the built-in theme
     assert 'motto = "hello"' in config          # user params merge last
     assert 'avatar = "img/avatar.png"' in config
     assert (site / "static/img/avatar.png").read_bytes() == b"IMG"
-    # the theme brings its own layouts -- except the content-policy
-    # files: the feed override, and the figure shortcode (with its
-    # image partial) that the pages' figure calls resolve to; Dream's
-    # extra pages are created
-    layouts = [str(p.relative_to(site)) for p in (site / "layouts").rglob("*")
-               if p.is_file()]
-    assert sorted(layouts) == ["layouts/_default/rss.xml",
-                               "layouts/partials/post-image.html",
-                               "layouts/shortcodes/figure.html"]
-    assert (site / "content/search/_index.md").exists()
-    assert "Archives" in (site / "content/posts/_index.md").read_text()
+    # an asset site.json names but the archive lacks is skipped, noted
+    assert "favicon" not in config
+    assert "favicon not found, skipped" in capsys.readouterr().err
+    assert (site / "layouts/_default/baseof.html").exists()
+    assert (site / "content/search.md").exists()
+    assert (site / "content/archives.md").exists()
     front = json.loads((site / "content/posts/second-post/index.md")
                        .read_text().split("\n\n", 1)[0])
-    # the baked card cover doubles as Dream's card and og:image; junk
-    # bytes defeat Pillow and are copied in unchanged
+    # the baked card cover doubles as og:image; junk bytes defeat Pillow
+    # and are copied in unchanged
     assert front["cover"] == "images/cover.jpg"
-    assert front["images"] == ["images/cover.jpg"]
+    assert "images" not in front
     assert (site / "content/posts/second-post/images/cover.jpg"
             ).read_bytes() == b"PNG"
+    assert front["authors"] == ["Ada Lovelace"]
     assert front["author"] == "Ada Lovelace"
-    assert front["authorlink"] == "https://medium.com/@ada"
+    assert "authorlink" not in front
 
 
 def test_cover_skips_gifs_and_huge_stills(tmp_path):
@@ -217,12 +209,12 @@ def test_cover_skips_gifs_and_huge_stills(tmp_path):
     (images / "big.png").write_bytes(png(7532, 3464))
     (images / "small.png").write_bytes(png(800, 600))
     (images / "anim.gif").write_bytes(b"GIF89a" + struct.pack("<HH", 400, 300))
-    assert hugo.image_size(images / "big.png") == (7532, 3464)
-    assert hugo.image_size(images / "anim.gif") == (400, 300)
+    assert sites.image_size(images / "big.png") == (7532, 3464)
+    assert sites.image_size(images / "anim.gif") == (400, 300)
     post = {"images": ["images/anim.gif", "images/big.png", "images/small.png"]}
-    assert hugo.pick_cover(post, tmp_path) == "images/small.png"
-    assert hugo.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
-    assert hugo.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
+    assert sites.pick_cover(post, tmp_path) == "images/small.png"
+    assert sites.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
+    assert sites.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
 
 
 def test_cover_skips_svgs_and_untyped_images(tmp_path):
@@ -237,8 +229,8 @@ def test_cover_skips_svgs_and_untyped_images(tmp_path):
     (images / "photo.JPG").write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 16)
     post = {"images": ["images/anim.gif", "images/badge.svg",
                        "images/blob.bin", "images/photo.JPG"]}
-    assert hugo.pick_cover(post, tmp_path) == "images/photo.JPG"
-    assert hugo.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
+    assert sites.pick_cover(post, tmp_path) == "images/photo.JPG"
+    assert sites.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
 
 
 def test_cover_thumbnails_crop_or_letterbox(tmp_path):

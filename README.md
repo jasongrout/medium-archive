@@ -3,257 +3,291 @@
 Archive a Medium publication as raw HTML plus a Markdown conversion, to
 support migrating a blog off Medium.
 
-It works in independent steps:
+The tool runs as independent steps. Only `fetch` (and `all`) touches the
+network. Every other step works offline from the archive, so the
+conversion can be tuned and re-run without hitting Medium again.
 
-* **`fetch`** pulls raw material from Medium — each post's page HTML, its RSS
-  feed item, full-resolution images, and the media behind gist embeds (the
-  gist's files, via medium.com/media and the GitHub gists API), unmodified —
-  into `<out>/raw/`. Fetching is incremental and resumable, so it can be
-  interrupted and re-run; re-running later picks up only new posts, and
-  backfills embed media for posts archived before it was collected.
-* **`import-export`** (optional) merges a Medium account export — the zip
-  from medium.com → Settings → Download your information, or a zip of just
-  its `posts/` folder — into `<out>/raw/`, matched to fetched posts by
-  Medium id. An export holds everything its
-  author ever wrote, so by default only files matching a post already in
-  the archive are merged (`--all` imports the rest, `--drafts` includes
-  drafts); run it once per author for a multi-author publication. Export
-  post files are the editor's own clean HTML with the exact publish
-  timestamp, so they become the preferred body source; the scraped page
-  still contributes tags, the updated date, the publication canonical URL,
-  and the images.
-* **`import-ghost`** (optional) recovers a Ghost blog's posts from the
-  Wayback Machine — a separate import path from `fetch`: fetch handles
-  Medium URLs from the live site, import-ghost handles Ghost URLs that
-  survive only as web.archive.org captures (a common case: the publication
-  lived on Ghost, often on the same domain, before its Medium era, and only
-  some posts were migrated). Every page ever captured on the host is
-  considered, and pages whose HTML declares a Ghost generator are kept, so
-  it works for any Ghost version or permalink style. A post that was
-  migrated to Medium — recognized by slug or title — gets its Ghost capture
-  attached to the archived post as `ghost.html`, alongside the Medium page
-  (like `import-export` attaches `export.html`): the Ghost original often
-  has cleaner code blocks, the exact original timestamp, and the old URL
-  for redirects. `compare --ghost` diffs the two conversions per post, and
-  `convert --prefer-ghost` uses the Ghost body. Posts with no archived
-  counterpart are imported as posts of their own. Images are recovered
-  from Wayback captures too.
-* **`compare`** (optional) verifies the page conversion offline: for every
-  post with both sources, it converts the body from the scraped page and
-  from the export independently and reports any disagreement. The two
-  should be identical, so a difference means new page chrome or a
-  conversion bug. It exits non-zero when posts differ, so it can gate
-  scripts.
-* **`convert`** turns the raw archive into Markdown files with front matter
-  and local images in `<out>/posts/`, plus a `posts.json` manifest and a
-  `redirects.csv` mapping old Medium URLs to the new post directories.
-  It never touches the network, so it can be re-run freely while tuning the
-  conversion (selectors, Markdown style, output layout) without hitting
-  Medium again. An optional hand-written `<out>/tags.json` cleans up the
-  Medium tags on the way into front matter — `"drop"` removes tags that
-  only made sense on medium.com, `"rename"` consolidates variants onto a
-  common tag, `"imply"` states that one tag entails another everywhere it
-  appears (every `jupytercon` post is an `events` post), and `"add"` /
-  `"remove"` adjust specific posts by slug: `"add"` names the plain topic
-  a post's Medium tags never did, `"remove"` subtracts a tag from the
-  posts it does not describe. An over-applied tag can be split either way
-  — drop everywhere and re-add where deserved, or keep it and remove the
-  handful of posts that only mention the project — reproducibly, with
-  `raw/` keeping the originals; a stale entry that changes no post aborts
-  a full run, like a fixup that no longer applies. `"display"` is the one
-  section that changes nothing about the tags themselves: it gives a tag
-  the name a site shows it under (`"ipython": "IPython"`,
-  `"jupyter-notebook": "Jupyter Notebook"`), so spaces and capitals are a
-  display concern and a tag stays one slug through `posts.json`, the rest
-  of `tags.json` and every `/tags/<tag>/` URL. Without an entry a tag
-  shows as itself with its hyphens as spaces (`open-science` → "open
-  science").
-* **`myst`** (optional) builds a [MyST](https://mystmd.org) site in
-  `<out>/site-myst/` from the converted posts: one page per post, a
-  cover-image gallery landing page (every post as a card, newest first,
-  via the [myst-listing](https://contrib.mystmd.org/myst-listing/)
-  plugin, with each post's first still image of sane size baked to the
-  same 640×360 thumbnail as the hugo/pelican card themes' and doubling
-  as the page's social-card image; a small generated companion plugin,
-  `site-myst/listing-covers.mjs`, turns the gallery's cover backgrounds
-  into real image nodes so mystmd's image pipeline serves local thumbnails),
-  a chronological `archive` page, a year-grouped table of contents, and
-  a `site-myst/redirects.csv` mapping every old inbound path — Medium
-  slug+id, `/p/<id>`, Ghost-era — to its page URL, the one mystmd
-  actually serves: slugs are capped at 50 characters and stripped to
-  `[a-z0-9-]`, so the exporter replicates mystmd's slug rules (including
-  collision numbering) rather than assuming filename == URL. Links
-  between posts of the publication are rewritten from Medium URLs to site
-  pages, front matter is reshaped to MyST's schema, and prose MyST would
-  misparse (`@handle` mentions as citations, paired `$` signs as math) is
-  escaped. Like `convert` it never touches the network, so the whole site
-  reproduces from `raw/` + `fixups/`: `convert` then `myst` (mystmd
-  downloads the pinned listing plugin at build time, like the site theme
-  itself). Site-wide text (title, description, landing-page intro) comes
-  from an optional hand-written `<out>/site.json`. Render the result with
-  `myst start` or `myst build --html` inside `<out>/site-myst/`
-  (`npm install -g mystmd`).
-* **`hugo`** and **`pelican`** (optional) do the same for
-  those generators, into `<out>/site-hugo/` and
-  `<out>/site-pelican/` — same page URLs (`/posts/<slug>/`), same link
-  rewriting, same `site.json`, and a `redirects.csv` in each site — so
-  the generators can be compared on identical content. The **hugo and
-  pelican sites are the preferred targets**: they carry the full
-  feature set described below (the card theme, Pagefind search, image
-  optimization, redirect stubs, capped full-content feeds); the myst
-  site is maintained as a simpler alternate. `hugo` and
-  `pelican` ship the same self-contained card-grid blog theme (in the
-  vein of pytorch.org/blog), in light and dark palettes with a
-  light/dark/system picker in the header — the choice persists per
-  browser, and with none stored the system scheme decides: a
-  paginated home of cover-image cards —
-  each post's first still image of sane size, chosen by header-sniffing
-  dimensions — tag links, excerpt and byline per card; article pages;
-  tag/author card listings with chip indexes sortable by name or by
-  post count; an optional header logo and browser-tab icon
-  (`site.json`'s `"avatar"` and `"favicon"`: archive-relative image
-  paths, copied into the site so it stays self-contained); an optional
-  site-wide announcement banner above the
-  header (`site.json`'s `"announcement"`: an http(s) URL fetched
-  client-side — the mechanism behind Sphinx's `announcement` theme
-  option, so a file like `https://jupyter.org/assets/banner.html` can
-  drive a blog and its project's documentation sites alike, with empty
-  content hiding the banner — or literal HTML; dismissable per
-  browser, and a changed announcement clears the dismissal);
-  click-to-zoom body images — clicking (or Enter on) an image whose
-  original holds more detail than the article column shows opens it
-  full size in a modal, the one Medium reading affordance the archive
-  would otherwise lose, since Medium's own "click to view image in
-  full size" hint is stripped as chrome on conversion; share links
-  under every article's byline and again at its foot — LinkedIn,
-  Facebook, Bluesky, Mastodon and email, under each network's own
-  logomark, which a hover deepens rather than recolors, since tinting a
-  logo to the site accent is against most of their brand guidelines —
-  built from the post's
-  absolute URL, so `base_url` has to be set for them to point anywhere
-  real (the exporters say so on stderr when it is not); a toot has no
-  single address to be sent to, so the Mastodon one asks the reader for
-  their server and remembers it per browser, taking a pasted server URL
-  or an `@you@server` handle as readily as a bare domain; Open Graph
-  metadata on every page — `og:title`, `og:description`, `og:url` and
-  the baked 640×360 cover as `og:image`, plus `article:` dates and
-  authors and a canonical link — since LinkedIn's and Facebook's share
-  URLs carry only the page address and build their whole share box from
-  these tags, which makes them the difference between a share link that
-  works and one that posts a bare URL; and a
-  `/search/` page
-  wired to [Pagefind](https://pagefind.app) — run `pagefind --site
-  public|output` after building for full-text search served as a results
-  page with highlighted, in-context excerpts and per-section
-  sub-results. Images are optimized the same way on both: 640×360
-  cover thumbnails baked at export time through Pillow (`pip install
-  pillow`, or the `covers` extra) — center-cropped when the source is
-  near 16:9, letterboxed when far from it, so a wide wordmark or a
-  square logo keeps its content instead of losing it to the crop
-  (padded with the image's own border color when the border is
-  uniform, over a blurred fill of the image otherwise, and never
-  upscaled past 2×) — and responsive, lazily-loaded webp variants
-  (480/736/1104 px `srcset`, never upscaled, with real width/height)
-  for photographic body images: Hugo natively through its image
-  pipeline and a render hook, Pelican by a plugin embedded in the
-  generated config after each build, mtime-cached so rebuilds only
-  touch changed images; line art and animated gifs are left out of the
-  ladder, and carry real width/height so click-to-zoom can measure
-  them. All three sites carry display copies of the images, not
-  the archival originals. Line art — the charts, screenshots and
-  diagrams most of the archive's PNGs are — keeps every pixel at its
-  own resolution as lossless webp (~60% smaller than the source PNG,
-  and pixel-exact: downscaling is what makes 9 px axis labels
-  unreadable, and it barely saves bytes on flat color anyway).
-  Photographs are resized past a size cap as they are placed — to a
-  1600 px longest edge through Pillow, and lossily re-encoded — as are
-  animated gifs (which get no srcset variants and dominate the built
-  sites byte-wise) to 1104 px through gifsicle when it is installed.
-  Copies are built once into `<out>/.image-cache/` and hard-linked
-  into every site. `raw/` and `posts/` keep full resolution;
-  `site.json` tunes or disables the caps (`"images":
-  {"still_max_edge": N, "animated_max_edge": N}`, 0 = off). Both render
-  every old inbound path (Medium slug+id, `/p/<id>`, Ghost-era) as a
-  redirect stub that works on any static host — `hugo`
-  through its `aliases` front matter, `pelican` through a small
-  plugin embedded in the generated config that turns the exported
-  `redirects.csv` into the same stub pages after each build. Tag *and*
-  author pages come with per-term RSS/Atom feeds on both
-  (`pelican`'s from Pelican's own tag/author machinery), each linked
-  from its own page by the RSS mark that also serves as the header's
-  feed link; every feed
-  carries the 20 most recent posts with their full content — like the
-  publication's original Medium feed — with feed URLs absolutized
-  against `base_url` and responsive `srcset` markup stripped, since a
-  feed announces new posts while the site itself is the archive.
-  Either generated theme can be replaced by a real
-  one without touching `content/`. Render with `hugo server` or
-  `pelican -l` respectively.
+## Steps
 
-  The `hugo` step can also target a real theme, named in `site.json`:
+**`fetch`** pulls raw material from Medium into `<out>/raw/`: each post's
+page HTML, its RSS feed item, full-resolution images, and the media
+behind gist embeds (the gist's files, via medium.com/media and the
+GitHub gists API). Nothing is modified. Fetching is incremental and
+resumable, so it can be interrupted and re-run. A later run picks up
+only new posts, and backfills embed media for posts archived before it
+was collected.
 
-  ```json
-  "hugo": {"theme": "dream",
-           "theme_repo": "https://github.com/g1eny0ung/hugo-theme-dream",
-           "avatar": "avatar.png",            // archive-relative, optional
-           "params": {"motto": "..."}}        // extra/override params
-  ```
+**`import-export`** (optional) merges a Medium account export into
+`<out>/raw/`. The export is the zip from medium.com → Settings →
+Download your information, or a zip of just its `posts/` folder. Files
+are matched to fetched posts by Medium id. An export holds everything
+its author ever wrote, so by default only posts already in the archive
+are merged; `--all` imports the rest and `--drafts` includes drafts.
+Run it once per author for a multi-author publication. Export files are
+the editor's own clean HTML with the exact publish timestamp, so they
+become the preferred body source. The scraped page still contributes
+tags, the updated date, the publication canonical URL, and the images.
 
-  The exporter then emits the theme's config instead of its own layouts;
-  clone the theme once into `<out>/site-hugo/themes/<name>` (regeneration
-  preserves `themes/`, and the exporter prints the clone command while it
-  is missing). The [Dream theme](https://hugo-theme-dream.g1en.site)
-  (Hugo ≥ 0.158) gets first-class support: each post's first raster still
-  of sane size (animated gifs, svg badges and 25-megapixel screenshots
-  are passed over) becomes its summary-card cover and og:image, baked
-  to the same 640×360 crop-or-letterbox thumbnail as the built-in
-  theme's, authors
-  get per-post bylines with profile links, Dream's built-in search page
-  and archives timeline are enabled, an Authors nav item points at the
-  author taxonomy, `siteStartYear` is derived from the oldest post, and
-  the `avatar` image is copied into the site for the header.
-* **`lint`** scans the converted posts for conversion-defect signatures —
-  leftover Medium chrome, unclosed code fences, images referenced but
-  missing on disk, remote Medium CDN images, embeds whose media was never
-  archived. It exits non-zero when a defect is found, so regressions
-  surface on every convert instead of waiting for a reader.
-* **`stats`** summarizes the converted archive: posts per year, provenance
-  (how each post was discovered — feed, sitemap, Wayback, Ghost era — which
-  sources were recovered for it, and which one each body was converted
-  from), authors, article length quartiles, tag frequencies, image counts.
-  `stats --tags` lists every tag with its post count — the worklist for
-  curating `tags.json`.
+**`import-ghost`** (optional) recovers a Ghost blog's posts from the
+Wayback Machine. This is a separate path from `fetch`: fetch handles
+Medium URLs on the live site, import-ghost handles Ghost URLs that
+survive only as web.archive.org captures. The common case is a
+publication that lived on Ghost, often on the same domain, before its
+Medium era, with only some posts migrated. Every page ever captured on
+the host is considered, and pages whose HTML declares a Ghost generator
+are kept, so any Ghost version or permalink style works. A post that
+was migrated to Medium, recognized by slug or title, gets its Ghost
+capture attached to the archived post as `ghost.html`, the way
+`import-export` attaches `export.html`. The Ghost original often has
+cleaner code blocks, the exact original timestamp, and the old URL for
+redirects. `compare --ghost` diffs the two conversions per post, and
+`convert --prefer-ghost` uses the Ghost body. Posts with no Medium
+counterpart are imported as posts of their own. Images are recovered
+from Wayback captures too.
 
-The `raw/` layer is the source of truth — the only part that cannot be
-regenerated once the Medium site is gone — and everything else is derived
-from it. A `README.md` written into the archive documents the full layout,
-the front matter fields, and the caveats. If the archive lives in version
-control, the small derived files `posts.json` and `redirects.csv` are
-worth committing anyway: their diffs show what a `fixups/` or `tags.json`
-change did to every post, while the bulky derived trees (`posts/`, the
-site directories) are better gitignored and regenerated. The archive's
-own README describes the archive; what the generated sites contain is
-documented here, so that changing a theme does not oblige every archive
-downstream to regenerate its README.
+**`compare`** (optional) verifies the page conversion offline. For every
+post with both sources it converts the body from the scraped page and
+from the export independently and reports any disagreement. The two
+should be identical, so a difference means new page chrome or a
+conversion bug. It exits non-zero when posts differ, so it can gate
+scripts.
+
+**`convert`** turns the raw archive into Markdown files with front matter
+and local images in `<out>/posts/`, plus a `posts.json` manifest and a
+`redirects.csv` mapping old Medium URLs to the new post directories. It
+never touches the network. An optional hand-written `<out>/tags.json`
+cleans up the Medium tags on the way into front matter; see
+[Tag cleanup](#tag-cleanup-tagsjson).
+
+**`myst`**, **`hugo`** and **`pelican`** (optional) each build a
+ready-to-render site from the converted posts, in `<out>/site-myst/`,
+`<out>/site-hugo/` and `<out>/site-pelican/`. All three give the posts
+the same page URLs, rewrite links between posts of the publication to
+those pages, read the same `site.json`, and write a `redirects.csv`
+into the site, so the generators can be compared on identical content.
+The hugo and pelican sites are the preferred targets and carry the full
+feature set. The myst site is a simpler alternate. See
+[Generated sites](#generated-sites).
+
+**`lint`** scans the converted posts for conversion-defect signatures:
+leftover Medium chrome, unclosed code fences, images referenced but
+missing on disk, remote Medium CDN images, embeds whose media was never
+archived. It exits non-zero when a defect is found, so regressions
+surface on every convert instead of waiting for a reader.
+
+**`stats`** summarizes the converted archive: posts per year, provenance
+(how each post was discovered, which sources were recovered for it, and
+which one each body was converted from), authors, article length
+quartiles, tag frequencies, image counts. `stats --tags` lists every
+tag with its post count, the worklist for curating `tags.json`.
+
+## The archive
+
+`raw/` is the source of truth and the only part that cannot be
+regenerated once the Medium site is gone. Everything else is derived
+from it. A `README.md` written into the archive documents the full
+layout, the front matter fields, and the caveats.
+
+If the archive lives in version control, commit the small derived files
+`posts.json` and `redirects.csv` anyway. Their diffs show what a
+`fixups/` or `tags.json` change did to every post. The bulky derived
+trees (`posts/` and the site directories) are better gitignored and
+regenerated.
+
+The archive's own README describes the archive. What the generated
+sites contain is documented here, so that a theme change does not
+oblige every archive downstream to regenerate its README.
+
+## Tag cleanup (`tags.json`)
+
+Medium tags arrive as slugs, and many only made sense on medium.com. An
+optional hand-written `<out>/tags.json` cleans them up as `convert`
+writes each post's front matter, reproducibly, while `raw/` keeps the
+originals. Its sections:
+
+- `"drop"` removes tags everywhere.
+- `"rename"` maps variants onto a common tag.
+- `"imply"` states that one tag entails another everywhere it appears:
+  every `jupytercon` post is an `events` post.
+- `"add"` puts tags on specific posts by slug, for the plain topic a
+  post's Medium tags never named.
+- `"remove"` takes a tag off specific posts by slug, for a tag that
+  does not describe the post it landed on.
+- `"display"` gives a tag the name a site shows it under
+  (`"ipython": "IPython"`, `"jupyter-notebook": "Jupyter Notebook"`).
+  It changes nothing about the tag itself: the tag stays one slug
+  through `posts.json`, the rest of `tags.json` and every
+  `/tags/<tag>/` URL. A tag without an entry shows as itself with its
+  hyphens as spaces (`open-science` → "open science").
+
+An over-applied tag can be split either way: drop it everywhere and
+re-add it where deserved, or keep it and remove it from the handful of
+posts that only mention the topic. A stale entry that changes no post
+aborts a full run, like a fixup that no longer applies. `posts.json`
+and every derived site inherit the cleaned tags.
+
+## Generated sites
+
+### The card theme (hugo and pelican)
+
+`hugo` and `pelican` ship the same self-contained card-grid blog theme,
+in the vein of pytorch.org/blog, in light and dark palettes. A
+light/dark/system picker in the header persists the choice per browser;
+with none stored, the system scheme decides. The theme provides:
+
+- A paginated home of cover-image cards. Each card shows the post's
+  first still image of sane size (chosen by header-sniffing
+  dimensions), tag links, excerpt and byline.
+- Article pages, tag and author card listings, and chip indexes
+  sortable by name or by post count.
+- An optional header logo and browser-tab icon: `site.json`'s
+  `"avatar"` and `"favicon"`, archive-relative image paths copied into
+  the site so it stays self-contained.
+- An optional site-wide announcement banner above the header, from
+  `site.json`'s `"announcement"`: either an http(s) URL fetched
+  client-side or literal HTML. The URL form is the mechanism behind
+  Sphinx's `announcement` theme option, so one file such as
+  `https://jupyter.org/assets/banner.html` can drive a blog and its
+  project's documentation sites alike, and empty content hides the
+  banner. Dismissal persists per browser, and a changed announcement
+  clears it.
+- Click-to-zoom body images. Clicking an image (or pressing Enter on
+  it) whose original holds more detail than the article column shows
+  opens it full size in a modal. This is the one Medium reading
+  affordance the archive would otherwise lose, since Medium's own
+  "click to view image in full size" hint is stripped as chrome on
+  conversion.
+- Share links under every article's byline and again at its foot:
+  LinkedIn, Facebook, Bluesky, Mastodon and email, under each network's
+  own logomark. A hover deepens the mark rather than recoloring it,
+  since tinting a logo to the site accent is against most brand
+  guidelines. The links are built from the post's absolute URL, so
+  `base_url` has to be set for them to point anywhere real; the
+  exporters say so on stderr when it is not. A toot has no single
+  address to be sent to, so the Mastodon link asks the reader for their
+  server and remembers it per browser, accepting a pasted server URL or
+  an `@you@server` handle as readily as a bare domain.
+- Open Graph metadata on every page: `og:site_name`, `og:type`,
+  `og:title`, `og:url`, `og:description`, the baked 640×360 cover as
+  `og:image` (with `twitter:card` following whether there is one),
+  `article:published_time`, the post's authors and tags, and a
+  canonical link. LinkedIn's and Facebook's share URLs carry only the
+  page address and build their whole share box from these tags, so they
+  are the difference between a share link that works and one that posts
+  a bare URL.
+- A `/search/` page wired to [Pagefind](https://pagefind.app). Run
+  `pagefind --site public` (hugo) or `pagefind --site output` (pelican)
+  after building for full-text search served as a results page with
+  highlighted, in-context excerpts and per-section sub-results.
+
+Render with `hugo server` or `pelican -l`.
+
+### Images
+
+All three sites carry display copies of the images, not the archival
+originals. `raw/` and `posts/` keep full resolution. Copies are built
+once into `<out>/.image-cache/` and hard-linked into every site.
+
+- Card covers are 640×360 thumbnails baked at export time through
+  Pillow (`pip install pillow`, or the `covers` extra). A source near
+  16:9 is center-cropped. A source far from it, such as a wide wordmark
+  or a square logo, is letterboxed instead so its content survives:
+  padded with the image's own border color when the border is uniform,
+  over a blurred fill of the image otherwise, and never upscaled past
+  2×.
+- Photographic body images get responsive, lazily-loaded webp variants
+  (480/736/1104 px `srcset`, never upscaled, with real width/height).
+  Hugo does this natively through its image pipeline and a render hook.
+  Pelican does it through a plugin embedded in the generated config
+  that runs after each build, mtime-cached so rebuilds only touch
+  changed images. Line art and animated gifs are left out of the ladder
+  but carry real width/height so click-to-zoom can measure them.
+- Line art, meaning the charts, screenshots and diagrams most of an
+  archive's PNGs are, keeps every pixel at its own resolution as
+  lossless webp. That is about 60% smaller than the source PNG and
+  pixel-exact. Downscaling is what makes 9 px axis labels unreadable,
+  and it barely saves bytes on flat color anyway.
+- Photographs are resized past a size cap as they are placed, to a
+  1600 px longest edge through Pillow, and lossily re-encoded. Animated
+  gifs get no srcset variants and dominate the built sites byte-wise,
+  so they are resized to 1104 px through gifsicle when it is installed.
+- `site.json` tunes or disables the caps:
+  `"images": {"still_max_edge": N, "animated_max_edge": N}`, with 0
+  meaning off.
+
+### Redirects and feeds
+
+Both card-theme sites render every old inbound path (Medium slug+id,
+`/p/<id>`, Ghost-era) as a redirect stub that works on any static host.
+Hugo does it through `aliases` front matter. Pelican has no aliases
+feature, so a small plugin embedded in the generated config turns the
+exported `redirects.csv` into the same stub pages after each build.
+
+Tag and author pages come with per-term feeds on both: RSS from hugo,
+Atom from pelican's own tag/author machinery. Each feed is linked from
+its own page by the RSS mark that also serves as the header's feed
+link. Every feed carries the 20 most recent posts with their full
+content, like the publication's original Medium feed, with URLs made
+absolute against `base_url` and without the responsive `srcset` markup
+the pages carry. A feed announces new posts, while the site itself is
+the archive.
+
+### The MyST site
+
+`myst` builds a [MyST](https://mystmd.org) site: one page per post, a
+cover-image gallery landing page, a chronological `archive` page, a
+year-grouped table of contents, and a `site-myst/redirects.csv`.
+
+The gallery shows every post as a card, newest first, through the
+[myst-listing](https://contrib.mystmd.org/myst-listing/) plugin. Each
+post's first still image of sane size is baked to the same 640×360
+thumbnail as the card theme's and doubles as the page's social-card
+image. A small generated companion plugin,
+`site-myst/listing-covers.mjs`, turns the gallery's cover backgrounds
+into real image nodes so mystmd's image pipeline serves the local
+thumbnails.
+
+`redirects.csv` maps every old inbound path to the URL mystmd actually
+serves. mystmd caps slugs at 50 characters and strips them to
+`[a-z0-9-]`, so the exporter replicates its slug rules, collision
+numbering included, rather than assuming filename equals URL. Links
+between posts of the publication are rewritten to site pages, front
+matter is reshaped to MyST's schema, and prose MyST would misparse is
+escaped: `@handle` mentions read as citations, paired `$` signs as
+math.
+
+Like `convert`, the step never touches the network, so the whole site
+reproduces from `raw/` plus `fixups/`. mystmd downloads the pinned
+listing plugin at build time, like the site theme itself. Render with
+`myst start` or `myst build --html` inside `<out>/site-myst/`
+(`npm install -g mystmd`).
 
 ## `site.json`
 
-Hand-written, hand-versioned with the archive, and read by all three
-exporters — everything about a built site that is the publication's
-rather than the tool's. Every key is optional; the sections above give
-the detail behind each.
+Hand-written, versioned with the archive, and read by all three
+exporters. It holds everything about a built site that belongs to the
+publication rather than the tool. Every key is optional.
 
 | key | what it does |
 |-----|--------------|
 | `title` | site title: the header, `<title>`, and every feed's name |
 | `description` | tagline under the title, and the feeds' description |
 | `intro` | landing-page blurb (Markdown), rendered by the myst and hugo landing pages |
-| `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter; unset, the exporters warn and fall back to a placeholder, so the share links and social previews point at a domain you do not own |
+| `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter. Unset, the exporters warn and fall back to a placeholder, so share links and social previews point at a domain you do not own |
 | `avatar` | archive-relative image path for the header logo |
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
-| `hugo` | hugo-specific settings, including a real theme to target instead of the built-in one |
+| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`favicon`, and extra `params` for the generated config |
+
+The `hugo` section in full:
+
+```json
+"hugo": {"locale": "en",                    // defaultContentLanguage
+         "avatar": "avatar.png",            // overrides the top-level key
+         "favicon": "favicon.ico",          // overrides the top-level key
+         "params": {"motto": "..."}}        // extra/override [params]
+```
 
 ## Installation
 
@@ -298,8 +332,8 @@ a single post, and more.
 
 ## Recommended workflow
 
-To archive a publication comprehensively — including posts Medium itself no
-longer lists — work through the steps in order:
+To archive a publication comprehensively, including posts Medium itself
+no longer lists, work through the steps in order:
 
 1. **Smoke-test** the whole pipeline on a handful of posts and eyeball the
    result before committing to a long run:
@@ -318,13 +352,13 @@ longer lists — work through the steps in order:
    medium-archive fetch https://blog.example.com/ --out myblog
    ```
 
-3. **Review `raw/missing.json`** if the fetch summary mentions it: those
+3. **Review `raw/missing.json`** if the fetch summary mentions it. Those
    posts survive only as web.archive.org captures. Open each entry's
    `wayback_url`, decide whether the post matters, and save what does by
-   hand — `fetch` cannot recover them. (Mangled URL variants the crawler
-   once saw — a truncated id, a stray hyphen — are matched to archived
-   posts and unflagged automatically; for anything left, the `wayback_url`
-   shows quickly whether there is a real post behind it.)
+   hand; `fetch` cannot recover them. Mangled URL variants the crawler
+   once saw, such as a truncated id or a stray hyphen, are matched to
+   archived posts and unflagged automatically. For anything left, the
+   `wayback_url` shows quickly whether there is a real post behind it.
 
 4. **Merge account exports** (medium.com → Settings → Download your
    information), once per author for a multi-author publication, then let
@@ -338,13 +372,13 @@ longer lists — work through the steps in order:
    This step is optional but worthwhile: export bodies convert most
    faithfully and carry exact publish timestamps.
 
-5. **Recover the blog's Ghost history**, if it has one (the earliest posts
-   in the Wayback Machine reveal it — a `generator` meta tag names the
-   platform). Ghost posts that were never migrated to Medium exist nowhere
-   else; migrated ones get their Ghost original attached to the archived
-   post, and `compare --ghost` shows where that original converts better
-   than Medium's copy (then cherry-pick with
-   `convert --prefer-ghost --only URL`):
+5. **Recover the blog's Ghost history**, if it has one. The earliest
+   posts in the Wayback Machine reveal it: a `generator` meta tag names
+   the platform. Ghost posts that were never migrated to Medium exist
+   nowhere else. Migrated ones get their Ghost original attached to the
+   archived post, and `compare --ghost` shows where that original
+   converts better than Medium's copy. Cherry-pick those with
+   `convert --prefer-ghost --only URL`.
 
    ```sh
    medium-archive import-ghost https://blog.example.com/ --out myblog
@@ -352,8 +386,8 @@ longer lists — work through the steps in order:
    ```
 
 6. **Convert and check the totals.** `stats` shows posts per year, authors,
-   and tags — compare the year counts against the publication's own archive
-   pages or your memory of its history; a gap year means undiscovered
+   and tags. Compare the year counts against the publication's own archive
+   pages or your memory of its history. A gap year means undiscovered
    posts, which can be seeded from any URL list via `fetch --urls FILE`:
 
    ```sh
@@ -362,73 +396,74 @@ longer lists — work through the steps in order:
    medium-archive stats --out myblog
    ```
 
-7. **Back up `raw/`** — it is the only part that cannot be regenerated once
-   the Medium site is gone — and re-run `fetch` periodically until the day
-   the blog actually moves, to pick up posts published in the meantime.
+7. **Back up `raw/`.** It is the only part that cannot be regenerated once
+   the Medium site is gone. Re-run `fetch` periodically until the day the
+   blog actually moves, to pick up posts published in the meantime.
 
 ## Notes
 
-* Discovery merges the sitemap with the RSS feed (roughly the ten most
-  recent posts, with full, cleaner bodies) and the Wayback Machine's index
-  of past captures (web.archive.org). Medium's sitemap only lists the last
-  few years of posts; older posts are still live on Medium but invisible to
-  sitemap+feed discovery, so the Wayback index recovers their URLs — the
-  posts themselves are still fetched from the live site (`--no-wayback`
-  skips this source, and `--urls FILE` can seed URLs collected any other
-  way). The real publish date from each page is checked against
-  `--start`/`--end` after fetching, since sitemap dates are modification
-  dates and Wayback dates are first-capture dates.
-* Posts that discovery finds but Medium no longer serves — deleted or
-  unpublished — are flagged in `raw/missing.json`, with a `wayback_url`
-  pointing at their web.archive.org captures for manual recovery.
-  Medium serves its not-found page with HTTP 200, so gone posts are
-  detected from the page content, not just the status code. A gone post
-  whose slug is archived under another id — likely deleted and republished
-  — is annotated with `same_slug_archived`. Re-running `fetch` re-checks
-  flagged posts and unflags any that reappear.
-* Medium boilerplate — the "was originally published on Medium" footer,
-  stat tracking pixels, clap/share UI — is stripped during `convert`; it is
-  still present in the raw pages. Embedded iframes become links and need
-  manual replacement — except gist embeds, whose files `fetch` archives
-  into `raw/<id>/media/` and `convert` inlines as code fences (a gist's
-  content exists nowhere in the page itself; Medium's state names only an
-  opaque media resource id). A gist embed whose media is not yet archived
-  converts to a link to the gist (export and Ghost bodies, which name it)
-  or a `[missing embed: <name>]` placeholder (the state, which doesn't);
-  `lint` flags the placeholders until a `fetch` re-run backfills the media.
-  Code fences carry the language Medium recorded for the block
-  (`codeBlockMetadata`), and user mentions resolve to the author's Medium
-  profile.
+* Discovery merges three sources: the sitemap, the RSS feed (roughly the
+  ten most recent posts, with full, cleaner bodies), and the Wayback
+  Machine's index of past captures. Medium's sitemap only lists the last
+  few years of posts. Older posts are still live on Medium but invisible
+  to sitemap and feed discovery, so the Wayback index recovers their
+  URLs; the posts themselves are still fetched from the live site.
+  `--no-wayback` skips that source, and `--urls FILE` can seed URLs
+  collected any other way. The real publish date from each page is
+  checked against `--start`/`--end` after fetching, since sitemap dates
+  are modification dates and Wayback dates are first-capture dates.
+* Posts that discovery finds but Medium no longer serves, deleted or
+  unpublished, are flagged in `raw/missing.json` with a `wayback_url`
+  pointing at their web.archive.org captures for manual recovery. Medium
+  serves its not-found page with HTTP 200, so gone posts are detected
+  from the page content, not just the status code. A gone post whose
+  slug is archived under another id was likely deleted and republished,
+  and is annotated with `same_slug_archived`. Re-running `fetch`
+  re-checks flagged posts and unflags any that reappear.
+* Medium boilerplate is stripped during `convert` and still present in
+  the raw pages: the "was originally published on Medium" footer, stat
+  tracking pixels, clap/share UI. Embedded iframes become links and need
+  manual replacement. Gist embeds are the exception. A gist's content
+  exists nowhere in the page itself, since Medium's state names only an
+  opaque media resource id, so `fetch` archives the gist's files into
+  `raw/<id>/media/` and `convert` inlines them as code fences. A gist
+  embed whose media is not yet archived converts to a link to the gist
+  (from export and Ghost bodies, which name it) or a
+  `[missing embed: <name>]` placeholder (from the state, which does
+  not). `lint` flags the placeholders until a `fetch` re-run backfills
+  the media. Code fences carry the language Medium recorded for the
+  block (`codeBlockMetadata`), and user mentions resolve to the author's
+  Medium profile.
 * A post's `description` is its summary and nothing else. Medium writes
   the summary it puts in JSON-LD and `<meta name="description">` as
-  `<title> <excerpt>` and caps the result, so the title arrives twice and
-  the excerpt is cut short; `og:description` carries the excerpt by
-  itself, and is preferred. On posts that open with their own title in
-  the body — Medium's early years, and the Ghost-era posts migrated into
-  it — the title leads even that excerpt, so `convert` drops a repeated
-  title from whichever summary it uses, whatever the source (an account
-  export's subtitle already arrives clean). A title that is itself
-  ellipsis-truncated is left alone: there is no telling where it ended,
-  so cutting it would strand its tail at the front of the description.
+  `<title> <excerpt>` and caps the result, so the title arrives twice
+  and the excerpt is cut short. `og:description` carries the excerpt by
+  itself and is preferred. Posts that open with their own title in the
+  body (Medium's early years, and Ghost-era posts migrated into it) lead
+  even that excerpt with the title, so `convert` drops a repeated title
+  from whichever summary it uses. An account export's subtitle already
+  arrives clean. A title that is itself ellipsis-truncated is left
+  alone: there is no telling where it ended, so cutting it would strand
+  its tail at the front of the description.
 * Every Medium page carries its post twice: rendered into the visible
   HTML, and as data in its embedded editor state
-  (`window.__APOLLO_STATE__`) — the ordered paragraph list with markup
+  (`window.__APOLLO_STATE__`), the ordered paragraph list with markup
   spans, image ids, code blocks, plus title, timestamps, author and
   tags. `convert` prefers the state (`body_source: state`) over the
-  rendered HTML: it has no chrome to strip and keeps what the renderer
-  destroys — the full text span of a link containing a code fragment,
+  rendered HTML. It has no chrome to strip and keeps what the renderer
+  destroys: the full text span of a link containing a code fragment,
   bold on code, and iframe embeds that an un-hydrated capture drops
   entirely. It also survives when Medium serves the bare application
   shell (no server-rendered article, page title just "Medium"), which is
-  how shell-only captures convert at all — though a shell's images were
-  never fetched, so its body keeps remote URLs until re-fetched.
+  how shell-only captures convert at all. A shell's images were never
+  fetched, though, so its body keeps remote URLs until re-fetched.
   `compare --state` verifies the state conversion against account
-  exports, like plain `compare` does for the page conversion; the
-  rendered page remains the fallback and is available with
+  exports, as plain `compare` does for the page conversion. The rendered
+  page remains the fallback and is available with
   `convert --prefer-page`.
-* Medium rate-limits and may serve a bot wall. A 429 is not retried —
-  fetch reports it (with the server's `Retry-After` hint, when sent) and
-  moves on; raise `--delay` and re-run to resume.
+* Medium rate-limits and may serve a bot wall. A 429 is not retried:
+  fetch reports it, with the server's `Retry-After` hint when sent, and
+  moves on. Raise `--delay` and re-run to resume.
 
 ## Layout
 
@@ -443,7 +478,8 @@ src/medium_archive/
   hugo.py        the hugo step: <out>/posts/ -> a Hugo site in <out>/site-hugo/
   pelican.py     the pelican step: <out>/posts/ -> a Pelican site in <out>/site-pelican/
   sites.py       machinery shared by the site exporters: page slugs, the
-                 in-publication link map, redirect maps, site.json
+                 in-publication link map, image placement, covers,
+                 redirect maps, site.json
   templates/     the site scaffolding the exporters copy into each site:
                  generator configs, themes, CSS, shared JS snippets
                  (see templates/README.md)

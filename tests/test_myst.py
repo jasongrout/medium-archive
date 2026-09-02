@@ -189,6 +189,13 @@ def test_non_image_figure_shell_is_dropped_for_myst():
     out = myst_figures(md)
     assert "<" not in out
     assert "[embed: https://u](https://u)\n\n*Cap.*" in out
+    # a link-wrapped image likewise: the figure directive has no link
+    # option, so the linked image and its caption stay paragraphs
+    md = ("<figure>\n\n[![Alt](images/a.png)](https://demo.example)\n\n"
+          "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>\n")
+    out = myst_figures(md)
+    assert "<" not in out and "{figure}" not in out
+    assert "[![Alt](images/a.png)](https://demo.example)\n\nCap." in out
 
 
 def test_escape_prose_for_myst():

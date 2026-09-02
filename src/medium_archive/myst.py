@@ -31,11 +31,10 @@ import re
 import sys
 from pathlib import Path
 
-from .sites import (ImagePlacer, LinkMap, by_year, clean_site,
-                    link_or_copy, load_site_inputs, make_cover_thumbnail,
-                    tag_names,
-                    page_stems, pick_cover, read_post_body,
-                    retarget_images, rewrite_body as _rewrite, template_text,
+from .sites import (Covers, ImagePlacer, LinkMap, by_year, clean_site,
+                    load_site_inputs, page_stems, place_images,
+                    read_post_body, retarget_images, rewrite_body as _rewrite,
+                    rewrite_figures, tag_names, template_text,
                     write_redirects_csv)
 
 # Segments MyST-escaping must leave alone: inline code, link destinations,
@@ -109,14 +108,7 @@ def escape_prose(line: str) -> str:
                    for i, p in enumerate(parts))
 
 
-# The <figure> shell convert writes around a captioned image, in the
-# exact shape _Converter emits it: tag lines and the single image and
-# caption lines between them, all blank-line separated.
-FIGURE_BLOCK_RE = re.compile(
-    r"<figure>\n\n(!\[[^\]\n]*\]\([^)\s]+\))\n\n"
-    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
 FIGURE_TAG_LINE_RE = re.compile(r"^</?fig(?:ure|caption)>\n\n?", re.M)
-ALT_RE = re.compile(r"!\[([^\]\n]*)\]\(([^)\s]+)\)")
 
 
 def myst_figures(markdown: str) -> str:
@@ -124,14 +116,16 @@ def myst_figures(markdown: str) -> str:
     images, rendered the MyST way: a captioned image becomes a
     {figure} directive, whose body mystmd renders as a real
     <figcaption> under the image. Anything else the shell wraps (the
-    link an embed became) falls back to dropping the shell lines,
-    leaving the paragraphs they wrapped -- mystmd is not guaranteed to
-    render raw HTML, so no shell may survive."""
-    def directive(m):
-        alt, src = ALT_RE.match(m.group(1)).groups()
+    link an embed became, an image wrapped in a link -- the directive
+    has no link option) falls back to dropping the shell lines, leaving
+    the paragraphs they wrapped -- mystmd is not guaranteed to render
+    raw HTML, so no shell may survive."""
+    def directive(alt, src, link, caption):
+        if link:
+            return None
         opt = f":alt: {alt}\n" if alt else ""
-        return f":::{{figure}} {src}\n{opt}\n{m.group(2)}\n:::"
-    markdown = FIGURE_BLOCK_RE.sub(directive, markdown)
+        return f":::{{figure}} {src}\n{opt}\n{caption}\n:::"
+    markdown = rewrite_figures(markdown, directive)
     markdown = FIGURE_TAG_LINE_RE.sub("", markdown)
     return re.sub(r"\n{3,}", "\n\n", markdown)
 
@@ -255,54 +249,25 @@ def build_site(out: Path) -> Path:
     site = out / "site-myst"
     clean_site(site, keep=("_build",))
     (site / "posts").mkdir(parents=True)
-
-    try:
-        from PIL import Image                      # noqa: F401
-        have_pillow = True
-    except ImportError:
-        have_pillow = False
-        print("pillow not installed: gallery covers keep full-size images "
-              "(`pip install pillow` and re-run for 640x360 thumbnails)",
-              file=sys.stderr)
-    covers = {url: cover for url, p in manifest.items()
-              if (cover := pick_cover(p, out / p["dir"]))}
-
+    covers = Covers(out, manifest, shown_as="gallery covers")
     placer = ImagePlacer(out, config)
     placer.warm(out, manifest)
     pages = 0
     for url, p in manifest.items():
         body = read_post_body(out / p["dir"])
         if body is None:
-            print(f"skipping (no index.md; re-run convert): {p['dir']}",
-                  file=sys.stderr)
             continue
         body = rewrite_body(body, links, "../")
         page_dir = site / "posts" / Path(p["dir"]).name
         page_dir.mkdir()
-        cover = covers.get(url)
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed
-        renames = {}
-        images = out / p["dir"] / "images"
-        if images.is_dir():
-            (page_dir / "images").mkdir()
-            for img in sorted(images.iterdir()):
-                dst = placer.place(img, page_dir / "images" / img.name)
-                if dst.name != img.name:
-                    renames[img.name] = dst.name
+        renames = place_images(out, p, page_dir, placer)
         (page_dir / f"{stems[url]}.md").write_text(
-            retarget_images(
-                page_front_matter(p, cover and ("images/cover.jpg"
-                                                if have_pillow else cover),
-                                  names)
-                + body, renames),
+            retarget_images(page_front_matter(p, covers.path(url), names)
+                            + body, renames),
             encoding="utf-8")
-        if cover and have_pillow:
-            # baked beside the placed originals; an image that defeats
-            # Pillow keeps its (already placed) display copy instead
-            dst = page_dir / "images" / "cover.jpg"
-            if not make_cover_thumbnail(out / p["dir"] / cover, dst):
-                link_or_copy(page_dir / retarget_images(cover, renames), dst)
+        covers.bake(url, page_dir)
         pages += 1
 
     placer.report()

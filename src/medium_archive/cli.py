@@ -260,10 +260,7 @@ def main():
                         "lazily-loaded body images), a /search/ page wired "
                         "to Pagefind (run `pagefind --site public` after "
                         "`hugo` for full-text search with highlighted "
-                        "in-context excerpts), and a redirect map. Or name "
-                        "a real theme in site.json's hugo section -- the "
-                        "Dream theme (hugo-theme-dream, Hugo >= 0.158) "
-                        "gets first-class support. Render with "
+                        "in-context excerpts), and a redirect map. Render with "
                         "`hugo server` inside <out>/site-hugo/ "
                         "(https://gohugo.io)")
     parser("pelican", help="build a Pelican site in <out>/site-pelican/ "

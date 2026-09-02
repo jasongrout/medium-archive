@@ -50,10 +50,10 @@ import json
 import re
 import sys
 
-from .sites import (ImagePlacer, bake_cover_thumbnails, clean_site,
+from .sites import (Covers, ImagePlacer, clean_site, copy_site_asset,
                     export_content, fill_template, load_site_inputs,
-                    page_stems, pick_cover, tag_names, template_text,
-                    write_redirects_csv)
+                    page_stems, rewrite_figures, tag_names, template_text,
+                    write_redirects_csv, write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
 # templates/README.md). The stylesheet is the card look shared with the
@@ -83,13 +83,6 @@ def attach_images(line: str) -> str:
     return IMAGE_RE.sub(r"]({attach}\1)", line)
 
 
-# The <figure> shell convert writes around a captioned image
-# (link-wrapped or not), in the exact shape _Converter emits it (the
-# image reference already carries the {attach} prefix: escape runs
-# first).
-FIGURE_BLOCK_RE = re.compile(
-    r"<figure>\n\n(\[)?!\[([^\]\n]*)\]\(([^)\s]+)\)(?(1)\]\(([^)\s]+)\))\n\n"
-    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
 FIGURE_TAG_RE = re.compile(r"^<(figure|figcaption)>$", re.M)
 
 
@@ -103,9 +96,10 @@ def figure_blocks(markdown: str) -> str:
     caption's Markdown at all, and which keeps img and caption out of
     <p> wrappers. A shell around anything but a single image (the link
     an embed became) keeps its blank-line-separated lines instead,
-    opted in with markdown="1" so the Markdown between them renders."""
-    def block(m):
-        _, alt, src, link, caption = m.groups()
+    opted in with markdown="1" so the Markdown between them renders.
+    The image reference already carries the {attach} prefix: escape
+    runs first."""
+    def block(alt, src, link, caption):
         esc = lambda v: (v.replace("&", "&amp;").replace('"', "&quot;")
                          .replace("<", "&lt;"))
         img = f'<img alt="{esc(alt)}" src="{src}" loading="lazy">'
@@ -115,7 +109,7 @@ def figure_blocks(markdown: str) -> str:
                 f"{img}\n"
                 f'<figcaption markdown="span">{caption}</figcaption>\n'
                 "</figure>")
-    markdown = FIGURE_BLOCK_RE.sub(block, markdown)
+    markdown = rewrite_figures(markdown, block)
     return FIGURE_TAG_RE.sub(r'<\1 markdown="1">', markdown)
 
 
@@ -129,17 +123,7 @@ def build_site(out):
     site = out / "site-pelican"
     clean_site(site, keep=("output",))
     (site / "content").mkdir(parents=True)
-
-    try:
-        from PIL import Image                      # noqa: F401
-        have_pillow = True
-    except ImportError:
-        have_pillow = False
-        print("pillow not installed: card covers keep full-size images "
-              "(`pip install pillow` and re-run for 640x360 thumbnails)",
-              file=sys.stderr)
-    covers = {url: cover for url, p in manifest.items()
-              if (cover := pick_cover(p, out / p["dir"]))}
+    covers = Covers(out, manifest)
 
     def front_matter(url, post):
         text = _meta("Title", post["title"] or url)
@@ -152,9 +136,8 @@ def build_site(out):
         if post.get("tags"):
             text += _meta("Tags", ", ".join(post["tags"]))
         text += _meta("Slug", stems[url])
-        if url in covers:
-            text += _meta("Cover", "images/cover.jpg" if have_pillow
-                          else covers[url])
+        if covers.path(url):
+            text += _meta("Cover", covers.path(url))
         if post.get("description"):
             text += _meta("Summary", post["description"])
         return text + "\n"
@@ -162,37 +145,23 @@ def build_site(out):
     pages = export_content(out, site, manifest, stems, front_matter,
                            escape=attach_images,
                            placer=ImagePlacer(out, config),
-                           transform=figure_blocks)
-    if have_pillow:
-        bake_cover_thumbnails(out, site, manifest, stems, covers)
+                           transform=figure_blocks, covers=covers)
 
-    import shutil
-    avatar = config.get("avatar")
-    avatar_setting = None
-    if avatar and (out / avatar).is_file():
-        dst = site / "theme" / "static" / "img" / ("avatar" + (out / avatar).suffix)
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(out / avatar, dst)
-        avatar_setting = f"theme/img/{dst.name}"
-
-    # the tab icon, shipped through the theme's static dir like the avatar
-    favicon = config.get("favicon")
-    favicon_setting = None
-    if favicon and (out / favicon).is_file():
-        dst = site / "theme" / "static" / ("favicon" + (out / favicon).suffix)
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(out / favicon, dst)
-        favicon_setting = f"theme/{dst.name}"
-
+    # the header logo and the tab icon, shipped through the theme's
+    # static dir
+    avatar = copy_site_asset(out, config.get("avatar"),
+                             site / "theme" / "static" / "img", "avatar")
+    favicon = copy_site_asset(out, config.get("favicon"),
+                              site / "theme" / "static", "favicon")
+    setting = lambda v: json.dumps(v) if v else "None"   # Python literals
     (site / "pelicanconf.py").write_text(fill_template(
         "pelican/pelicanconf.py.tmpl",
         title=json.dumps(config["title"], ensure_ascii=False),
         description=json.dumps(config.get("description", ""),
                                ensure_ascii=False),
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
-        # json for the string cases; None must render as Python's None
-        avatar=json.dumps(avatar_setting) if avatar_setting else "None",
-        favicon=json.dumps(favicon_setting) if favicon_setting else "None",
+        avatar=setting(avatar and f"theme/img/{avatar}"),
+        favicon=setting(favicon and f"theme/{favicon}"),
         # a site-wide banner above the header -- an http(s) URL the theme
         # fetches client-side (empty content hides the banner, like Sphinx
         # themes' html announcement option), or literal HTML
@@ -202,10 +171,7 @@ def build_site(out):
                                ensure_ascii=False, indent=4),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")
 
-    for rel, src in TEMPLATES.items():
-        path = site / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(template_text(src), encoding="utf-8")
+    write_templates(site, TEMPLATES)
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"pelican done: {pages}/{len(manifest)} pages -> {site}",
           file=sys.stderr)
