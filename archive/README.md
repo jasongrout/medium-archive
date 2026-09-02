@@ -120,7 +120,7 @@ raw/
                                 when one was merged in with `import-export`;
                                 the editor's own HTML, byte-for-byte
     feed_item.json            the post's RSS item, when the feed covered it
-                                at fetch time (title, author, tags, date,
+                                at fetch time (title, authors, tags, date,
                                 content_html). Only ~10 recent posts have one.
     images.json               {source_url: filename} for images/
     images/<filename>         full-resolution images referenced by the post
@@ -180,8 +180,7 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 | field           | meaning |
 |-----------------|---------|
 | `title`         | post title; one Medium cut short with an ellipsis (an untitled post is titled with its opening heading, capped at about a hundred characters) is completed from that heading |
-| `author`        | author display name (JSON-LD, or RSS `dc:creator`) |
-| `author_url`    | author profile URL on Medium, if present |
+| `authors`       | the post's authors, each `{"name", "url"}`: display name (JSON-LD, the export byline, or RSS `dc:creator`) and Medium profile URL, if present (null otherwise) |
 | `date`          | publish timestamp (ISO 8601, UTC) |
 | `updated`       | last-modified timestamp, if present |
 | `original_url`  | canonical Medium URL of the post |

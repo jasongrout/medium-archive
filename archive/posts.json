@@ -1,8 +1,12 @@
 {
   "https://blog.jupyter.org/positron-server-available-for-academic-use-via-jupyterhub-ae4e406f9444": {
     "title": "Positron Server available for academic use via JupyterHub",
-    "author": "Jupyter Foundation",
-    "author_url": "https://medium.com/@jupyterfoundation",
+    "authors": [
+      {
+        "name": "Jupyter Foundation",
+        "url": "https://medium.com/@jupyterfoundation"
+      }
+    ],
     "date": "2026-07-29T18:19:35Z",
     "updated": "2026-07-31T12:28:41Z",
     "original_url": "https://blog.jupyter.org/positron-server-available-for-academic-use-via-jupyterhub-ae4e406f9444",
@@ -23,8 +27,12 @@
   },
   "https://blog.jupyter.org/jupyterlite-0-8-is-released-0c89c4200f79": {
     "title": "JupyterLite 0.8 is released! 🎉",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2026-07-10T05:01:02Z",
     "updated": "2026-07-10T05:49:25Z",
     "original_url": "https://blog.jupyter.org/jupyterlite-0-8-is-released-0c89c4200f79",
@@ -53,8 +61,12 @@
   },
   "https://blog.jupyter.org/navigating-the-post-workshop-fog-a-path-to-myst-6aaaaa6bf81f": {
     "title": "Navigating the Post-Workshop Fog: a Path to Myst",
-    "author": "Chiara Marmo",
-    "author_url": "https://medium.com/@marmochiaskl",
+    "authors": [
+      {
+        "name": "Chiara Marmo",
+        "url": "https://medium.com/@marmochiaskl"
+      }
+    ],
     "date": "2026-07-09T15:15:37Z",
     "updated": "2026-07-09T15:15:37Z",
     "original_url": "https://blog.jupyter.org/navigating-the-post-workshop-fog-a-path-to-myst-6aaaaa6bf81f",
@@ -79,8 +91,12 @@
   },
   "https://blog.jupyter.org/2026-jupyter-community-call-for-funding-proposals-f938928a1b8e": {
     "title": "2026 Jupyter Community Call For Funding Proposals",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2026-07-06T19:32:14.160Z",
     "updated": "2026-07-09T09:54:31Z",
     "original_url": "https://blog.jupyter.org/2026-jupyter-community-call-for-funding-proposals-f938928a1b8e",
@@ -102,8 +118,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-6-and-notebook-7-6-are-out-dd84e1e919f2": {
     "title": "JupyterLab 4.6 and Notebook 7.6 are out!",
-    "author": "Michał Krassowski",
-    "author_url": "https://medium.com/@krassowski.michal",
+    "authors": [
+      {
+        "name": "Michał Krassowski",
+        "url": "https://medium.com/@krassowski.michal"
+      }
+    ],
     "date": "2026-07-02T16:13:50Z",
     "updated": "2026-07-02T16:15:16Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-6-and-notebook-7-6-are-out-dd84e1e919f2",
@@ -147,8 +167,12 @@
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-1998f468b29e": {
     "title": "Congratulations, Distinguished Contributors!",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2026-06-24T15:08:46Z",
     "updated": "2026-06-26T07:16:54Z",
     "original_url": "https://blog.jupyter.org/congratulations-distinguished-contributors-1998f468b29e",
@@ -173,8 +197,12 @@
   },
   "https://blog.jupyter.org/announcing-jupyter-builder-a-standalone-build-system-for-jupyterlab-extensions-c3d4cc06fa95": {
     "title": "Announcing jupyter-builder: A Standalone Build System for JupyterLab Extensions",
-    "author": "Darshan Kr. Paudyal",
-    "author_url": "https://medium.com/@pranishpoudel10",
+    "authors": [
+      {
+        "name": "Darshan Kr. Paudyal",
+        "url": "https://medium.com/@pranishpoudel10"
+      }
+    ],
     "date": "2026-06-19T13:11:00Z",
     "updated": "2026-06-19T13:11:00Z",
     "original_url": "https://blog.jupyter.org/announcing-jupyter-builder-a-standalone-build-system-for-jupyterlab-extensions-c3d4cc06fa95",
@@ -196,8 +224,12 @@
   },
   "https://blog.jupyter.org/jupyter-user-survey-252ac60945ae": {
     "title": "Jupyter User Survey",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2026-06-18T15:04:36.837Z",
     "updated": "2026-06-18T15:04:36Z",
     "original_url": "https://blog.jupyter.org/jupyter-user-survey-252ac60945ae",
@@ -217,8 +249,12 @@
   },
   "https://blog.jupyter.org/becoming-the-new-jupyterhub-and-jupyter-book-community-manager-481d864947d4": {
     "title": "Becoming the new JupyterHub and Jupyter Book community manager",
-    "author": "Serena Bonaretti",
-    "author_url": "https://medium.com/@serena.bonaretti",
+    "authors": [
+      {
+        "name": "Serena Bonaretti",
+        "url": "https://medium.com/@serena.bonaretti"
+      }
+    ],
     "date": "2026-06-15T07:01:03Z",
     "updated": "2026-06-15T07:01:03Z",
     "original_url": "https://blog.jupyter.org/becoming-the-new-jupyterhub-and-jupyter-book-community-manager-481d864947d4",
@@ -241,8 +277,12 @@
   },
   "https://blog.jupyter.org/catching-jupyter-specific-bugs-before-ci-does-announcing-jupyter-eslint-plugin-fc65ae414630": {
     "title": "Catching Jupyter-specific bugs before CI does: announcing jupyter eslint plugin",
-    "author": "Darshan Kr. Paudyal",
-    "author_url": "https://medium.com/@pranishpoudel10",
+    "authors": [
+      {
+        "name": "Darshan Kr. Paudyal",
+        "url": "https://medium.com/@pranishpoudel10"
+      }
+    ],
     "date": "2026-06-11T15:13:32Z",
     "updated": "2026-06-11T15:13:32Z",
     "original_url": "https://blog.jupyter.org/catching-jupyter-specific-bugs-before-ci-does-announcing-jupyter-eslint-plugin-fc65ae414630",
@@ -263,8 +303,12 @@
   },
   "https://blog.jupyter.org/a-users-journey-with-plugin-playground-from-first-idea-to-installable-jupyterlab-extension-697021dd6fb9": {
     "title": "A User’s Journey with Plugin Playground: From First Idea to Installable JupyterLab Extension.",
-    "author": "Anuj Singh",
-    "author_url": "https://medium.com/@workwithanuj26",
+    "authors": [
+      {
+        "name": "Anuj Singh",
+        "url": "https://medium.com/@workwithanuj26"
+      }
+    ],
     "date": "2026-05-28T17:45:34Z",
     "updated": "2026-05-28T18:07:49Z",
     "original_url": "https://blog.jupyter.org/a-users-journey-with-plugin-playground-from-first-idea-to-installable-jupyterlab-extension-697021dd6fb9",
@@ -291,8 +335,12 @@
   },
   "https://blog.jupyter.org/our-new-jupyter-foundation-community-manager-61129cf288b1": {
     "title": "Our new Jupyter Foundation Community Manager",
-    "author": "RP",
-    "author_url": "https://medium.com/@rbpandey",
+    "authors": [
+      {
+        "name": "RP",
+        "url": "https://medium.com/@rbpandey"
+      }
+    ],
     "date": "2026-05-18T20:01:56Z",
     "updated": "2026-05-18T20:01:56Z",
     "original_url": "https://blog.jupyter.org/our-new-jupyter-foundation-community-manager-61129cf288b1",
@@ -312,8 +360,12 @@
   },
   "https://blog.jupyter.org/nb-cli-a-command-line-interface-for-ai-agents-and-notebook-automation-996ad7edacd9": {
     "title": "nb-cli: A Command-Line Interface for AI Agents and Notebook Automation",
-    "author": "Piyush Jain",
-    "author_url": "https://medium.com/@pyjain",
+    "authors": [
+      {
+        "name": "Piyush Jain",
+        "url": "https://medium.com/@pyjain"
+      }
+    ],
     "date": "2026-05-11T19:04:11Z",
     "updated": "2026-05-11T19:04:11Z",
     "original_url": "https://blog.jupyter.org/nb-cli-a-command-line-interface-for-ai-agents-and-notebook-automation-996ad7edacd9",
@@ -338,8 +390,12 @@
   },
   "https://blog.jupyter.org/a-jupyter-workshop-demystifying-myst-markdown-in-education-612995ff6d56": {
     "title": "A Jupyter Workshop: Demystifying MyST Markdown in Education",
-    "author": "Chiara Marmo",
-    "author_url": "https://medium.com/@marmochiaskl",
+    "authors": [
+      {
+        "name": "Chiara Marmo",
+        "url": "https://medium.com/@marmochiaskl"
+      }
+    ],
     "date": "2026-04-30T15:05:13Z",
     "updated": "2026-04-30T15:05:13Z",
     "original_url": "https://blog.jupyter.org/a-jupyter-workshop-demystifying-myst-markdown-in-education-612995ff6d56",
@@ -361,8 +417,12 @@
   },
   "https://blog.jupyter.org/how-we-combine-multiple-repositories-into-one-website-at-jupyterbook-org-588c0197a369": {
     "title": "How we combine multiple repositories into one website at jupyterbook.org",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2026-04-22T13:01:02.086Z",
     "updated": "2026-04-22T13:01:02Z",
     "original_url": "https://blog.jupyter.org/how-we-combine-multiple-repositories-into-one-website-at-jupyterbook-org-588c0197a369",
@@ -384,8 +444,12 @@
   },
   "https://blog.jupyter.org/exploring-petabytes-of-the-night-sky-jupyter-notebooks-at-noirlabs-astro-data-lab-science-ae012dfd4723": {
     "title": "Exploring Petabytes of the Night Sky — Jupyter Notebooks at NOIRLab’s Astro Data Lab Science Platform",
-    "author": "Robert Nikutta",
-    "author_url": "https://medium.com/@robnik",
+    "authors": [
+      {
+        "name": "Robert Nikutta",
+        "url": "https://medium.com/@robnik"
+      }
+    ],
     "date": "2026-04-20T18:04:46Z",
     "updated": "2026-04-20T18:04:46Z",
     "original_url": "https://blog.jupyter.org/exploring-petabytes-of-the-night-sky-jupyter-notebooks-at-noirlabs-astro-data-lab-science-ae012dfd4723",
@@ -411,8 +475,12 @@
   },
   "https://blog.jupyter.org/the-myst-anywidget-directive-daa55c348ab2": {
     "title": "The MyST AnyWidget Directive",
-    "author": "Steve Purves",
-    "author_url": "https://medium.com/@stevejpurves",
+    "authors": [
+      {
+        "name": "Steve Purves",
+        "url": "https://medium.com/@stevejpurves"
+      }
+    ],
     "date": "2026-04-16T15:28:45Z",
     "updated": "2026-04-16T15:28:45Z",
     "original_url": "https://blog.jupyter.org/the-myst-anywidget-directive-daa55c348ab2",
@@ -435,8 +503,12 @@
   },
   "https://blog.jupyter.org/better-sharing-ux-with-nbgitpuller-and-contextual-error-handling-18eb5c83dc1b": {
     "title": "Better sharing UX with nbgitpuller and contextual error handling",
-    "author": "Jenny Wong",
-    "author_url": "https://medium.com/@jnywong",
+    "authors": [
+      {
+        "name": "Jenny Wong",
+        "url": "https://medium.com/@jnywong"
+      }
+    ],
     "date": "2026-04-09T15:02:48Z",
     "updated": "2026-04-09T15:02:48Z",
     "original_url": "https://blog.jupyter.org/better-sharing-ux-with-nbgitpuller-and-contextual-error-handling-18eb5c83dc1b",
@@ -463,8 +535,12 @@
   },
   "https://blog.jupyter.org/berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-help-from-2i2c-f0f22d0b5ba5": {
     "title": "Berkeley Institute for Data Science (BIDS) joins the mybinder.org",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2026-04-08T23:34:32Z",
     "updated": "2026-04-08T23:34:32Z",
     "original_url": "https://blog.jupyter.org/berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-help-from-2i2c-f0f22d0b5ba5",
@@ -485,8 +561,12 @@
   },
   "https://blog.jupyter.org/ibm-brings-jupyter-and-spark-to-the-mainframe-74bec140245f": {
     "title": "IBM Brings Jupyter and Spark to the Mainframe",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-03-30T09:06:18.000Z",
     "updated": "2017-08-29T19:08:15Z",
     "original_url": "https://blog.jupyter.org/ibm-brings-jupyter-and-spark-to-the-mainframe-74bec140245f",
@@ -507,8 +587,12 @@
   },
   "https://blog.jupyter.org/whats-new-in-myst-markdown-1-8-2-b7ae8975b03e": {
     "title": "What’s New in MyST Markdown 1.8.2",
-    "author": "Jupyter Book",
-    "author_url": "https://medium.com/@jupyter-book",
+    "authors": [
+      {
+        "name": "Jupyter Book",
+        "url": "https://medium.com/@jupyter-book"
+      }
+    ],
     "date": "2026-03-26T15:10:00Z",
     "updated": "2026-03-26T15:10:00Z",
     "original_url": "https://blog.jupyter.org/whats-new-in-myst-markdown-1-8-2-b7ae8975b03e",
@@ -530,8 +614,12 @@
   },
   "https://blog.jupyter.org/jupyter-security-sprint-march-31st-5a2293de5cd5": {
     "title": "Jupyter Security Sprint March 31st",
-    "author": "Joe Lucas ",
-    "author_url": "https://medium.com/@joe.lucas.0311",
+    "authors": [
+      {
+        "name": "Joe Lucas ",
+        "url": "https://medium.com/@joe.lucas.0311"
+      }
+    ],
     "date": "2026-03-20T19:47:55Z",
     "updated": "2026-03-20T19:47:55Z",
     "original_url": "https://blog.jupyter.org/jupyter-security-sprint-march-31st-5a2293de5cd5",
@@ -552,8 +640,12 @@
   },
   "https://blog.jupyter.org/700-jupyterlab-4-extensions-8ac295b3d974": {
     "title": "700 JupyterLab 4 Extensions!",
-    "author": "Konstantin Taletskiy",
-    "author_url": "https://medium.com/@kostal91",
+    "authors": [
+      {
+        "name": "Konstantin Taletskiy",
+        "url": "https://medium.com/@kostal91"
+      }
+    ],
     "date": "2026-03-13T17:18:37Z",
     "updated": "2026-03-13T17:18:37Z",
     "original_url": "https://blog.jupyter.org/700-jupyterlab-4-extensions-8ac295b3d974",
@@ -582,8 +674,12 @@
   },
   "https://blog.jupyter.org/call-for-applications-community-manager-for-jupyterhub-and-jupyter-book-88b128a1a7b9": {
     "title": "Call for applications: Community Manager for JupyterHub and Jupyter Book",
-    "author": "Kirstie Whitaker",
-    "author_url": "https://medium.com/@kirstiej",
+    "authors": [
+      {
+        "name": "Kirstie Whitaker",
+        "url": "https://medium.com/@kirstiej"
+      }
+    ],
     "date": "2026-03-05T16:44:42Z",
     "updated": "2026-03-05T19:07:22Z",
     "original_url": "https://blog.jupyter.org/call-for-applications-community-manager-for-jupyterhub-and-jupyter-book-88b128a1a7b9",
@@ -606,8 +702,12 @@
   },
   "https://blog.jupyter.org/mybinder-org-adding-request-origin-to-events-archive-92fe0f954eab": {
     "title": "mybinder.org adding request Origin to events archive",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2026-02-02T16:27:16Z",
     "updated": "2026-03-02T23:33:47Z",
     "original_url": "https://blog.jupyter.org/mybinder-org-adding-request-origin-to-events-archive-92fe0f954eab",
@@ -628,8 +728,12 @@
   },
   "https://blog.jupyter.org/expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps-7fb98eece82e": {
     "title": "Expanding Geospatial Workflows in JupyterGIS: STAC Browsing and Story Maps",
-    "author": "Gregory Mooney",
-    "author_url": "https://medium.com/@gregory.mooney",
+    "authors": [
+      {
+        "name": "Gregory Mooney",
+        "url": "https://medium.com/@gregory.mooney"
+      }
+    ],
     "date": "2026-02-19T17:34:34Z",
     "updated": "2026-02-19T17:34:34Z",
     "original_url": "https://blog.jupyter.org/expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps-7fb98eece82e",
@@ -655,8 +759,12 @@
   },
   "https://blog.jupyter.org/jupyterlite-officially-joins-project-jupyter-77df24c8db80": {
     "title": "JupyterLite Officially Joins Project Jupyter!",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2026-02-12T16:14:21.549Z",
     "updated": "2026-02-19T12:26:48Z",
     "original_url": "https://blog.jupyter.org/jupyterlite-officially-joins-project-jupyter-77df24c8db80",
@@ -682,8 +790,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-call-february-2026-3e25bc0671d9": {
     "title": "Jupyter Community Call: February 2026",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2026-02-16T13:26:17Z",
     "updated": "2026-02-16T13:26:17Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-call-february-2026-3e25bc0671d9",
@@ -704,8 +816,12 @@
   },
   "https://blog.jupyter.org/instantly-view-parquet-files-in-jupyterlab-with-arbalister-4799c28bbce7": {
     "title": "Instantly view Parquet files in JupyterLab with Arbalister",
-    "author": "Antoine Prouvost",
-    "author_url": "https://medium.com/@AntoineProuvost",
+    "authors": [
+      {
+        "name": "Antoine Prouvost",
+        "url": "https://medium.com/@AntoineProuvost"
+      }
+    ],
     "date": "2026-01-29T16:18:02Z",
     "updated": "2026-02-04T14:50:04Z",
     "original_url": "https://blog.jupyter.org/instantly-view-parquet-files-in-jupyterlab-with-arbalister-4799c28bbce7",
@@ -729,8 +845,12 @@
   },
   "https://blog.jupyter.org/jupyterlite-0-7-is-released-67db4d1609ad": {
     "title": "JupyterLite 0.7 is released! 🎉",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2025-12-04T22:11:08Z",
     "updated": "2025-12-04T22:11:08Z",
     "original_url": "https://blog.jupyter.org/jupyterlite-0-7-is-released-67db4d1609ad",
@@ -759,8 +879,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-5-and-notebook-7-5-are-available-1bcd1fa19a47": {
     "title": "JupyterLab 4.5 and Notebook 7.5 are available!",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2025-11-24T09:32:09Z",
     "updated": "2025-11-24T09:32:09Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-5-and-notebook-7-5-are-available-1bcd1fa19a47",
@@ -788,8 +912,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-early-2026-a9ce9670ba19": {
     "title": "Jupyter Community Workshops: Early 2026",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2025-11-20T13:48:58.746Z",
     "updated": "2025-11-20T13:48:58Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-early-2026-a9ce9670ba19",
@@ -809,8 +937,12 @@
   },
   "https://blog.jupyter.org/scaling-maintainer-intuition-with-pull-request-triage-boards-779f2387498b": {
     "title": "Scaling “Maintainer Intuition” with Pull Request Triage Boards",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2025-11-16T21:22:10Z",
     "updated": "2025-11-16T21:22:10Z",
     "original_url": "https://blog.jupyter.org/scaling-maintainer-intuition-with-pull-request-triage-boards-779f2387498b",
@@ -830,8 +962,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-call-december-2025-f0cf14e857ed": {
     "title": "Hey Jovyans, we’d love for you to join us on our final community call of the year!",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2025-11-13T16:18:41Z",
     "updated": "2025-11-13T16:18:41Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-call-december-2025-f0cf14e857ed",
@@ -852,8 +988,12 @@
   },
   "https://blog.jupyter.org/announcing-our-first-jupyter-community-funded-proposals-dd5263c19be3": {
     "title": "Announcing our first Jupyter Community Funded Proposals",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2025-11-04T19:19:41.370Z",
     "updated": "2025-11-04T19:19:41Z",
     "original_url": "https://blog.jupyter.org/announcing-our-first-jupyter-community-funded-proposals-dd5263c19be3",
@@ -876,8 +1016,12 @@
   },
   "https://blog.jupyter.org/gnu-octave-meets-jupyterlite-compute-anywhere-anytime-8b033afbbcdc": {
     "title": "GNU Octave Meets JupyterLite: Compute Anywhere, Anytime!",
-    "author": "Isabel Paredes",
-    "author_url": "https://medium.com/@isabel.paredes",
+    "authors": [
+      {
+        "name": "Isabel Paredes",
+        "url": "https://medium.com/@isabel.paredes"
+      }
+    ],
     "date": "2025-10-16T15:04:13Z",
     "updated": "2025-10-16T15:04:13Z",
     "original_url": "https://blog.jupyter.org/gnu-octave-meets-jupyterlite-compute-anywhere-anytime-8b033afbbcdc",
@@ -902,8 +1046,12 @@
   },
   "https://blog.jupyter.org/your-ideas-our-support-jupyter-community-call-for-funding-proposals-f4642590ae76": {
     "title": "Your Ideas, Our Support: Jupyter Community Call For Funding Proposals",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2025-08-28T15:18:11.649Z",
     "updated": "2025-09-26T23:11:53Z",
     "original_url": "https://blog.jupyter.org/your-ideas-our-support-jupyter-community-call-for-funding-proposals-f4642590ae76",
@@ -925,8 +1073,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-are-back-3cca15d02975": {
     "title": "Jupyter Community Workshops Are Back!",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2025-08-07T20:03:49.073Z",
     "updated": "2025-09-04T21:44:14Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-are-back-3cca15d02975",
@@ -946,8 +1098,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-call-september-2025-e4d2cfa3ea41": {
     "title": "Jupyter Community Call: September 2025",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2025-07-31T15:11:03Z",
     "updated": "2025-07-31T15:11:03Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-call-september-2025-e4d2cfa3ea41",
@@ -968,8 +1124,12 @@
   },
   "https://blog.jupyter.org/real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter-and-qgis-d25dbe2832a6": {
     "title": "Collaborative editing for GIS workflows with Jupyter and QGIS",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2025-02-26T18:50:53Z",
     "updated": "2025-07-16T19:41:52Z",
     "original_url": "https://blog.jupyter.org/real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter-and-qgis-d25dbe2832a6",
@@ -999,8 +1159,12 @@
   },
   "https://blog.jupyter.org/c-in-jupyter-interpreting-c-in-the-web-c9d93542f20b": {
     "title": "C++ in Jupyter — Interpreting C++ in the Web",
-    "author": "Anutosh Bhat",
-    "author_url": "https://medium.com/@anutosh.bhat",
+    "authors": [
+      {
+        "name": "Anutosh Bhat",
+        "url": "https://medium.com/@anutosh.bhat"
+      }
+    ],
     "date": "2025-06-19T15:29:49Z",
     "updated": "2025-06-19T15:29:49Z",
     "original_url": "https://blog.jupyter.org/c-in-jupyter-interpreting-c-in-the-web-c9d93542f20b",
@@ -1037,8 +1201,12 @@
   },
   "https://blog.jupyter.org/jupyterlite-0-6-0-is-released-b4bc69bfc8f4": {
     "title": "JupyterLite 0.6.0 is released! 🎉",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2025-06-12T15:04:51Z",
     "updated": "2025-06-12T15:04:51Z",
     "original_url": "https://blog.jupyter.org/jupyterlite-0-6-0-is-released-b4bc69bfc8f4",
@@ -1069,8 +1237,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-call-june-2025-2a34ba44ca13": {
     "title": "Jupyter Community Call: June 2025",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2025-05-22T15:06:47Z",
     "updated": "2025-05-22T15:06:47Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-call-june-2025-2a34ba44ca13",
@@ -1091,8 +1263,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-4-and-notebook-7-4-are-available-aca2782d4f3d": {
     "title": "JupyterLab 4.4 and Notebook 7.4 are available!",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2025-05-21T09:54:36Z",
     "updated": "2025-05-21T09:54:36Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-4-and-notebook-7-4-are-available-aca2782d4f3d",
@@ -1120,8 +1296,12 @@
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-2504029fc5a9": {
     "title": "Congratulations, Distinguished Contributors!",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2025-05-15T15:15:28Z",
     "updated": "2025-05-15T15:22:31Z",
     "original_url": "https://blog.jupyter.org/congratulations-distinguished-contributors-2504029fc5a9",
@@ -1148,8 +1328,12 @@
   },
   "https://blog.jupyter.org/r-in-the-browser-announcing-our-webassembly-distribution-9450e9539ed5": {
     "title": "R in the Browser: Announcing Our WebAssembly Distribution",
-    "author": "Isabel Paredes",
-    "author_url": "https://medium.com/@isabel.paredes",
+    "authors": [
+      {
+        "name": "Isabel Paredes",
+        "url": "https://medium.com/@isabel.paredes"
+      }
+    ],
     "date": "2025-02-28T08:31:50Z",
     "updated": "2025-04-25T07:39:17Z",
     "original_url": "https://blog.jupyter.org/r-in-the-browser-announcing-our-webassembly-distribution-9450e9539ed5",
@@ -1179,8 +1363,12 @@
   },
   "https://blog.jupyter.org/exploring-open-access-art-using-the-deno-jupyter-kernel-da0ad084966e": {
     "title": "Exploring Open Access Art Using the Deno Jupyter Kernel",
-    "author": "Trevor Manz",
-    "author_url": "https://medium.com/@manzt",
+    "authors": [
+      {
+        "name": "Trevor Manz",
+        "url": "https://medium.com/@manzt"
+      }
+    ],
     "date": "2025-04-17T15:27:14Z",
     "updated": "2025-04-17T15:27:14Z",
     "original_url": "https://blog.jupyter.org/exploring-open-access-art-using-the-deno-jupyter-kernel-da0ad084966e",
@@ -1217,8 +1405,12 @@
   },
   "https://blog.jupyter.org/benjamin-ragan-kelley-59a6bf015ea9": {
     "title": "Benjamin Ragan-Kelley",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2020-10-03T21:02:03Z",
     "updated": "2025-04-10T15:24:21Z",
     "original_url": "https://blog.jupyter.org/benjamin-ragan-kelley-59a6bf015ea9",
@@ -1242,8 +1434,12 @@
   },
   "https://blog.jupyter.org/voila-gridstack-template-8a431c2b353e": {
     "title": "Configure your dashboards with Voilà gridstack template",
-    "author": "Bartosz Telenczuk",
-    "author_url": "https://medium.com/@bartosz.telenczuk",
+    "authors": [
+      {
+        "name": "Bartosz Telenczuk",
+        "url": "https://medium.com/@bartosz.telenczuk"
+      }
+    ],
     "date": "2019-11-11T14:03:38Z",
     "updated": "2019-11-11T14:03:38Z",
     "original_url": "https://blog.jupyter.org/voila-gridstack-template-8a431c2b353e",
@@ -1268,8 +1464,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2025-c654a31a584e": {
     "title": "JupyterCon 2025!",
-    "author": "Rick Wagner",
-    "author_url": "https://medium.com/@rpwagner",
+    "authors": [
+      {
+        "name": "Rick Wagner",
+        "url": "https://medium.com/@rpwagner"
+      }
+    ],
     "date": "2025-03-31T21:24:00Z",
     "updated": "2025-03-31T21:24:00Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2025-c654a31a584e",
@@ -1291,8 +1491,12 @@
   },
   "https://blog.jupyter.org/project-jupyters-2025-executive-council-elections-605b183ec64c": {
     "title": "Project Jupyter’s 2025 Executive Council Elections",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2025-03-06T16:26:42.609Z",
     "updated": "2025-03-06T16:26:42Z",
     "original_url": "https://blog.jupyter.org/project-jupyters-2025-executive-council-elections-605b183ec64c",
@@ -1312,8 +1516,12 @@
   },
   "https://blog.jupyter.org/simplifying-and-speeding-up-binder-builds-with-buildkit-d44f96582994": {
     "title": "Simplifying and speeding up Binder builds with BuildKit",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2025-03-03T14:05:29.171Z",
     "updated": "2025-03-03T14:05:29Z",
     "original_url": "https://blog.jupyter.org/simplifying-and-speeding-up-binder-builds-with-buildkit-d44f96582994",
@@ -1337,8 +1545,12 @@
   },
   "https://blog.jupyter.org/building-ai-agents-for-jupyterlab-using-notebook-intelligence-0515d4c41a61": {
     "title": "Building AI Agents for JupyterLab using Notebook Intelligence",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2025-02-24T18:03:48Z",
     "updated": "2025-02-24T18:03:48Z",
     "original_url": "https://blog.jupyter.org/building-ai-agents-for-jupyterlab-using-notebook-intelligence-0515d4c41a61",
@@ -1364,8 +1576,12 @@
   },
   "https://blog.jupyter.org/announcing-jupytercad-3-0-d8f4b7b0a719": {
     "title": "Announcing JupyterCAD 3.0",
-    "author": "Arjun Verma",
-    "author_url": "https://medium.com/@arjxn.py",
+    "authors": [
+      {
+        "name": "Arjun Verma",
+        "url": "https://medium.com/@arjxn.py"
+      }
+    ],
     "date": "2025-02-17T09:38:15Z",
     "updated": "2025-02-17T09:38:15Z",
     "original_url": "https://blog.jupyter.org/announcing-jupytercad-3-0-d8f4b7b0a719",
@@ -1392,8 +1608,12 @@
   },
   "https://blog.jupyter.org/join-jupyterhub-on-zulip-chat-4c17491bd96d": {
     "title": "Join JupyterHub on Zulip chat!",
-    "author": "Sarah Gibson",
-    "author_url": "https://medium.com/@drsarahlgibson",
+    "authors": [
+      {
+        "name": "Sarah Gibson",
+        "url": "https://medium.com/@drsarahlgibson"
+      }
+    ],
     "date": "2025-02-06T16:05:20Z",
     "updated": "2025-02-06T16:05:20Z",
     "original_url": "https://blog.jupyter.org/join-jupyterhub-on-zulip-chat-4c17491bd96d",
@@ -1415,8 +1635,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-call-february-2025-163de1701169": {
     "title": "Jupyter Community Call: February 2025",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2025-01-30T22:59:06Z",
     "updated": "2025-01-31T17:37:30Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-call-february-2025-163de1701169",
@@ -1435,8 +1659,12 @@
   },
   "https://blog.jupyter.org/introducing-notebook-intelligence-3648c306b91a": {
     "title": "Introducing Notebook Intelligence!",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2025-01-13T16:28:57Z",
     "updated": "2025-01-13T16:28:57Z",
     "original_url": "https://blog.jupyter.org/introducing-notebook-intelligence-3648c306b91a",
@@ -1471,8 +1699,12 @@
   },
   "https://blog.jupyter.org/build-your-jupyter-dashboard-using-solara-569fa5b16e9c": {
     "title": "Build your Jupyter dashboard using Solara",
-    "author": "Maarten Breddels",
-    "author_url": "https://medium.com/@maartenbreddels",
+    "authors": [
+      {
+        "name": "Maarten Breddels",
+        "url": "https://medium.com/@maartenbreddels"
+      }
+    ],
     "date": "2024-12-17T10:26:00Z",
     "updated": "2024-12-18T08:06:33Z",
     "original_url": "https://blog.jupyter.org/build-your-jupyter-dashboard-using-solara-569fa5b16e9c",
@@ -1502,8 +1734,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-3-and-notebook-7-3-are-available-eaaa7227d61b": {
     "title": "JupyterLab 4.3 and Notebook 7.3 are available!",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2024-12-05T22:41:26Z",
     "updated": "2024-12-05T22:41:26Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-3-and-notebook-7-3-are-available-eaaa7227d61b",
@@ -1529,8 +1765,12 @@
   },
   "https://blog.jupyter.org/jupyterlite-terminal-edb3f80dc1c0": {
     "title": "JupyterLite Terminal",
-    "author": "Ian Thomas",
-    "author_url": "https://medium.com/@ianthomas23",
+    "authors": [
+      {
+        "name": "Ian Thomas",
+        "url": "https://medium.com/@ianthomas23"
+      }
+    ],
     "date": "2024-11-13T19:37:04Z",
     "updated": "2024-11-13T19:37:04Z",
     "original_url": "https://blog.jupyter.org/jupyterlite-terminal-edb3f80dc1c0",
@@ -1558,8 +1798,12 @@
   },
   "https://blog.jupyter.org/november-2024-jupyter-community-call-f5d0761c67a1": {
     "title": "November 2024 Jupyter Community Call",
-    "author": "Jason Weill",
-    "author_url": "https://medium.com/@JasonWeill",
+    "authors": [
+      {
+        "name": "Jason Weill",
+        "url": "https://medium.com/@JasonWeill"
+      }
+    ],
     "date": "2024-10-21T20:12:57Z",
     "updated": "2024-11-12T19:22:51Z",
     "original_url": "https://blog.jupyter.org/november-2024-jupyter-community-call-f5d0761c67a1",
@@ -1578,8 +1822,12 @@
   },
   "https://blog.jupyter.org/automate-your-releases-with-the-jupyter-releaser-701e7b9841e6": {
     "title": "Automate your releases with the Jupyter Releaser 🚀",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2024-10-28T18:09:15Z",
     "updated": "2024-10-28T18:09:15Z",
     "original_url": "https://blog.jupyter.org/automate-your-releases-with-the-jupyter-releaser-701e7b9841e6",
@@ -1603,8 +1851,12 @@
   },
   "https://blog.jupyter.org/project-jupyter-joins-lf-charities-6daa30a46dab": {
     "title": "Project Jupyter joins LF Charities",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2024-10-23T19:00:22.853Z",
     "updated": "2024-10-23T19:00:22Z",
     "original_url": "https://blog.jupyter.org/project-jupyter-joins-lf-charities-6daa30a46dab",
@@ -1626,8 +1878,12 @@
   },
   "https://blog.jupyter.org/exploring-a-documents-timeline-in-jupyterlab-6084f96db263": {
     "title": "Exploring a Document’s Timeline in JupyterLab",
-    "author": "Meriembenismail",
-    "author_url": "https://medium.com/@meriembenismail867",
+    "authors": [
+      {
+        "name": "Meriembenismail",
+        "url": "https://medium.com/@meriembenismail867"
+      }
+    ],
     "date": "2024-09-13T19:15:26Z",
     "updated": "2024-09-13T19:15:26Z",
     "original_url": "https://blog.jupyter.org/exploring-a-documents-timeline-in-jupyterlab-6084f96db263",
@@ -1650,8 +1906,12 @@
   },
   "https://blog.jupyter.org/interactive-mapping-with-ipyopenlayers-2b8bc93bb6c4": {
     "title": "Interactive Mapping with ipyopenlayers",
-    "author": "Cheour Nour",
-    "author_url": "https://medium.com/@cheour.nour",
+    "authors": [
+      {
+        "name": "Cheour Nour",
+        "url": "https://medium.com/@cheour.nour"
+      }
+    ],
     "date": "2024-09-05T15:30:36Z",
     "updated": "2024-09-05T15:30:36Z",
     "original_url": "https://blog.jupyter.org/interactive-mapping-with-ipyopenlayers-2b8bc93bb6c4",
@@ -1679,8 +1939,12 @@
   },
   "https://blog.jupyter.org/announcing-the-2023-jupyter-distinguished-contributor-award-recipients-1b2cc4ba203f": {
     "title": "Announcing the 2023 Jupyter Distinguished Contributor Award Recipients",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2024-09-04T16:46:35Z",
     "updated": "2024-09-04T16:46:35Z",
     "original_url": "https://blog.jupyter.org/announcing-the-2023-jupyter-distinguished-contributor-award-recipients-1b2cc4ba203f",
@@ -1701,8 +1965,12 @@
   },
   "https://blog.jupyter.org/binderhub-is-out-of-beta-fa2781a229d6": {
     "title": "BinderHub is out of Beta!",
-    "author": "Tim Head",
-    "author_url": "https://medium.com/@betatim",
+    "authors": [
+      {
+        "name": "Tim Head",
+        "url": "https://medium.com/@betatim"
+      }
+    ],
     "date": "2019-04-26T16:49:14Z",
     "updated": "2019-04-26T18:41:38Z",
     "original_url": "https://blog.jupyter.org/binderhub-is-out-of-beta-fa2781a229d6",
@@ -1725,8 +1993,12 @@
   },
   "https://blog.jupyter.org/mybinder-org-serves-two-million-launches-7543ae498a2a": {
     "title": "MyBinder.org serves two million launches",
-    "author": "Tim Head",
-    "author_url": "https://medium.com/@betatim",
+    "authors": [
+      {
+        "name": "Tim Head",
+        "url": "https://medium.com/@betatim"
+      }
+    ],
     "date": "2018-11-13T12:35:21Z",
     "updated": "2018-11-13T12:35:21Z",
     "original_url": "https://blog.jupyter.org/mybinder-org-serves-two-million-launches-7543ae498a2a",
@@ -1750,8 +2022,12 @@
   },
   "https://blog.jupyter.org/automating-mybinder-org-dependency-upgrades-in-10-steps-bb5e38542059": {
     "title": "How we automated mybinder.org dependency upgrades in 10 steps",
-    "author": "Chris Hench",
-    "author_url": "https://medium.com/@chris.l.hench",
+    "authors": [
+      {
+        "name": "Chris Hench",
+        "url": "https://medium.com/@chris.l.hench"
+      }
+    ],
     "date": "2019-07-17T15:34:43Z",
     "updated": "2019-07-17T15:34:43Z",
     "original_url": "https://blog.jupyter.org/automating-mybinder-org-dependency-upgrades-in-10-steps-bb5e38542059",
@@ -1776,8 +2052,12 @@
   },
   "https://blog.jupyter.org/community-building-report-project-jupyter-5a0fd7c8b08d": {
     "title": "Community Building Report: Project Jupyter",
-    "author": "Ana Ruvalcaba",
-    "author_url": "https://medium.com/@Ruv7",
+    "authors": [
+      {
+        "name": "Ana Ruvalcaba",
+        "url": "https://medium.com/@Ruv7"
+      }
+    ],
     "date": "2024-08-29T19:21:26Z",
     "updated": "2024-08-29T19:21:26Z",
     "original_url": "https://blog.jupyter.org/community-building-report-project-jupyter-5a0fd7c8b08d",
@@ -1798,8 +2078,12 @@
   },
   "https://blog.jupyter.org/ipydatagrid-is-now-part-of-project-jupyter-3b3dfb877664": {
     "title": "ipydatagrid is now part of Project Jupyter",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2024-08-22T15:01:42Z",
     "updated": "2024-08-22T15:01:42Z",
     "original_url": "https://blog.jupyter.org/ipydatagrid-is-now-part-of-project-jupyter-3b3dfb877664",
@@ -1824,8 +2108,12 @@
   },
   "https://blog.jupyter.org/ipywidgets-5-0-895e98da83a": {
     "title": "ipywidgets 5.0",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-04-23T02:48:01.000Z",
     "updated": "2017-08-28T18:21:25Z",
     "original_url": "https://blog.jupyter.org/ipywidgets-5-0-895e98da83a",
@@ -1845,8 +2133,12 @@
   },
   "https://blog.jupyter.org/jupyter-recognized-as-champion-of-open-science-by-u-s-white-house-fcb0018f8efa": {
     "title": "Jupyter recognized as “Champion of Open Science” by U.S. White House",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2024-05-07T20:51:42.853Z",
     "updated": "2024-07-09T16:36:42Z",
     "original_url": "https://blog.jupyter.org/jupyter-recognized-as-champion-of-open-science-by-u-s-white-house-fcb0018f8efa",
@@ -1865,8 +2157,12 @@
   },
   "https://blog.jupyter.org/ipython-3-2-released-6072cabb82cc": {
     "title": "IPython 3.2 released",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-06-23T01:11:12.000Z",
     "updated": "2017-08-28T19:19:27Z",
     "original_url": "https://blog.jupyter.org/ipython-3-2-released-6072cabb82cc",
@@ -1888,8 +2184,12 @@
   },
   "https://blog.jupyter.org/release-of-ipython-5-5-and-6-2-158537648393": {
     "title": "Release of IPython 5.5 and 6.2",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2017-09-15T18:42:51.052Z",
     "updated": "2017-09-15T18:42:51Z",
     "original_url": "https://blog.jupyter.org/release-of-ipython-5-5-and-6-2-158537648393",
@@ -1909,8 +2209,12 @@
   },
   "https://blog.jupyter.org/jupytergis-d63b7adf9d0c": {
     "title": "JupyterGIS",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2024-06-12T17:09:25Z",
     "updated": "2024-06-12T17:09:25Z",
     "original_url": "https://blog.jupyter.org/jupytergis-d63b7adf9d0c",
@@ -1934,8 +2238,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-2-and-notebook-7-2-are-available-b5e6b3c753de": {
     "title": "JupyterLab 4.2 and Notebook 7.2 are available!",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2024-05-22T21:00:49Z",
     "updated": "2024-05-22T21:03:06Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-2-and-notebook-7-2-are-available-b5e6b3c753de",
@@ -1961,8 +2269,12 @@
   },
   "https://blog.jupyter.org/cuda-enabled-jupyter-docker-images-8a9f8b8f2158": {
     "title": "CUDA enabled Jupyter Docker Images",
-    "author": "Ayaz Salikhov",
-    "author_url": "https://medium.com/@mathbunnyru",
+    "authors": [
+      {
+        "name": "Ayaz Salikhov",
+        "url": "https://medium.com/@mathbunnyru"
+      }
+    ],
     "date": "2024-04-16T22:08:56Z",
     "updated": "2024-04-17T09:01:21Z",
     "original_url": "https://blog.jupyter.org/cuda-enabled-jupyter-docker-images-8a9f8b8f2158",
@@ -1982,8 +2294,12 @@
   },
   "https://blog.jupyter.org/make-your-pandas-or-polars-dataframes-interactive-with-itables-2-0-c64e75468fe6": {
     "title": "Make your Pandas or Polars DataFrames Interactive with ITables 2.0",
-    "author": "Marc Wouts",
-    "author_url": "https://medium.com/@marc-wouts",
+    "authors": [
+      {
+        "name": "Marc Wouts",
+        "url": "https://medium.com/@marc-wouts"
+      }
+    ],
     "date": "2024-03-19T18:39:46Z",
     "updated": "2024-03-19T18:39:46Z",
     "original_url": "https://blog.jupyter.org/make-your-pandas-or-polars-dataframes-interactive-with-itables-2-0-c64e75468fe6",
@@ -2007,8 +2323,12 @@
   },
   "https://blog.jupyter.org/security-release-jupyter-notebook-4-3-1-808e1f3bb5e2": {
     "title": "Security release: Jupyter Notebook 4.3.1",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-12-22T02:25:40.000Z",
     "updated": "2017-08-28T18:20:32Z",
     "original_url": "https://blog.jupyter.org/security-release-jupyter-notebook-4-3-1-808e1f3bb5e2",
@@ -2031,8 +2351,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-desktop-ui-modes-cec528d5e460": {
     "title": "JupyterLab Desktop UI Modes",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2024-03-11T21:09:05Z",
     "updated": "2024-03-11T21:09:05Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-desktop-ui-modes-cec528d5e460",
@@ -2058,8 +2382,12 @@
   },
   "https://blog.jupyter.org/python-environment-management-using-jupyterlab-desktop-cli-e57485c9287c": {
     "title": "Python environment management using JupyterLab Desktop CLI",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2024-03-01T20:41:43Z",
     "updated": "2024-03-01T20:41:43Z",
     "original_url": "https://blog.jupyter.org/python-environment-management-using-jupyterlab-desktop-cli-e57485c9287c",
@@ -2084,8 +2412,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-1-and-notebook-7-1-are-here-20bfc3c10217": {
     "title": "JupyterLab 4.1 and Notebook 7.1 are here 🎉",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2024-02-26T22:57:05.464Z",
     "updated": "2024-02-28T17:47:02Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-1-and-notebook-7-1-are-here-20bfc3c10217",
@@ -2113,8 +2445,12 @@
   },
   "https://blog.jupyter.org/curvenote-joins-the-mybinder-org-federation-76fc575e9898": {
     "title": "Curvenote joins the mybinder.org federation",
-    "author": "Steve Purves",
-    "author_url": "https://medium.com/@stevejamespurves",
+    "authors": [
+      {
+        "name": "Steve Purves",
+        "url": "https://medium.com/@stevejamespurves"
+      }
+    ],
     "date": "2024-02-22T16:19:37Z",
     "updated": "2024-02-22T16:19:37Z",
     "original_url": "https://blog.jupyter.org/curvenote-joins-the-mybinder-org-federation-76fc575e9898",
@@ -2136,8 +2472,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-3-end-of-maintenance-879778927db2": {
     "title": "JupyterLab 3 end of maintenance",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2024-02-19T22:07:30.334Z",
     "updated": "2024-02-19T22:07:30Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-3-end-of-maintenance-879778927db2",
@@ -2157,8 +2497,12 @@
   },
   "https://blog.jupyter.org/python-environment-management-in-jupyterlab-desktop-3b119c5811d9": {
     "title": "Python environment management in JupyterLab Desktop",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2024-02-19T22:26:39Z",
     "updated": "2024-02-19T22:26:39Z",
     "original_url": "https://blog.jupyter.org/python-environment-management-in-jupyterlab-desktop-3b119c5811d9",
@@ -2190,8 +2534,12 @@
   },
   "https://blog.jupyter.org/bringing-modern-javascript-to-the-jupyter-notebook-fc998095081e": {
     "title": "Bringing Modern JavaScript to the Jupyter Notebook",
-    "author": "Kyle Kelley",
-    "author_url": "https://medium.com/@rgbkrk",
+    "authors": [
+      {
+        "name": "Kyle Kelley",
+        "url": "https://medium.com/@rgbkrk"
+      }
+    ],
     "date": "2023-09-24T03:34:13Z",
     "updated": "2024-02-13T16:02:44Z",
     "original_url": "https://blog.jupyter.org/bringing-modern-javascript-to-the-jupyter-notebook-fc998095081e",
@@ -2219,8 +2567,12 @@
   },
   "https://blog.jupyter.org/the-jupytext-menu-is-back-3e6212e8c090": {
     "title": "The Jupytext Menu is back!",
-    "author": "Marc Wouts",
-    "author_url": "https://medium.com/@marc-wouts",
+    "authors": [
+      {
+        "name": "Marc Wouts",
+        "url": "https://medium.com/@marc-wouts"
+      }
+    ],
     "date": "2024-01-31T20:29:55Z",
     "updated": "2024-01-31T20:29:55Z",
     "original_url": "https://blog.jupyter.org/the-jupytext-menu-is-back-3e6212e8c090",
@@ -2247,8 +2599,12 @@
   },
   "https://blog.jupyter.org/meet-xeus-r-a-future-proof-jupyter-kernel-for-r-1adc5fdd09ab": {
     "title": "Meet Xeus-R: a future-proof Jupyter kernel for R",
-    "author": "Romain François",
-    "author_url": "https://medium.com/@romain.r.francois",
+    "authors": [
+      {
+        "name": "Romain François",
+        "url": "https://medium.com/@romain.r.francois"
+      }
+    ],
     "date": "2024-01-22T17:20:06Z",
     "updated": "2024-01-22T17:20:06Z",
     "original_url": "https://blog.jupyter.org/meet-xeus-r-a-future-proof-jupyter-kernel-for-r-1adc5fdd09ab",
@@ -2276,8 +2632,12 @@
   },
   "https://blog.jupyter.org/jupyter-media-strategy-social-media-update-e4d6171b0580": {
     "title": "Jupyter Media Strategy & Social Media Update",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2024-01-10T21:00:58.366Z",
     "updated": "2024-01-10T22:04:25Z",
     "original_url": "https://blog.jupyter.org/jupyter-media-strategy-social-media-update-e4d6171b0580",
@@ -2299,8 +2659,12 @@
   },
   "https://blog.jupyter.org/recent-keyboard-navigation-improvements-in-jupyter-4df32f97628d": {
     "title": "Recent keyboard navigation improvements in Jupyter",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2023-12-16T09:48:35.856Z",
     "updated": "2023-12-16T09:48:35Z",
     "original_url": "https://blog.jupyter.org/recent-keyboard-navigation-improvements-in-jupyter-4df32f97628d",
@@ -2320,8 +2684,12 @@
   },
   "https://blog.jupyter.org/open-community-call-b93d44fc5856": {
     "title": "Open Community Call",
-    "author": "Eric Gentry",
-    "author_url": "https://medium.com/@egentry_3200",
+    "authors": [
+      {
+        "name": "Eric Gentry",
+        "url": "https://medium.com/@egentry_3200"
+      }
+    ],
     "date": "2023-12-08T19:48:57Z",
     "updated": "2023-12-08T19:48:57Z",
     "original_url": "https://blog.jupyter.org/open-community-call-b93d44fc5856",
@@ -2341,8 +2709,12 @@
   },
   "https://blog.jupyter.org/and-voici-e02367197ba2": {
     "title": "And Voici!",
-    "author": "Duc Trung Le",
-    "author_url": "https://medium.com/@trungleduc",
+    "authors": [
+      {
+        "name": "Duc Trung Le",
+        "url": "https://medium.com/@trungleduc"
+      }
+    ],
     "date": "2023-12-06T15:21:05Z",
     "updated": "2023-12-06T15:21:05Z",
     "original_url": "https://blog.jupyter.org/and-voici-e02367197ba2",
@@ -2369,8 +2741,12 @@
   },
   "https://blog.jupyter.org/project-jupyter-computatio-nalnarratives-as-the-engine-of-collaborative-data-science-2b5fb94c3c58": {
     "title": "Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-07-08T01:45:28.000Z",
     "updated": "2023-08-12T20:54:50Z",
     "original_url": "https://blog.jupyter.org/project-jupyter-computatio-nalnarratives-as-the-engine-of-collaborative-data-science-2b5fb94c3c58",
@@ -2389,8 +2765,12 @@
   },
   "https://blog.jupyter.org/plug-your-application-into-the-jupyter-world-805e48918801": {
     "title": "Plug your application into the Jupyter world",
-    "author": "David Brochart",
-    "author_url": "https://medium.com/@david-brochart",
+    "authors": [
+      {
+        "name": "David Brochart",
+        "url": "https://medium.com/@david-brochart"
+      }
+    ],
     "date": "2023-10-23T06:09:52Z",
     "updated": "2023-10-23T06:09:52Z",
     "original_url": "https://blog.jupyter.org/plug-your-application-into-the-jupyter-world-805e48918801",
@@ -2416,8 +2796,12 @@
   },
   "https://blog.jupyter.org/voilà-0-5-0-homecoming-66f2465aa86f": {
     "title": "Voilà 0.5.0 : Homecoming",
-    "author": "Duc Trung Le",
-    "author_url": "https://medium.com/@trungleduc",
+    "authors": [
+      {
+        "name": "Duc Trung Le",
+        "url": "https://medium.com/@trungleduc"
+      }
+    ],
     "date": "2023-09-25T14:54:53Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/voilà-0-5-0-homecoming-66f2465aa86f",
@@ -2445,8 +2829,12 @@
   },
   "https://blog.jupyter.org/generative-ai-in-jupyter-3f7174824862": {
     "title": "Generative AI in Jupyter",
-    "author": "Jason Weill",
-    "author_url": "https://medium.com/@JasonWeill",
+    "authors": [
+      {
+        "name": "Jason Weill",
+        "url": "https://medium.com/@JasonWeill"
+      }
+    ],
     "date": "2023-08-02T16:15:31Z",
     "updated": "2023-08-16T00:33:46Z",
     "original_url": "https://blog.jupyter.org/generative-ai-in-jupyter-3f7174824862",
@@ -2485,8 +2873,12 @@
   },
   "https://blog.jupyter.org/desktop-gis-software-in-the-cloud-with-jupyterhub-ddced297019a": {
     "title": "Desktop GIS software in the cloud with JupyterHub: A QGreenland workshop success story",
-    "author": "Matt Fisher",
-    "author_url": "https://medium.com/@mattfisher87",
+    "authors": [
+      {
+        "name": "Matt Fisher",
+        "url": "https://medium.com/@mattfisher87"
+      }
+    ],
     "date": "2023-08-02T16:23:51Z",
     "updated": "2023-08-02T16:51:58Z",
     "original_url": "https://blog.jupyter.org/desktop-gis-software-in-the-cloud-with-jupyterhub-ddced297019a",
@@ -2515,8 +2907,12 @@
   },
   "https://blog.jupyter.org/announcing-jupyter-notebook-7-8d6d66126dcf": {
     "title": "Announcing Jupyter Notebook 7",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2023-07-26T16:08:13.680Z",
     "updated": "2023-07-28T21:24:56Z",
     "original_url": "https://blog.jupyter.org/announcing-jupyter-notebook-7-8d6d66126dcf",
@@ -2542,8 +2938,12 @@
   },
   "https://blog.jupyter.org/european-commission-funds-jupyter-bug-bounty-program-b7b96f9831e6": {
     "title": "European Commission Funds Jupyter Bug Bounty Program",
-    "author": "Rick Wagner",
-    "author_url": "https://medium.com/@rpwagner",
+    "authors": [
+      {
+        "name": "Rick Wagner",
+        "url": "https://medium.com/@rpwagner"
+      }
+    ],
     "date": "2023-07-28T19:46:47Z",
     "updated": "2023-07-28T19:46:47Z",
     "original_url": "https://blog.jupyter.org/european-commission-funds-jupyter-bug-bounty-program-b7b96f9831e6",
@@ -2565,8 +2965,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2023-recordings-now-live-on-youtube-17564b75a2a": {
     "title": "🎉 JupyterCon 2023 recordings now live on YouTube! 🎉",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2023-07-22T21:14:07.534Z",
     "updated": "2023-07-22T21:16:24Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2023-recordings-now-live-on-youtube-17564b75a2a",
@@ -2588,8 +2992,12 @@
   },
   "https://blog.jupyter.org/anywidget-jupyter-widgets-made-easy-164eb2eae102": {
     "title": "anywidget: Jupyter Widgets Made Easy",
-    "author": "Trevor Manz",
-    "author_url": "https://medium.com/@manzt",
+    "authors": [
+      {
+        "name": "Trevor Manz",
+        "url": "https://medium.com/@manzt"
+      }
+    ],
     "date": "2023-07-11T23:09:51Z",
     "updated": "2023-07-11T23:09:51Z",
     "original_url": "https://blog.jupyter.org/anywidget-jupyter-widgets-made-easy-164eb2eae102",
@@ -2620,8 +3028,12 @@
   },
   "https://blog.jupyter.org/nbviewer-and-githubs-rate-limit-e5f544bf81b6": {
     "title": "nbviewer and GitHub’s rate limit",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-03-01T07:45:23.000Z",
     "updated": "2017-09-25T09:25:12Z",
     "original_url": "https://blog.jupyter.org/nbviewer-and-githubs-rate-limit-e5f544bf81b6",
@@ -2647,8 +3059,12 @@
   },
   "https://blog.jupyter.org/introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes-b79bfd18566d": {
     "title": "Introducing the Helm Chart for JupyterHub Deployment with Kubernetes",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-06-29T23:21:51.000Z",
     "updated": "2017-08-28T18:20:33Z",
     "original_url": "https://blog.jupyter.org/introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes-b79bfd18566d",
@@ -2668,8 +3084,12 @@
   },
   "https://blog.jupyter.org/a-theme-editor-for-jupyterlab-8f08ab62894d": {
     "title": "A theme editor for JupyterLab",
-    "author": "Florence Haudin",
-    "author_url": "https://medium.com/@florence.haudin",
+    "authors": [
+      {
+        "name": "Florence Haudin",
+        "url": "https://medium.com/@florence.haudin"
+      }
+    ],
     "date": "2023-06-19T08:11:31Z",
     "updated": "2023-06-19T08:11:31Z",
     "original_url": "https://blog.jupyter.org/a-theme-editor-for-jupyterlab-8f08ab62894d",
@@ -2694,8 +3114,12 @@
   },
   "https://blog.jupyter.org/from-intern-to-mentor-6055df406999": {
     "title": "From intern to mentor",
-    "author": "Georgiana Dolocan",
-    "author_url": "https://medium.com/@georgiana.dolocan",
+    "authors": [
+      {
+        "name": "Georgiana Dolocan",
+        "url": "https://medium.com/@georgiana.dolocan"
+      }
+    ],
     "date": "2023-06-19T08:02:03Z",
     "updated": "2023-06-19T08:02:03Z",
     "original_url": "https://blog.jupyter.org/from-intern-to-mentor-6055df406999",
@@ -2716,8 +3140,12 @@
   },
   "https://blog.jupyter.org/collaborative-cad-in-jupyterlab-8eb9e8f81f0": {
     "title": "Collaborative CAD in JupyterLab",
-    "author": "Duc Trung Le",
-    "author_url": "https://medium.com/@trungleduc",
+    "authors": [
+      {
+        "name": "Duc Trung Le",
+        "url": "https://medium.com/@trungleduc"
+      }
+    ],
     "date": "2023-06-02T15:15:36Z",
     "updated": "2023-06-16T14:55:59Z",
     "original_url": "https://blog.jupyter.org/collaborative-cad-in-jupyterlab-8eb9e8f81f0",
@@ -2749,8 +3177,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-4-0-is-here-388d05e03442": {
     "title": "JupyterLab 4.0 is Here",
-    "author": "Jason Weill",
-    "author_url": "https://medium.com/@JasonWeill",
+    "authors": [
+      {
+        "name": "Jason Weill",
+        "url": "https://medium.com/@JasonWeill"
+      }
+    ],
     "date": "2023-06-05T20:04:00Z",
     "updated": "2023-06-05T21:25:08Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-4-0-is-here-388d05e03442",
@@ -2774,8 +3206,12 @@
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-7a7b215b8bd0": {
     "title": "Congratulations, Distinguished Contributors!",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2023-06-02T12:41:24Z",
     "updated": "2023-06-02T12:41:24Z",
     "original_url": "https://blog.jupyter.org/congratulations-distinguished-contributors-7a7b215b8bd0",
@@ -2805,8 +3241,12 @@
   },
   "https://blog.jupyter.org/a-2019-retrospective-from-the-binder-project-57a449517362": {
     "title": "A 2019 retrospective from the Binder Project",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2020-01-15T17:48:07.051Z",
     "updated": "2020-01-15T18:10:49Z",
     "original_url": "https://blog.jupyter.org/a-2019-retrospective-from-the-binder-project-57a449517362",
@@ -2834,8 +3274,12 @@
   },
   "https://blog.jupyter.org/introducing-learn-python-with-jupyter-11214f152159": {
     "title": "Introducing “Learn Python with Jupyter”",
-    "author": "Serena Bonaretti",
-    "author_url": "https://medium.com/@serena.bonaretti",
+    "authors": [
+      {
+        "name": "Serena Bonaretti",
+        "url": "https://medium.com/@serena.bonaretti"
+      }
+    ],
     "date": "2023-04-28T06:14:59Z",
     "updated": "2023-04-28T06:14:59Z",
     "original_url": "https://blog.jupyter.org/introducing-learn-python-with-jupyter-11214f152159",
@@ -2856,8 +3300,12 @@
   },
   "https://blog.jupyter.org/mybinder-org-reducing-capacity-c93ccfc6413f": {
     "title": "Mybinder.org reducing capacity",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2023-04-25T07:28:45Z",
     "updated": "2023-04-27T20:16:20Z",
     "original_url": "https://blog.jupyter.org/mybinder-org-reducing-capacity-c93ccfc6413f",
@@ -2876,8 +3324,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-format-workshop-outcomes-c45faf113018": {
     "title": "Jupyter Notebook format workshop outcomes",
-    "author": "Frédéric Collonval",
-    "author_url": "https://medium.com/@fcollonval",
+    "authors": [
+      {
+        "name": "Frédéric Collonval",
+        "url": "https://medium.com/@fcollonval"
+      }
+    ],
     "date": "2023-04-12T17:40:58Z",
     "updated": "2023-04-12T17:40:58Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-format-workshop-outcomes-c45faf113018",
@@ -2901,8 +3353,12 @@
   },
   "https://blog.jupyter.org/accurately-counting-daily-weekly-monthly-active-users-on-jupyterhub-6fbec6c6ce2f": {
     "title": "Accurately counting Daily, Weekly & Monthly active users on JupyterHub",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2023-03-27T09:16:41Z",
     "updated": "2023-03-27T09:16:41Z",
     "original_url": "https://blog.jupyter.org/accurately-counting-daily-weekly-monthly-active-users-on-jupyterhub-6fbec6c6ce2f",
@@ -2924,8 +3380,12 @@
   },
   "https://blog.jupyter.org/embed-interactive-itkwidgets-3d-renderings-into-jupyterlite-deployments-10eb9ea30980": {
     "title": "Embed interactive itkwidgets 3D renderings into JupyterLite deployments",
-    "author": "Matt McCormick @thewtex@fosstodon.org",
-    "author_url": "https://medium.com/@thewtex",
+    "authors": [
+      {
+        "name": "Matt McCormick @thewtex@fosstodon.org",
+        "url": "https://medium.com/@thewtex"
+      }
+    ],
     "date": "2023-03-10T14:04:59Z",
     "updated": "2023-03-15T10:27:57Z",
     "original_url": "https://blog.jupyter.org/embed-interactive-itkwidgets-3d-renderings-into-jupyterlite-deployments-10eb9ea30980",
@@ -2947,8 +3407,12 @@
   },
   "https://blog.jupyter.org/updating-defaults-on-mybinder-org-4df41d601955": {
     "title": "Updating defaults on mybinder.org",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2023-03-09T08:31:16Z",
     "updated": "2023-03-10T15:53:26Z",
     "original_url": "https://blog.jupyter.org/updating-defaults-on-mybinder-org-4df41d601955",
@@ -2972,8 +3436,12 @@
   },
   "https://blog.jupyter.org/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15": {
     "title": "Online Collaboration Café launch: JupyterHub team meetings to become more collaborative spaces!",
-    "author": "Sarah Gibson",
-    "author_url": "https://medium.com/@drsarahlgibson",
+    "authors": [
+      {
+        "name": "Sarah Gibson",
+        "url": "https://medium.com/@drsarahlgibson"
+      }
+    ],
     "date": "2023-02-27T08:49:46Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/online-collaboration-café-launch-jupyterhub-team-meetings-to-become-more-collaborative-spaces-b713edadf15",
@@ -2996,8 +3464,12 @@
   },
   "https://blog.jupyter.org/improving-the-accessibility-of-jupyter-6c695db518d3": {
     "title": "Improving the accessibility of Jupyter",
-    "author": "QuantStack",
-    "author_url": "https://medium.com/@QuantStack",
+    "authors": [
+      {
+        "name": "QuantStack",
+        "url": "https://medium.com/@QuantStack"
+      }
+    ],
     "date": "2023-02-24T11:11:47Z",
     "updated": "2023-02-24T11:11:47Z",
     "original_url": "https://blog.jupyter.org/improving-the-accessibility-of-jupyter-6c695db518d3",
@@ -3019,8 +3491,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-have-opened-c1bae085125a": {
     "title": "JupyterCon 2023 is just around the corner, and it promises to be an exciting and action-packed…",
-    "author": "Gayle Ollington",
-    "author_url": "https://medium.com/@gayle_ollington",
+    "authors": [
+      {
+        "name": "Gayle Ollington",
+        "url": "https://medium.com/@gayle_ollington"
+      }
+    ],
     "date": "2023-02-09T23:43:33Z",
     "updated": "2023-02-09T23:43:33Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-have-opened-c1bae085125a",
@@ -3044,8 +3520,12 @@
   },
   "https://blog.jupyter.org/introducing-the-new-jupyterlab-desktop-bca1982bdb23": {
     "title": "Introducing the new JupyterLab Desktop!",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2023-02-09T10:21:21Z",
     "updated": "2023-02-09T10:21:21Z",
     "original_url": "https://blog.jupyter.org/introducing-the-new-jupyterlab-desktop-bca1982bdb23",
@@ -3080,8 +3560,12 @@
   },
   "https://blog.jupyter.org/introducing-jupyter-scheduler-f9e82676c388": {
     "title": "Introducing Jupyter Scheduler",
-    "author": "Jason Weill",
-    "author_url": "https://medium.com/@JasonWeill",
+    "authors": [
+      {
+        "name": "Jason Weill",
+        "url": "https://medium.com/@JasonWeill"
+      }
+    ],
     "date": "2022-12-14T15:26:59Z",
     "updated": "2023-02-01T18:20:27Z",
     "original_url": "https://blog.jupyter.org/introducing-jupyter-scheduler-f9e82676c388",
@@ -3115,8 +3599,12 @@
   },
   "https://blog.jupyter.org/report-on-the-jupyterlite-community-workshop-aafaefe254ef": {
     "title": "Report on the JupyterLite Community Workshop 💡",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2023-01-27T13:06:03Z",
     "updated": "2023-01-27T13:30:08Z",
     "original_url": "https://blog.jupyter.org/report-on-the-jupyterlite-community-workshop-aafaefe254ef",
@@ -3141,8 +3629,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2023-keynotes-c6b5d3d964e5": {
     "title": "JupyterCon 2023 keynotes",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2023-01-18T20:39:44Z",
     "updated": "2023-01-18T20:39:44Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2023-keynotes-c6b5d3d964e5",
@@ -3165,8 +3657,12 @@
   },
   "https://blog.jupyter.org/announcing-a-new-jupyter-governance-model-and-our-first-executive-council-39b3989dc064": {
     "title": "Announcing a New Jupyter Governance Model and Our First Executive Council",
-    "author": "Jason Weill",
-    "author_url": "https://medium.com/@JasonWeill",
+    "authors": [
+      {
+        "name": "Jason Weill",
+        "url": "https://medium.com/@JasonWeill"
+      }
+    ],
     "date": "2023-01-13T21:08:32Z",
     "updated": "2023-01-13T21:08:32Z",
     "original_url": "https://blog.jupyter.org/announcing-a-new-jupyter-governance-model-and-our-first-executive-council-39b3989dc064",
@@ -3187,8 +3683,12 @@
   },
   "https://blog.jupyter.org/a-jupyter-kernel-for-gnu-octave-b6d29e56341f": {
     "title": "A Jupyter kernel for GNU Octave",
-    "author": "Giulio Girardi",
-    "author_url": "https://medium.com/@rapgenic",
+    "authors": [
+      {
+        "name": "Giulio Girardi",
+        "url": "https://medium.com/@rapgenic"
+      }
+    ],
     "date": "2023-01-11T17:33:37Z",
     "updated": "2023-01-11T17:33:37Z",
     "original_url": "https://blog.jupyter.org/a-jupyter-kernel-for-gnu-octave-b6d29e56341f",
@@ -3219,8 +3719,12 @@
   },
   "https://blog.jupyter.org/an-sql-solution-for-jupyter-ef4a00a0d925": {
     "title": "An SQL solution for Jupyter",
-    "author": "Mariana Meireles",
-    "author_url": "https://medium.com/@mari-meir",
+    "authors": [
+      {
+        "name": "Mariana Meireles",
+        "url": "https://medium.com/@mari-meir"
+      }
+    ],
     "date": "2021-02-03T12:03:43Z",
     "updated": "2023-01-10T18:33:36Z",
     "original_url": "https://blog.jupyter.org/an-sql-solution-for-jupyter-ef4a00a0d925",
@@ -3246,8 +3750,12 @@
   },
   "https://blog.jupyter.org/openness-diversity-and-dignity-a-foundation-for-global-collaboration-f7c71fba523": {
     "title": "Openness, Diversity and Dignity: a Foundation for Global Collaboration",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-01-31T12:04:00.000Z",
     "updated": "2017-08-28T18:20:38Z",
     "original_url": "https://blog.jupyter.org/openness-diversity-and-dignity-a-foundation-for-global-collaboration-f7c71fba523",
@@ -3266,8 +3774,12 @@
   },
   "https://blog.jupyter.org/jupytercon-nyc-august-22nd-25th-565dc4129835": {
     "title": "JupyterCon NYC: August 22nd-25th",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-07-14T18:56:52.000Z",
     "updated": "2017-08-28T18:36:58Z",
     "original_url": "https://blog.jupyter.org/jupytercon-nyc-august-22nd-25th-565dc4129835",
@@ -3289,8 +3801,12 @@
   },
   "https://blog.jupyter.org/voil%C3%A0-is-now-an-official-jupyter-subproject-87d659583490": {
     "title": "Voilà is now a Jupyter subproject",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2019-12-29T12:11:11Z",
     "updated": "2019-12-29T12:15:50Z",
     "original_url": "https://blog.jupyter.org/voilà-is-now-an-official-jupyter-subproject-87d659583490",
@@ -3315,8 +3831,12 @@
   },
   "https://blog.jupyter.org/elyra-reaches-1-0-0-41039dc06405": {
     "title": "Elyra reaches 1.0.0",
-    "author": "Luciano Resende",
-    "author_url": "https://medium.com/@lresende",
+    "authors": [
+      {
+        "name": "Luciano Resende",
+        "url": "https://medium.com/@lresende"
+      }
+    ],
     "date": "2020-08-10T15:55:20Z",
     "updated": "2020-08-10T15:55:20Z",
     "original_url": "https://blog.jupyter.org/elyra-reaches-1-0-0-41039dc06405",
@@ -3351,8 +3871,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-jupyter-for-education-82af9e34b510": {
     "title": "Jupyter Community Workshop: Jupyter for Education",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2022-12-05T23:37:39Z",
     "updated": "2022-12-19T11:40:48Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-jupyter-for-education-82af9e34b510",
@@ -3376,8 +3900,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-desktop-2022-recap-28bdf00205c6": {
     "title": "JupyterLab Desktop — 2022 recap",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2022-12-13T23:07:07Z",
     "updated": "2022-12-13T23:07:07Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-desktop-2022-recap-28bdf00205c6",
@@ -3404,8 +3932,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-the-notebook-file-format-8133ed606118": {
     "title": "Jupyter Community Workshop: The notebook file format",
-    "author": "Frédéric Collonval",
-    "author_url": "https://medium.com/@fcollonval",
+    "authors": [
+      {
+        "name": "Frédéric Collonval",
+        "url": "https://medium.com/@fcollonval"
+      }
+    ],
     "date": "2022-12-08T16:09:36Z",
     "updated": "2022-12-08T16:09:36Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-the-notebook-file-format-8133ed606118",
@@ -3426,8 +3958,12 @@
   },
   "https://blog.jupyter.org/introducing-jupyterhubs-outreachy-interns-december-2022-cohort-23aaf4613556": {
     "title": "Introducing JupyterHub’s Outreachy interns! — December 2022 Cohort",
-    "author": "Sarah Gibson",
-    "author_url": "https://medium.com/@drsarahlgibson",
+    "authors": [
+      {
+        "name": "Sarah Gibson",
+        "url": "https://medium.com/@drsarahlgibson"
+      }
+    ],
     "date": "2022-12-07T07:45:37Z",
     "updated": "2022-12-07T07:45:37Z",
     "original_url": "https://blog.jupyter.org/introducing-jupyterhubs-outreachy-interns-december-2022-cohort-23aaf4613556",
@@ -3451,8 +3987,12 @@
   },
   "https://blog.jupyter.org/disc-sprint-nyc-2018-548780d0f40": {
     "title": "Contribute to your first open source project",
-    "author": "Samuel Brice",
-    "author_url": "https://medium.com/@samdbrice",
+    "authors": [
+      {
+        "name": "Samuel Brice",
+        "url": "https://medium.com/@samdbrice"
+      }
+    ],
     "date": "2018-10-22T18:13:59Z",
     "updated": "2018-10-22T18:18:52Z",
     "original_url": "https://blog.jupyter.org/disc-sprint-nyc-2018-548780d0f40",
@@ -3475,8 +4015,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-5-1-0-ddc8b0d6e989": {
     "title": "Jupyter Notebook 5.1.0",
-    "author": "Grant Nestor",
-    "author_url": "https://medium.com/@senornestor",
+    "authors": [
+      {
+        "name": "Grant Nestor",
+        "url": "https://medium.com/@senornestor"
+      }
+    ],
     "date": "2017-09-15T16:49:47Z",
     "updated": "2017-09-15T16:49:47Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-5-1-0-ddc8b0d6e989",
@@ -3496,8 +4040,12 @@
   },
   "https://blog.jupyter.org/jupyter-server-2-0-is-released-121ac99e909a": {
     "title": "Jupyter Server 2.0 is released!",
-    "author": "Zach Sailer",
-    "author_url": "https://medium.com/@zachsailer",
+    "authors": [
+      {
+        "name": "Zach Sailer",
+        "url": "https://medium.com/@zachsailer"
+      }
+    ],
     "date": "2022-12-06T23:25:36Z",
     "updated": "2022-12-06T23:25:36Z",
     "original_url": "https://blog.jupyter.org/jupyter-server-2-0-is-released-121ac99e909a",
@@ -3517,8 +4065,12 @@
   },
   "https://blog.jupyter.org/jupyter-pop-up-march-21-boston-b736d842fa8f": {
     "title": "Jupyter Pop-Up, March 21, Boston",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2018-02-09T22:20:32.360Z",
     "updated": "2018-02-09T22:20:32Z",
     "original_url": "https://blog.jupyter.org/jupyter-pop-up-march-21-boston-b736d842fa8f",
@@ -3539,8 +4091,12 @@
   },
   "https://blog.jupyter.org/jupyter-conference-advisory-committee-9c096d308552": {
     "title": "Jupyter Conference Advisory Committee",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2019-02-11T16:07:46.933Z",
     "updated": "2019-02-11T16:07:46Z",
     "original_url": "https://blog.jupyter.org/jupyter-conference-advisory-committee-9c096d308552",
@@ -3559,8 +4115,12 @@
   },
   "https://blog.jupyter.org/incident-report-jupyter-services-down-f5b3888fa5c2": {
     "title": "Incident Report: Jupyter services down",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2017-12-14T19:52:41.167Z",
     "updated": "2017-12-14T20:46:30Z",
     "original_url": "https://blog.jupyter.org/incident-report-jupyter-services-down-f5b3888fa5c2",
@@ -3580,8 +4140,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebooks-for-post-election-audits-4bdd13d3e800": {
     "title": "Jupyter notebooks for post-election audits",
-    "author": "Kellie Ottoboni",
-    "author_url": "https://medium.com/@knottoboni",
+    "authors": [
+      {
+        "name": "Kellie Ottoboni",
+        "url": "https://medium.com/@knottoboni"
+      }
+    ],
     "date": "2019-01-22T16:01:00Z",
     "updated": "2019-01-22T16:01:00Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebooks-for-post-election-audits-4bdd13d3e800",
@@ -3603,8 +4167,12 @@
   },
   "https://blog.jupyter.org/report-on-the-jupyter-community-workshop-77016ab1d49b": {
     "title": "Report on the Jupyter Community Workshop",
-    "author": "Serena Bonaretti",
-    "author_url": "https://medium.com/@serena.bonaretti",
+    "authors": [
+      {
+        "name": "Serena Bonaretti",
+        "url": "https://medium.com/@serena.bonaretti"
+      }
+    ],
     "date": "2022-11-30T16:40:28Z",
     "updated": "2022-11-30T16:40:28Z",
     "original_url": "https://blog.jupyter.org/report-on-the-jupyter-community-workshop-77016ab1d49b",
@@ -3626,8 +4194,12 @@
   },
   "https://blog.jupyter.org/the-superheros-and-the-magic-wand-596acaab722a": {
     "title": "The superheroes and the magic wand",
-    "author": "Georgiana Dolocan",
-    "author_url": "https://medium.com/@georgiana.dolocan",
+    "authors": [
+      {
+        "name": "Georgiana Dolocan",
+        "url": "https://medium.com/@georgiana.dolocan"
+      }
+    ],
     "date": "2020-03-19T18:23:28Z",
     "updated": "2020-03-19T18:26:38Z",
     "original_url": "https://blog.jupyter.org/the-superheros-and-the-magic-wand-596acaab722a",
@@ -3652,8 +4224,12 @@
   },
   "https://blog.jupyter.org/juan-klopper-c33c2fd0ed36": {
     "title": "Juan Klopper",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-08-03T16:01:29Z",
     "updated": "2020-08-03T16:01:29Z",
     "original_url": "https://blog.jupyter.org/juan-klopper-c33c2fd0ed36",
@@ -3677,8 +4253,12 @@
   },
   "https://blog.jupyter.org/mybinder-ovhcloud-e2ce3d9701fc": {
     "title": "MyBinder @ OVHcloud",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2022-11-23T11:28:51Z",
     "updated": "2022-11-23T11:28:51Z",
     "original_url": "https://blog.jupyter.org/mybinder-ovhcloud-e2ce3d9701fc",
@@ -3699,8 +4279,12 @@
   },
   "https://blog.jupyter.org/community-workshop-jupyterlite-e992c61f5d7f": {
     "title": "Jupyter Community Workshop: JupyterLite",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2022-11-10T15:45:24Z",
     "updated": "2022-11-10T15:45:24Z",
     "original_url": "https://blog.jupyter.org/community-workshop-jupyterlite-e992c61f5d7f",
@@ -3725,8 +4309,12 @@
   },
   "https://blog.jupyter.org/jupytercon-is-back-in-2023-90e5c25eeec9": {
     "title": "JupyterCon is back in 2023",
-    "author": "Gayle Ollington",
-    "author_url": "https://medium.com/@gayle_ollington",
+    "authors": [
+      {
+        "name": "Gayle Ollington",
+        "url": "https://medium.com/@gayle_ollington"
+      }
+    ],
     "date": "2022-10-17T15:15:17Z",
     "updated": "2022-10-26T20:11:08Z",
     "original_url": "https://blog.jupyter.org/jupytercon-is-back-in-2023-90e5c25eeec9",
@@ -3748,8 +4336,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-update-current-round-review-and-a-sneak-peek-into-round-4-11119040c814": {
     "title": "Jupyter Community Workshops Update — Current Round Review & Sneak Peek into Round 4",
-    "author": "Gayle Ollington",
-    "author_url": "https://medium.com/@gayle_ollington",
+    "authors": [
+      {
+        "name": "Gayle Ollington",
+        "url": "https://medium.com/@gayle_ollington"
+      }
+    ],
     "date": "2022-10-12T21:45:40Z",
     "updated": "2022-10-25T20:19:32Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-update-current-round-review-and-a-sneak-peek-into-round-4-11119040c814",
@@ -3772,8 +4364,12 @@
   },
   "https://blog.jupyter.org/accelerating-jupyterlab-68942bb8d602": {
     "title": "Accelerating JupyterLab",
-    "author": "Frédéric Collonval",
-    "author_url": "https://medium.com/@fcollonval",
+    "authors": [
+      {
+        "name": "Frédéric Collonval",
+        "url": "https://medium.com/@fcollonval"
+      }
+    ],
     "date": "2022-10-10T17:38:41Z",
     "updated": "2022-10-10T17:38:41Z",
     "original_url": "https://blog.jupyter.org/accelerating-jupyterlab-68942bb8d602",
@@ -3799,8 +4395,12 @@
   },
   "https://blog.jupyter.org/lucy-dagostino-mcgowan-13adbdedccf0": {
     "title": "Lucy D’Agostino McGowan",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-08-16T20:15:18Z",
     "updated": "2020-08-16T20:25:16Z",
     "original_url": "https://blog.jupyter.org/lucy-dagostino-mcgowan-13adbdedccf0",
@@ -3823,8 +4423,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-the-future-of-jupyter-widgets-475f67288da0": {
     "title": "Jupyter Community Workshop: The Future of Jupyter Widgets",
-    "author": "Itay Dafna",
-    "author_url": "https://medium.com/@itayd",
+    "authors": [
+      {
+        "name": "Itay Dafna",
+        "url": "https://medium.com/@itayd"
+      }
+    ],
     "date": "2022-09-20T17:02:28Z",
     "updated": "2022-09-21T16:19:44Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-the-future-of-jupyter-widgets-475f67288da0",
@@ -3847,8 +4451,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-6-5-0-release-candidate-4c229c6dab55": {
     "title": "Jupyter Notebook 6.5.0 Release Candidate",
-    "author": "Rosio Reyes",
-    "author_url": "https://medium.com/@rosioreyes",
+    "authors": [
+      {
+        "name": "Rosio Reyes",
+        "url": "https://medium.com/@rosioreyes"
+      }
+    ],
     "date": "2022-09-15T15:01:55Z",
     "updated": "2022-09-15T15:57:34Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-6-5-0-release-candidate-4c229c6dab55",
@@ -3870,8 +4478,12 @@
   },
   "https://blog.jupyter.org/upgrading-nbgrader-99c56ae56c47": {
     "title": "Upgrading Nbgrader",
-    "author": "Nicolas Brichet",
-    "author_url": "https://medium.com/@nbrichet",
+    "authors": [
+      {
+        "name": "Nicolas Brichet",
+        "url": "https://medium.com/@nbrichet"
+      }
+    ],
     "date": "2022-09-15T07:51:16Z",
     "updated": "2022-09-15T08:09:19Z",
     "original_url": "https://blog.jupyter.org/upgrading-nbgrader-99c56ae56c47",
@@ -3896,8 +4508,12 @@
   },
   "https://blog.jupyter.org/packaging-for-jupyter-in-2022-c7be64c38926": {
     "title": "Packaging for Jupyter in 2022",
-    "author": "Steven Silvester",
-    "author_url": "https://medium.com/@steven.silvester",
+    "authors": [
+      {
+        "name": "Steven Silvester",
+        "url": "https://medium.com/@steven.silvester"
+      }
+    ],
     "date": "2022-09-06T15:15:00Z",
     "updated": "2022-09-06T18:56:02Z",
     "original_url": "https://blog.jupyter.org/packaging-for-jupyter-in-2022-c7be64c38926",
@@ -3918,8 +4534,12 @@
   },
   "https://blog.jupyter.org/xeus-is-now-a-jupyter-subproject-c4ec5a1bf30b": {
     "title": "Xeus is now a Jupyter subproject",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2020-02-04T12:08:39Z",
     "updated": "2020-02-08T13:30:32Z",
     "original_url": "https://blog.jupyter.org/xeus-is-now-a-jupyter-subproject-c4ec5a1bf30b",
@@ -3943,8 +4563,12 @@
   },
   "https://blog.jupyter.org/zero-to-jupyterhub-helm-chart-0-8-b99e0a79fd2a": {
     "title": "Zero to JupyterHub helm chart 0.8",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2019-02-21T18:34:40Z",
     "updated": "2019-02-21T18:34:40Z",
     "original_url": "https://blog.jupyter.org/zero-to-jupyterhub-helm-chart-0-8-b99e0a79fd2a",
@@ -3966,8 +4590,12 @@
   },
   "https://blog.jupyter.org/the-international-binder-federation-4f6235c1537e": {
     "title": "The International Binder Federation",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2019-07-01T09:11:01.031Z",
     "updated": "2019-07-01T09:11:01Z",
     "original_url": "https://blog.jupyter.org/the-international-binder-federation-4f6235c1537e",
@@ -3990,8 +4618,12 @@
   },
   "https://blog.jupyter.org/jupytercon-nyc-august-2017-8e21f649d83e": {
     "title": "JupyterCon NYC, August 2017",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-01-27T00:30:27.000Z",
     "updated": "2017-08-28T19:57:11Z",
     "original_url": "https://blog.jupyter.org/jupytercon-nyc-august-2017-8e21f649d83e",
@@ -4013,8 +4645,12 @@
   },
   "https://blog.jupyter.org/requiring-2fa-for-jupyter-github-organizations-ad15507da9b1": {
     "title": "Requiring 2FA for Jupyter GitHub Organizations",
-    "author": "Rick Wagner",
-    "author_url": "https://medium.com/@rpwagner",
+    "authors": [
+      {
+        "name": "Rick Wagner",
+        "url": "https://medium.com/@rpwagner"
+      }
+    ],
     "date": "2022-07-05T15:00:31Z",
     "updated": "2022-08-11T09:23:31Z",
     "original_url": "https://blog.jupyter.org/requiring-2fa-for-jupyter-github-organizations-ad15507da9b1",
@@ -4034,8 +4670,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-5-0-909c6c172d78": {
     "title": "Jupyter Notebook 5.0",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-04-04T18:29:41.000Z",
     "updated": "2017-08-28T18:20:36Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-5-0-909c6c172d78",
@@ -4061,8 +4701,12 @@
   },
   "https://blog.jupyter.org/visual-programming-in-jupyterlab-with-blockly-7731ec3e113c": {
     "title": "Visual programming in JupyterLab with Blockly",
-    "author": "Denisa Checiu",
-    "author_url": "https://medium.com/@denisa.checiu",
+    "authors": [
+      {
+        "name": "Denisa Checiu",
+        "url": "https://medium.com/@denisa.checiu"
+      }
+    ],
     "date": "2022-07-29T13:12:30Z",
     "updated": "2022-07-29T13:12:30Z",
     "original_url": "https://blog.jupyter.org/visual-programming-in-jupyterlab-with-blockly-7731ec3e113c",
@@ -4087,8 +4731,12 @@
   },
   "https://blog.jupyter.org/mamba-meets-jupyterlite-88ef49ac4dc8": {
     "title": "Mamba meets JupyterLite",
-    "author": "Thorsten Beier",
-    "author_url": "https://medium.com/@derthorstenbeier",
+    "authors": [
+      {
+        "name": "Thorsten Beier",
+        "url": "https://medium.com/@derthorstenbeier"
+      }
+    ],
     "date": "2022-07-14T11:19:29Z",
     "updated": "2022-07-15T10:26:42Z",
     "original_url": "https://blog.jupyter.org/mamba-meets-jupyterlite-88ef49ac4dc8",
@@ -4113,8 +4761,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-c7491a3cca00": {
     "title": "Jupyter Community Workshops: Call for Proposals",
-    "author": "Gayle Ollington",
-    "author_url": "https://medium.com/@gayle_ollington",
+    "authors": [
+      {
+        "name": "Gayle Ollington",
+        "url": "https://medium.com/@gayle_ollington"
+      }
+    ],
     "date": "2022-04-26T16:55:11Z",
     "updated": "2022-05-25T16:18:14Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-c7491a3cca00",
@@ -4138,8 +4790,12 @@
   },
   "https://blog.jupyter.org/national-scale-interactive-computing-2c104455e062": {
     "title": "National Scale Interactive Computing",
-    "author": "James Colliander",
-    "author_url": "https://medium.com/@colliand",
+    "authors": [
+      {
+        "name": "James Colliander",
+        "url": "https://medium.com/@colliand"
+      }
+    ],
     "date": "2019-08-22T19:06:58Z",
     "updated": "2019-08-22T20:06:56Z",
     "original_url": "https://blog.jupyter.org/national-scale-interactive-computing-2c104455e062",
@@ -4161,8 +4817,12 @@
   },
   "https://blog.jupyter.org/elife-sprint-integrating-stencila-and-binder-18834e9ad584": {
     "title": "elife sprint: Integrating Stencila and Binder",
-    "author": "Daniel Nüst",
-    "author_url": "https://medium.com/@nuest",
+    "authors": [
+      {
+        "name": "Daniel Nüst",
+        "url": "https://medium.com/@nuest"
+      }
+    ],
     "date": "2018-12-10T10:15:32Z",
     "updated": "2018-12-10T10:15:32Z",
     "original_url": "https://blog.jupyter.org/elife-sprint-integrating-stencila-and-binder-18834e9ad584",
@@ -4189,8 +4849,12 @@
   },
   "https://blog.jupyter.org/securely-pushing-to-github-from-a-jupyterhub-3ee42dfdc54f": {
     "title": "Securely pushing to GitHub from a JupyterHub with gh-scoped-creds",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2022-04-21T16:54:41Z",
     "updated": "2022-04-21T16:57:10Z",
     "original_url": "https://blog.jupyter.org/securely-pushing-to-github-from-a-jupyterhub-3ee42dfdc54f",
@@ -4213,8 +4877,12 @@
   },
   "https://blog.jupyter.org/jupyter-events-update-67315ebb0afa": {
     "title": "Jupyter Events Update",
-    "author": "Gayle Ollington",
-    "author_url": "https://medium.com/@gayle_ollington",
+    "authors": [
+      {
+        "name": "Gayle Ollington",
+        "url": "https://medium.com/@gayle_ollington"
+      }
+    ],
     "date": "2022-04-21T21:12:43Z",
     "updated": "2022-04-21T21:12:43Z",
     "original_url": "https://blog.jupyter.org/jupyter-events-update-67315ebb0afa",
@@ -4236,8 +4904,12 @@
   },
   "https://blog.jupyter.org/inspector-jupyterlab-404cce3e1df6": {
     "title": "Inspector JupyterLab",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2022-04-11T11:50:13Z",
     "updated": "2022-04-21T09:37:40Z",
     "original_url": "https://blog.jupyter.org/inspector-jupyterlab-404cce3e1df6",
@@ -4262,8 +4934,12 @@
   },
   "https://blog.jupyter.org/jupyter-hackathon-series-in-hawaii-97b3d1fbce68": {
     "title": "Jupyter Hackathon Series in Hawaii",
-    "author": "Chalmer Lowe",
-    "author_url": "https://medium.com/@chalmer.lowe",
+    "authors": [
+      {
+        "name": "Chalmer Lowe",
+        "url": "https://medium.com/@chalmer.lowe"
+      }
+    ],
     "date": "2018-12-06T20:17:05Z",
     "updated": "2018-12-06T20:17:05Z",
     "original_url": "https://blog.jupyter.org/jupyter-hackathon-series-in-hawaii-97b3d1fbce68",
@@ -4287,8 +4963,12 @@
   },
   "https://blog.jupyter.org/jupyter-for-science-user-facilities-and-high-performance-computing-de178106872": {
     "title": "Jupyter for Science User Facilities and High Performance Computing",
-    "author": "Rollin Thomas",
-    "author_url": "https://medium.com/@rcthomas",
+    "authors": [
+      {
+        "name": "Rollin Thomas",
+        "url": "https://medium.com/@rcthomas"
+      }
+    ],
     "date": "2019-07-09T23:53:07Z",
     "updated": "2019-07-09T23:53:07Z",
     "original_url": "https://blog.jupyter.org/jupyter-for-science-user-facilities-and-high-performance-computing-de178106872",
@@ -4310,8 +4990,12 @@
   },
   "https://blog.jupyter.org/jupyter-accessibility-workshops-wrap-up-8649dfe5f89": {
     "title": "Jupyter Accessibility Workshops Wrap Up",
-    "author": "Isabela Presedo-Floyd",
-    "author_url": "https://medium.com/@ipresedo",
+    "authors": [
+      {
+        "name": "Isabela Presedo-Floyd",
+        "url": "https://medium.com/@ipresedo"
+      }
+    ],
     "date": "2022-04-09T04:48:04Z",
     "updated": "2022-04-09T04:48:04Z",
     "original_url": "https://blog.jupyter.org/jupyter-accessibility-workshops-wrap-up-8649dfe5f89",
@@ -4334,8 +5018,12 @@
   },
   "https://blog.jupyter.org/please-dont-disable-authentication-in-jupyter-servers-dd197206e7f6": {
     "title": "Please don’t disable authentication in Jupyter servers",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2022-04-05T09:50:01Z",
     "updated": "2022-04-05T09:50:01Z",
     "original_url": "https://blog.jupyter.org/please-dont-disable-authentication-in-jupyter-servers-dd197206e7f6",
@@ -4354,8 +5042,12 @@
   },
   "https://blog.jupyter.org/introducing-templates-for-jupyter-widget-layouts-f72bcb35a662": {
     "title": "Introducing templates for Jupyter widgets layouts",
-    "author": "Bartosz Telenczuk",
-    "author_url": "https://medium.com/@bartosz.telenczuk",
+    "authors": [
+      {
+        "name": "Bartosz Telenczuk",
+        "url": "https://medium.com/@bartosz.telenczuk"
+      }
+    ],
     "date": "2019-07-04T09:41:47Z",
     "updated": "2019-07-04T09:41:47Z",
     "original_url": "https://blog.jupyter.org/introducing-templates-for-jupyter-widget-layouts-f72bcb35a662",
@@ -4381,8 +5073,12 @@
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-bc349fa60d68": {
     "title": "Congratulations, Distinguished Contributors!",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2022-03-16T16:23:40Z",
     "updated": "2022-03-16T17:21:17Z",
     "original_url": "https://blog.jupyter.org/congratulations-distinguished-contributors-bc349fa60d68",
@@ -4413,8 +5109,12 @@
   },
   "https://blog.jupyter.org/jupyter-everywhere-f8151c2cc6e8": {
     "title": "Jupyter Everywhere",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2022-03-15T15:22:05Z",
     "updated": "2022-03-15T15:38:41Z",
     "original_url": "https://blog.jupyter.org/jupyter-everywhere-f8151c2cc6e8",
@@ -4445,8 +5145,12 @@
   },
   "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-2-aae1dbcdb9ac": {
     "title": "Join us for the Jupyter Accessibility Workshops (Part 2)",
-    "author": "Isabela Presedo-Floyd",
-    "author_url": "https://medium.com/@ipresedo",
+    "authors": [
+      {
+        "name": "Isabela Presedo-Floyd",
+        "url": "https://medium.com/@ipresedo"
+      }
+    ],
     "date": "2022-03-04T15:55:09Z",
     "updated": "2022-03-04T15:55:09Z",
     "original_url": "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-2-aae1dbcdb9ac",
@@ -4469,8 +5173,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-the-next-generation-of-the-jupyter-notebook-5c949dabea3": {
     "title": "JupyterLab: the next generation of the Jupyter Notebook",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-07-15T03:47:08.000Z",
     "updated": "2017-08-28T18:20:59Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-the-next-generation-of-the-jupyter-notebook-5c949dabea3",
@@ -4492,8 +5200,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-desktop-app-now-available-b8b661b17e9a": {
     "title": "JupyterLab Desktop App now available!",
-    "author": "Mehmet Bektas",
-    "author_url": "https://medium.com/@mbektasdev",
+    "authors": [
+      {
+        "name": "Mehmet Bektas",
+        "url": "https://medium.com/@mbektasdev"
+      }
+    ],
     "date": "2021-09-22T13:36:46Z",
     "updated": "2022-02-16T01:57:41Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-desktop-app-now-available-b8b661b17e9a",
@@ -4515,8 +5227,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-for-jan-aug-2020-710f687e30f4": {
     "title": "Jupyter Community Workshops: Call for Proposals for Jan-Aug 2020",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2019-11-12T23:32:24.850Z",
     "updated": "2019-11-21T05:13:52Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-for-jan-aug-2020-710f687e30f4",
@@ -4538,8 +5254,12 @@
   },
   "https://blog.jupyter.org/release-of-ipython-8-0-6e034ff122ef": {
     "title": "Release of IPython 8.0",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2022-01-12T13:37:51.828Z",
     "updated": "2022-01-12T16:14:28Z",
     "original_url": "https://blog.jupyter.org/release-of-ipython-8-0-6e034ff122ef",
@@ -4561,8 +5281,12 @@
   },
   "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-1-133e0e522d1b": {
     "title": "Join us for the Jupyter Accessibility Workshops (Part 1)",
-    "author": "Isabela Presedo-Floyd",
-    "author_url": "https://medium.com/@ipresedo",
+    "authors": [
+      {
+        "name": "Isabela Presedo-Floyd",
+        "url": "https://medium.com/@ipresedo"
+      }
+    ],
     "date": "2022-01-06T18:30:06Z",
     "updated": "2022-01-10T16:24:42Z",
     "original_url": "https://blog.jupyter.org/join-us-for-the-jupyter-accessibility-workshops-part-1-133e0e522d1b",
@@ -4585,8 +5309,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-2021-update-84c5cd3c5e75": {
     "title": "Jupyter Community 2021 Update",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2021-12-20T17:53:57.396Z",
     "updated": "2021-12-20T20:18:44Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-2021-update-84c5cd3c5e75",
@@ -4607,8 +5335,12 @@
   },
   "https://blog.jupyter.org/jupyter-games-cda20dc15a21": {
     "title": "Jupyter Games",
-    "author": "Thorsten Beier",
-    "author_url": "https://medium.com/@derthorstenbeier",
+    "authors": [
+      {
+        "name": "Thorsten Beier",
+        "url": "https://medium.com/@derthorstenbeier"
+      }
+    ],
     "date": "2021-12-14T19:38:47Z",
     "updated": "2021-12-14T19:38:47Z",
     "original_url": "https://blog.jupyter.org/jupyter-games-cda20dc15a21",
@@ -4644,8 +5376,12 @@
   },
   "https://blog.jupyter.org/need-for-speed-voilà-edition-a9e1300ab3b2": {
     "title": "Need for Speed: Voilà edition",
-    "author": "Duc Trung Le",
-    "author_url": "https://medium.com/@trungleduc",
+    "authors": [
+      {
+        "name": "Duc Trung Le",
+        "url": "https://medium.com/@trungleduc"
+      }
+    ],
     "date": "2021-12-10T14:52:56Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/need-for-speed-voilà-edition-a9e1300ab3b2",
@@ -4669,8 +5405,12 @@
   },
   "https://blog.jupyter.org/jupyterhub-2-0-7a038715e96d": {
     "title": "JupyterHub 2.0",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2021-12-01T14:15:18Z",
     "updated": "2021-12-01T14:15:18Z",
     "original_url": "https://blog.jupyter.org/jupyterhub-2-0-7a038715e96d",
@@ -4689,8 +5429,12 @@
   },
   "https://blog.jupyter.org/ipython-parallel-in-2021-2945985c032a": {
     "title": "IPython Parallel in 2021",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2021-11-30T07:55:49Z",
     "updated": "2021-11-30T07:55:49Z",
     "original_url": "https://blog.jupyter.org/ipython-parallel-in-2021-2945985c032a",
@@ -4711,8 +5455,12 @@
   },
   "https://blog.jupyter.org/how-i-automated-authorised-cloud-deployments-from-pull-requests-with-github-actions-13f890538e32": {
     "title": "How I automated authorised cloud deployments from Pull Requests with GitHub Actions",
-    "author": "Sarah Gibson",
-    "author_url": "https://medium.com/@drsarahlgibson",
+    "authors": [
+      {
+        "name": "Sarah Gibson",
+        "url": "https://medium.com/@drsarahlgibson"
+      }
+    ],
     "date": "2021-11-22T18:30:17Z",
     "updated": "2021-11-22T18:30:58Z",
     "original_url": "https://blog.jupyter.org/how-i-automated-authorised-cloud-deployments-from-pull-requests-with-github-actions-13f890538e32",
@@ -4734,8 +5482,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-5-5-0-17b2e2d4f7f": {
     "title": "Jupyter Notebook 5.5.0",
-    "author": "Grant Nestor",
-    "author_url": "https://medium.com/@senornestor",
+    "authors": [
+      {
+        "name": "Grant Nestor",
+        "url": "https://medium.com/@senornestor"
+      }
+    ],
     "date": "2018-05-25T00:11:32Z",
     "updated": "2018-05-27T16:59:06Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-5-5-0-17b2e2d4f7f",
@@ -4755,8 +5507,12 @@
   },
   "https://blog.jupyter.org/ploomber-maintainable-and-collaborative-pipelines-in-jupyter-acb3ad2101a7": {
     "title": "Ploomber: Maintainable and Collaborative Pipelines in Jupyter",
-    "author": "Eduardo Blancas",
-    "author_url": "https://medium.com/@edublancas",
+    "authors": [
+      {
+        "name": "Eduardo Blancas",
+        "url": "https://medium.com/@edublancas"
+      }
+    ],
     "date": "2021-09-01T14:17:16Z",
     "updated": "2021-11-10T16:54:45Z",
     "original_url": "https://blog.jupyter.org/ploomber-maintainable-and-collaborative-pipelines-in-jupyter-acb3ad2101a7",
@@ -4789,8 +5545,12 @@
   },
   "https://blog.jupyter.org/xeus-lite-379e96bb199d": {
     "title": "Xeus-Lite",
-    "author": "Thorsten Beier",
-    "author_url": "https://medium.com/@derthorstenbeier",
+    "authors": [
+      {
+        "name": "Thorsten Beier",
+        "url": "https://medium.com/@derthorstenbeier"
+      }
+    ],
     "date": "2021-10-25T09:40:55Z",
     "updated": "2021-10-25T09:40:55Z",
     "original_url": "https://blog.jupyter.org/xeus-lite-379e96bb199d",
@@ -4823,8 +5583,12 @@
   },
   "https://blog.jupyter.org/czi-awards-three-eoss-grants-to-jupyter-community-members-6aef43bd9468": {
     "title": "CZI awards three EOSS grants to Jupyter community members",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2021-10-14T20:30:57.202Z",
     "updated": "2021-10-14T20:32:46Z",
     "original_url": "https://blog.jupyter.org/czi-awards-three-eoss-grants-to-jupyter-community-members-6aef43bd9468",
@@ -4846,8 +5610,12 @@
   },
   "https://blog.jupyter.org/diving-into-leadership-to-build-push-button-code-df2a075c9914": {
     "title": "Diving into Leadership to Build Push-Button Code",
-    "author": "Sarah Gibson",
-    "author_url": "https://medium.com/@drsarahlgibson",
+    "authors": [
+      {
+        "name": "Sarah Gibson",
+        "url": "https://medium.com/@drsarahlgibson"
+      }
+    ],
     "date": "2019-10-15T18:34:31Z",
     "updated": "2019-10-15T18:34:31Z",
     "original_url": "https://blog.jupyter.org/diving-into-leadership-to-build-push-button-code-df2a075c9914",
@@ -4871,8 +5639,12 @@
   },
   "https://blog.jupyter.org/looking-at-notebooks-from-a-new-perspective-bfd06797f188": {
     "title": "Looking at notebooks from a new perspective",
-    "author": "Mariana Meireles",
-    "author_url": "https://medium.com/@mari-meir",
+    "authors": [
+      {
+        "name": "Mariana Meireles",
+        "url": "https://medium.com/@mari-meir"
+      }
+    ],
     "date": "2021-10-05T08:33:17Z",
     "updated": "2021-10-05T09:48:17Z",
     "original_url": "https://blog.jupyter.org/looking-at-notebooks-from-a-new-perspective-bfd06797f188",
@@ -4901,8 +5673,12 @@
   },
   "https://blog.jupyter.org/xeus-2-0-cb460d4daed4": {
     "title": "Xeus 2.0",
-    "author": "Johan Mabille",
-    "author_url": "https://medium.com/@johan-mabille",
+    "authors": [
+      {
+        "name": "Johan Mabille",
+        "url": "https://medium.com/@johan-mabille"
+      }
+    ],
     "date": "2021-09-28T09:41:20Z",
     "updated": "2021-09-28T09:41:20Z",
     "original_url": "https://blog.jupyter.org/xeus-2-0-cb460d4daed4",
@@ -4925,8 +5701,12 @@
   },
   "https://blog.jupyter.org/from-jupyter-to-the-moon-2e432df402c8": {
     "title": "From Jupyter to the Moon",
-    "author": "Thorsten Beier",
-    "author_url": "https://medium.com/@derthorstenbeier",
+    "authors": [
+      {
+        "name": "Thorsten Beier",
+        "url": "https://medium.com/@derthorstenbeier"
+      }
+    ],
     "date": "2021-09-24T12:24:08Z",
     "updated": "2021-09-24T12:24:56Z",
     "original_url": "https://blog.jupyter.org/from-jupyter-to-the-moon-2e432df402c8",
@@ -4961,8 +5741,12 @@
   },
   "https://blog.jupyter.org/connect-to-a-jupyterhub-from-visual-studio-code-ed7ed3a31bcb": {
     "title": "Connect to a JupyterHub from Visual Studio Code",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2019-12-09T17:23:25Z",
     "updated": "2019-12-09T17:23:25Z",
     "original_url": "https://blog.jupyter.org/connect-to-a-jupyterhub-from-visual-studio-code-ed7ed3a31bcb",
@@ -4990,8 +5774,12 @@
   },
   "https://blog.jupyter.org/trusted-ci-cybersecurity-engagement-with-jupyter-859a5f5d7201": {
     "title": "Trusted CI Cybersecurity Engagement with Jupyter",
-    "author": "Rollin Thomas",
-    "author_url": "https://medium.com/@rcthomas",
+    "authors": [
+      {
+        "name": "Rollin Thomas",
+        "url": "https://medium.com/@rcthomas"
+      }
+    ],
     "date": "2021-09-15T18:09:21Z",
     "updated": "2021-09-15T18:09:21Z",
     "original_url": "https://blog.jupyter.org/trusted-ci-cybersecurity-engagement-with-jupyter-859a5f5d7201",
@@ -5010,8 +5798,12 @@
   },
   "https://blog.jupyter.org/community-note-8e9e6e30760": {
     "title": "Community Note",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2021-09-08T19:40:37.998Z",
     "updated": "2021-09-08T19:40:37Z",
     "original_url": "https://blog.jupyter.org/community-note-8e9e6e30760",
@@ -5030,8 +5822,12 @@
   },
   "https://blog.jupyter.org/jupyter-role-in-chaosdb-4cb269815d26": {
     "title": "Jupyter’s role in #ChaosDB",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2021-09-01T21:43:45.641Z",
     "updated": "2021-09-02T06:56:25Z",
     "original_url": "https://blog.jupyter.org/jupyter-role-in-chaosdb-4cb269815d26",
@@ -5052,8 +5848,12 @@
   },
   "https://blog.jupyter.org/field-report-on-the-kernel-community-workshop-a4ad73a1a718": {
     "title": "Field Report on the Kernel Community Workshop",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2019-10-07T13:24:17Z",
     "updated": "2019-10-16T14:53:58Z",
     "original_url": "https://blog.jupyter.org/field-report-on-the-kernel-community-workshop-a4ad73a1a718",
@@ -5080,8 +5880,12 @@
   },
   "https://blog.jupyter.org/report-on-the-jupyter-community-workshop-on-dashboarding-14f8ad9f3c0": {
     "title": "Report on the Jupyter Community Workshop on Dashboarding",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2020-02-14T21:06:39Z",
     "updated": "2020-02-14T21:06:39Z",
     "original_url": "https://blog.jupyter.org/report-on-the-jupyter-community-workshop-on-dashboarding-14f8ad9f3c0",
@@ -5106,8 +5910,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-2019-year-in-review-8876336924e4": {
     "title": "Jupyter Community Workshops 2019 Year in Review",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2020-02-24T20:03:09.235Z",
     "updated": "2020-02-24T20:03:09Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-2019-year-in-review-8876336924e4",
@@ -5133,8 +5941,12 @@
   },
   "https://blog.jupyter.org/south-america-jupyter-community-workshop-4edc51c7a6ce": {
     "title": "South America Jupyter Community Workshop",
-    "author": "Damian Avila",
-    "author_url": "https://medium.com/@damianavila82",
+    "authors": [
+      {
+        "name": "Damian Avila",
+        "url": "https://medium.com/@damianavila82"
+      }
+    ],
     "date": "2019-09-26T17:47:16Z",
     "updated": "2019-09-26T17:47:16Z",
     "original_url": "https://blog.jupyter.org/south-america-jupyter-community-workshop-4edc51c7a6ce",
@@ -5156,8 +5968,12 @@
   },
   "https://blog.jupyter.org/cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyter-notebook-a70fae0d3239": {
     "title": "CVE-2021–32797 and CVE-2021–32798 Remote Code execution in JupyterLab and Jupyter Notebook",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2021-08-09T20:05:49.573Z",
     "updated": "2021-08-09T20:19:21Z",
     "original_url": "https://blog.jupyter.org/cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyter-notebook-a70fae0d3239",
@@ -5179,8 +5995,12 @@
   },
   "https://blog.jupyter.org/build-a-jupyter-widget-with-react-and-typescript-d83e07340fa3": {
     "title": "Build a Jupyter Widget with React and TypeScript",
-    "author": "John Waidhofer",
-    "author_url": "https://medium.com/@johnwaidhofer",
+    "authors": [
+      {
+        "name": "John Waidhofer",
+        "url": "https://medium.com/@johnwaidhofer"
+      }
+    ],
     "date": "2021-07-30T19:02:39Z",
     "updated": "2021-08-05T18:00:33Z",
     "original_url": "https://blog.jupyter.org/build-a-jupyter-widget-with-react-and-typescript-d83e07340fa3",
@@ -5203,8 +6023,12 @@
   },
   "https://blog.jupyter.org/nbviewer-has-a-new-host-ovhcloud-28bcab6a7ab4": {
     "title": "nbviewer has a new host: OVHcloud",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2020-03-06T19:46:26Z",
     "updated": "2020-03-06T19:46:26Z",
     "original_url": "https://blog.jupyter.org/nbviewer-has-a-new-host-ovhcloud-28bcab6a7ab4",
@@ -5224,8 +6048,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-3-0-is-out-4f58385e25bb": {
     "title": "JupyterLab 3.0 is released!",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2021-01-05T08:28:54Z",
     "updated": "2021-07-19T16:35:36Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-3-0-is-out-4f58385e25bb",
@@ -5255,8 +6083,12 @@
   },
   "https://blog.jupyter.org/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa": {
     "title": "JupyterLite: Jupyter ❤️ WebAssembly ❤️ Python",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2021-07-13T09:11:43Z",
     "updated": null,
     "original_url": "https://blog.jupyter.org/jupyterlite-jupyter-️-webassembly-️-python-f6e2e41ab3fa",
@@ -5294,8 +6126,12 @@
   },
   "https://blog.jupyter.org/how-we-made-jupyter-notebooks-collaborative-with-yjs-b8dff6a9d8af": {
     "title": "How we made Jupyter Notebooks collaborative with Yjs",
-    "author": "Kevin Jahns",
-    "author_url": "https://medium.com/@kevin-jahns",
+    "authors": [
+      {
+        "name": "Kevin Jahns",
+        "url": "https://medium.com/@kevin-jahns"
+      }
+    ],
     "date": "2021-06-04T18:46:36Z",
     "updated": "2021-06-11T12:41:43Z",
     "original_url": "https://blog.jupyter.org/how-we-made-jupyter-notebooks-collaborative-with-yjs-b8dff6a9d8af",
@@ -5317,8 +6153,12 @@
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-149deff3033c": {
     "title": "Congratulations, Distinguished Contributors!",
-    "author": "Afshin T. Darian",
-    "author_url": "https://medium.com/@micronova",
+    "authors": [
+      {
+        "name": "Afshin T. Darian",
+        "url": "https://medium.com/@micronova"
+      }
+    ],
     "date": "2021-05-25T13:01:20Z",
     "updated": "2021-06-08T09:42:27Z",
     "original_url": "https://blog.jupyter.org/congratulations-distinguished-contributors-149deff3033c",
@@ -5348,8 +6188,12 @@
   },
   "https://blog.jupyter.org/setting-up-a-production-ready-tljh-deployment-3c81c0ada18f": {
     "title": "Setting up a “Production Ready” TLJH deployment",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2021-06-04T17:05:40Z",
     "updated": "2021-06-04T17:05:40Z",
     "original_url": "https://blog.jupyter.org/setting-up-a-production-ready-tljh-deployment-3c81c0ada18f",
@@ -5371,8 +6215,12 @@
   },
   "https://blog.jupyter.org/enabling-the-jupyterlab-debugger-with-ipykernel-8d7248f522b0": {
     "title": "Enabling the JupyterLab debugger with ipykernel",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2021-05-13T11:45:00Z",
     "updated": "2021-06-02T14:59:07Z",
     "original_url": "https://blog.jupyter.org/enabling-the-jupyterlab-debugger-with-ipykernel-8d7248f522b0",
@@ -5398,8 +6246,12 @@
   },
   "https://blog.jupyter.org/retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel-8096b8b223d0": {
     "title": "RetroLab — A JupyterLab distribution with a retro look and feel",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2021-05-27T11:31:52Z",
     "updated": "2021-05-28T21:29:15Z",
     "original_url": "https://blog.jupyter.org/retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel-8096b8b223d0",
@@ -5434,8 +6286,12 @@
   },
   "https://blog.jupyter.org/outreachy-jupyter-supporting-diversity-in-open-communities-dfa78db4b0bd": {
     "title": "Outreachy & Jupyter: Supporting diversity in open communities",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2018-11-28T17:26:19Z",
     "updated": "2018-11-28T18:35:56Z",
     "original_url": "https://blog.jupyter.org/outreachy-jupyter-supporting-diversity-in-open-communities-dfa78db4b0bd",
@@ -5458,8 +6314,12 @@
   },
   "https://blog.jupyter.org/nbterm-jupyter-notebooks-in-the-terminal-6a2b55d08b70": {
     "title": "nbterm: Jupyter Notebooks in the terminal",
-    "author": "David Brochart",
-    "author_url": "https://medium.com/@david-brochart",
+    "authors": [
+      {
+        "name": "David Brochart",
+        "url": "https://medium.com/@david-brochart"
+      }
+    ],
     "date": "2021-04-26T16:42:17Z",
     "updated": "2021-04-26T16:42:17Z",
     "original_url": "https://blog.jupyter.org/nbterm-jupyter-notebooks-in-the-terminal-6a2b55d08b70",
@@ -5481,8 +6341,12 @@
   },
   "https://blog.jupyter.org/lessons-learned-from-jupyters-contributor-in-residence-pilot-427e2b361a7b": {
     "title": "Lessons learned from Jupyter’s Contributor in Residence pilot",
-    "author": "Georgiana Dolocan",
-    "author_url": "https://medium.com/@georgiana.dolocan",
+    "authors": [
+      {
+        "name": "Georgiana Dolocan",
+        "url": "https://medium.com/@georgiana.dolocan"
+      }
+    ],
     "date": "2021-03-11T20:22:02Z",
     "updated": "2021-03-11T20:22:02Z",
     "original_url": "https://blog.jupyter.org/lessons-learned-from-jupyters-contributor-in-residence-pilot-427e2b361a7b",
@@ -5505,8 +6369,12 @@
   },
   "https://blog.jupyter.org/abracadabra-bringing-the-magics-to-xeus-python-9d17bcfacb4": {
     "title": "Abracadabra! Bringing the magics to xeus-python",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2021-02-18T13:30:54Z",
     "updated": "2021-02-18T14:06:22Z",
     "original_url": "https://blog.jupyter.org/abracadabra-bringing-the-magics-to-xeus-python-9d17bcfacb4",
@@ -5535,8 +6403,12 @@
   },
   "https://blog.jupyter.org/genomic-data-representation-in-jupyter-c57a5bb518d6": {
     "title": "Genomic data visualization in Jupyter",
-    "author": "Jean-David Harrouet",
-    "author_url": "https://medium.com/@jeandavid.harrouet",
+    "authors": [
+      {
+        "name": "Jean-David Harrouet",
+        "url": "https://medium.com/@jeandavid.harrouet"
+      }
+    ],
     "date": "2021-02-08T13:29:55Z",
     "updated": "2021-02-11T11:36:24Z",
     "original_url": "https://blog.jupyter.org/genomic-data-representation-in-jupyter-c57a5bb518d6",
@@ -5560,8 +6432,12 @@
   },
   "https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09": {
     "title": "Simpler authentication for small scale JupyterHubs with NativeAuthenticator",
-    "author": "Leticia Portella",
-    "author_url": "https://medium.com/@leportella",
+    "authors": [
+      {
+        "name": "Leticia Portella",
+        "url": "https://medium.com/@leportella"
+      }
+    ],
     "date": "2019-02-26T16:31:03Z",
     "updated": "2019-03-04T14:41:39Z",
     "original_url": "https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09",
@@ -5590,8 +6466,12 @@
   },
   "https://blog.jupyter.org/a-curiously-recurring-widget-library-261a65bd56fe": {
     "title": "A Curiously Recurring Widget Library",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2021-01-27T14:22:50Z",
     "updated": "2021-01-27T21:41:59Z",
     "original_url": "https://blog.jupyter.org/a-curiously-recurring-widget-library-261a65bd56fe",
@@ -5617,8 +6497,12 @@
   },
   "https://blog.jupyter.org/robotic-process-automation-with-jupyterlab-713b5630e457": {
     "title": "Robotic Process Automation with JupyterLab",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2021-01-18T10:36:27Z",
     "updated": "2021-01-18T10:36:27Z",
     "original_url": "https://blog.jupyter.org/robotic-process-automation-with-jupyterlab-713b5630e457",
@@ -5648,8 +6532,12 @@
   },
   "https://blog.jupyter.org/dashboarding-with-jupyterlab-3-789fcb1a5857": {
     "title": "Dashboarding with JupyterLab 3",
-    "author": "Carlos Herrero",
-    "author_url": "https://medium.com/@hbcarlos",
+    "authors": [
+      {
+        "name": "Carlos Herrero",
+        "url": "https://medium.com/@hbcarlos"
+      }
+    ],
     "date": "2021-01-08T10:25:42Z",
     "updated": "2021-01-08T11:15:48Z",
     "original_url": "https://blog.jupyter.org/dashboarding-with-jupyterlab-3-789fcb1a5857",
@@ -5677,8 +6565,12 @@
   },
   "https://blog.jupyter.org/survey-jupyterlab-and-beyond-88c7fbd27a79": {
     "title": "Survey — JupyterLab and beyond",
-    "author": "Luciano Resende",
-    "author_url": "https://medium.com/@lresende",
+    "authors": [
+      {
+        "name": "Luciano Resende",
+        "url": "https://medium.com/@lresende"
+      }
+    ],
     "date": "2020-12-14T21:30:09Z",
     "updated": "2020-12-14T21:30:09Z",
     "original_url": "https://blog.jupyter.org/survey-jupyterlab-and-beyond-88c7fbd27a79",
@@ -5700,8 +6592,12 @@
   },
   "https://blog.jupyter.org/a-c-backend-for-vega-lite-bd2524b247c2": {
     "title": "A C++ API for Vega-Lite",
-    "author": "Madhur Tandon",
-    "author_url": "https://medium.com/@madhurtandon",
+    "authors": [
+      {
+        "name": "Madhur Tandon",
+        "url": "https://medium.com/@madhurtandon"
+      }
+    ],
     "date": "2020-12-02T15:27:32Z",
     "updated": "2020-12-03T14:23:00Z",
     "original_url": "https://blog.jupyter.org/a-c-backend-for-vega-lite-bd2524b247c2",
@@ -5728,8 +6624,12 @@
   },
   "https://blog.jupyter.org/teaching-and-learning-with-jupyter-c1d965f7b93a": {
     "title": "Teaching and Learning with Jupyter",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2019-01-07T12:57:30Z",
     "updated": "2019-01-07T12:57:30Z",
     "original_url": "https://blog.jupyter.org/teaching-and-learning-with-jupyter-c1d965f7b93a",
@@ -5750,8 +6650,12 @@
   },
   "https://blog.jupyter.org/tema-okun-a7e5f1f0cd05": {
     "title": "Tema Okun",
-    "author": "Reshama Shaikh",
-    "author_url": "https://medium.com/@reshamas",
+    "authors": [
+      {
+        "name": "Reshama Shaikh",
+        "url": "https://medium.com/@reshamas"
+      }
+    ],
     "date": "2020-10-12T16:21:03Z",
     "updated": "2020-11-27T15:05:53Z",
     "original_url": "https://blog.jupyter.org/tema-okun-a7e5f1f0cd05",
@@ -5773,8 +6677,12 @@
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-f617e40689e7": {
     "title": "Congratulations, Distinguished Contributors!",
-    "author": "Afshin T. Darian",
-    "author_url": "https://medium.com/@micronova",
+    "authors": [
+      {
+        "name": "Afshin T. Darian",
+        "url": "https://medium.com/@micronova"
+      }
+    ],
     "date": "2020-11-20T16:45:38Z",
     "updated": "2020-11-20T16:45:38Z",
     "original_url": "https://blog.jupyter.org/congratulations-distinguished-contributors-f617e40689e7",
@@ -5814,8 +6722,12 @@
   },
   "https://blog.jupyter.org/reusable-code-snippets-in-jupyterlab-8d75a0f9d207": {
     "title": "Reusable code snippets in JupyterLab",
-    "author": "Luciano Resende",
-    "author_url": "https://medium.com/@lresende",
+    "authors": [
+      {
+        "name": "Luciano Resende",
+        "url": "https://medium.com/@lresende"
+      }
+    ],
     "date": "2020-11-18T18:08:18Z",
     "updated": "2020-11-19T15:38:14Z",
     "original_url": "https://blog.jupyter.org/reusable-code-snippets-in-jupyterlab-8d75a0f9d207",
@@ -5845,8 +6757,12 @@
   },
   "https://blog.jupyter.org/jupyter-meets-the-earth-1b0eb33c83f": {
     "title": "Jupyter meets the Earth",
-    "author": "Lindsey Heagy",
-    "author_url": "https://medium.com/@lheagy",
+    "authors": [
+      {
+        "name": "Lindsey Heagy",
+        "url": "https://medium.com/@lheagy"
+      }
+    ],
     "date": "2019-09-09T17:48:58Z",
     "updated": "2020-08-07T17:34:55Z",
     "original_url": "https://blog.jupyter.org/jupyter-meets-the-earth-1b0eb33c83f",
@@ -5870,8 +6786,12 @@
   },
   "https://blog.jupyter.org/devops-intelligence-3ff48a76b525": {
     "title": "DevOps Intelligence",
-    "author": "Jürgen Hermann",
-    "author_url": "https://medium.com/@jhermann_",
+    "authors": [
+      {
+        "name": "Jürgen Hermann",
+        "url": "https://medium.com/@jhermann_"
+      }
+    ],
     "date": "2019-04-06T14:50:19Z",
     "updated": "2019-04-06T23:23:24Z",
     "original_url": "https://blog.jupyter.org/devops-intelligence-3ff48a76b525",
@@ -5895,8 +6815,12 @@
   },
   "https://blog.jupyter.org/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130": {
     "title": "A Gallery of Voilà Examples",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2019-07-09T10:53:27Z",
     "updated": "2020-01-21T14:00:18Z",
     "original_url": "https://blog.jupyter.org/a-gallery-of-voilà-examples-a2ce7ef99130",
@@ -5921,8 +6845,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-5-2-0-9c5b3ea672f": {
     "title": "Jupyter Notebook 5.2.0",
-    "author": "Grant Nestor",
-    "author_url": "https://medium.com/@senornestor",
+    "authors": [
+      {
+        "name": "Grant Nestor",
+        "url": "https://medium.com/@senornestor"
+      }
+    ],
     "date": "2017-10-13T18:04:03Z",
     "updated": "2017-10-14T22:49:26Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-5-2-0-9c5b3ea672f",
@@ -5942,8 +6870,12 @@
   },
   "https://blog.jupyter.org/jupyterday-in-the-triangle-913591d31d81": {
     "title": "JupyterDay in the Triangle",
-    "author": "Peter Parente",
-    "author_url": "https://medium.com/@parente",
+    "authors": [
+      {
+        "name": "Peter Parente",
+        "url": "https://medium.com/@parente"
+      }
+    ],
     "date": "2018-10-04T16:15:51Z",
     "updated": "2018-10-04T16:15:51Z",
     "original_url": "https://blog.jupyter.org/jupyterday-in-the-triangle-913591d31d81",
@@ -5964,8 +6896,12 @@
   },
   "https://blog.jupyter.org/on-demand-notebooks-with-jupyterhub-jupyter-enterprise-gateway-and-kubernetes-e8e423695cbf": {
     "title": "On-demand Notebooks with JupyterHub, Jupyter Enterprise Gateway and Kubernetes",
-    "author": "Luciano Resende",
-    "author_url": "https://medium.com/@lresende",
+    "authors": [
+      {
+        "name": "Luciano Resende",
+        "url": "https://medium.com/@lresende"
+      }
+    ],
     "date": "2018-10-16T15:03:29Z",
     "updated": "2018-11-01T20:29:15Z",
     "original_url": "https://blog.jupyter.org/on-demand-notebooks-with-jupyterhub-jupyter-enterprise-gateway-and-kubernetes-e8e423695cbf",
@@ -5988,8 +6924,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-security-fixes-59817e86a711": {
     "title": "Jupyter Notebook security fixes",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2018-11-19T22:20:58Z",
     "updated": "2018-11-19T22:20:58Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-security-fixes-59817e86a711",
@@ -6009,8 +6949,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-xssi-security-fix-546cd95babb0": {
     "title": "Jupyter notebook XSSI security fix",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2019-03-09T20:46:45Z",
     "updated": "2019-03-09T20:46:45Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-xssi-security-fix-546cd95babb0",
@@ -6030,8 +6974,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-jupyter-server-design-and-roadmap-workshop-6e6760cc5098": {
     "title": "Jupyter Community Workshop: Jupyter Server Design and Roadmap Workshop",
-    "author": "Luciano Resende",
-    "author_url": "https://medium.com/@lresende",
+    "authors": [
+      {
+        "name": "Luciano Resende",
+        "url": "https://medium.com/@lresende"
+      }
+    ],
     "date": "2019-04-30T23:58:22Z",
     "updated": "2019-04-30T23:58:22Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-jupyter-server-design-and-roadmap-workshop-6e6760cc5098",
@@ -6053,8 +7001,12 @@
   },
   "https://blog.jupyter.org/integrating-output-in-documentation-with-jupyter-sphinx-ecf569ddab85": {
     "title": "Integrating output in documentation with jupyter-sphinx",
-    "author": "Anton Akhmerov",
-    "author_url": "https://medium.com/@anton.akhmerov",
+    "authors": [
+      {
+        "name": "Anton Akhmerov",
+        "url": "https://medium.com/@anton.akhmerov"
+      }
+    ],
     "date": "2019-05-30T18:22:03Z",
     "updated": "2019-05-30T18:22:03Z",
     "original_url": "https://blog.jupyter.org/integrating-output-in-documentation-with-jupyter-sphinx-ecf569ddab85",
@@ -6077,8 +7029,12 @@
   },
   "https://blog.jupyter.org/https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackathon-2eff14df298a": {
     "title": "University of Edinburgh Jupyter Community nbgrader Hackathon",
-    "author": "James Slack",
-    "author_url": "https://medium.com/@slack.james.a",
+    "authors": [
+      {
+        "name": "James Slack",
+        "url": "https://medium.com/@slack.james.a"
+      }
+    ],
     "date": "2019-05-22T16:59:19Z",
     "updated": "2019-05-22T16:59:19Z",
     "original_url": "https://blog.jupyter.org/https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackathon-2eff14df298a",
@@ -6098,8 +7054,12 @@
   },
   "https://blog.jupyter.org/kellie-ottoboni-receives-award-for-post-election-auditing-notebook-96e7277863d1": {
     "title": "Kellie Ottoboni Receives Award for Post-Election Auditing Notebook",
-    "author": "Kellie Ottoboni",
-    "author_url": "https://medium.com/@knottoboni",
+    "authors": [
+      {
+        "name": "Kellie Ottoboni",
+        "url": "https://medium.com/@knottoboni"
+      }
+    ],
     "date": "2019-04-02T17:01:00Z",
     "updated": "2019-04-02T17:01:00Z",
     "original_url": "https://blog.jupyter.org/kellie-ottoboni-receives-award-for-post-election-auditing-notebook-96e7277863d1",
@@ -6118,8 +7078,12 @@
   },
   "https://blog.jupyter.org/introducing-traefikproxy-a-new-jupyterhub-proxy-based-on-traefik-4839e972faf6": {
     "title": "Introducing TraefikProxy — a scalable and highly available proxy for JupyterHub",
-    "author": "Georgiana Dolocan",
-    "author_url": "https://medium.com/@georgiana.dolocan",
+    "authors": [
+      {
+        "name": "Georgiana Dolocan",
+        "url": "https://medium.com/@georgiana.dolocan"
+      }
+    ],
     "date": "2019-03-06T11:58:52Z",
     "updated": "2019-03-06T11:58:52Z",
     "original_url": "https://blog.jupyter.org/introducing-traefikproxy-a-new-jupyterhub-proxy-based-on-traefik-4839e972faf6",
@@ -6144,8 +7108,12 @@
   },
   "https://blog.jupyter.org/notebook-4-1-release-37d6ae621f83": {
     "title": "Notebook 4.1 release",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-01-08T23:36:01.000Z",
     "updated": "2017-08-28T18:20:30Z",
     "original_url": "https://blog.jupyter.org/notebook-4-1-release-37d6ae621f83",
@@ -6171,8 +7139,12 @@
   },
   "https://blog.jupyter.org/ipygany-jupyter-into-the-third-dimension-29a97597fc33": {
     "title": "ipygany: Jupyter into the third dimension",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2020-10-14T09:51:39Z",
     "updated": "2020-11-01T12:42:10Z",
     "original_url": "https://blog.jupyter.org/ipygany-jupyter-into-the-third-dimension-29a97597fc33",
@@ -6199,8 +7171,12 @@
   },
   "https://blog.jupyter.org/jupyter-meets-the-earth-earthcube-community-meeting-4bb9fb49cada": {
     "title": "Jupyter meets the Earth: EarthCube Community Meeting",
-    "author": "Lindsey Heagy",
-    "author_url": "https://medium.com/@lheagy",
+    "authors": [
+      {
+        "name": "Lindsey Heagy",
+        "url": "https://medium.com/@lheagy"
+      }
+    ],
     "date": "2020-08-17T19:42:47Z",
     "updated": "2020-09-11T00:32:26Z",
     "original_url": "https://blog.jupyter.org/jupyter-meets-the-earth-earthcube-community-meeting-4bb9fb49cada",
@@ -6232,8 +7208,12 @@
   },
   "https://blog.jupyter.org/omoju-miller-435db40d347e": {
     "title": "Omoju Miller",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-09-29T13:44:48Z",
     "updated": "2020-09-29T13:46:45Z",
     "original_url": "https://blog.jupyter.org/omoju-miller-435db40d347e",
@@ -6256,8 +7236,12 @@
   },
   "https://blog.jupyter.org/the-templating-system-of-nbconvert-6-47ea781eacd2": {
     "title": "The templating system of nbconvert 6",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2020-09-26T07:31:21Z",
     "updated": "2020-09-26T08:20:16Z",
     "original_url": "https://blog.jupyter.org/the-templating-system-of-nbconvert-6-47ea781eacd2",
@@ -6286,8 +7270,12 @@
   },
   "https://blog.jupyter.org/slicerjupyter-a-3d-slicer-kernel-for-interactive-publications-6f2ad829f635": {
     "title": "SlicerJupyter: a 3D Slicer kernel for interactive publications",
-    "author": "Jean-Christophe Fillion-Robin",
-    "author_url": "https://medium.com/@jcfr",
+    "authors": [
+      {
+        "name": "Jean-Christophe Fillion-Robin",
+        "url": "https://medium.com/@jcfr"
+      }
+    ],
     "date": "2020-07-08T16:29:54Z",
     "updated": "2020-07-08T16:58:49Z",
     "original_url": "https://blog.jupyter.org/slicerjupyter-a-3d-slicer-kernel-for-interactive-publications-6f2ad829f635",
@@ -6320,8 +7308,12 @@
   },
   "https://blog.jupyter.org/binder-with-zenodo-af68ed6648a6": {
     "title": "Binder + Zenodo: A how-to guide",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2019-06-21T13:46:52.603Z",
     "updated": "2019-06-22T15:42:11Z",
     "original_url": "https://blog.jupyter.org/binder-with-zenodo-af68ed6648a6",
@@ -6350,8 +7342,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-ros-3dc9dab7f421": {
     "title": "JupyterLab, the Cloud Robotics Command Station",
-    "author": "Carlos Herrero",
-    "author_url": "https://medium.com/@hbcarlos",
+    "authors": [
+      {
+        "name": "Carlos Herrero",
+        "url": "https://medium.com/@hbcarlos"
+      }
+    ],
     "date": "2020-08-11T13:19:04Z",
     "updated": "2020-08-11T13:20:45Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-ros-3dc9dab7f421",
@@ -6381,8 +7377,12 @@
   },
   "https://blog.jupyter.org/announcing-the-new-jupyter-book-cbf7aa8bc72e": {
     "title": "Announcing the new Jupyter Book",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2020-08-12T19:55:18.927Z",
     "updated": "2020-08-12T20:07:43Z",
     "original_url": "https://blog.jupyter.org/announcing-the-new-jupyter-book-cbf7aa8bc72e",
@@ -6408,8 +7408,12 @@
   },
   "https://blog.jupyter.org/anima-anandkumar-274f2619c90d": {
     "title": "Anima Anandkumar",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-07-13T20:39:03Z",
     "updated": "2020-07-15T09:58:23Z",
     "original_url": "https://blog.jupyter.org/anima-anandkumar-274f2619c90d",
@@ -6432,8 +7436,12 @@
   },
   "https://blog.jupyter.org/jeremy-howard-8dace7b4a34a": {
     "title": "Jeremy Howard",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-07-21T17:36:03Z",
     "updated": "2020-08-15T16:54:08Z",
     "original_url": "https://blog.jupyter.org/jeremy-howard-8dace7b4a34a",
@@ -6456,8 +7464,12 @@
   },
   "https://blog.jupyter.org/jupytercon-online-more-than-a-conference-4677cf25a915": {
     "title": "JupyterCon Online: more than a conference",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-06-29T19:25:58Z",
     "updated": "2020-06-30T14:16:57Z",
     "original_url": "https://blog.jupyter.org/jupytercon-online-more-than-a-conference-4677cf25a915",
@@ -6480,8 +7492,12 @@
   },
   "https://blog.jupyter.org/a-jupyter-kernel-for-sqlite-9549c5dcf551": {
     "title": "A Jupyter kernel for SQLite",
-    "author": "Mariana Meireles",
-    "author_url": "https://medium.com/@mari-meir",
+    "authors": [
+      {
+        "name": "Mariana Meireles",
+        "url": "https://medium.com/@mari-meir"
+      }
+    ],
     "date": "2020-06-11T08:42:36Z",
     "updated": "2020-12-30T15:29:30Z",
     "original_url": "https://blog.jupyter.org/a-jupyter-kernel-for-sqlite-9549c5dcf551",
@@ -6507,8 +7523,12 @@
   },
   "https://blog.jupyter.org/plasma-a-learning-platform-powered-by-jupyter-1b850fcd8624": {
     "title": "Plasma: A learning platform powered by Jupyter",
-    "author": "Jeremy Tuloup",
-    "author_url": "https://medium.com/@jeremy.tuloup",
+    "authors": [
+      {
+        "name": "Jeremy Tuloup",
+        "url": "https://medium.com/@jeremy.tuloup"
+      }
+    ],
     "date": "2020-05-11T07:55:18Z",
     "updated": "2020-05-11T07:55:18Z",
     "original_url": "https://blog.jupyter.org/plasma-a-learning-platform-powered-by-jupyter-1b850fcd8624",
@@ -6537,8 +7557,12 @@
   },
   "https://blog.jupyter.org/cir-report-i-1ca418c230cd": {
     "title": "The Jupyter Contributor In Residence, update 1",
-    "author": "Georgiana Dolocan",
-    "author_url": "https://medium.com/@georgiana.dolocan",
+    "authors": [
+      {
+        "name": "Georgiana Dolocan",
+        "url": "https://medium.com/@georgiana.dolocan"
+      }
+    ],
     "date": "2020-05-07T15:22:56Z",
     "updated": "2020-05-07T15:22:56Z",
     "original_url": "https://blog.jupyter.org/cir-report-i-1ca418c230cd",
@@ -6563,8 +7587,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol-2409409ed7ec": {
     "title": "Jupyter Community Workshop: Building upon the Jupyter Kernel Protocol",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2019-04-04T09:52:39Z",
     "updated": "2019-04-11T14:17:35Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol-2409409ed7ec",
@@ -6587,8 +7615,12 @@
   },
   "https://blog.jupyter.org/interactive-graph-visualization-in-jupyter-with-ipycytoscape-a8828a54ab63": {
     "title": "Interactive Graph Visualization in Jupyter with ipycytoscape",
-    "author": "Mariana Meireles",
-    "author_url": "https://medium.com/@mari-meir",
+    "authors": [
+      {
+        "name": "Mariana Meireles",
+        "url": "https://medium.com/@mari-meir"
+      }
+    ],
     "date": "2020-04-30T16:16:13Z",
     "updated": "2020-07-28T08:34:09Z",
     "original_url": "https://blog.jupyter.org/interactive-graph-visualization-in-jupyter-with-ipycytoscape-a8828a54ab63",
@@ -6616,8 +7648,12 @@
   },
   "https://blog.jupyter.org/a-visual-debugger-for-jupyter-914e61716559": {
     "title": "A visual debugger for Jupyter",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2020-03-25T15:53:19.396Z",
     "updated": "2020-03-26T09:12:44Z",
     "original_url": "https://blog.jupyter.org/a-visual-debugger-for-jupyter-914e61716559",
@@ -6654,8 +7690,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2020-is-a-go-47c82b281fa8": {
     "title": "JupyterCon 2020 is a go!",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2020-02-07T21:19:17Z",
     "updated": "2020-07-15T14:32:28Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2020-is-a-go-47c82b281fa8",
@@ -6677,8 +7717,12 @@
   },
   "https://blog.jupyter.org/jupyter-ascending-1bf5b362d97e": {
     "title": "Jupyter Ascending",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-08-12T05:48:58.000Z",
     "updated": "2017-08-28T18:20:34Z",
     "original_url": "https://blog.jupyter.org/jupyter-ascending-1bf5b362d97e",
@@ -6698,8 +7742,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-jupyter-for-scientific-user-facilities-and-high-performance-computing-3afa4a990086": {
     "title": "Jupyter Community Workshop: Jupyter for Scientific User Facilities and High-Performance Computing",
-    "author": "Rollin Thomas",
-    "author_url": "https://medium.com/@rcthomas",
+    "authors": [
+      {
+        "name": "Rollin Thomas",
+        "url": "https://medium.com/@rcthomas"
+      }
+    ],
     "date": "2019-01-29T19:35:15Z",
     "updated": "2019-01-29T19:35:15Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-jupyter-for-scientific-user-facilities-and-high-performance-computing-3afa4a990086",
@@ -6719,8 +7767,12 @@
   },
   "https://blog.jupyter.org/the-jupyterhub-and-binder-contributor-in-residence-56708d1e3069": {
     "title": "The JupyterHub and Binder Contributor in Residence!",
-    "author": "Tim Head",
-    "author_url": "https://medium.com/@betatim",
+    "authors": [
+      {
+        "name": "Tim Head",
+        "url": "https://medium.com/@betatim"
+      }
+    ],
     "date": "2019-11-26T19:52:08Z",
     "updated": "2019-11-26T19:52:08Z",
     "original_url": "https://blog.jupyter.org/the-jupyterhub-and-binder-contributor-in-residence-56708d1e3069",
@@ -6745,8 +7797,12 @@
   },
   "https://blog.jupyter.org/a-slideshow-template-for-voil%C3%A0-apps-435f67d10b4f": {
     "title": "A slideshow template for Voilà apps",
-    "author": "Marianne Corvellec",
-    "author_url": "https://medium.com/@marianne.corvellec",
+    "authors": [
+      {
+        "name": "Marianne Corvellec",
+        "url": "https://medium.com/@marianne.corvellec"
+      }
+    ],
     "date": "2019-10-29T10:32:34Z",
     "updated": "2019-10-29T14:11:26Z",
     "original_url": "https://blog.jupyter.org/a-slideshow-template-for-voilà-apps-435f67d10b4f",
@@ -6772,8 +7828,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-26a8417e5b6a": {
     "title": "Jupyter Community Workshops: Call for Proposals",
-    "author": "Ana Ruvalcaba",
-    "author_url": "https://medium.com/@Ruv7",
+    "authors": [
+      {
+        "name": "Ana Ruvalcaba",
+        "url": "https://medium.com/@Ruv7"
+      }
+    ],
     "date": "2018-11-14T19:26:04Z",
     "updated": "2018-11-15T18:42:25Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-call-for-proposals-26a8417e5b6a",
@@ -6793,8 +7853,12 @@
   },
   "https://blog.jupyter.org/ipycanvas-a-python-canvas-for-jupyter-bbb51e4777f7": {
     "title": "ipycanvas: A Python Canvas for Jupyter",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2019-10-25T12:48:17Z",
     "updated": "2022-04-08T08:29:20Z",
     "original_url": "https://blog.jupyter.org/ipycanvas-a-python-canvas-for-jupyter-bbb51e4777f7",
@@ -6825,8 +7889,12 @@
   },
   "https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a": {
     "title": "Interactive GIS in Jupyter with ipyleaflet",
-    "author": "QuantStack",
-    "author_url": "https://medium.com/@QuantStack",
+    "authors": [
+      {
+        "name": "QuantStack",
+        "url": "https://medium.com/@QuantStack"
+      }
+    ],
     "date": "2019-09-24T22:54:36Z",
     "updated": "2019-09-25T15:19:47Z",
     "original_url": "https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a",
@@ -6866,8 +7934,12 @@
   },
   "https://blog.jupyter.org/building-a-calculator-jupyter-kernel-4aed5764a295": {
     "title": "Building a Calculator Jupyter Kernel",
-    "author": "QuantStack",
-    "author_url": "https://medium.com/@QuantStack",
+    "authors": [
+      {
+        "name": "QuantStack",
+        "url": "https://medium.com/@QuantStack"
+      }
+    ],
     "date": "2019-07-16T08:36:31Z",
     "updated": "2019-07-16T09:14:28Z",
     "original_url": "https://blog.jupyter.org/building-a-calculator-jupyter-kernel-4aed5764a295",
@@ -6894,8 +7966,12 @@
   },
   "https://blog.jupyter.org/99-ways-to-extend-the-jupyter-ecosystem-11e5dab7c54": {
     "title": "99 ways to extend the Jupyter ecosystem",
-    "author": "yuvipanda",
-    "author_url": "https://medium.com/@yuvipanda",
+    "authors": [
+      {
+        "name": "yuvipanda",
+        "url": "https://medium.com/@yuvipanda"
+      }
+    ],
     "date": "2019-06-18T15:55:33Z",
     "updated": "2019-06-18T15:55:33Z",
     "original_url": "https://blog.jupyter.org/99-ways-to-extend-the-jupyter-ecosystem-11e5dab7c54",
@@ -6922,8 +7998,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-dashboarding-with-project-jupyter-b0e421bdf164": {
     "title": "Jupyter Community Workshop: Dashboarding with Project Jupyter",
-    "author": "Sylvain Corlay",
-    "author_url": "https://medium.com/@SylvainCorlay",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "https://medium.com/@SylvainCorlay"
+      }
+    ],
     "date": "2019-02-19T18:02:31Z",
     "updated": "2019-02-19T18:23:43Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-dashboarding-with-project-jupyter-b0e421bdf164",
@@ -6946,8 +8026,12 @@
   },
   "https://blog.jupyter.org/and-voil%C3%A0-f6a2c08a4a93": {
     "title": "And voilà!",
-    "author": "QuantStack",
-    "author_url": "https://medium.com/@QuantStack",
+    "authors": [
+      {
+        "name": "QuantStack",
+        "url": "https://medium.com/@QuantStack"
+      }
+    ],
     "date": "2019-06-11T17:42:35Z",
     "updated": "2021-01-08T08:38:30Z",
     "original_url": "https://blog.jupyter.org/and-voilà-f6a2c08a4a93",
@@ -6979,8 +8063,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshop-south-america-d8e482652952": {
     "title": "Jupyter Community Workshop: South America",
-    "author": "Damian Avila",
-    "author_url": "https://medium.com/@damianavila82",
+    "authors": [
+      {
+        "name": "Damian Avila",
+        "url": "https://medium.com/@damianavila82"
+      }
+    ],
     "date": "2019-05-28T22:04:17Z",
     "updated": "2019-05-28T22:04:17Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshop-south-america-d8e482652952",
@@ -7000,8 +8088,12 @@
   },
   "https://blog.jupyter.org/jupyter-qtconsole-4-4-81f2eaad5706": {
     "title": "Jupyter QtConsole 4.4",
-    "author": "C.A.M. Gerlach",
-    "author_url": "https://medium.com/@CAM.Gerlach",
+    "authors": [
+      {
+        "name": "C.A.M. Gerlach",
+        "url": "https://medium.com/@CAM.Gerlach"
+      }
+    ],
     "date": "2018-09-18T15:01:02Z",
     "updated": "2018-09-18T15:01:02Z",
     "original_url": "https://blog.jupyter.org/jupyter-qtconsole-4-4-81f2eaad5706",
@@ -7026,8 +8118,12 @@
   },
   "https://blog.jupyter.org/how-to-deploy-jupyterhub-with-kubernetes-on-openstack-f8f6120d4b1": {
     "title": "Deploying JupyterHub with Kubernetes on OpenStack",
-    "author": "Loïc Gouarin",
-    "author_url": "https://medium.com/@lgouarin",
+    "authors": [
+      {
+        "name": "Loïc Gouarin",
+        "url": "https://medium.com/@lgouarin"
+      }
+    ],
     "date": "2018-10-15T13:11:34Z",
     "updated": "2018-10-15T15:04:22Z",
     "original_url": "https://blog.jupyter.org/how-to-deploy-jupyterhub-with-kubernetes-on-openstack-f8f6120d4b1",
@@ -7060,8 +8156,12 @@
   },
   "https://blog.jupyter.org/announcing-jupyterhub-1-0-8fff78acad7f": {
     "title": "Announcing JupyterHub 1.0",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2019-05-04T03:58:34Z",
     "updated": "2019-05-04T03:58:34Z",
     "original_url": "https://blog.jupyter.org/announcing-jupyterhub-1-0-8fff78acad7f",
@@ -7083,8 +8183,12 @@
   },
   "https://blog.jupyter.org/ros-jupyter-b7e82b5e1202": {
     "title": "ROS @ Jupyter",
-    "author": "Wolf Vollprecht",
-    "author_url": "https://medium.com/@wolfv",
+    "authors": [
+      {
+        "name": "Wolf Vollprecht",
+        "url": "https://medium.com/@wolfv"
+      }
+    ],
     "date": "2019-04-07T21:15:07Z",
     "updated": "2019-04-07T21:15:07Z",
     "original_url": "https://blog.jupyter.org/ros-jupyter-b7e82b5e1202",
@@ -7109,8 +8213,12 @@
   },
   "https://blog.jupyter.org/open-redirect-vulnerability-in-jupyter-jupyterhub-adf43583f1e4": {
     "title": "Open Redirect Vulnerability in Jupyter notebook, JupyterHub",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2019-03-28T14:03:26Z",
     "updated": "2019-04-01T11:20:08Z",
     "original_url": "https://blog.jupyter.org/open-redirect-vulnerability-in-jupyter-jupyterhub-adf43583f1e4",
@@ -7131,8 +8239,12 @@
   },
   "https://blog.jupyter.org/authoring-custom-jupyter-widgets-2884a462e724": {
     "title": "Authoring Custom Jupyter Widgets",
-    "author": "QuantStack",
-    "author_url": "https://medium.com/@QuantStack",
+    "authors": [
+      {
+        "name": "QuantStack",
+        "url": "https://medium.com/@QuantStack"
+      }
+    ],
     "date": "2018-03-05T12:12:59Z",
     "updated": "2018-03-05T12:12:59Z",
     "original_url": "https://blog.jupyter.org/authoring-custom-jupyter-widgets-2884a462e724",
@@ -7164,8 +8276,12 @@
   },
   "https://blog.jupyter.org/the-future-of-jupytercon-2019-and-beyond-9e3002faaf48": {
     "title": "The Future of JupyterCon, 2019 and Beyond",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2018-12-12T18:20:36.718Z",
     "updated": "2018-12-12T18:20:36Z",
     "original_url": "https://blog.jupyter.org/the-future-of-jupytercon-2019-and-beyond-9e3002faaf48",
@@ -7185,8 +8301,12 @@
   },
   "https://blog.jupyter.org/deadline-extension-jupyter-community-workshops-9ff760d4e66c": {
     "title": "Deadline Extension: Jupyter Community Workshops",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2018-07-31T17:52:20.455Z",
     "updated": "2026-08-22T20:41:16Z",
     "original_url": "https://blog.jupyter.org/deadline-extension-jupyter-community-workshops-9ff760d4e66c",
@@ -7206,8 +8326,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-a7f1dca1735e": {
     "title": "Jupyter Community Workshops",
-    "author": "Jason Grout",
-    "author_url": "https://medium.com/@grout.jason",
+    "authors": [
+      {
+        "name": "Jason Grout",
+        "url": "https://medium.com/@grout.jason"
+      }
+    ],
     "date": "2019-01-15T20:06:20.565Z",
     "updated": "2019-01-16T07:48:23Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-a7f1dca1735e",
@@ -7227,8 +8351,12 @@
   },
   "https://blog.jupyter.org/a-new-python-kernel-for-jupyter-fcdf211e30a8": {
     "title": "A new Python kernel for Jupyter",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2019-01-09T09:16:43Z",
     "updated": "2019-09-30T07:04:22Z",
     "original_url": "https://blog.jupyter.org/a-new-python-kernel-for-jupyter-fcdf211e30a8",
@@ -7262,8 +8390,12 @@
   },
   "https://blog.jupyter.org/introducing-repo2docker-61a593c0752d": {
     "title": "Introducing repo2docker",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2018-12-14T18:24:13.342Z",
     "updated": "2018-12-14T19:02:31Z",
     "original_url": "https://blog.jupyter.org/introducing-repo2docker-61a593c0752d",
@@ -7286,8 +8418,12 @@
   },
   "https://blog.jupyter.org/ipython-7-0-async-repl-a35ce050f7f7": {
     "title": "IPython 7.0, Async REPL",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2018-09-27T17:41:03.848Z",
     "updated": "2018-09-27T17:41:03Z",
     "original_url": "https://blog.jupyter.org/ipython-7-0-async-repl-a35ce050f7f7",
@@ -7314,8 +8450,12 @@
   },
   "https://blog.jupyter.org/introducing-jupyter-enterprise-gateway-db4859f86762": {
     "title": "Introducing Jupyter Enterprise Gateway",
-    "author": "Luciano Resende",
-    "author_url": "https://medium.com/@lresende",
+    "authors": [
+      {
+        "name": "Luciano Resende",
+        "url": "https://medium.com/@lresende"
+      }
+    ],
     "date": "2018-09-17T20:19:21Z",
     "updated": "2018-09-17T20:19:21Z",
     "original_url": "https://blog.jupyter.org/introducing-jupyter-enterprise-gateway-db4859f86762",
@@ -7340,8 +8480,12 @@
   },
   "https://blog.jupyter.org/synopsis-jupytercon-2018-education-track-6f9b3f4d8dd9": {
     "title": "Synopsis: JupyterCon 2018 Education Track",
-    "author": "Lorena A Barba",
-    "author_url": "https://medium.com/@lorenaabarba",
+    "authors": [
+      {
+        "name": "Lorena A Barba",
+        "url": "https://medium.com/@lorenaabarba"
+      }
+    ],
     "date": "2018-08-22T01:02:11Z",
     "updated": "2018-08-22T11:54:25Z",
     "original_url": "https://blog.jupyter.org/synopsis-jupytercon-2018-education-track-6f9b3f4d8dd9",
@@ -7364,8 +8508,12 @@
   },
   "https://blog.jupyter.org/jupyter-community-workshops-cbd34ac82549": {
     "title": "Jupyter Community Workshops",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2018-07-11T18:46:00.288Z",
     "updated": "2018-08-03T10:21:43Z",
     "original_url": "https://blog.jupyter.org/jupyter-community-workshops-cbd34ac82549",
@@ -7385,8 +8533,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2018-registration-open-3b52abba9cce": {
     "title": "JupyterCon 2018: Registration Open",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2018-04-11T15:01:01.255Z",
     "updated": "2018-08-16T19:35:29Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2018-registration-open-3b52abba9cce",
@@ -7409,8 +8561,12 @@
   },
   "https://blog.jupyter.org/security-fix-for-jupyter-notebook-450f272b6932": {
     "title": "Security fix for Jupyter Notebook",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2018-07-18T04:31:39Z",
     "updated": "2018-08-16T17:33:09Z",
     "original_url": "https://blog.jupyter.org/security-fix-for-jupyter-notebook-450f272b6932",
@@ -7430,8 +8586,12 @@
   },
   "https://blog.jupyter.org/the-big-split-9d7b88a031a7": {
     "title": "The Big Split™",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-04-16T02:39:53.000Z",
     "updated": "2017-08-28T19:01:40Z",
     "original_url": "https://blog.jupyter.org/the-big-split-9d7b88a031a7",
@@ -7452,8 +8612,12 @@
   },
   "https://blog.jupyter.org/jupyterday-paris-4afa5e97cb1a": {
     "title": "JupyterDay Paris",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-12-03T23:00:28.000Z",
     "updated": "2017-08-28T19:58:19Z",
     "original_url": "https://blog.jupyter.org/jupyterday-paris-4afa5e97cb1a",
@@ -7474,8 +8638,12 @@
   },
   "https://blog.jupyter.org/jupyterday-atlanta-2016-69d78bbdd7af": {
     "title": "JupyterDay Atlanta 2016",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-07-28T18:15:41.000Z",
     "updated": "2017-08-29T19:01:13Z",
     "original_url": "https://blog.jupyter.org/jupyterday-atlanta-2016-69d78bbdd7af",
@@ -7496,8 +8664,12 @@
   },
   "https://blog.jupyter.org/announcing-jupyter-day-atlanta-spring-2018-d68ebee2c6cb": {
     "title": "The Atlanta Jupyter User Group is excited to announce Early Bird Tickets and the Call for Proposals…",
-    "author": "Tony Fast",
-    "author_url": "https://medium.com/@tonyfast",
+    "authors": [
+      {
+        "name": "Tony Fast",
+        "url": "https://medium.com/@tonyfast"
+      }
+    ],
     "date": "2018-02-06T22:01:25Z",
     "updated": "2018-02-20T21:26:59Z",
     "original_url": "https://blog.jupyter.org/announcing-jupyter-day-atlanta-spring-2018-d68ebee2c6cb",
@@ -7518,8 +8690,12 @@
   },
   "https://blog.jupyter.org/jupyterdays-boston-2016-80816ab9954f": {
     "title": "JupyterDays Boston 2016",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-02-17T00:46:12.000Z",
     "updated": "2017-08-28T18:20:44Z",
     "original_url": "https://blog.jupyter.org/jupyterdays-boston-2016-80816ab9954f",
@@ -7538,8 +8714,12 @@
   },
   "https://blog.jupyter.org/jupyterday-nyc-333efb100d08": {
     "title": "JupyterDay NYC",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-10-19T05:19:09.000Z",
     "updated": "2017-08-28T19:54:22Z",
     "original_url": "https://blog.jupyter.org/jupyterday-nyc-333efb100d08",
@@ -7560,8 +8740,12 @@
   },
   "https://blog.jupyter.org/jupyterday-hawaii-2016-da8569d52e12": {
     "title": "JupyterDay Hawaii 2016",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-09-26T22:49:13.000Z",
     "updated": "2017-08-28T20:04:12Z",
     "original_url": "https://blog.jupyter.org/jupyterday-hawaii-2016-da8569d52e12",
@@ -7582,8 +8766,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2018-nyc-august-21-25-5571d7454d5b": {
     "title": "JupyterCon 2018, NYC August 21–25",
-    "author": "Paco Xander Nathan",
-    "author_url": "https://medium.com/@pacoid",
+    "authors": [
+      {
+        "name": "Paco Xander Nathan",
+        "url": "https://medium.com/@pacoid"
+      }
+    ],
     "date": "2018-03-15T18:30:47Z",
     "updated": "2018-03-20T14:28:43Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2018-nyc-august-21-25-5571d7454d5b",
@@ -7607,8 +8795,12 @@
   },
   "https://blog.jupyter.org/jupyterhub-0-9-54d43bd08a08": {
     "title": "JupyterHub 0.9",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2018-06-18T13:18:45Z",
     "updated": "2018-06-18T15:15:28Z",
     "original_url": "https://blog.jupyter.org/jupyterhub-0-9-54d43bd08a08",
@@ -7627,8 +8819,12 @@
   },
   "https://blog.jupyter.org/i-python-you-r-we-julia-baf064ca1fb6": {
     "title": "I Python, You R, We Julia",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2018-05-29T16:11:01.362Z",
     "updated": "2018-05-29T16:11:01Z",
     "original_url": "https://blog.jupyter.org/i-python-you-r-we-julia-baf064ca1fb6",
@@ -7652,8 +8848,12 @@
   },
   "https://blog.jupyter.org/new-funding-for-jupyter-12009a836867": {
     "title": "New funding for Jupyter",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-07-08T03:34:20.000Z",
     "updated": "2017-08-28T19:43:59Z",
     "original_url": "https://blog.jupyter.org/new-funding-for-jupyter-12009a836867",
@@ -7675,8 +8875,12 @@
   },
   "https://blog.jupyter.org/jupyter-receives-the-acm-software-system-award-d433b0dfe3a2": {
     "title": "Jupyter receives the ACM Software System Award",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2018-05-02T13:01:02.662Z",
     "updated": "2018-05-02T14:03:30Z",
     "original_url": "https://blog.jupyter.org/jupyter-receives-the-acm-software-system-award-d433b0dfe3a2",
@@ -7700,8 +8904,12 @@
   },
   "https://blog.jupyter.org/interpreted-c-for-gis-with-jupyter-ae191bc6fb8e": {
     "title": "Interpreted C++ for GIS with Jupyter",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2018-04-24T08:35:10Z",
     "updated": "2019-09-30T07:04:46Z",
     "original_url": "https://blog.jupyter.org/interpreted-c-for-gis-with-jupyter-ae191bc6fb8e",
@@ -7736,8 +8944,12 @@
   },
   "https://blog.jupyter.org/release-of-ipython-5-0-8ce60b8d2e8e": {
     "title": "Release of IPython 5.0",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2016-07-08T06:56:31.000Z",
     "updated": "2017-08-28T18:20:46Z",
     "original_url": "https://blog.jupyter.org/release-of-ipython-5-0-8ce60b8d2e8e",
@@ -7759,8 +8971,12 @@
   },
   "https://blog.jupyter.org/rendering-notebooks-on-github-f7ac8736d686": {
     "title": "Rendering Notebooks on GitHub",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2015-05-07T19:47:00.000Z",
     "updated": "2017-08-28T20:08:59Z",
     "original_url": "https://blog.jupyter.org/rendering-notebooks-on-github-f7ac8736d686",
@@ -7783,8 +8999,12 @@
   },
   "https://blog.jupyter.org/we-analyzed-1-million-jupyter-notebooks-now-you-can-too-guest-post-8116a964b536": {
     "title": "We Analyzed 1 Million Jupyter Notebooks — Now You Can Too [Guest Post]",
-    "author": "Adam Rule",
-    "author_url": "https://medium.com/@acrule",
+    "authors": [
+      {
+        "name": "Adam Rule",
+        "url": "https://medium.com/@acrule"
+      }
+    ],
     "date": "2018-03-23T08:58:23Z",
     "updated": "2018-03-23T08:58:23Z",
     "original_url": "https://blog.jupyter.org/we-analyzed-1-million-jupyter-notebooks-now-you-can-too-guest-post-8116a964b536",
@@ -7807,8 +9027,12 @@
   },
   "https://blog.jupyter.org/reproducible-data-dependencies-for-python-guest-post-d0f68293a99": {
     "title": "Reproducible Data Dependencies for Python [Guest Post]",
-    "author": "Aneesh Karve",
-    "author_url": "https://medium.com/@akarve",
+    "authors": [
+      {
+        "name": "Aneesh Karve",
+        "url": "https://medium.com/@akarve"
+      }
+    ],
     "date": "2018-03-13T17:01:01Z",
     "updated": "2018-03-13T17:01:01Z",
     "original_url": "https://blog.jupyter.org/reproducible-data-dependencies-for-python-guest-post-d0f68293a99",
@@ -7831,8 +9055,12 @@
   },
   "https://blog.jupyter.org/a-diagram-editor-for-jupyterlab-a254121ff919": {
     "title": "A Diagram Editor for JupyterLab",
-    "author": "Wolf Vollprecht",
-    "author_url": "https://medium.com/@wolfv",
+    "authors": [
+      {
+        "name": "Wolf Vollprecht",
+        "url": "https://medium.com/@wolfv"
+      }
+    ],
     "date": "2018-02-26T11:33:21Z",
     "updated": "2018-02-26T11:51:03Z",
     "original_url": "https://blog.jupyter.org/a-diagram-editor-for-jupyterlab-a254121ff919",
@@ -7854,8 +9082,12 @@
   },
   "https://blog.jupyter.org/jupyterlab-is-ready-for-users-5a6f039b8906": {
     "title": "JupyterLab is Ready for Users",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2018-02-20T13:12:04.174Z",
     "updated": "2018-02-20T20:53:56Z",
     "original_url": "https://blog.jupyter.org/jupyterlab-is-ready-for-users-5a6f039b8906",
@@ -7879,8 +9111,12 @@
   },
   "https://blog.jupyter.org/security-fix-for-jupyterhub-gitlab-oauthenticator-7b14571d1f76": {
     "title": "Security fix for JupyterHub GitLab OAuthenticator Group Whitelists",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2018-02-16T22:12:54Z",
     "updated": "2018-03-16T15:15:19Z",
     "original_url": "https://blog.jupyter.org/security-fix-for-jupyterhub-gitlab-oauthenticator-7b14571d1f76",
@@ -7900,8 +9136,12 @@
   },
   "https://blog.jupyter.org/announcing-the-jupyterhub-helm-chart-v0-5-fa532bb8519d": {
     "title": "Announcing the JupyterHub Helm Chart v0.5",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2017-12-20T16:24:14.266Z",
     "updated": "2018-02-01T10:33:13Z",
     "original_url": "https://blog.jupyter.org/announcing-the-jupyterhub-helm-chart-v0-5-fa532bb8519d",
@@ -7923,8 +9163,12 @@
   },
   "https://blog.jupyter.org/congratulations-to-the-ligo-and-virgo-collaborations-from-project-jupyter-5923247be019": {
     "title": "Congratulations to the LIGO and VIRGO Collaborations from Project Jupyter",
-    "author": "Brian E. Granger",
-    "author_url": "https://medium.com/@ellisonbg",
+    "authors": [
+      {
+        "name": "Brian E. Granger",
+        "url": "https://medium.com/@ellisonbg"
+      }
+    ],
     "date": "2017-11-13T23:03:19Z",
     "updated": "2017-11-13T23:03:46Z",
     "original_url": "https://blog.jupyter.org/congratulations-to-the-ligo-and-virgo-collaborations-from-project-jupyter-5923247be019",
@@ -7945,8 +9189,12 @@
   },
   "https://blog.jupyter.org/enjoy-jupytercon-2017-on-youtube-670e5ee606a8": {
     "title": "Enjoy JupyterCon 2017 on YouTube",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2017-11-24T10:09:01.159Z",
     "updated": "2018-01-08T16:43:52Z",
     "original_url": "https://blog.jupyter.org/enjoy-jupytercon-2017-on-youtube-670e5ee606a8",
@@ -7966,8 +9214,12 @@
   },
   "https://blog.jupyter.org/jupytercon-2018-call-for-proposal-87986014ee0b": {
     "title": "JupyterCon 2018: Call For Proposal",
-    "author": "M Bussonnier",
-    "author_url": "https://medium.com/@mbussonn",
+    "authors": [
+      {
+        "name": "M Bussonnier",
+        "url": "https://medium.com/@mbussonn"
+      }
+    ],
     "date": "2018-01-18T22:53:13.831Z",
     "updated": "2018-02-20T21:27:12Z",
     "original_url": "https://blog.jupyter.org/jupytercon-2018-call-for-proposal-87986014ee0b",
@@ -7991,8 +9243,12 @@
   },
   "https://blog.jupyter.org/jupyter-notebook-5-3-0-f2b08652279d": {
     "title": "Jupyter Notebook 5.3.0",
-    "author": "Grant Nestor",
-    "author_url": "https://medium.com/@senornestor",
+    "authors": [
+      {
+        "name": "Grant Nestor",
+        "url": "https://medium.com/@senornestor"
+      }
+    ],
     "date": "2018-01-17T15:59:10Z",
     "updated": "2018-01-18T02:06:49Z",
     "original_url": "https://blog.jupyter.org/jupyter-notebook-5-3-0-f2b08652279d",
@@ -8012,8 +9268,12 @@
   },
   "https://blog.jupyter.org/the-continued-existence-of-the-emacs-ipython-notebook-54bd1c371d57": {
     "title": "The Continued Existence of the Emacs IPython Notebook",
-    "author": "Project Jupyter",
-    "author_url": "https://medium.com/@ProjectJupyter",
+    "authors": [
+      {
+        "name": "Project Jupyter",
+        "url": "https://medium.com/@ProjectJupyter"
+      }
+    ],
     "date": "2017-02-23T22:26:23.000Z",
     "updated": "2017-08-28T18:20:46Z",
     "original_url": "https://blog.jupyter.org/the-continued-existence-of-the-emacs-ipython-notebook-54bd1c371d57",
@@ -8033,8 +9293,12 @@
   },
   "https://blog.jupyter.org/public-notebooks-and-security-3058c433c884": {
     "title": "Public Notebooks and Security",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2017-11-28T19:33:18Z",
     "updated": "2017-11-28T19:33:18Z",
     "original_url": "https://blog.jupyter.org/public-notebooks-and-security-3058c433c884",
@@ -8054,8 +9318,12 @@
   },
   "https://blog.jupyter.org/binder-2-0-a-tech-guide-2017-fd40515a3a84": {
     "title": "Binder 2.0, a Tech Guide",
-    "author": "Chris Holdgraf",
-    "author_url": "https://medium.com/@choldgraf",
+    "authors": [
+      {
+        "name": "Chris Holdgraf",
+        "url": "https://medium.com/@choldgraf"
+      }
+    ],
     "date": "2017-11-30T16:01:01.658Z",
     "updated": "2017-11-30T19:25:08Z",
     "original_url": "https://blog.jupyter.org/binder-2-0-a-tech-guide-2017-fd40515a3a84",
@@ -8083,8 +9351,12 @@
   },
   "https://blog.jupyter.org/interactive-workflows-for-c-with-jupyter-fe9b54227d92": {
     "title": "Interactive Workflows for C++ with Jupyter",
-    "author": "QuantStack",
-    "author_url": "https://medium.com/@QuantStack",
+    "authors": [
+      {
+        "name": "QuantStack",
+        "url": "https://medium.com/@QuantStack"
+      }
+    ],
     "date": "2017-11-29T16:33:41Z",
     "updated": "2019-12-25T09:42:53Z",
     "original_url": "https://blog.jupyter.org/interactive-workflows-for-c-with-jupyter-fe9b54227d92",
@@ -8121,8 +9393,12 @@
   },
   "https://blog.jupyter.org/jupyterhub-0-8-19b00b75e3df": {
     "title": "JupyterHub 0.8",
-    "author": "Min RK",
-    "author_url": "https://medium.com/@minrk",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "https://medium.com/@minrk"
+      }
+    ],
     "date": "2017-10-03T19:42:26Z",
     "updated": "2017-10-03T19:42:26Z",
     "original_url": "https://blog.jupyter.org/jupyterhub-0-8-19b00b75e3df",
@@ -8141,8 +9417,12 @@
   },
   "https://blog.jupyter.org/2015/02/13/post0": {
     "title": "Welcome to Jupyter",
-    "author": "Jupyter Team",
-    "author_url": "http://blog.jupyter.org/author/jupyter/",
+    "authors": [
+      {
+        "name": "Jupyter Team",
+        "url": "http://blog.jupyter.org/author/jupyter/"
+      }
+    ],
     "date": "2015-02-13T20:27:00.000Z",
     "updated": "2015-04-15T22:37:33.000Z",
     "original_url": "http://blog.jupyter.org/2015/02/13/post0",
@@ -8161,8 +9441,12 @@
   },
   "https://blog.jupyter.org/2015/11/19/project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley": {
     "title": "Project Jupyter is hiring two postdoctoral fellows @ UC Berkeley",
-    "author": "Fernando Perez",
-    "author_url": "http://blog.jupyter.org/author/fernando/",
+    "authors": [
+      {
+        "name": "Fernando Perez",
+        "url": "http://blog.jupyter.org/author/fernando/"
+      }
+    ],
     "date": "2015-11-19T22:03:30.000Z",
     "updated": "2015-11-19T22:03:30.000Z",
     "original_url": "http://blog.jupyter.org/2015/11/19/project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley",
@@ -8181,8 +9465,12 @@
   },
   "https://blog.jupyter.org/2015/12/14/jupyterday-chicago-2016": {
     "title": "JupyterDay Chicago 2016",
-    "author": "Safia Abdalla",
-    "author_url": "http://blog.jupyter.org/author/safia/",
+    "authors": [
+      {
+        "name": "Safia Abdalla",
+        "url": "http://blog.jupyter.org/author/safia/"
+      }
+    ],
     "date": "2015-12-14T18:26:51.000Z",
     "updated": "2016-01-12T19:47:39.000Z",
     "original_url": "http://blog.jupyter.org/2015/12/14/jupyterday-chicago-2016",
@@ -8206,8 +9494,12 @@
   },
   "https://blog.jupyter.org/2015/12/15/continuum-analytics-gift": {
     "title": "Continuum Analytics donates $100k to Project Jupyter",
-    "author": "Brian Granger",
-    "author_url": "http://blog.jupyter.org/author/brian/",
+    "authors": [
+      {
+        "name": "Brian Granger",
+        "url": "http://blog.jupyter.org/author/brian/"
+      }
+    ],
     "date": "2015-12-15T16:59:54.000Z",
     "updated": "2015-12-16T01:21:17.000Z",
     "original_url": "http://blog.jupyter.org/2015/12/15/continuum-analytics-gift",
@@ -8226,8 +9518,12 @@
   },
   "https://blog.jupyter.org/2015/12/22/hiring-project-manager": {
     "title": "We are hiring a Project Manager at UC Berkeley",
-    "author": "Fernando Perez",
-    "author_url": "http://blog.jupyter.org/author/fernando/",
+    "authors": [
+      {
+        "name": "Fernando Perez",
+        "url": "http://blog.jupyter.org/author/fernando/"
+      }
+    ],
     "date": "2015-12-22T18:34:49.000Z",
     "updated": "2015-12-22T18:34:49.000Z",
     "original_url": "http://blog.jupyter.org/2015/12/22/hiring-project-manager",
@@ -8246,8 +9542,12 @@
   },
   "https://blog.jupyter.org/2015/12/22/jupyter-notebook-user-experience-survey": {
     "title": "Jupyter Notebook User Experience Survey",
-    "author": "Jupyter Team",
-    "author_url": "http://blog.jupyter.org/author/jupyter/",
+    "authors": [
+      {
+        "name": "Jupyter Team",
+        "url": "http://blog.jupyter.org/author/jupyter/"
+      }
+    ],
     "date": "2015-12-22T05:13:10.000Z",
     "updated": "2015-12-22T05:13:10.000Z",
     "original_url": "http://blog.jupyter.org/2015/12/22/jupyter-notebook-user-experience-survey",
@@ -8267,8 +9567,12 @@
   },
   "https://blog.jupyter.org/2016/02/29/jdboston16-speaker-announcement": {
     "title": "Speakers for JupyterDays Boston, March 17-18",
-    "author": "Andrew Odewahn",
-    "author_url": "http://blog.jupyter.org/author/andrew/",
+    "authors": [
+      {
+        "name": "Andrew Odewahn",
+        "url": "http://blog.jupyter.org/author/andrew/"
+      }
+    ],
     "date": "2016-02-29T22:44:44.000Z",
     "updated": "2016-02-29T22:50:19.000Z",
     "original_url": "http://blog.jupyter.org/2016/02/29/jdboston16-speaker-announcement",
@@ -8287,8 +9591,12 @@
   },
   "https://blog.jupyter.org/2016/03/09/jupyter-kernel-gateway": {
     "title": "Jupyter Kernel Gateway",
-    "author": "Peter Parente",
-    "author_url": "http://blog.jupyter.org/author/parente/",
+    "authors": [
+      {
+        "name": "Peter Parente",
+        "url": "http://blog.jupyter.org/author/parente/"
+      }
+    ],
     "date": "2016-03-09T03:19:03.000Z",
     "updated": "2016-03-11T03:19:36.000Z",
     "original_url": "http://blog.jupyter.org/2016/03/09/jupyter-kernel-gateway",
@@ -8307,8 +9615,12 @@
   },
   "https://blog.jupyter.org/2016/04/15/notebook-4-2": {
     "title": "Notebook 4.2",
-    "author": "Min RK",
-    "author_url": "http://blog.jupyter.org/author/min/",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "http://blog.jupyter.org/author/min/"
+      }
+    ],
     "date": "2016-04-15T20:31:40.000Z",
     "updated": "2016-04-16T05:03:22.000Z",
     "original_url": "http://blog.jupyter.org/2016/04/15/notebook-4-2",
@@ -8328,8 +9640,12 @@
   },
   "https://blog.jupyter.org/2016/08/03/security-fix-notebook-4-2-2": {
     "title": "Notebook 4.2.2: Security fix",
-    "author": "Min RK",
-    "author_url": "http://blog.jupyter.org/author/min/",
+    "authors": [
+      {
+        "name": "Min RK",
+        "url": "http://blog.jupyter.org/author/min/"
+      }
+    ],
     "date": "2016-08-03T20:47:08.000Z",
     "updated": "2016-08-03T20:47:08.000Z",
     "original_url": "http://blog.jupyter.org/2016/08/03/security-fix-notebook-4-2-2",
@@ -8350,8 +9666,12 @@
   },
   "https://blog.jupyter.org/2016/09/26/ipywidget-security-release": {
     "title": "ipywidget security release",
-    "author": "Jupyter Team",
-    "author_url": "http://blog.jupyter.org/author/jupyter/",
+    "authors": [
+      {
+        "name": "Jupyter Team",
+        "url": "http://blog.jupyter.org/author/jupyter/"
+      }
+    ],
     "date": "2016-09-26T23:37:05.000Z",
     "updated": "2016-12-15T18:27:16.000Z",
     "original_url": "http://blog.jupyter.org/2016/09/26/ipywidget-security-release",
@@ -8372,8 +9692,12 @@
   },
   "https://blog.jupyter.org/2017/03/01/ipywidgets-6-release": {
     "title": "Release of ipywidgets 6.0",
-    "author": "Sylvain Corlay",
-    "author_url": "http://blog.jupyter.org/author/sylvain-corlay/",
+    "authors": [
+      {
+        "name": "Sylvain Corlay",
+        "url": "http://blog.jupyter.org/author/sylvain-corlay/"
+      }
+    ],
     "date": "2017-03-01T15:44:27.000Z",
     "updated": "2017-08-28T18:33:33.000Z",
     "original_url": "http://blog.jupyter.org/2017/03/01/ipywidgets-6-release",
@@ -8393,8 +9717,12 @@
   },
   "https://blog.jupyter.org/2017/04/19/release-of-ipython-6-0": {
     "title": "Release of IPython 6.0",
-    "author": "Matthias Bussonnier",
-    "author_url": "http://blog.jupyter.org/author/matthias/",
+    "authors": [
+      {
+        "name": "Matthias Bussonnier",
+        "url": "http://blog.jupyter.org/author/matthias/"
+      }
+    ],
     "date": "2017-04-19T22:37:43.000Z",
     "updated": "2017-04-19T22:47:31.000Z",
     "original_url": "http://blog.jupyter.org/2017/04/19/release-of-ipython-6-0",
@@ -8416,8 +9744,12 @@
   },
   "https://blog.jupyter.org/2017/05/31/release-of-ipython-5-4-6-1-and-rlipython-2": {
     "title": "Release of IPython 5.4, 6.1, and rlipython.",
-    "author": "Matthias Bussonnier",
-    "author_url": "http://blog.jupyter.org/author/matthias/",
+    "authors": [
+      {
+        "name": "Matthias Bussonnier",
+        "url": "http://blog.jupyter.org/author/matthias/"
+      }
+    ],
     "date": "2017-05-31T22:47:19.000Z",
     "updated": "2017-05-31T22:47:19.000Z",
     "original_url": "http://blog.jupyter.org/2017/05/31/release-of-ipython-5-4-6-1-and-rlipython-2",
@@ -8437,8 +9769,12 @@
   },
   "https://blog.jupyter.org/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0": {
     "title": "JupyterGIS 0.16: New visualization capabilities, collaborative Story Maps, and more",
-    "author": "Martin Renou",
-    "author_url": "https://medium.com/@martinRenou",
+    "authors": [
+      {
+        "name": "Martin Renou",
+        "url": "https://medium.com/@martinRenou"
+      }
+    ],
     "date": "2026-08-24T16:09:39Z",
     "updated": "2026-08-24T16:09:39Z",
     "original_url": "https://blog.jupyter.org/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0",
@@ -8467,8 +9803,12 @@
   },
   "https://blog.jupyter.org/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f": {
     "title": "What you told us: results from the 2026 Jupyter User Experience and Product Enhancement Survey",
-    "author": "Jupyter Foundation",
-    "author_url": "https://medium.com/@jupyterfoundation",
+    "authors": [
+      {
+        "name": "Jupyter Foundation",
+        "url": "https://medium.com/@jupyterfoundation"
+      }
+    ],
     "date": "2026-08-25T13:42:25Z",
     "updated": "2026-08-25T21:08:53Z",
     "original_url": "https://blog.jupyter.org/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f",
@@ -8496,8 +9836,12 @@
   },
   "https://blog.jupyter.org/a-robotics-workbench-for-jupytercad-6eb498a22178": {
     "title": "A Robotics Workbench for JupyterCAD",
-    "author": "Yahia Heni",
-    "author_url": "https://medium.com/@yahia.heni",
+    "authors": [
+      {
+        "name": "Yahia Heni",
+        "url": "https://medium.com/@yahia.heni"
+      }
+    ],
     "date": "2026-09-02T18:22:37Z",
     "updated": "2026-09-02T18:22:37Z",
     "original_url": "https://blog.jupyter.org/a-robotics-workbench-for-jupytercad-6eb498a22178",
