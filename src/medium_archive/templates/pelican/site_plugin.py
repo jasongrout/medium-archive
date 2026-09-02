@@ -147,8 +147,8 @@ def _name_tags(article_generator):
     # reader sees is left to set. Pelican renders a tag from the Tag
     # object everywhere, including the per-tag feed's title, which it
     # builds in Python out of reach of any template; so the objects
-    # themselves are named here, the way the hugo exporter gives each
-    # term an _index.md title. Runs on article_generator_finalized: the
+    # themselves are named here, the way the hugo site's content adapter
+    # titles each term from data/tags.json. Runs on article_generator_finalized: the
     # tags are collected by then and nothing is written yet.
     #
     # Pelican builds a Tag object per article, from that article's own

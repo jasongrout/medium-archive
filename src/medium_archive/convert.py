@@ -30,8 +30,19 @@ from .readme import write_readme
 from .tags import load_tag_map
 from .urls import canonical_url, medium_id, resolve_canonical, slug_of
 
-EMPTY_INFO = {"title": "", "author": "", "author_url": None, "date": "",
+EMPTY_INFO = {"title": "", "authors": [], "date": "",
               "updated": None, "description": "", "tags": []}
+
+
+def feed_item_authors(feed_item: dict) -> list:
+    """The RSS item's authors. Items saved before authors became a list
+    carry one `author` name (raw/ is never rewritten), so read that
+    form too."""
+    if feed_item.get("authors"):
+        return feed_item["authors"]
+    if feed_item.get("author"):
+        return [{"name": feed_item["author"], "url": None}]
+    return []
 
 
 class _Converter(MarkdownConverter):
@@ -324,7 +335,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     feed_item = None
     if (raw / "feed_item.json").exists():
         feed_item = json.loads(read_raw(raw / "feed_item.json", fixups))
-        info["author"] = info["author"] or feed_item.get("author", "")
+        info["authors"] = info["authors"] or feed_item_authors(feed_item)
         info["title"] = info["title"] or feed_item.get("title", "")
         if feed_item.get("tags"):
             info["tags"] = feed_item["tags"]
@@ -336,8 +347,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     if (raw / "export.html").exists():
         exp = parse_export(read_raw(raw / "export.html", fixups))
         info["title"] = info["title"] or exp["title"]
-        info["author"] = info["author"] or exp["author"]
-        info["author_url"] = info["author_url"] or exp["author_url"]
+        info["authors"] = info["authors"] or exp["authors"]
         if exp["date"]:
             info["date"] = exp["date"]      # exact first-publish timestamp
         if exp["subtitle"]:
@@ -405,8 +415,7 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     ghost_url = gmeta.get("original_url")
     front = {
         "title": info["title"],
-        "author": info["author"],
-        "author_url": info["author_url"],
+        "authors": info["authors"],
         "date": info["date"],
         "updated": info["updated"],
         "original_url": canon,

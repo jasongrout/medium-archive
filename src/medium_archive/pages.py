@@ -162,13 +162,24 @@ def _description(soup, ld: dict, title: str) -> str:
     return ""
 
 
+def ld_authors(ld: dict) -> list:
+    """The JSON-LD author field as [{name, url}]: schema.org allows one
+    Person or a list of them, each a dict or a bare name."""
+    author = ld.get("author")
+    authors = []
+    for a in author if isinstance(author, list) else [author]:
+        name = a.get("name") if isinstance(a, dict) else a
+        if name:
+            authors.append({"name": name,
+                            "url": a.get("url") if isinstance(a, dict) else None})
+    return authors
+
+
 def extract_metadata(soup, url: str) -> dict:
     ld = parse_ld_json(soup)
-    author = ld.get("author")
-    if isinstance(author, list):
-        author = author[0] if author else None
-    author_name = author.get("name") if isinstance(author, dict) else author
-    author_url = author.get("url") if isinstance(author, dict) else None
+    authors = ld_authors(ld)
+    if not authors and meta(soup, name="author"):
+        authors = [{"name": meta(soup, name="author"), "url": None}]
     canon = soup.find("link", rel="canonical")
     # The rendered title heading keeps the full text of a title Medium
     # truncated in the headline and og:title (see untruncated_title).
@@ -180,8 +191,7 @@ def extract_metadata(soup, url: str) -> dict:
     return {
         "url": canonical_url(canon["href"]) if canon and canon.get("href") else url,
         "title": title,
-        "author": author_name or meta(soup, name="author") or "",
-        "author_url": author_url,
+        "authors": authors,
         "date": ld.get("datePublished") or meta(soup, property="article:published_time") or "",
         "updated": ld.get("dateModified"),
         "description": _description(soup, ld, title),
@@ -204,14 +214,16 @@ def ghost_metadata(soup, url: str) -> dict:
         t = soup.find("time", datetime=True)
         if t:
             info["date"] = t["datetime"]
-    if not info["author"]:
+    if not info["authors"]:
         # Casper-style footer: <section class="author"><h4><a href="/author/x">
+        # (one per author on multi-author posts; each link once)
         for a in soup.select('.author h4 a, .author-card-name a, a[href*="/author/"]'):
             name = a.get_text(strip=True)
-            if name and not name.lower().startswith("more posts"):
-                info["author"] = name
-                info["author_url"] = urljoin(info["url"], a.get("href", "")) or None
-                break
+            if (name and not name.lower().startswith("more posts")
+                    and name not in [x["name"] for x in info["authors"]]):
+                info["authors"].append({
+                    "name": name,
+                    "url": urljoin(info["url"], a.get("href", "")) or None})
     article = soup.find("article")
     if article:
         # Ghost puts each tag on the article element as a tag-<slug> class.

@@ -21,13 +21,13 @@ def write_post(out, rel, front):
 
 def build_archive(out):
     manifest = {
-        A: {"dir": "posts/2020-01-01-alpha", "title": "Alpha", "author": "Ann",
+        A: {"dir": "posts/2020-01-01-alpha", "title": "Alpha", "authors": [{"name": "Ann", "url": None}],
             "date": "2020-01-01T00:00:00Z", "tags": ["t"], "images": [],
             "body_source": "export"},
-        B: {"dir": "posts/2021-02-02-beta", "title": "Beta", "author": "Ann",
+        B: {"dir": "posts/2021-02-02-beta", "title": "Beta", "authors": [{"name": "Ann", "url": None}],
             "date": "2021-02-02T00:00:00Z", "tags": [], "images": [],
             "body_source": "page"},
-        C: {"dir": "posts/2015-03-03-old-ghost-post", "title": "Old", "author": "Bo",
+        C: {"dir": "posts/2015-03-03-old-ghost-post", "title": "Old", "authors": [{"name": "Bo", "url": None}],
             "date": "2015-03-03T00:00:00Z", "tags": [], "images": [],
             "body_source": "ghost"},
     }

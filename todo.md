@@ -300,9 +300,11 @@ Tags:
   other section's stale or contradictory entry.
 
   Each exporter carries the name the way its generator wants it. Hugo
-  gets a term page per tag, `content/tags/<tag>/_index.md` with that
+  gets the map as `data/tags.json`, from which a content adapter
+  (`content/tags/_content.gotmpl`) creates a term page per tag with that
   title, so cards, the tag page and its `<title>`, the chip index and
-  the per-tag RSS feed all pick it up while front matter keeps the slug.
+  the per-tag RSS feed all pick it up while front matter keeps the slug,
+  and a checked-in site renames a tag in one file.
   Pelican gets a `TAG_DISPLAY` map in `pelicanconf.py`, which the site
   plugin sets on the `Tag` objects once the tags are collected. Tags
   still reach Pelican as slugs, so `tag.slug` is exact rather than

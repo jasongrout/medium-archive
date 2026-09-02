@@ -40,7 +40,7 @@ def walk_sitemap(session, url, base_host, seen=None) -> list:
 
 
 def parse_feed(xml_text: str, base_host: str) -> dict:
-    """{url: {title, author, tags, date, content_html}} from RSS XML."""
+    """{url: {title, authors, tags, date, content_html}} from RSS XML."""
     soup = BeautifulSoup(xml_text, "xml")
     items = {}
     for item in soup.find_all("item"):
@@ -50,11 +50,12 @@ def parse_feed(xml_text: str, base_host: str) -> dict:
         if not is_post_url(u, base_host):
             continue
         pub = item.find("pubDate")
-        creator = item.find("dc:creator") or item.find("creator")
+        creators = item.find_all("dc:creator") or item.find_all("creator")
         content = item.find("content:encoded") or item.find("encoded")
         items[u] = {
             "title": item.title.text.strip() if item.title else "",
-            "author": creator.text.strip() if creator else "",
+            "authors": [{"name": c.text.strip(), "url": None}
+                        for c in creators if c.text.strip()],
             "tags": [c.text.strip() for c in item.find_all("category") if c.text],
             "date": pub.text.strip() if pub else None,
             "content_html": content.text if content else "",

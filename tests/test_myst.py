@@ -16,8 +16,8 @@ def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
               body: str, **extra) -> str:
     url = f"{BASE}/{slug}-{mid}"
     d = f"posts/{date[:10]}-{slug}"
-    post = {"title": slug.replace("-", " ").title(), "author": "Ada Lovelace",
-            "author_url": "https://medium.com/@ada", "date": date,
+    post = {"title": slug.replace("-", " ").title(), "date": date,
+            "authors": [{"name": "Ada Lovelace", "url": "https://medium.com/@ada"}],
             "updated": None, "original_url": url,
             "original_path": f"/{slug}-{mid}", "medium_id": mid, "slug": slug,
             "canonical_url": None, "ghost_url": None, "description": "About " + slug,
@@ -219,7 +219,8 @@ def test_escape_prose_for_myst():
 def test_mononym_author_is_literal(tmp_path):
     manifest = {}
     make_post(tmp_path, manifest, "solo", "abc123abc123",
-              "2020-01-01T00:00:00Z", "Hi.\n", author="yuvipanda")
+              "2020-01-01T00:00:00Z", "Hi.\n",
+              authors=[{"name": "yuvipanda", "url": None}])
     (tmp_path / "posts.json").write_text(json.dumps(manifest))
     site = build_site(tmp_path)
     text = (site / "posts/2020-01-01-solo/solo.md").read_text()
@@ -289,3 +290,16 @@ def test_tags_carry_their_display_names(archive):
     site = build_site(out)
     text = (site / "posts/2021-03-01-second-post/second-post.md").read_text()
     assert 'tags: ["Example Tag"]' in text
+
+
+def test_multiple_authors(tmp_path):
+    manifest = {}
+    make_post(tmp_path, manifest, "duet", "abc123abc123", "2020-01-01T00:00:00Z",
+              "Hi.\n", authors=[{"name": "Ada Lovelace", "url": "https://medium.com/@ada"},
+                                {"name": "yuvipanda", "url": None}])
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    site = build_site(tmp_path)
+    text = (site / "posts/2020-01-01-duet/duet.md").read_text()
+    assert ('authors:\n  - name: "Ada Lovelace"\n    url: "https://medium.com/@ada"\n'
+            '  - name:\n      literal: "yuvipanda"\n') in text
+    assert "Ada Lovelace, yuvipanda" in (site / "archive.md").read_text()

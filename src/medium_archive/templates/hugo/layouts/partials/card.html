@@ -18,6 +18,6 @@
 {{ with .GetTerms "tags" }}<p class="card-tags">{{ range . }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a> {{ end }}</p>{{ end }}
 <h2 class="card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
 <p class="card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
-<p class="card-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>{{ with .Params.author }} · {{ . }}{{ end }}</p>
+<p class="card-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>{{ with .Params.authors }} · {{ delimit . ", " }}{{ end }}</p>
 </div>
 </article>

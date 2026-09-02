@@ -15,8 +15,8 @@ def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
               body: str, **extra) -> str:
     url = f"{BASE}/{slug}-{mid}"
     d = f"posts/{date[:10]}-{slug}"
-    post = {"title": slug.replace("-", " ").title(), "author": "Ada Lovelace",
-            "author_url": "https://medium.com/@ada", "date": date,
+    post = {"title": slug.replace("-", " ").title(), "date": date,
+            "authors": [{"name": "Ada Lovelace", "url": "https://medium.com/@ada"}],
             "updated": None, "original_url": url,
             "original_path": f"/{slug}-{mid}", "medium_id": mid, "slug": slug,
             "canonical_url": None, "ghost_url": None, "description": "About " + slug,
@@ -196,8 +196,7 @@ def test_hugo_site_config_and_front_matter(archive, capsys):
     assert (site / "content/posts/second-post/images/cover.jpg"
             ).read_bytes() == b"PNG"
     assert front["authors"] == ["Ada Lovelace"]
-    assert front["author"] == "Ada Lovelace"
-    assert "authorlink" not in front
+    assert "author" not in front                # the taxonomy is the byline
 
 
 def test_cover_prefers_stills_falls_back_to_gifs_skips_huge(tmp_path):
@@ -304,8 +303,13 @@ def test_tag_display_names_reach_both_sites(archive):
     front = json.loads((hugo_site / "content/posts/second-post/index.md")
                        .read_text().split("\n\n", 1)[0])
     assert front["tags"] == ["example"]           # the tag is still a slug
-    term = hugo_site / "content/tags/example/_index.md"
-    assert json.loads(term.read_text()) == {"title": "Example Tag"}
+    # one data file names every tag; the content adapter beside the
+    # posts turns it into the term pages (kind term, path = slug)
+    names = hugo_site / "data/tags.json"
+    assert json.loads(names.read_text()) == {"example": "Example Tag"}
+    adapter = (hugo_site / "content/tags/_content.gotmpl").read_text()
+    assert "hugo.Data.tags" in adapter and '"kind" "term"' in adapter
+    assert not (hugo_site / "content/tags/example").exists()
 
     pelican_site = pelican.build_site(archive)
     head = (pelican_site / "content/posts/second-post/index.md") \
@@ -324,8 +328,8 @@ def test_tags_display_as_slugs_with_spaces_by_default(archive):
         post["tags"] = ["open-science"]
     (archive / "posts.json").write_text(json.dumps(manifest))
     site = hugo.build_site(archive)
-    term = site / "content/tags/open-science/_index.md"
-    assert json.loads(term.read_text()) == {"title": "open science"}
+    names = json.loads((site / "data/tags.json").read_text())
+    assert names == {"open-science": "open science"}
 
 
 def test_feed_links_carry_the_rss_mark(archive):
@@ -435,7 +439,7 @@ def test_pelican_site(archive):
     head = text.split("\n\n", 1)[0]
     assert "Title: Second Post" in head
     assert "Date: 2021-03-01 10:00" in head
-    assert "Author: Ada Lovelace" in head
+    assert "Authors: Ada Lovelace" in head
     assert "Tags: example" in head and "Slug: second-post" in head
     assert "Cover: images/" in head          # summary-card cover
     # colocated images become {attach} links -- but not inside fences
@@ -888,3 +892,43 @@ def test_animated_gifs_capped_via_gifsicle(tmp_path):
     with Image.open(placed) as im:
         assert max(im.size) == 1104 and im.n_frames == 3
     assert placed.stat().st_size < (src / "anim.gif").stat().st_size
+
+
+def test_multiple_authors_reach_both_sites(tmp_path):
+    """A post's authors list, of any length, is the byline everywhere:
+    hugo's authors taxonomy (front matter names only; the card and feed
+    read the same list), pelican's Authors: header, which it splits into
+    Author objects -- on commas, so a name holding one flips the
+    separator to semicolons."""
+    manifest = {}
+    make_post(tmp_path, manifest, "duet", "abc123abc123", "2020-01-01T00:00:00Z",
+              "Hi.\n", authors=[{"name": "Ada Lovelace", "url": "https://medium.com/@ada"},
+                                {"name": "yuvipanda", "url": None}])
+    make_post(tmp_path, manifest, "trio", "abc123abc124", "2020-01-02T00:00:00Z",
+              "Hi.\n", authors=[{"name": "Project Jupyter, Inc.", "url": None},
+                                {"name": "Min RK", "url": None}])
+    make_post(tmp_path, manifest, "solo", "abc123abc125", "2020-01-03T00:00:00Z",
+              "Hi.\n", authors=[])
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (tmp_path / "site.json").write_text(json.dumps({"title": "T"}))
+
+    site = hugo.build_site(tmp_path)
+    front = lambda stem: json.loads(
+        (site / f"content/posts/{stem}/index.md").read_text().split("\n\n", 1)[0])
+    assert front("duet")["authors"] == ["Ada Lovelace", "yuvipanda"]
+    assert "author" not in front("duet")
+    assert "authors" not in front("solo")
+    assert "capitalizeListTitles = false" in (site / "hugo.toml").read_text()
+    for layout in ("layouts/partials/card.html", "layouts/_default/rss.xml"):
+        text = (site / layout).read_text()
+        assert ".Params.authors" in text and ".Params.author " not in text, layout
+
+    site = pelican.build_site(tmp_path)
+    head = lambda stem: (site / f"content/posts/{stem}/index.md").read_text().split("\n\n", 1)[0]
+    assert "Authors: Ada Lovelace, yuvipanda\n" in head("duet")
+    assert "Authors: Project Jupyter, Inc.; Min RK\n" in head("trio")
+    assert "Author" not in head("solo")
+    for tpl in ("article", "macros", "base"):
+        text = (site / f"theme/templates/{tpl}.html").read_text()
+        assert "article.authors" in text and "article.author " not in text \
+            and "article.author." not in text and "article.author|" not in text, tpl

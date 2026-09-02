@@ -143,6 +143,12 @@ The built-in theme (`hugo.TEMPLATES` maps each file into the site; the
 regular list and taxonomy pages share `list.html`), plus:
 
 - `hugo.toml.tmpl` is the generated site config.
+- `content/tags/_content.gotmpl` is a content adapter: it creates one
+  term page per entry of `data/tags.json` (tag slug -> display name,
+  written by `hugo.write_tag_names`), so the tag pages, cards, chip
+  index and per-tag feeds all show a tag's name while its URL stays
+  the slug -- and a checked-in copy of the site renames a tag by
+  editing that one data file.
 - `layouts/_default/rss.xml` gives full-content feeds, like the
   publication's original Medium feed: summary in `<description>`,
   complete body in `<content:encoded>`, capped by `services.rss.limit`.

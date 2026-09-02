@@ -163,14 +163,15 @@ def page_front_matter(post: dict, cover: str | None = None,
     if post.get("date"):
         # bare date: MyST ignores (and warns about) a time component
         lines.append(f"date: {_yml(post['date'][:10])}")
-    if post.get("author"):
-        if " " in post["author"].strip():
-            lines.append(f"authors:\n  - name: {_yml(post['author'])}")
-        else:                    # mononym; MyST would warn parsing it
-            lines.append("authors:\n  - name:\n"
-                         f"      literal: {_yml(post['author'])}")
-        if post.get("author_url"):
-            lines.append(f"    url: {_yml(post['author_url'])}")
+    if post.get("authors"):
+        lines.append("authors:")
+        for a in post["authors"]:
+            if " " in a["name"].strip():
+                lines.append(f"  - name: {_yml(a['name'])}")
+            else:                # mononym; MyST would warn parsing it
+                lines.append(f"  - name:\n      literal: {_yml(a['name'])}")
+            if a.get("url"):
+                lines.append(f"    url: {_yml(a['url'])}")
     if post.get("tags"):
         shown = [(names or {}).get(tag, tag) for tag in post["tags"]]
         lines.append(f"tags: {_yml(shown)}")
@@ -232,8 +233,8 @@ def write_archive(site: Path, manifest: dict, stems: dict):
             date = (p.get("date") or "")[:10]
             entry = f"- {date} — [{esc(p['title'] or url)}]" \
                     f"(posts/{Path(p['dir']).name}/{stems[url]}.md)"
-            if p.get("author"):
-                entry += f" · {esc(p['author'])}"
+            if p.get("authors"):
+                entry += " · " + esc(", ".join(a["name"] for a in p["authors"]))
             lines.append(entry)
         lines.append("")
     (site / "archive.md").write_text("\n".join(lines), encoding="utf-8")
