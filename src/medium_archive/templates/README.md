@@ -160,7 +160,24 @@ regular list and taxonomy pages share `list.html`), plus:
   responsive, lazily-loaded variants (webp encodes of the still
   originals; gif/svg/webp sources pass through untouched). The render
   hook and the figure shortcode share it, so captioned and bare images
-  carry the same markup.
+  carry the same markup. The post's first image (front matter
+  `first_image`, from the exporter) is fetched eagerly at high priority
+  instead of lazily, as WordPress treats the first content image.
+- `layouts/partials/paginator.html` is the one paginator a listing
+  page (home, a section, a term) renders from, for the list templates
+  and for the head alike: page 2 of a listing is its own address, and
+  `baseof.html` names it in the canonical link, `og:url` and `<title>`
+  rather than page one, which search engines would fold every page
+  into. Hugo keeps the first paginator a page builds, so head and body
+  asking with the same arguments get the same one.
+- `layouts/partials/jsonld.html` is a post's structured data: a
+  schema.org `BlogPosting` (headline, dates, author, publisher with
+  logo, cover, keywords), built as a dict and jsonified so every value
+  is escaped for a `<script>`.
+- `layouts/robots.txt` names the sitemap Hugo generates, or disallows
+  everything when site.json sets `"noindex"` (the same switch puts a
+  `noindex` robots tag on every page, as a page's own front matter
+  does for the search page).
 - `layouts/_default/_markup/render-image.html` handles body images from
   Markdown image syntax, delegated to the partial.
 - `layouts/shortcodes/figure.html` renders a captioned (and possibly
@@ -178,14 +195,22 @@ regular list and taxonomy pages share `list.html`), plus:
   `TAG_DISPLAY`, the tag-slug-to-name map (tags reach Pelican as slugs
   so their URLs are exact; see `tags.py`).
 - `site_plugin.py` is appended verbatim after the filled config. It
-  gives Pelican the redirect stubs Hugo renders for aliases, the
-  responsive body images the hugo theme's render hook produces, and the
+  gives Pelican the redirect stubs Hugo renders for aliases (and the
+  `_redirects` file both exporters write), the responsive body images
+  the hugo theme's render hook produces (with the first one eager, as
+  there), the sitemap and robots.txt Hugo generates on its own, and the
   names tags are shown under (from `TAG_DISPLAY`, set on the `Tag`
   objects so the theme and the per-tag feeds both pick them up). It
-  refers to names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`),
-  so it is not importable on its own.
+  refers to names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
+  `NOINDEX`), so it is not importable on its own.
 - `theme/templates/` is the Jinja theme. `author.html` is `tag.html`
-  with the `tag` variable swapped for `author`; keep them in step.
+  with the `tag` variable swapped for `author`; keep them in step. Each
+  template names its page in a `name` block; `base.html` composes the
+  `<title>` and `og:title` from it, adding the page number of a
+  paginated listing and the site name, and takes the page's own
+  address from Pelican's `output_file`, so page 2 of a listing is
+  canonical to itself rather than to page 1. A template that sets
+  `noindex` (the search page) gets a `noindex` robots tag.
 
 ## myst/
 

@@ -58,6 +58,11 @@ CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = $avatar
 FAVICON = $favicon
 ANNOUNCEMENT = $announcement
+# keep search engines off this deployment (a preview): a noindex robots
+# tag on every page, and a robots.txt that disallows all
+NOINDEX = $noindex
+# the publication's @handle, credited on links shared to X/Twitter
+TWITTER = $twitter
 # tag slug -> the name the tag is shown under. Tags reach Pelican as
 # slugs, so tag.slug and every /tags/<slug>/ URL are exact rather than
 # whatever Pelican's slugify would make of a name like "C++"; the site

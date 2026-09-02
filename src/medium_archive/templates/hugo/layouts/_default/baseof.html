@@ -3,8 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
+{{/* A paginated listing is many pages, each its own address: the
+     canonical link, og:url and <title> below name the page actually
+     being rendered, not page one for all of them, which search
+     engines would otherwise fold into one (see partials/paginator.html) */}}
+{{ $pager := partial "paginator.html" . }}
+{{ $url := .Permalink }}
+{{ $name := cond .IsHome site.Title .Title }}
+{{ with $pager }}{{ $url = .URL | absURL }}{{ if gt .PageNumber 1 }}{{ $name = printf "%s · Page %d" $name .PageNumber }}{{ end }}{{ end }}
+<title>{{ $name }}{{ if not .IsHome }} · {{ site.Title }}{{ end }}</title>
 {{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
+{{/* max-image-preview:large lets a search engine show the post's images
+     at full size in results and Discover, WordPress's default on every
+     page; "noindex" (site.json, for a preview deployment, or a page's
+     front matter, the search page) keeps a page out of the index */}}
+<meta name="robots" content="{{ if or site.Params.noindex .Params.noindex }}noindex{{ else }}index, follow, max-image-preview:large{{ end }}">
 {{/* Open Graph, which LinkedIn and Facebook read and nothing else
      supplies: their share URLs carry only the page address, so the
      headline, blurb and thumbnail of a share come from these tags --
@@ -13,18 +26,25 @@
      Every URL here is absolute against baseURL, so they are as real as
      site.json's base_url (which the exporter warns about when unset). */}}
 {{ $card := "" }}{{ with .Params.cover }}{{ with $.Resources.Get . }}{{ $card = .Permalink }}{{ end }}{{ end }}
-<link rel="canonical" href="{{ .Permalink }}">
+<link rel="canonical" href="{{ $url }}">
 <meta property="og:site_name" content="{{ site.Title }}">
-<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
-<meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }}{{ end }}">
-<meta property="og:url" content="{{ .Permalink }}">
+{{ $post := eq .Type "posts" }}
+<meta property="og:type" content="{{ if $post }}article{{ else }}website{{ end }}">
+<meta property="og:title" content="{{ $name }}">
+<meta property="og:url" content="{{ $url }}">
 {{ with or .Description site.Params.description }}<meta property="og:description" content="{{ . }}">
 {{ end }}{{ with $card }}<meta property="og:image" content="{{ . }}">
 {{ end }}<meta name="twitter:card" content="{{ if $card }}summary_large_image{{ else }}summary{{ end }}">
-{{ if .IsPage }}<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
-{{ range .GetTerms "authors" }}<meta property="article:author" content="{{ .LinkTitle }}">
+{{ with site.Params.twitter }}<meta name="twitter:site" content="{{ . }}">
+{{ end }}{{ if $post }}<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{/* article:author is a profile address by the Open Graph spec (the
+     author page here); the name itself goes in the author meta tag */}}
+{{ range .GetTerms "authors" }}<meta property="article:author" content="{{ .Permalink }}">
+<meta name="author" content="{{ .LinkTitle }}">
 {{ end }}{{ range .GetTerms "tags" }}<meta property="article:tag" content="{{ .LinkTitle }}">
-{{ end }}{{ end }}{{/* the site-wide feed on every page, as the pelican theme's head has
+{{ end }}{{ partial "jsonld.html" (dict "page" . "image" $card) }}
+{{ end }}{{/* the site-wide feed on every page, as the pelican theme's head has
      it, then this page's own feed where it has one (a tag's, an
      author's, a section's) -- each titled the way that feed titles
      itself, so a reader files it under the name it will show */}}

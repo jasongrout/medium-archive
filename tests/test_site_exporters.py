@@ -702,11 +702,15 @@ def test_a_title_is_plain_text_not_html(archive):
     article = (pelican_site / "theme/templates/article.html").read_text()
     assert "{% set post_title = article.title %}" in article
     assert "article.title|striptags" not in article
+    # the page name the head renders into <title> and og:title is the
+    # template's name block, and the article's is the title as it is
+    assert "{% block name %}{{ article.title }}{% endblock %}" in article
 
     base = (pelican_site / "theme/templates/base.html").read_text()
     og_title = next(line for line in base.splitlines()
                     if 'property="og:title"' in line)
-    assert "{{ article.title|e }}" in og_title, og_title
+    assert 'content="{{ self.name() }}' in og_title, og_title
+    assert "<title>{% block name %}{{ SITENAME }}{% endblock %}" in base
     assert "striptags" not in og_title, og_title
     # the summary, though, really is HTML -- pelican formats that one,
     # and an auto-generated summary is a fragment of the body -- so it
@@ -932,3 +936,120 @@ def test_multiple_authors_reach_both_sites(tmp_path):
         text = (site / f"theme/templates/{tpl}.html").read_text()
         assert "article.authors" in text and "article.author " not in text \
             and "article.author." not in text and "article.author|" not in text, tpl
+
+
+def test_first_image_loads_eagerly(archive):
+    """Every body image is lazy except the first, which is the one most
+    likely on screen at load (WordPress's treatment of the first content
+    image): the exporter names it, and each theme fetches it eagerly at
+    high priority. A reference inside a code fence is not an image."""
+    assert sites.first_image("text\n\n```\n![x](images/a.png)\n```\n"
+                             "![y](images/b.png) and ![z](images/c.png)\n"
+                             ) == "images/b.png"
+    assert sites.first_image("no images\n") is None
+    hugo_site = hugo.build_site(archive)
+    front = json.loads((hugo_site / "content/posts/second-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert front["first_image"] == "images/001-pic.png"
+    first = json.loads((hugo_site / "content/posts/first-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert "first_image" not in first
+    partial = (hugo_site / "layouts/partials/post-image.html").read_text()
+    assert ".page.Params.first_image" in partial
+    assert 'fetchpriority="high"' in partial and 'loading="lazy"' in partial
+    pelican_site = pelican.build_site(archive)
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert "_prioritize_first_images" in config
+    assert 'fetchpriority="high"' in config
+
+
+def test_crawl_files(archive):
+    """What search engines ask for first: a sitemap and a robots.txt
+    naming it (Hugo generates the sitemap itself; Pelican's plugin
+    writes both), plus the redirect map as a `_redirects` file for hosts
+    that turn one into HTTP 301s. The search page stays out of the
+    index and the sitemap."""
+    hugo_site = hugo.build_site(archive)
+    assert "enableRobotsTXT = true" in (hugo_site / "hugo.toml").read_text()
+    robots = (hugo_site / "layouts/robots.txt").read_text()
+    assert '"sitemap.xml" | absURL' in robots and "Disallow: /" in robots
+    search = json.loads((hugo_site / "content/search.md").read_text())
+    assert search["noindex"] is True and search["sitemap"] == {"disable": True}
+    redirects = (hugo_site / "static/_redirects").read_text().splitlines()
+    assert "/first-post-aaa111aaa111 /posts/first-post/ 301" in redirects
+    assert "/2015/06/01/first-post /posts/first-post/ 301" in redirects
+    assert "/p/bbb222bbb222 /posts/second-post/ 301" in redirects
+    assert all(line.endswith(" 301") for line in redirects)
+    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    assert 'name="robots"' in baseof and "max-image-preview:large" in baseof
+    assert "site.Params.noindex" in baseof and ".Params.noindex" in baseof
+
+    pelican_site = pelican.build_site(archive)
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert "NOINDEX = False" in config
+    for name in ("_collect_sitemap", "_write_crawl_files", "sitemap.xml",
+                 "robots.txt", '"_redirects"'):
+        assert name in config, name
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    assert 'name="robots"' in base and "max-image-preview:large" in base
+    assert "NOINDEX or noindex" in base
+    search = (pelican_site / "theme/templates/search.html").read_text()
+    assert "{% set noindex = true %}" in search
+
+
+def test_noindex_and_twitter_reach_both_sites(archive):
+    """site.json's "noindex" keeps search engines off a deployment (a
+    preview, which would otherwise be indexed as a copy of the real
+    site); "twitter" credits the publication's handle on shared links."""
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["noindex"] = True
+    cfg["twitter"] = "@example"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    config = (hugo.build_site(archive) / "hugo.toml").read_text()
+    assert "noindex = true" in config and 'twitter = "@example"' in config
+    config = (pelican.build_site(archive) / "pelicanconf.py").read_text()
+    assert "NOINDEX = True" in config and 'TWITTER = "@example"' in config
+
+
+def test_page_metadata_search_engines_read(archive):
+    """What Medium's and WordPress's pages carry beyond the share tags:
+    the post's own description, its modified date, its author by name
+    and by page, structured data (a schema.org BlogPosting), and a
+    canonical address that is the page's own -- page 2 of a listing
+    included, which both engines would otherwise call page one."""
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    heads = {"hugo": (hugo_site / "layouts/_default/baseof.html").read_text(),
+             "pelican": (pelican_site / "theme/templates/base.html").read_text()}
+    for engine, head in heads.items():
+        for prop in ("article:modified_time", "article:author"):
+            assert f'property="{prop}"' in head, (engine, prop)
+        assert 'name="author"' in head, engine
+        assert 'name="twitter:site"' in head, engine
+    # structured data: one block, a BlogPosting, with the fields that
+    # matter, and every value escaped for a <script>
+    ld = (hugo_site / "layouts/partials/jsonld.html").read_text()
+    assert 'type="application/ld+json"' in ld
+    assert 'type="application/ld+json"' in heads["pelican"]
+    for key in ("BlogPosting", "headline", "datePublished", "dateModified",
+                "author", "publisher", "mainEntityOfPage"):
+        assert key in ld, key
+    assert "jsonify | safeJS" in ld
+    assert 'partial "jsonld.html"' in heads["hugo"]
+    for key in ("BlogPosting", "headline", "datePublished", "dateModified",
+                "author", "publisher", "mainEntityOfPage"):
+        assert key in heads["pelican"], key
+    assert "{{ ld|tojson }}" in heads["pelican"]
+    # a post page's description is the post's, not the site's
+    desc = next(line for line in heads["pelican"].splitlines()
+                if 'name="description"' in line)
+    assert "article.summary|striptags|e" in desc, desc
+    # the address of the page being rendered: the listing's paginator
+    # in hugo (one partial for the head and the list templates), the
+    # output file in pelican
+    assert 'partial "paginator.html"' in heads["hugo"]
+    assert '<link rel="canonical" href="{{ $url }}">' in heads["hugo"]
+    for layout in ("index.html", "_default/list.html"):
+        assert 'partial "paginator.html"' in (hugo_site / "layouts" / layout).read_text()
+    assert "output_file" in heads["pelican"]
+    assert '<link rel="canonical" href="{{ page_url }}">' in heads["pelican"]

@@ -1,0 +1,34 @@
+{{- /* Structured data for a post (ctx: page, image -- the absolute
+       og:image URL or ""): a schema.org BlogPosting, the block Medium
+       (as SocialMediaPosting) and WordPress's SEO plugins put on every
+       post, from which search engines take the headline, dates,
+       author and publisher without parsing the page. Built as a dict
+       and jsonified, so every value is escaped for a <script>. */ -}}
+{{- $p := .page -}}
+{{- $stamp := "2006-01-02T15:04:05Z07:00" -}}
+{{- $publisher := dict "@type" "Organization" "name" site.Title "url" site.Home.Permalink -}}
+{{- with site.Params.avatar -}}
+{{- $publisher = merge $publisher (dict "logo" (dict "@type" "ImageObject" "url" (. | absURL))) -}}
+{{- end -}}
+{{- $ld := dict
+  "@context" "https://schema.org"
+  "@type" "BlogPosting"
+  "mainEntityOfPage" $p.Permalink
+  "url" $p.Permalink
+  "headline" $p.Title
+  "datePublished" ($p.Date.Format $stamp)
+  "dateModified" ($p.Lastmod.Format $stamp)
+  "inLanguage" site.Language.Lang
+  "isAccessibleForFree" true
+  "publisher" $publisher -}}
+{{- with $p.Description -}}{{- $ld = merge $ld (dict "description" .) -}}{{- end -}}
+{{- with .image -}}{{- $ld = merge $ld (dict "image" (slice .)) -}}{{- end -}}
+{{- $authors := slice -}}
+{{- range $p.GetTerms "authors" -}}
+{{- $authors = $authors | append (dict "@type" "Person" "name" .LinkTitle "url" .Permalink) -}}
+{{- end -}}
+{{- with $authors -}}{{- $ld = merge $ld (dict "author" .) -}}{{- end -}}
+{{- $tags := slice -}}
+{{- range $p.GetTerms "tags" -}}{{- $tags = $tags | append .LinkTitle -}}{{- end -}}
+{{- with $tags -}}{{- $ld = merge $ld (dict "keywords" (delimit . ", ")) -}}{{- end -}}
+<script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>

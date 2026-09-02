@@ -127,6 +127,11 @@ def load_site_inputs(out: Path):
     config = {"title": "Blog archive", "description": "", "intro": ""}
     if (out / "site.json").exists():
         config.update(json.loads((out / "site.json").read_text()))
+    # Two optional keys both card themes read: "noindex" (true keeps
+    # search engines off the whole site -- a preview deployment, which
+    # would otherwise be indexed as a copy of the real one -- through a
+    # robots meta tag on every page and a robots.txt that disallows
+    # all) and "twitter" (the publication's @handle, for twitter:site).
     # Absolute links -- feed URLs, redirect stubs, the Open Graph tags
     # and the share links a reader hands to LinkedIn or Facebook -- are
     # built from base_url. Without it each exporter falls back to a
@@ -786,6 +791,15 @@ def old_paths(post: dict, url: str):
     return pairs
 
 
+def redirect_rules(manifest: dict, stems: dict, new_path):
+    """(old inbound path, new page URL, original URL) for every old
+    path of every post, oldest post first; new_path(stem) chooses the
+    URL scheme."""
+    for url, p in sorted(manifest.items(), key=lambda kv: kv[1].get("date") or ""):
+        for old, original in old_paths(p, url):
+            yield old, new_path(stems[url]), original
+
+
 def write_redirects_csv(site: Path, manifest: dict, stems: dict, new_path):
     """old inbound path -> new page URL (new_path(stem) chooses the URL
     scheme). The archive-root redirects.csv maps to posts/ directories;
@@ -794,10 +808,39 @@ def write_redirects_csv(site: Path, manifest: dict, stems: dict, new_path):
         v = "" if v is None else str(v)
         return '"' + v.replace('"', '""') + '"' if any(c in v for c in ',"\n') else v
     rows = ["old_path,new_path,original_url"]
-    for url, p in sorted(manifest.items(), key=lambda kv: kv[1].get("date") or ""):
-        for old, original in old_paths(p, url):
-            rows.append(",".join(q(x) for x in (old, new_path(stems[url]), original)))
+    for old, new, original in redirect_rules(manifest, stems, new_path):
+        rows.append(",".join(q(x) for x in (old, new, original)))
     (site / "redirects.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+
+def redirects_file(rules) -> str:
+    """The same map as a `_redirects` file -- one `old new 301` rule per
+    line, the format Netlify, Cloudflare Pages and their imitators read
+    from the site root. Where a host honors it, an old link answers
+    with a real HTTP 301, which search engines credit to the new page
+    directly; hosts that ignore the file (GitHub Pages) still serve
+    the meta-refresh stubs at the same paths. Rules from
+    redirect_rules() or the rows of redirects.csv."""
+    return "".join(f"{old} {new} 301\n" for old, new, *_ in rules)
+
+
+def first_image(markdown: str) -> str | None:
+    """The images/<name> reference of the first body image, or None. The
+    first image of a post is usually in the first screen, so the site
+    themes load it eagerly and at high priority where every later one
+    is lazy -- the treatment WordPress gives the first content image,
+    since lazy-loading the largest visible image delays the page's
+    largest contentful paint. Fenced code is skipped: an image
+    reference there is content, not an image."""
+    fence = False
+    for line in markdown.split("\n"):
+        if re.match(r"^`{3,}", line):
+            fence = not fence
+        elif not fence:
+            m = re.search(r"!\[[^\]\n]*\]\((images/[^)\s]+)\)", line)
+            if m:
+                return m.group(1)
+    return None
 
 
 def clean_site(site: Path, keep=()):
@@ -870,6 +913,11 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
         if body is None:
             continue
         body = rewrite_body(body, target_for, escape)
+        # the page's first body image, for front_matter() to name when
+        # its generator wants it (see first_image); found before the
+        # transform, which may rewrite image references into a
+        # generator's own syntax
+        p = dict(p, first_image=first_image(body))
         if transform is not None:
             body = transform(body)
         page_dir = site / "content" / "posts" / stems[url]

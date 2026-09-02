@@ -43,7 +43,13 @@ generated config embeds a small plugin (templates/pelican/site_plugin.py,
 appended verbatim): after each build it reads the
 exported redirects.csv and writes a meta-refresh redirect stub at every
 old inbound path (Medium slug+id, /p/<id>, Ghost-era) -- the same stub
-pages Hugo renders for aliases, working on any static host.
+pages Hugo renders for aliases, working on any static host -- plus the
+same map as a `_redirects` file for hosts that turn one into HTTP 301s.
+The plugin also writes what Pelican has no built-in for and Hugo emits
+on its own: a sitemap.xml of the site's pages (post lastmod from the
+updated date) and a robots.txt naming it; the theme's pages carry the
+metadata search engines and share targets read (see
+templates/README.md).
 """
 
 import json
@@ -171,6 +177,8 @@ def build_site(out):
         # themes' html announcement option), or literal HTML
         announcement=(json.dumps(config["announcement"], ensure_ascii=False)
                       if config.get("announcement") else "None"),
+        noindex="True" if config.get("noindex") else "False",
+        twitter=setting(config.get("twitter")),
         tag_display=json.dumps(dict(sorted(tag_names(manifest, out).items())),
                                ensure_ascii=False, indent=4),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")

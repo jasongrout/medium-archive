@@ -5,9 +5,14 @@
        Only photographs get the ladder: png and webp here are line art
        the placer kept whole (see ImagePlacer), whose 9 px text does not
        survive a 736 px variant, and an animated gif loses its frames
-       through the image pipeline. */ -}}
+       through the image pipeline. The post's first image (front
+       matter first_image, from the exporter) is the one most likely
+       on screen at load, so it is fetched eagerly and first, as
+       WordPress treats the first content image; every other one is
+       lazy. */ -}}
 {{- $img := .page.Resources.Get .src -}}
 {{- $alt := .alt -}}
+{{- $loading := cond (eq .src .page.Params.first_image) ` fetchpriority="high"` ` loading="lazy"` -}}
 {{- if and $img (eq $img.MediaType.MainType "image") (ne $img.MediaType.SubType "svg") -}}
 {{- $srcset := slice -}}
 {{- if not (in (slice "gif" "webp" "png") $img.MediaType.SubType) -}}
@@ -18,7 +23,7 @@
 {{- end -}}
 {{- end -}}
 {{- end -}}
-<img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy" alt="{{ $alt }}">
+<img src="{{ $img.RelPermalink }}"{{ with $srcset }} srcset="{{ delimit . ", " }}" sizes="(max-width: 800px) 100vw, 736px"{{ end }} width="{{ $img.Width }}" height="{{ $img.Height }}"{{ $loading | safeHTMLAttr }} alt="{{ $alt }}">
 {{- else -}}
-<img src="{{ .src | safeURL }}" alt="{{ $alt }}" loading="lazy">
+<img src="{{ .src | safeURL }}" alt="{{ $alt }}"{{ $loading | safeHTMLAttr }}>
 {{- end -}}

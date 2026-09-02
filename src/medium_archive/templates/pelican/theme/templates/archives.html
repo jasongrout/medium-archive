@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Archives · {{ SITENAME }}{% endblock %}
+{% block name %}Archives{% endblock %}
 {% block content %}
 <h1 class="page-title">Archives</h1>
 {% for year, year_articles in dates | groupby("date.year") | reverse %}

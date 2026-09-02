@@ -15,7 +15,11 @@ and the caption stays programmatically associated with its picture. Front matter
 authors feed Hugo's taxonomies, which give the tag/author listing pages
 and per-term RSS feeds, and every old inbound path (Medium slug+id,
 /p/<id>, Ghost-era) becomes an alias, so Hugo emits redirect stubs for
-old links on any static host.
+old links on any static host; the same map is written as a `_redirects`
+file for hosts that turn one into HTTP 301s. Hugo's own sitemap.xml
+(page lastmod from the post's updated date) is joined by a robots.txt
+naming it, and the theme's pages carry the metadata search engines and
+share targets read (see templates/README.md).
 
 Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
 are exactly the archive's tag; the names tags are shown under
@@ -46,8 +50,9 @@ import sys
 
 from .sites import (Covers, ImagePlacer, clean_site, copy_site_asset,
                     export_content, fill_template, load_site_inputs,
-                    old_paths, page_stems, rewrite_figures, tag_names,
-                    write_redirects_csv, write_templates)
+                    old_paths, page_stems, redirect_rules, redirects_file,
+                    rewrite_figures, tag_names, write_redirects_csv,
+                    write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
 # templates/README.md for the rationale behind the individual files).
@@ -61,6 +66,10 @@ TEMPLATES = {
     "layouts/_default/baseof.html": "hugo/layouts/_default/baseof.html",
     "layouts/partials/card.html": "hugo/layouts/partials/card.html",
     "layouts/partials/share.html": "hugo/layouts/partials/share.html",
+    "layouts/partials/paginator.html":
+        "hugo/layouts/partials/paginator.html",
+    "layouts/partials/jsonld.html": "hugo/layouts/partials/jsonld.html",
+    "layouts/robots.txt": "hugo/layouts/robots.txt",
     "layouts/index.html": "hugo/layouts/index.html",
     "layouts/_default/single.html": "hugo/layouts/_default/single.html",
     "layouts/_default/list.html": "hugo/layouts/_default/list.html",
@@ -118,6 +127,8 @@ def front_matter(url: str, post: dict, cover: str | None = None) -> str:
         front["authors"] = [a["name"] for a in post["authors"]]
     if cover:               # bundle resource: the card cover and og:image
         front["cover"] = cover
+    if post.get("first_image"):     # loaded eagerly, the rest lazily
+        front["first_image"] = post["first_image"]
     front["aliases"] = [path for path, _ in old_paths(post, url)]
     return json.dumps(front, indent=2, ensure_ascii=False) + "\n\n"
 
@@ -170,10 +181,13 @@ def build_site(out):
         json.dumps({"title": config["title"]}) + "\n\n"
         + (config.get("intro", "") + "\n" if config.get("intro") else ""),
         encoding="utf-8")
-    # the theme's Pagefind search page and year-grouped archives timeline
+    # the theme's Pagefind search page and year-grouped archives timeline;
+    # search results are nobody's landing page, so the search page is
+    # kept out of the index and the sitemap, as WordPress keeps its own
     (site / "content" / "search.md").write_text(
         json.dumps({"title": "Search", "layout": "search",
-                    "url": "/search/"}) + "\n", encoding="utf-8")
+                    "url": "/search/", "noindex": True,
+                    "sitemap": {"disable": True}}) + "\n", encoding="utf-8")
     (site / "content" / "archives.md").write_text(
         json.dumps({"title": "Archives", "layout": "archives",
                     "url": "/archives/"}) + "\n", encoding="utf-8")
@@ -205,6 +219,12 @@ def build_site(out):
     # like Sphinx themes' html announcement option), or literal HTML
     if config.get("announcement"):
         params["announcement"] = config["announcement"]
+    # "noindex": keep search engines off this deployment (a preview);
+    # "twitter": the publication's @handle, credited on shared links
+    if config.get("noindex"):
+        params["noindex"] = True
+    if config.get("twitter"):
+        params["twitter"] = config["twitter"]
     params.update(hugo_config.get("params", {}))
     (site / "hugo.toml").write_text(fill_template(
         "hugo/hugo.toml.tmpl",
@@ -214,7 +234,14 @@ def build_site(out):
         params=_toml_params(params),
     ), encoding="utf-8")
     write_templates(site, TEMPLATES)
-    write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
+    new_path = lambda stem: f"/posts/{stem}/"
+    write_redirects_csv(site, manifest, stems, new_path)
+    # the same map as a host-level `_redirects` file, copied to the site
+    # root from static/ (see sites.redirects_file)
+    (site / "static").mkdir(exist_ok=True)
+    (site / "static" / "_redirects").write_text(
+        redirects_file(redirect_rules(manifest, stems, new_path)),
+        encoding="utf-8")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "
           "`pagefind --site public` for search)", file=sys.stderr)
