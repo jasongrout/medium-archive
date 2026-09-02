@@ -179,7 +179,7 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 
 | field           | meaning |
 |-----------------|---------|
-| `title`         | post title |
+| `title`         | post title; one Medium cut short with an ellipsis (an untitled post is titled with its opening heading, capped at about a hundred characters) is completed from that heading |
 | `author`        | author display name (JSON-LD, or RSS `dc:creator`) |
 | `author_url`    | author profile URL on Medium, if present |
 | `date`          | publish timestamp (ISO 8601, UTC) |
