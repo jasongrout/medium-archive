@@ -186,32 +186,16 @@ It works in independent steps:
   publication's original Medium feed — with feed URLs absolutized
   against `base_url` and responsive `srcset` markup stripped, since a
   feed announces new posts while the site itself is the archive.
-  Either generated theme can be replaced by a real
-  one without touching `content/`. Render with `hugo server` or
-  `pelican -l` respectively.
+  Render with `hugo server` or `pelican -l` respectively.
 
-  The `hugo` step can also target a real theme, named in `site.json`:
+  The `hugo` step's generated config can be tuned from `site.json`:
 
   ```json
-  "hugo": {"theme": "dream",
-           "theme_repo": "https://github.com/g1eny0ung/hugo-theme-dream",
-           "avatar": "avatar.png",            // archive-relative, optional
-           "params": {"motto": "..."}}        // extra/override params
+  "hugo": {"locale": "en",                    // defaultContentLanguage
+           "avatar": "avatar.png",            // overrides the top-level key
+           "favicon": "favicon.ico",          // overrides the top-level key
+           "params": {"motto": "..."}}        // extra/override [params]
   ```
-
-  The exporter then emits the theme's config instead of its own layouts;
-  clone the theme once into `<out>/site-hugo/themes/<name>` (regeneration
-  preserves `themes/`, and the exporter prints the clone command while it
-  is missing). The [Dream theme](https://hugo-theme-dream.g1en.site)
-  (Hugo ≥ 0.158) gets first-class support: each post's first raster still
-  of sane size (animated gifs, svg badges and 25-megapixel screenshots
-  are passed over) becomes its summary-card cover and og:image, baked
-  to the same 640×360 crop-or-letterbox thumbnail as the built-in
-  theme's, authors
-  get per-post bylines with profile links, Dream's built-in search page
-  and archives timeline are enabled, an Authors nav item points at the
-  author taxonomy, `siteStartYear` is derived from the oldest post, and
-  the `avatar` image is copied into the site for the header.
 * **`lint`** scans the converted posts for conversion-defect signatures —
   leftover Medium chrome, unclosed code fences, images referenced but
   missing on disk, remote Medium CDN images, embeds whose media was never
@@ -253,7 +237,7 @@ the detail behind each.
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
-| `hugo` | hugo-specific settings, including a real theme to target instead of the built-in one |
+| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`favicon`, and extra `params` for the generated config |
 
 ## Installation
 

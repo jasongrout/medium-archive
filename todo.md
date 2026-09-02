@@ -163,19 +163,13 @@ clean `lint` run, and the offline test suite):
   generator over marking, the affordances, open/close by mouse,
   keyboard and scroll, the zoomed source being the original, and
   re-measurement when the window resizes under an image.
-- **Hugo theme support (Dream)** — site.json's `hugo` section can name
-  a real theme (`theme`, `theme_repo`, optional `avatar` and `params`);
-  the exporter then emits that theme's config instead of its own
-  layouts and keeps `site-hugo/themes/` across regenerations. Dream
-  (hugo-theme-dream, Hugo ≥ 0.158) gets first-class treatment: covers
-  for the masonry cards from each post's first still image of sane
-  size (animated gifs and >12 MP stills are passed over — Dream
-  webp-encodes covers at original size), per-post bylines with
-  profile links, the built-in search page and /posts archives
-  timeline, an Authors nav item, siteStartYear from the oldest post,
-  and an avatar copied into the site. Validated against the full
-  archive with Hugo 0.158: all pages, covers, search, tag/author
-  pages and feeds render (screenshots checked via headless Chromium).
+- **Hugo named-theme support removed** — the `hugo` step once let
+  `site.json` name a real theme (`theme`, `theme_repo`) and gave the
+  Dream theme first-class treatment (its params, search and archives
+  sections, byline links). The archive settled on the built-in card
+  theme, so that path is gone: the exporter always writes its own
+  layouts, and the `hugo` section keeps only `locale`, `avatar`,
+  `favicon` and `params`.
 
 From the 2026-08 review of other Medium-to-Markdown tools (medium-2-md,
 mediumexporter — the latter's media-resource handling exposed a silent
@@ -303,8 +297,8 @@ data loss here):
   Each exporter carries the name the way its generator wants it. Hugo
   gets a term page per tag, `content/tags/<tag>/_index.md` with that
   title, so cards, the tag page and its `<title>`, the chip index and
-  the per-tag RSS feed all pick it up — under a real theme as much as
-  the built-in one — while front matter keeps the slug. Pelican gets a
+  the per-tag RSS feed all pick it up — while front matter keeps the
+  slug. Pelican gets a
   `TAG_DISPLAY` map in `pelicanconf.py`, which the site plugin sets on
   the `Tag` objects once the tags are collected, with tags still
   reaching Pelican as slugs so `tag.slug` is exact rather than whatever

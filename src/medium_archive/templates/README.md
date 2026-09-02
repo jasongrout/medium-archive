@@ -150,9 +150,7 @@ regular list and taxonomy pages share `list.html`), plus:
   `services.rss.limit`. Feed readers resolve relative URLs unreliably,
   so root-relative src/href become absolute against baseURL, and the
   responsive srcset/sizes attributes (meaningless in a feed) are
-  stripped. Written for site and per-term feeds alike, and also when a
-  real theme is configured — feed policy is content policy, not
-  styling.
+  stripped. Written for site and per-term feeds alike.
 - `layouts/partials/post-image.html` — one body image: responsive,
   lazily-loaded variants (webp encodes of the still originals;
   gif/svg/webp sources pass through untouched). Shared by the render
@@ -165,9 +163,8 @@ regular list and taxonomy pages share `list.html`), plus:
   the image through the same partial, the caption rendered inline with
   no `<p>` wrapper, styling left to CSS. The exporter rewrites
   convert's raw figure shells into calls to this shortcode
-  (`hugo.figure_shortcodes`), and writes it even under a real theme —
-  a theme's own figure shortcode would drop the caption, which is
-  passed as inner content.
+  (`hugo.figure_shortcodes`); the caption is passed as inner content,
+  which Hugo's built-in figure shortcode would drop.
 
 ## pelican/
 

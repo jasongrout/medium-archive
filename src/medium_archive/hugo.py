@@ -22,31 +22,21 @@ are exactly the archive's tag; the name a tag is shown under (tags.json's
 `display`) arrives instead as a term page, content/tags/<tag>/_index.md
 with that title, which is how every place Hugo renders a term -- cards,
 the tag page and its <title>, the chip index, the per-tag feed -- picks
-it up at once, under a real theme as much as the built-in one.
+it up at once.
 
-Hugo has no default theme. By default the exporter writes a small
-self-contained one (layouts/ + css, from the package's templates/hugo/
-and templates/shared/ files) with light and dark palettes and a
+Hugo has no default theme. The exporter writes a small self-contained
+one (layouts/ + css, from the package's templates/hugo/ and
+templates/shared/ files) with light and dark palettes and a
 light/dark/system picker in the header (the choice persists per
 browser; with none stored, the system scheme decides) and
 click-to-zoom body images (post pages open an image whose original
 holds more detail than the column shows full size in a modal, like
 Medium's); search is then
 the one feature Hugo does not generate (run `pagefind --site public`
-after `hugo` for a static search UI). Or name a real theme in site.json --
-
-    "hugo": {"theme": "dream",
-             "theme_repo": "https://github.com/g1eny0ung/hugo-theme-dream",
-             "params": {...}}                       # optional overrides
-
--- and the exporter emits that theme's config instead of its own
-layouts; clone the theme into <out>/site-hugo/themes/<name> once
-(regeneration preserves themes/). The Dream theme
-(https://hugo-theme-dream.g1en.site) gets first-class treatment: each
-post's first image becomes its summary-card cover, the /posts archives
-page and /search page (Dream's built-in title+description search) are
-created, the RSS nav item is enabled, an Authors nav item points at the
-author taxonomy, and siteStartYear is derived from the oldest post.
+after `hugo` for a static search UI). site.json's optional `hugo`
+section tunes the generated config: `locale`, `avatar` and `favicon`
+(overriding the top-level keys), and `params` merged last into
+[params].
 """
 
 import json
@@ -59,11 +49,14 @@ from .sites import (ImagePlacer, bake_cover_thumbnails,  # noqa: F401
                     load_site_inputs, old_paths, page_stems, pick_cover,
                     tag_names, template_text, write_redirects_csv)
 
-# The built-in theme, written when site.json names no real theme: file
-# in the site -> its templates/ source (see templates/README.md for the
-# rationale behind the individual files). The regular list and taxonomy
-# pages share one layout; the stylesheet is the card look shared with
-# the pelican theme.
+# The built-in theme: file in the site -> its templates/ source (see
+# templates/README.md for the rationale behind the individual files).
+# The regular list and taxonomy pages share one layout; the stylesheet
+# is the card look shared with the pelican theme. The feed override and
+# the figure shortcode (with the image partial it and the render hook
+# share) are content policy rather than styling: the pages' figure
+# calls resolve to that shortcode, which takes the caption as inner
+# content.
 TEMPLATES = {
     "layouts/_default/baseof.html": "hugo/layouts/_default/baseof.html",
     "layouts/partials/card.html": "hugo/layouts/partials/card.html",
@@ -78,6 +71,10 @@ TEMPLATES = {
     "layouts/alias.html": "hugo/layouts/alias.html",
     "layouts/_default/_markup/render-image.html":
         "hugo/layouts/_default/_markup/render-image.html",
+    "layouts/_default/rss.xml": "hugo/layouts/_default/rss.xml",
+    "layouts/shortcodes/figure.html": "hugo/layouts/shortcodes/figure.html",
+    "layouts/partials/post-image.html":
+        "hugo/layouts/partials/post-image.html",
     "static/css/style.css": "shared/card.css",
 }
 
@@ -126,20 +123,17 @@ def front_matter(url: str, post: dict, cover: str | None = None) -> str:
         front["tags"] = post["tags"]
     if post.get("author"):
         front["authors"] = [post["author"]]      # the author taxonomy
-        front["author"] = post["author"]         # per-post byline (Dream)
-        if post.get("author_url"):
-            front["authorlink"] = post["author_url"]
-    if cover:               # bundle resource: Dream's card and og:image
+        front["author"] = post["author"]         # card byline, feed creator
+    if cover:               # bundle resource: the card cover and og:image
         front["cover"] = cover
-        front["images"] = [cover]
     front["aliases"] = [path for path, _ in old_paths(post, url)]
     return json.dumps(front, indent=2, ensure_ascii=False) + "\n\n"
 
 
 def _toml_params(params: dict) -> str:
     """[params] as TOML: flat keys first, dict values as sub-tables whose
-    dict entries render as inline tables (Dream's navItems form). Values
-    go through JSON, whose scalar/list syntax TOML shares."""
+    dict entries render as inline tables. Values go through JSON, whose
+    scalar/list syntax TOML shares."""
     j = lambda v: json.dumps(v, ensure_ascii=False)
     flat, tables = [], []
     for key, value in params.items():
@@ -155,19 +149,6 @@ def _toml_params(params: dict) -> str:
         else:
             flat.append(f"{key} = {j(value)}")
     return "\n\n".join(["[params]\n" + "\n".join(flat)] + tables)
-
-
-def dream_params(manifest: dict, config: dict) -> dict:
-    """Dream's conventions, derived from the archive: RSS in the nav, an
-    Authors item for the author taxonomy, the site's first year."""
-    years = [p["date"][:4] for p in manifest.values() if p.get("date")]
-    params = {"headerTitle": config["title"], "author": config["title"],
-              "rss": True}
-    if years:
-        params["siteStartYear"] = int(min(years))
-    params["navItems"] = {
-        "authors": {"href": "/authors", "icon": "people", "title": "Authors"}}
-    return params
 
 
 def write_tag_terms(site, names: dict):
@@ -190,34 +171,21 @@ def build_site(out):
     manifest, config = load_site_inputs(out)
     stems = page_stems(manifest)
     hugo_config = config.get("hugo", {})
-    theme = hugo_config.get("theme")
-    dream = theme == "dream"
     site = out / "site-hugo"
-    clean_site(site, keep=("public", "resources", "themes"))
+    clean_site(site, keep=("public", "resources"))
 
     (site / "content").mkdir(parents=True)
     (site / "content" / "_index.md").write_text(
         json.dumps({"title": config["title"]}) + "\n\n"
         + (config.get("intro", "") + "\n" if config.get("intro") else ""),
         encoding="utf-8")
-    if dream:
-        # Dream renders /posts as an archives timeline and turns an empty
-        # search section into its built-in title+description search page
-        (site / "content" / "posts").mkdir()
-        (site / "content" / "posts" / "_index.md").write_text(
-            json.dumps({"title": "Archives"}) + "\n", encoding="utf-8")
-        (site / "content" / "search").mkdir()
-        (site / "content" / "search" / "_index.md").write_text("{}\n",
-                                                               encoding="utf-8")
-    elif not theme:
-        # the built-in theme's Pagefind search page and year-grouped
-        # archives timeline
-        (site / "content" / "search.md").write_text(
-            json.dumps({"title": "Search", "layout": "search",
-                        "url": "/search/"}) + "\n", encoding="utf-8")
-        (site / "content" / "archives.md").write_text(
-            json.dumps({"title": "Archives", "layout": "archives",
-                        "url": "/archives/"}) + "\n", encoding="utf-8")
+    # the theme's Pagefind search page and year-grouped archives timeline
+    (site / "content" / "search.md").write_text(
+        json.dumps({"title": "Search", "layout": "search",
+                    "url": "/search/"}) + "\n", encoding="utf-8")
+    (site / "content" / "archives.md").write_text(
+        json.dumps({"title": "Archives", "layout": "archives",
+                    "url": "/archives/"}) + "\n", encoding="utf-8")
     try:
         from PIL import Image                      # noqa: F401
         have_pillow = True
@@ -240,8 +208,6 @@ def build_site(out):
     write_tag_terms(site, tag_names(manifest, out))
 
     params = {"description": config.get("description", "")}
-    if dream:
-        params.update(dream_params(manifest, config))
     # "avatar" (site.json top level, or hugo section): archive-relative
     # path of a hand-picked site logo, shown in the header; copied into
     # the site so the site stays self-contained
@@ -279,31 +245,14 @@ def build_site(out):
         base_url=json.dumps(config.get("base_url", "https://example.org/")),
         title=json.dumps(config["title"], ensure_ascii=False),
         locale=json.dumps(hugo_config.get("locale", "en")),
-        theme=f"theme = {json.dumps(theme)}\n" if theme else "",
         params=_toml_params(params),
     ), encoding="utf-8")
-    if not theme:               # the theme provides layouts and styling
-        for rel, src in TEMPLATES.items():
-            path = site / rel
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(template_text(src), encoding="utf-8")
-    # written even under a real theme -- content policy, not styling
-    # (see templates/README.md): the feed override, and the figure
-    # shortcode the pages' figure calls resolve to (a theme's own
-    # would drop the caption, passed as inner content) with the image
-    # partial it and the render hook share
-    for rel in ("layouts/_default/rss.xml",
-                "layouts/shortcodes/figure.html",
-                "layouts/partials/post-image.html"):
+    for rel, src in TEMPLATES.items():
         path = site / rel
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(template_text("hugo/" + rel), encoding="utf-8")
+        path.write_text(template_text(src), encoding="utf-8")
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
-    if theme and not (site / "themes" / theme).is_dir():
-        repo = hugo_config.get("theme_repo", "<theme repository>")
-        print(f"theme missing (kept across regenerations): "
-              f"git clone {repo} {site / 'themes' / theme}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "
           "`pagefind --site public` for search)", file=sys.stderr)
     return site
