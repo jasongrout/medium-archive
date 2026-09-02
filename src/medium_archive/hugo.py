@@ -110,9 +110,8 @@ def front_matter(url: str, post: dict, cover: str | None = None) -> str:
         front["description"] = post["description"]
     if post.get("tags"):
         front["tags"] = post["tags"]
-    if post.get("author"):
-        front["authors"] = [post["author"]]      # the author taxonomy
-        front["author"] = post["author"]         # card byline, feed creator
+    if post.get("authors"):                      # the author taxonomy
+        front["authors"] = [a["name"] for a in post["authors"]]
     if cover:               # bundle resource: the card cover and og:image
         front["cover"] = cover
     front["aliases"] = [path for path, _ in old_paths(post, url)]

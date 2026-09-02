@@ -13,7 +13,7 @@
 <article class="post" data-pagefind-body>
 <h1>{{ article.title }}</h1>
 <p class="post-meta"><time>{{ article.locale_date }}</time>
-{%- if article.author %} · <a href="{{ SITEURL }}/{{ article.author.url }}">{{ article.author }}</a>{% endif %}
+{%- for a in article.authors %} · <a href="{{ SITEURL }}/{{ a.url }}">{{ a }}</a>{% endfor %}
 {%- if article.tags %} ·{% for t in article.tags %} <a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a>{% endfor %}{% endif %}</p>
 {{ share(post_url, post_title) }}
 {{ article.content|safe }}

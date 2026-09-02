@@ -112,8 +112,8 @@ def test_ghost_page_parsing():
     info = ghost_metadata(soup, "http://x/")
     assert info["title"] == "Hello World"
     assert info["date"] == "2015-03-04T10:00:00.000Z"
-    assert info["author"] == "Ann Author"
-    assert info["author_url"] == "http://blog.example.com/author/ann/"
+    assert info["authors"] == [{"name": "Ann Author",
+                                "url": "http://blog.example.com/author/ann/"}]
     assert info["tags"] == ["news"]
     assert info["description"] == "A first post"
     body = ghost_body(soup)

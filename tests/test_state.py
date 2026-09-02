@@ -54,8 +54,8 @@ def md_of_state(state):
 def test_metadata_from_state():
     info = state_metadata(make_state([]), MID)
     assert info["title"] == "My Post"
-    assert info["author"] == "Ann Author"
-    assert info["author_url"] == "https://medium.com/@ann"
+    assert info["authors"] == [{"name": "Ann Author",
+                                "url": "https://medium.com/@ann"}]
     assert info["date"] == "2019-12-29T12:11:11Z"
     assert info["updated"] == "2019-12-29T12:15:50Z"
     assert info["description"] == "The subtitle."

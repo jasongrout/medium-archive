@@ -24,8 +24,8 @@
 {% if og_image %}<meta property="og:image" content="{{ og_image }}">
 {% endif %}<meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}">
 {% if article %}<meta property="article:published_time" content="{{ article.date.isoformat() }}">
-{% if article.author %}<meta property="article:author" content="{{ article.author|e }}">
-{% endif %}{% for t in article.tags %}<meta property="article:tag" content="{{ t|e }}">
+{% for a in article.authors %}<meta property="article:author" content="{{ a|e }}">
+{% endfor %}{% for t in article.tags %}<meta property="article:tag" content="{{ t|e }}">
 {% endfor %}{% endif %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
 {% if tag and TAG_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ TAG_FEED_ATOM.format(slug=tag.slug) }}" title="{{ SITENAME }} - {{ tag }}">
 {% elif author and AUTHOR_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ AUTHOR_FEED_ATOM.format(slug=author.slug) }}" title="{{ SITENAME }} - {{ author }}">

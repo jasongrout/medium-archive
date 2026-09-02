@@ -49,7 +49,7 @@ def test_wayback_urls_paginates_filters_and_dates():
 def test_discover_merges_sources_and_dedupes_by_id(monkeypatch, tmp_path):
     monkeypatch.setattr(discovery, "fetch_feed", lambda session, base, raw_dir: {
         "https://blog.example.com/new-post-111122223333": {
-            "title": "t", "author": "a", "tags": [],
+            "title": "t", "authors": [{"name": "a", "url": None}], "tags": [],
             "date": "Mon, 03 Aug 2026 10:00:00 GMT", "content_html": ""}})
     monkeypatch.setattr(discovery, "walk_sitemap", lambda session, url, host, seen=None: [
         ("https://blog.example.com/renamed-post-abcdefabcdef", None)])
@@ -64,3 +64,15 @@ def test_discover_merges_sources_and_dedupes_by_id(monkeypatch, tmp_path):
     assert d["https://blog.example.com/new-post-111122223333"][1] == "feed"
     assert d["https://blog.example.com/first-post-0123456789ab"][1] == "wayback"
     assert len(d) == 4
+
+
+def test_parse_feed_collects_every_creator():
+    xml = """<?xml version="1.0"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
+<item><title>Two</title><link>https://blog.example.com/two-111122223333</link>
+<dc:creator>Ann</dc:creator><dc:creator>Bo</dc:creator><category>t</category></item>
+<item><title>None</title><link>https://blog.example.com/none-111122224444</link></item>
+</channel></rss>"""
+    items = discovery.parse_feed(xml, "blog.example.com")
+    assert items["https://blog.example.com/two-111122223333"]["authors"] == \
+        [{"name": "Ann", "url": None}, {"name": "Bo", "url": None}]
+    assert items["https://blog.example.com/none-111122224444"]["authors"] == []

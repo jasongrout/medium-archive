@@ -96,7 +96,8 @@ def cmd_stats(args):
         else:
             missing_bodies += 1
 
-    authors = Counter((p.get("author") or "(unknown)") for p in posts)
+    authors = Counter(a["name"] for p in posts
+                      for a in p.get("authors") or [{"name": "(unknown)"}])
     tags = Counter(t for p in posts for t in p.get("tags") or [])
     untagged = sum(1 for p in posts if not p.get("tags"))
     years = Counter(d[:4] for d in dates)

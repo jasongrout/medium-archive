@@ -402,3 +402,27 @@ def test_converted_front_matter_description_has_no_title(tmp_path):
     front = convert_post(URL, raw, tmp_path / "posts", prefer_page=True)
     assert front["title"] == "Widgets for everyone"
     assert front["description"] == "We shipped it."
+
+
+def test_json_ld_authors_one_or_many():
+    from medium_archive.pages import ld_authors
+    # schema.org allows one Person or a list, each a dict or a bare name
+    assert ld_authors({"author": {"name": "Ann", "url": "https://medium.com/@ann"}}) \
+        == [{"name": "Ann", "url": "https://medium.com/@ann"}]
+    assert ld_authors({"author": [{"name": "Ann"}, "Bo", {"url": "x"}]}) \
+        == [{"name": "Ann", "url": None}, {"name": "Bo", "url": None}]
+    assert ld_authors({}) == []
+    # a page without JSON-LD falls back to the author meta tag
+    soup = BeautifulSoup('<html><head><meta name="author" content="Cy">'
+                         '</head><body></body></html>', "html.parser")
+    assert extract_metadata(soup, URL)["authors"] == [{"name": "Cy", "url": None}]
+
+
+def test_feed_item_authors_reads_the_old_single_author_form():
+    from medium_archive.convert import feed_item_authors
+    # raw/ is never rewritten: feed items saved before authors became a
+    # list carry one name under `author`
+    assert feed_item_authors({"author": "Ann"}) == [{"name": "Ann", "url": None}]
+    assert feed_item_authors({"authors": [{"name": "Ann", "url": None}],
+                              "author": "ignored"}) == [{"name": "Ann", "url": None}]
+    assert feed_item_authors({"author": ""}) == []

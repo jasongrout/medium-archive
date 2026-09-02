@@ -30,8 +30,8 @@ def parse_export(text: str) -> dict:
     return {
         "title": title.get_text(strip=True) if title else "",
         "subtitle": subtitle.get_text(" ", strip=True) if subtitle else "",
-        "author": author.get_text(strip=True) if author else "",
-        "author_url": author.get("href") if author else None,
+        "authors": [{"name": author.get_text(strip=True),
+                     "url": author.get("href")}] if author else [],
         "date": time_el.get("datetime") if time_el else "",
         "canonical_url": canonical_url(canon["href"]) if canon and canon.get("href") else None,
         "soup": soup,

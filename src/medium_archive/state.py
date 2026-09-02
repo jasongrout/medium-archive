@@ -120,8 +120,9 @@ def state_metadata(state: dict, medium_id: str) -> dict:
     return {
         "url": post.get("canonicalUrl") or post.get("mediumUrl") or "",
         "title": post.get("title") or "",
-        "author": creator.get("name") or "",
-        "author_url": f"https://medium.com/@{username}" if username else None,
+        "authors": [{"name": creator["name"],
+                     "url": f"https://medium.com/@{username}" if username else None}]
+        if creator.get("name") else [],
         "date": iso(first) if first else "",
         "updated": iso(latest) if latest > first else None,
         "description": preview.get("subtitle") or "",

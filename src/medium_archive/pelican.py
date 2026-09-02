@@ -131,8 +131,12 @@ def build_site(out):
             text += _meta("Date", post["date"][:16].replace("T", " "))
         if post.get("updated"):
             text += _meta("Modified", post["updated"][:16].replace("T", " "))
-        if post.get("author"):
-            text += _meta("Author", post["author"])
+        if post.get("authors"):
+            # Pelican splits the list on semicolons when it has any,
+            # else on commas: pick the separator no name contains
+            names = [a["name"] for a in post["authors"]]
+            sep = "; " if any("," in n for n in names) else ", "
+            text += _meta("Authors", sep.join(names))
         if post.get("tags"):
             text += _meta("Tags", ", ".join(post["tags"]))
         text += _meta("Slug", stems[url])
