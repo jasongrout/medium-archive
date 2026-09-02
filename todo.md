@@ -123,7 +123,10 @@ clean `lint` run, and the offline test suite):
   animated gifs, emits fixed-name srcset descriptors regardless of
   actual image size, and adds bs4+lxml (AGPL) to the site's build
   requirements. Covers are chosen by sniffing dimensions from image
-  headers (no image library needed for that path). Relatedly,
+  headers (no image library needed for that path); only png/jpeg/webp
+  names qualify, since the baked cover is served as cover.jpg and
+  Hugo's card template rasterizes it, aborting the build on an svg
+  badge it cannot decode. Relatedly,
   `convert` now renames images fetched from extensionless URLs
   (stored as `.bin` in raw/) to the extension their bytes call for, so
   every derived layer gets typed image names — 103 such files in the

@@ -225,6 +225,22 @@ def test_cover_skips_gifs_and_huge_stills(tmp_path):
     assert hugo.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
 
 
+def test_cover_skips_svgs_and_untyped_images(tmp_path):
+    """The baked cover is served as cover.jpg and Hugo's card template
+    rasterizes it, so an svg badge as the cover aborts the whole hugo
+    build ("image: unknown format"): only raster formats qualify. A
+    .bin (bytes convert could not type) is no cover either."""
+    images = tmp_path / "images"
+    images.mkdir()
+    (images / "badge.svg").write_bytes(b'<svg xmlns="http://www.w3.org/2000/svg"/>')
+    (images / "blob.bin").write_bytes(b"?")
+    (images / "photo.JPG").write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 16)
+    post = {"images": ["images/anim.gif", "images/badge.svg",
+                       "images/blob.bin", "images/photo.JPG"]}
+    assert hugo.pick_cover(post, tmp_path) == "images/photo.JPG"
+    assert hugo.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
+
+
 def test_cover_thumbnails_crop_or_letterbox(tmp_path):
     from PIL import Image
 

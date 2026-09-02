@@ -208,13 +208,24 @@ def image_size(path):
     return None
 
 
+# What a summary-card cover may be: the raster formats every card
+# template and Pillow decode. Not gif (animated ones are busy in a card
+# grid and cost an animated encode per build), not svg (a badge from
+# shields.io re-hosted by Medium is the usual one), not the .bin of
+# unrecognized bytes. Names are trusted: convert already typed the
+# extensionless downloads by their bytes.
+COVER_EXTS = (".png", ".jpg", ".jpeg", ".webp")
+
+
 def pick_cover(post: dict, post_dir) -> str | None:
-    """The post's first still image of sane size, for its summary card:
-    an animated gif is busy in a card grid (and costs an animated encode
-    per build), an enormous still is slow or worse (see
-    MAX_COVER_PIXELS); an unreadable one is left to the generator."""
+    """The post's first raster still of sane size, for its summary card
+    -- see COVER_EXTS; an enormous still is passed over too (slow or
+    worse, see MAX_COVER_PIXELS). Only decodable formats qualify: the
+    baked cover is served as cover.jpg whatever it was, and Hugo's card
+    template rasterizes it (.Fill), which aborts the whole build on an
+    svg it cannot decode."""
     for image in post.get("images", ()):
-        if image.lower().endswith(".gif"):
+        if not image.lower().endswith(COVER_EXTS):
             continue
         try:
             size = image_size(post_dir / image)

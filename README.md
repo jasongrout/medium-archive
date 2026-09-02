@@ -203,10 +203,11 @@ It works in independent steps:
   clone the theme once into `<out>/site-hugo/themes/<name>` (regeneration
   preserves `themes/`, and the exporter prints the clone command while it
   is missing). The [Dream theme](https://hugo-theme-dream.g1en.site)
-  (Hugo ≥ 0.158) gets first-class support: each post's first still image
-  of sane size (animated gifs and 25-megapixel screenshots are passed
-  over) becomes its summary-card cover and og:image, baked to the same
-  640×360 crop-or-letterbox thumbnail as the built-in theme's, authors
+  (Hugo ≥ 0.158) gets first-class support: each post's first raster still
+  of sane size (animated gifs, svg badges and 25-megapixel screenshots
+  are passed over) becomes its summary-card cover and og:image, baked
+  to the same 640×360 crop-or-letterbox thumbnail as the built-in
+  theme's, authors
   get per-post bylines with profile links, Dream's built-in search page
   and archives timeline are enabled, an Authors nav item points at the
   author taxonomy, `siteStartYear` is derived from the oldest post, and
