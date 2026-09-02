@@ -8493,5 +8493,32 @@
     ],
     "body_source": "feed",
     "dir": "posts/2026-08-25-what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan"
+  },
+  "https://blog.jupyter.org/a-robotics-workbench-for-jupytercad-6eb498a22178": {
+    "title": "A Robotics Workbench for JupyterCAD",
+    "author": "Yahia Heni",
+    "author_url": "https://medium.com/@yahia.heni",
+    "date": "2026-09-02T18:22:37Z",
+    "updated": "2026-09-02T18:22:37Z",
+    "original_url": "https://blog.jupyter.org/a-robotics-workbench-for-jupytercad-6eb498a22178",
+    "original_path": "/a-robotics-workbench-for-jupytercad-6eb498a22178",
+    "medium_id": "6eb498a22178",
+    "slug": "a-robotics-workbench-for-jupytercad",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "A unified in-browser workflow from CAD to URDF kinematics",
+    "tags": [
+      "jupytercad",
+      "robotics",
+      "urdu"
+    ],
+    "images": [
+      "images/001-1_pZAalrX9FpY6Bbv0aSJAWg.gif",
+      "images/002-1_eWCCAx2Uyw7pf3DXCmbVyQ.gif",
+      "images/003-1_hG86LjJfW9V_AVmjbAd_Pw.gif",
+      "images/004-0_Zir-X_cL1PYlmmnW.svg"
+    ],
+    "body_source": "feed",
+    "dir": "posts/2026-09-02-a-robotics-workbench-for-jupytercad"
   }
 }
