@@ -167,12 +167,14 @@ with none stored, the system scheme decides. The theme provides:
   address to be sent to, so the Mastodon link asks the reader for their
   server and remembers it per browser, accepting a pasted server URL or
   an `@you@server` handle as readily as a bare domain.
-- Open Graph metadata on every page: `og:title`, `og:description`,
-  `og:url`, the baked 640×360 cover as `og:image`, `article:` dates and
-  authors, and a canonical link. LinkedIn's and Facebook's share URLs
-  carry only the page address and build their whole share box from
-  these tags, so they are the difference between a share link that
-  works and one that posts a bare URL.
+- Open Graph metadata on every page: `og:site_name`, `og:type`,
+  `og:title`, `og:url`, `og:description`, the baked 640×360 cover as
+  `og:image` (with `twitter:card` following whether there is one),
+  `article:published_time`, the post's authors and tags, and a
+  canonical link. LinkedIn's and Facebook's share URLs carry only the
+  page address and build their whole share box from these tags, so they
+  are the difference between a share link that works and one that posts
+  a bare URL.
 - A `/search/` page wired to [Pagefind](https://pagefind.app). Run
   `pagefind --site public` (hugo) or `pagefind --site output` (pelican)
   after building for full-text search served as a results page with
@@ -221,14 +223,14 @@ Hugo does it through `aliases` front matter. Pelican has no aliases
 feature, so a small plugin embedded in the generated config turns the
 exported `redirects.csv` into the same stub pages after each build.
 
-Tag and author pages come with per-term RSS/Atom feeds on both,
-pelican's from its own tag/author machinery. Each feed is linked from
+Tag and author pages come with per-term feeds on both: RSS from hugo,
+Atom from pelican's own tag/author machinery. Each feed is linked from
 its own page by the RSS mark that also serves as the header's feed
 link. Every feed carries the 20 most recent posts with their full
-content, like the publication's original Medium feed. Feed URLs are
-absolutized against `base_url` and responsive `srcset` markup is
-stripped: a feed announces new posts, while the site itself is the
-archive.
+content, like the publication's original Medium feed, with URLs made
+absolute against `base_url` and without the responsive `srcset` markup
+the pages carry. A feed announces new posts, while the site itself is
+the archive.
 
 ### The MyST site
 
