@@ -144,9 +144,12 @@ redirects.csv                 original_path, medium_id, original_url,
 posts/
   <YYYY-MM-DD>-<slug>/        one directory per converted post
     index.md                  front matter + Markdown body
-    images/<filename>         images copied from raw/, referenced relatively
-site.json                     optional hand-written site text used by `myst`:
-                                title, description, intro (landing page)
+    images/<filename>         full-resolution images copied from raw/,
+                                referenced relatively
+site.json                     optional hand-written site settings read by
+                                every site exporter: title, description,
+                                intro (landing page), base_url, avatar,
+                                favicon, announcement, image caps, hugo
 site-myst/                    optional MyST site built by `medium-archive
                                 myst` from posts/ + posts.json:
   myst.yml                    project config, plugins, and year-grouped toc
@@ -158,8 +161,9 @@ site-myst/                    optional MyST site built by `medium-archive
     <page>.md                 the post, MyST front matter + rewritten body;
                                 the page's URL slug is the filename, capped
                                 by mystmd at 50 characters
-    images/<filename>         hard links to the images in posts/, plus the
-                                baked cover.jpg gallery thumbnail
+    images/<filename>         display copies of the images in posts/ (see
+                                the medium-archive README), plus the baked
+                                cover.jpg gallery thumbnail
   redirects.csv               old inbound path -> the page URL mystmd serves
 site-hugo/,                   optional Hugo/Pelican sites built by
 site-pelican/                   `medium-archive hugo|pelican`: the same
@@ -280,9 +284,11 @@ Medium era keep working too.
 
 ## Building the sites
 
-Tools: Hugo extended >= 0.158, `pip install pelican markdown pillow`,
-`npm install -g mystmd pagefind`, and optionally gifsicle (without it,
-animated-gif display copies keep their full size).
+Tools: Hugo extended (0.128 or newer, for the generated config's
+`[pagination]` table; validated with 0.140 and 0.158),
+`pip install pelican markdown pillow`, `npm install -g mystmd pagefind`,
+and optionally gifsicle (without it, animated-gif display copies keep
+their full size).
 
 Before deploying, set `base_url` in `site.json` to the site's real
 domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
