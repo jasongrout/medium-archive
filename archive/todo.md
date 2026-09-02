@@ -60,8 +60,7 @@ Last full validation, all three against all 333 posts:
   variants for body images (~2100 processed images, ~2 min build).
   `pagefind --site public` after `hugo` gives /search/ — a results
   page with highlighted in-context excerpts and per-section
-  sub-results. All verified in headless Chromium. (site.json can
-  instead target the Dream theme; that support remains.)
+  sub-results. All verified in headless Chromium.
 - **pelican, card theme** (pelican 4.12.0): the same card-grid look
   from the exporter's own Pelican theme — cover cards (640×360 JPEG
   thumbnails generated at export when Pillow is installed, ~16 KB
