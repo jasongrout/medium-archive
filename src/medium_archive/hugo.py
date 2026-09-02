@@ -18,11 +18,13 @@ and per-term RSS feeds, and every old inbound path (Medium slug+id,
 old links on any static host.
 
 Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
-are exactly the archive's tag; the name a tag is shown under (tags.json's
-`display`) arrives instead as a term page, content/tags/<tag>/_index.md
-with that title, which is how every place Hugo renders a term -- cards,
-the tag page and its <title>, the chip index, the per-tag feed -- picks
-it up at once.
+are exactly the archive's tag; the names tags are shown under
+(tags.json's `display`) arrive instead as one data file, data/tags.json,
+from which a content adapter, content/tags/_content.gotmpl, creates the
+term pages with those titles -- which is how every place Hugo renders a
+term (cards, the tag page and its <title>, the chip index, the per-tag
+feed) picks a name up at once, and how a checked-in copy of the site
+renames a tag by editing one file rather than a directory per tag.
 
 Hugo has no default theme. The exporter writes a small self-contained
 one (layouts/ + css, from the package's templates/hugo/ and
@@ -74,6 +76,8 @@ TEMPLATES = {
     "layouts/partials/post-image.html":
         "hugo/layouts/partials/post-image.html",
     "static/css/style.css": "shared/card.css",
+    # the term pages, from data/tags.json (see write_tag_names)
+    "content/tags/_content.gotmpl": "hugo/content/tags/_content.gotmpl",
 }
 
 
@@ -139,20 +143,19 @@ def _toml_params(params: dict) -> str:
     return "\n\n".join(["[params]\n" + "\n".join(flat)] + tables)
 
 
-def write_tag_terms(site, names: dict):
-    """A branch bundle per tag, content/tags/<tag>/_index.md, carrying
-    the name the tag is shown under. Front matter keeps the slug, so the
-    term and its /tags/<tag>/ URL are unchanged and it is only the title
-    Hugo renders that gains its spaces and capitals -- which means every
-    place a term's title reaches (cards, the tag page heading and
-    <title>, the chip index, per-tag RSS) is covered at once, in a real
-    theme as much as in the built-in one."""
-    for tag, name in sorted(names.items()):
-        term = site / "content" / "tags" / tag
-        term.mkdir(parents=True, exist_ok=True)
-        (term / "_index.md").write_text(
-            json.dumps({"title": name}, ensure_ascii=False) + "\n",
-            encoding="utf-8")
+def write_tag_names(site, names: dict):
+    """data/tags.json: tag slug -> the name the tag is shown under, the
+    one file the site's content adapter (content/tags/_content.gotmpl,
+    in TEMPLATES) builds the term pages from. Front matter keeps the
+    slug, so the term and its /tags/<tag>/ URL are unchanged and it is
+    only the title Hugo renders that gains its spaces and capitals --
+    which means every place a term's title reaches (cards, the tag page
+    heading and <title>, the chip index, per-tag RSS) is covered at
+    once, in a real theme as much as in the built-in one."""
+    (site / "data").mkdir(parents=True, exist_ok=True)
+    (site / "data" / "tags.json").write_text(
+        json.dumps(dict(sorted(names.items())), indent=2, ensure_ascii=False)
+        + "\n", encoding="utf-8")
 
 
 def build_site(out):
@@ -180,7 +183,7 @@ def build_site(out):
         lambda url, p: front_matter(url, p, cover=covers.path(url)),
         placer=ImagePlacer(out, config), transform=figure_shortcodes,
         covers=covers)
-    write_tag_terms(site, tag_names(manifest, out))
+    write_tag_names(site, tag_names(manifest, out))
 
     params = {"description": config.get("description", "")}
     # "avatar" (site.json top level, or hugo section): a hand-picked site

@@ -303,8 +303,13 @@ def test_tag_display_names_reach_both_sites(archive):
     front = json.loads((hugo_site / "content/posts/second-post/index.md")
                        .read_text().split("\n\n", 1)[0])
     assert front["tags"] == ["example"]           # the tag is still a slug
-    term = hugo_site / "content/tags/example/_index.md"
-    assert json.loads(term.read_text()) == {"title": "Example Tag"}
+    # one data file names every tag; the content adapter beside the
+    # posts turns it into the term pages (kind term, path = slug)
+    names = hugo_site / "data/tags.json"
+    assert json.loads(names.read_text()) == {"example": "Example Tag"}
+    adapter = (hugo_site / "content/tags/_content.gotmpl").read_text()
+    assert "hugo.Data.tags" in adapter and '"kind" "term"' in adapter
+    assert not (hugo_site / "content/tags/example").exists()
 
     pelican_site = pelican.build_site(archive)
     head = (pelican_site / "content/posts/second-post/index.md") \
@@ -323,8 +328,8 @@ def test_tags_display_as_slugs_with_spaces_by_default(archive):
         post["tags"] = ["open-science"]
     (archive / "posts.json").write_text(json.dumps(manifest))
     site = hugo.build_site(archive)
-    term = site / "content/tags/open-science/_index.md"
-    assert json.loads(term.read_text()) == {"title": "open science"}
+    names = json.loads((site / "data/tags.json").read_text())
+    assert names == {"open-science": "open science"}
 
 
 def test_feed_links_carry_the_rss_mark(archive):
