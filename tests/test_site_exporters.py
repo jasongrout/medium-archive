@@ -31,6 +31,15 @@ def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
     return url
 
 
+def png_header(w=800, h=450) -> bytes:
+    """A png signature and IHDR with no pixel data: passes the format
+    sniff (junk bytes under a .png name are no cover), while defeating
+    Pillow, so the placer and the cover bake copy it in unchanged."""
+    import struct
+    return (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+            + struct.pack(">II", w, h) + b"\x00" * 8)
+
+
 @pytest.fixture
 def archive(tmp_path):
     manifest = {}
@@ -45,7 +54,7 @@ def archive(tmp_path):
               "```\n![fenced](images/lit.png)\n```\n",
               images=["images/001-pic.png"])
     (second / "images").mkdir()
-    (second / "images" / "001-pic.png").write_bytes(b"PNG")
+    (second / "images" / "001-pic.png").write_bytes(png_header())
     (tmp_path / "posts.json").write_text(json.dumps(manifest))
     (tmp_path / "site.json").write_text(json.dumps(
         {"title": "Example Blog", "description": "An example.",
@@ -64,7 +73,7 @@ def test_hugo_site(archive):
     assert front["title"] == "Second Post"
     assert front["tags"] == ["example"] and front["authors"] == ["Ada Lovelace"]
     assert front["aliases"] == ["/second-post-bbb222bbb222", "/p/bbb222bbb222"]
-    assert (page.parent / "images/001-pic.png").read_bytes() == b"PNG"
+    assert (page.parent / "images/001-pic.png").read_bytes() == png_header()
     # the Ghost-era path becomes an alias too
     first = json.loads((site / "content/posts/first-post/index.md")
                        .read_text().split("\n\n", 1)[0])
@@ -198,12 +207,12 @@ def test_hugo_dream_theme(archive):
     assert "Archives" in (site / "content/posts/_index.md").read_text()
     front = json.loads((site / "content/posts/second-post/index.md")
                        .read_text().split("\n\n", 1)[0])
-    # the baked card cover doubles as Dream's card and og:image; junk
-    # bytes defeat Pillow and are copied in unchanged
+    # the baked card cover doubles as Dream's card and og:image; a png
+    # Pillow cannot decode is copied in unchanged
     assert front["cover"] == "images/cover.jpg"
     assert front["images"] == ["images/cover.jpg"]
     assert (site / "content/posts/second-post/images/cover.jpg"
-            ).read_bytes() == b"PNG"
+            ).read_bytes() == png_header()
     assert front["author"] == "Ada Lovelace"
     assert front["authorlink"] == "https://medium.com/@ada"
 
@@ -223,6 +232,28 @@ def test_cover_skips_gifs_and_huge_stills(tmp_path):
     assert hugo.pick_cover(post, tmp_path) == "images/small.png"
     assert hugo.pick_cover({"images": ["images/anim.gif"]}, tmp_path) is None
     assert hugo.pick_cover({"images": ["images/missing.png"]}, tmp_path) is None
+
+
+def test_cover_is_a_decodable_raster_whatever_its_name(tmp_path):
+    """The baked cover is served as cover.jpg and Hugo's card template
+    rasterizes it, so an svg badge or junk bytes as the cover abort the
+    whole hugo build ("image: unknown format"): only bytes that decode
+    are candidates, and the file name is not trusted."""
+    import struct
+    images = tmp_path / "images"
+    images.mkdir()
+    (images / "badge.svg").write_bytes(
+        b'<svg xmlns="http://www.w3.org/2000/svg" width="107" height="20">'
+        b"</svg>\n")
+    (images / "junk.png").write_bytes(b"PNG")
+    (images / "still.png").write_bytes(
+        b"GIF89a" + struct.pack("<HH", 400, 300))           # a gif in disguise
+    (images / "photo.bin").write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 16)
+    post = {"images": ["images/anim.gif", "images/badge.svg",
+                       "images/junk.png", "images/still.png",
+                       "images/photo.bin"]}
+    assert hugo.pick_cover(post, tmp_path) == "images/photo.bin"
+    assert hugo.pick_cover({"images": post["images"][:-1]}, tmp_path) is None
 
 
 def test_cover_thumbnails_crop_or_letterbox(tmp_path):
