@@ -58,8 +58,33 @@ body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+/* A link is the surrounding text with a 2px rule in the accent under
+   it, not accent text: Jupyter Orange on the white cards is 2.8:1,
+   below WCAG AA's 4.5:1 for text, and the brand guidelines rule out a
+   darker shade. As a rule the orange carries no text, so the link reads
+   at its line's own contrast -- the ink's in a paragraph, the muted
+   grey's in a byline, every text token clears 7:1 -- and the colour
+   still says "link". `inherit`, not `--ink`, so an author's name in a
+   muted byline stays muted rather than jumping out of the line.
+   The rule is .1em, not a pixel count, so it scales with the type the
+   way a stroke does: 2px under the 1.25rem article column, 1.6px in a
+   1rem byline, 1.3px under the .82rem card tags. A fixed 2px was
+   proportionally heavier under the small muted lines, and the orange
+   there, beside grey text on a dark card, stood out more than the
+   link warranted. Longhands, not the shorthand, so a later
+   `text-decoration-line` leaves the rule's colour and weight in place.
+   The same treatment in both palettes: one link language, even though
+   orange text passes on the dark cards. */
+a { color: inherit; text-decoration-line: underline;
+    text-decoration-color: var(--accent); text-decoration-thickness: .1em;
+    text-underline-offset: .15em; }
+/* Links that are components rather than words -- the site title and
+   nav, card covers and titles, tag pills, chips, page numbers, the
+   archive list -- carry no rule at rest; hovering shows the same rule. */
+.site-title, .site-header nav a, .card-cover, .card-title a,
+.tag, .share-link, .chip, ul.pagination .page-link,
+.archives a { text-decoration-line: none; }
+a:hover { text-decoration-line: underline; }
 
 /* jupyter.org's .global-banner styling, so a shared announcement file
    looks the same here as there: white on the accent with a soft
@@ -86,10 +111,24 @@ a:hover { text-decoration: underline; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
-.site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
-.site-header nav a:hover { color: var(--accent); }
-/* the current page's nav item, in the accent like jupyter.org's navbar */
-.site-header nav a[aria-current="page"] { color: var(--accent); }
+/* the masthead is the site's name, not a link among links: no rule on
+   hover either (a:hover outranks .site-title, so it says so itself) */
+.site-title:hover { text-decoration-line: none; }
+/* The nav is a row of tabs, not a row of links: no text underline,
+   and the current page's item is bold ink with a 3px accent bar on
+   the header's bottom edge, the tab convention rather than the link
+   rule. jupyter.org's navbar sets the current item in orange text,
+   the 2.8:1 the link rule exists to avoid. The bar reaches the edge
+   by padding each item down through the bar's own bottom padding and
+   pulling it back with a matching negative margin, so the bar sits
+   on the header's border rather than under the text. */
+.site-header nav a { display: inline-block; margin-left: 1.25rem;
+                     padding-bottom: calc(.9rem - 3px); margin-bottom: -.9rem;
+                     border-bottom: 3px solid transparent;
+                     color: var(--soft); font-weight: 500; }
+.site-header nav a:hover { color: var(--ink); }
+.site-header nav a[aria-current="page"] { color: var(--ink); font-weight: 700;
+                                          border-bottom-color: var(--accent); }
 
 .theme-picker, .font-picker { display: inline-flex; vertical-align: middle;
                               margin-left: 1.25rem; }
@@ -123,7 +162,8 @@ a:hover { text-decoration: underline; }
    heading where that term has a feed of its own */
 .feed-link { display: inline-flex; align-items: center; }
 .feed-icon { width: 1rem; height: 1rem; }
-.site-header nav .feed-link { vertical-align: middle; }
+.site-header nav .feed-link { vertical-align: middle; padding-bottom: 0;
+                              margin-bottom: 0; border-bottom: 0; }
 .page-title .feed-link { margin-left: .55rem; color: var(--muted);
                          vertical-align: middle; }
 .page-title .feed-link:hover { color: var(--accent); }
@@ -141,9 +181,7 @@ a:hover { text-decoration: underline; }
 .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .card-body { padding: 1.1rem 1.25rem 1.25rem; display: flex;
              flex-direction: column; flex: 1; }
-.card-tags { margin: 0 0 .35rem; }
-.card-tags a { color: var(--accent); font-size: .82rem; font-weight: 600;
-               margin-right: .6rem; }
+.card-tags { margin: 0 0 .5rem; display: flex; flex-wrap: wrap; gap: .35rem; }
 .card-title { margin: 0 0 .5rem; font-size: 1.3rem; line-height: 1.3; }
 .card-title a { color: var(--ink); }
 .card-excerpt { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
@@ -161,12 +199,16 @@ a:hover { text-decoration: underline; }
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
-.post-meta .tag { display: inline-flex; align-items: center;
-                  background: var(--code-bg); border: 1px solid var(--line);
-                  border-radius: 999px; padding: .05rem .65rem;
-                  font-size: .82rem; color: var(--soft); }
-.post-meta .tag:hover { border-color: var(--accent); color: var(--accent);
-                        text-decoration: none; }
+/* A tag is a pill, in the article byline and on a card alike: one
+   form for the term wherever it appears. Hover colours the border, not
+   the text -- orange text is the contrast the link rule exists to
+   avoid. */
+.tag { display: inline-flex; align-items: center;
+       background: var(--code-bg); border: 1px solid var(--line);
+       border-radius: 999px; padding: .05rem .65rem;
+       font-size: .82rem; color: var(--soft); }
+.tag:hover { border-color: var(--accent); color: var(--ink);
+             text-decoration: none; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
@@ -333,8 +375,9 @@ a:hover { text-decoration: underline; }
 /* hover deepens the mark rather than coloring it: these are the
    networks' logos, and most of their brand guidelines allow a
    one-color rendering but not a recoloring, which the site accent
-   would be. Contrast carries the affordance instead. */
-.share-link:hover { color: var(--ink); border-color: var(--muted);
+   would be. The ring around it is ours, so it takes the accent on
+   hover as a tag's does. */
+.share-link:hover { color: var(--ink); border-color: var(--accent);
                     text-decoration: none; }
 .share-icon { width: 1.05rem; height: 1.05rem; fill: currentColor; }
 
@@ -390,6 +433,7 @@ ul.pagination { display: flex; justify-content: center; gap: .25rem;
                 list-style: none; padding: 0; margin: 0 0 3rem; }
 ul.pagination .page-link { display: inline-block; padding: .35rem .8rem;
                            background: var(--card); border-radius: 6px; color: var(--ink); }
+ul.pagination .page-link:hover { text-decoration-line: underline; }
 ul.pagination .active .page-link { background: var(--accent); color: #fff; }
 ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
 

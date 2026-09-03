@@ -1,6 +1,7 @@
 """The hugo and pelican steps: posts/ + posts.json -> a site."""
 
 import json
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -748,10 +749,13 @@ def test_post_share_links(archive):
     assert ".share-icon { width: 1.05rem" in css
     # the marks are the networks' logos: a hover may deepen them, but
     # recoloring them to this site's accent is against most of those
-    # networks' brand guidelines
+    # networks' brand guidelines. The ring around a mark is the site's
+    # own, so only the text colour (the mark's, via currentColor) is
+    # held off the accent
     hover = next(line for line in css.splitlines()
                  if line.startswith(".share-link:hover"))
-    assert "var(--accent)" not in hover, hover
+    colour = re.search(r"[{;]\s*color: ([^;]+);", hover).group(1)
+    assert colour != "var(--accent)", hover
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 
