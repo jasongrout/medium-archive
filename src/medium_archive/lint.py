@@ -57,6 +57,11 @@ MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
 # (convert.youtube_iframe), which is content, not a bare link.
 EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
 
+# a Giphy embed whose file the fetch step has not archived yet: the
+# image or clip still points at Giphy (--embeds)
+REMOTE_EMBED_ASSET_RE = re.compile(
+    r'(?:!\[[^\]]*\]\(|<video src=")(https?://[^)"]*giphy\.com/[^)"]*)')
+
 FENCE_RE = re.compile(r"^`{3,}")
 
 # The page analysis WordPress's SEO plugins run (--seo): where a search
@@ -122,6 +127,7 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     raw_root is the archive's raw/ directory, for the page's editor
     state; without it, or without a page, only the bare links are
     reported."""
+    from .images import giphy_media
     from .sites import IFRAME_RE           # sites imports this module
     problems = []
     links, players = [], 0
@@ -130,6 +136,9 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
             continue
         links.extend(m.group(1) for m in EMBED_LINK_RE.finditer(line))
         players += bool(IFRAME_RE.match(line))
+        for m in REMOTE_EMBED_ASSET_RE.finditer(line):
+            problems.append(f"embed media not archived, served from Giphy: "
+                            f"{m.group(1)[:100]} (re-run fetch)")
     for url in links:
         problems.append(f"embed is a bare link, its content is not in the "
                         f"archive: {url[:100]} (replace it by hand)")
@@ -138,9 +147,11 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     if page is None or not page.is_file():
         return problems
     from .state import state_embed_targets     # sites imports this module
-    expected = state_embed_targets(page.read_text(encoding="utf-8",
-                                                  errors="replace"),
-                                   front["medium_id"])
+    # a Giphy embed converts to an image or clip, archived or not, so it
+    # is never among the links a body source could have dropped
+    expected = [t for t in state_embed_targets(
+        page.read_text(encoding="utf-8", errors="replace"), front["medium_id"])
+        if not giphy_media(t[0])]
     # the state's targets and the body's links name one embed in different
     # forms (a canonical page vs an embed URL), so they are compared by
     # count: fewer links and players than the state has embeds means the

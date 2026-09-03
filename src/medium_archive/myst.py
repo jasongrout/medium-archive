@@ -31,7 +31,7 @@ import re
 import sys
 from pathlib import Path
 
-from .sites import (IFRAME_RE, Covers, ImagePlacer, LinkMap, by_year, clean_site,
+from .sites import (IFRAME_RE, VIDEO_RE, Covers, ImagePlacer, LinkMap, by_year, clean_site,
                     load_site_inputs, page_stems, place_images,
                     read_post_body, retarget_images, rewrite_body as _rewrite,
                     rewrite_figures, tag_names, template_text,
@@ -134,6 +134,24 @@ def myst_iframes(markdown: str) -> str:
     return IFRAME_RE.sub(lambda m: _iframe_directive(m.group(0)), markdown)
 
 
+# a captioned clip: the shell around convert's video line
+VIDEO_SHELL_RE = re.compile(
+    r"<figure>\n\n(<video [^\n]+></video>)\n\n"
+    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
+
+
+def myst_videos(markdown: str) -> str:
+    """convert's clip lines in MyST's own form: mystmd renders an image
+    whose source is a video file as a <video>, so a bare clip is image
+    syntax and a captioned one a {figure} directive."""
+    def src_of(line):
+        return VIDEO_RE.match(line).group(1)
+    markdown = VIDEO_SHELL_RE.sub(
+        lambda m: f":::{{figure}} {src_of(m.group(1))}\n\n{m.group(2)}\n:::",
+        markdown)
+    return VIDEO_RE.sub(lambda m: f"![]({m.group(1)})", markdown)
+
+
 def myst_figures(markdown: str) -> str:
     """The <figure>/<figcaption> shells convert writes around captioned
     images, rendered the MyST way: a captioned image becomes a
@@ -149,7 +167,7 @@ def myst_figures(markdown: str) -> str:
         opt = f":alt: {alt}\n" if alt else ""
         return f":::{{figure}} {src}\n{opt}\n{caption}\n:::"
     markdown = rewrite_figures(markdown, directive)
-    markdown = myst_iframes(markdown)
+    markdown = myst_videos(myst_iframes(markdown))
     markdown = FIGURE_TAG_LINE_RE.sub("", markdown)
     return re.sub(r"\n{3,}", "\n\n", markdown)
 

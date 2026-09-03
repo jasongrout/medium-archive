@@ -121,3 +121,27 @@ def sniff_image_ext(path) -> str | None:
     if SVG_HEAD_RE.match(head.removeprefix(b"\xef\xbb\xbf")):
         return ".svg"
     return None
+
+
+# A Giphy embed's target: the media file itself (media.giphy.com, with
+# or without the newer v1.<token> path segment), or the gif's page or
+# embed URL, which names the id the media URL is built from
+GIPHY_FILE_RE = re.compile(
+    r"^https?://(?:media\d*|i)\.giphy\.com/media/(?:v\d\.[^/]+/)?"
+    r"([A-Za-z0-9]+)/[^/?#]+\.(?:gif|mp4|webp)(?:[?#].*)?$")
+GIPHY_PAGE_RE = re.compile(
+    r"^https?://(?:www\.)?giphy\.com/(?:embed/|gifs/(?:[^/?#]*-)?)([A-Za-z0-9]+)")
+
+
+def giphy_media(url: str) -> str | None:
+    """The direct media URL behind a Giphy embed -- the file the archive
+    can fetch and serve itself -- or None for any other URL. A media URL
+    is kept as it is (Medium's embeds name the gif or the mp4); a page
+    or embed URL becomes the gif, which every Giphy id serves."""
+    if not url:
+        return None
+    m = GIPHY_FILE_RE.match(url)
+    if m:
+        return url.split("#")[0].split("?")[0]
+    m = GIPHY_PAGE_RE.match(url)
+    return f"https://media.giphy.com/media/{m.group(1)}/giphy.gif" if m else None

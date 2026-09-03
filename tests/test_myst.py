@@ -317,3 +317,12 @@ def test_youtube_player_becomes_an_iframe_directive():
         ":width: 100%\n\n*Cap.*\n:::\n\n"
         ":::{iframe} https://www.youtube-nocookie.com/embed/abcdefghijk\n"
         ":width: 100%\n:::\n")
+
+
+def test_clip_becomes_a_video_image_or_figure():
+    # mystmd renders an image whose source is a video as a <video>
+    line = '<video src="images/002-giphy.mp4" autoplay loop muted playsinline></video>'
+    md = f"Intro.\n\n<figure>\n\n{line}\n\n<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>\n\n{line}\n"
+    assert myst_figures(md) == (
+        "Intro.\n\n:::{figure} images/002-giphy.mp4\n\nCap.\n:::\n\n"
+        "![](images/002-giphy.mp4)\n")

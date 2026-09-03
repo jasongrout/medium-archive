@@ -507,7 +507,13 @@ no longer lists, work through the steps in order:
   with the state's title for assistive tech and any `t=` start time)
   that Hugo and Pelican render as raw HTML and the MyST exporter
   rewrites to the `{iframe}` directive; `lint --embeds` counts it as
-  content. Code
+  content. A Giphy embed names a media file, which `fetch` downloads
+  into `raw/<id>/images/` alongside the post's images (a re-run
+  backfills posts archived earlier, like gist media), so `convert`
+  serves it from the post itself: the gif as an image, the mp4 as a
+  looping muted `<video>` that the MyST exporter writes in its image
+  syntax. Until the file is fetched the image or clip points at Giphy,
+  which `lint --embeds` reports. Code
   fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.

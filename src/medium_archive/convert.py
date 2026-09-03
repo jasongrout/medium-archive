@@ -21,7 +21,7 @@ from .dates import parse_date
 from .export import export_body, parse_export
 from .fetch import archive_base, read_index
 from .fixup import load_fixups, read_raw
-from .images import image_source, sniff_image_ext
+from .images import giphy_media, image_source, sniff_image_ext
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json, strip_title_prefix)
@@ -73,6 +73,13 @@ class _Converter(MarkdownConverter):
             return text
         return f"\n\n<figure>\n\n{text.strip()}\n\n</figure>\n\n"
 
+    def convert_video(self, el, text, parent_tags):
+        # the looping clip a Giphy mp4 embed became (see to_markdown): the
+        # gif's behaviour, as one canonical HTML block the exporters and
+        # lint recognize (VIDEO_RE in sites.py)
+        return (f'\n\n<video src="{escape(el.get("src") or "", quote=True)}" '
+                'autoplay loop muted playsinline></video>\n\n')
+
     def convert_iframe(self, el, text, parent_tags):
         # the YouTube player to_markdown leaves in place (every other
         # iframe became a link or a placeholder before conversion), as
@@ -116,7 +123,7 @@ def _captioned_figure(figure) -> bool:
     return bool(cap and cap.get_text(strip=True)
                 and any(t.find_parent("figcaption") is None
                         for t in figure.find_all(["img", "a", "iframe",
-                                                  "script", "pre"])))
+                                                  "video", "script", "pre"])))
 
 
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com",
@@ -214,27 +221,54 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     # the same asset appears under miro.medium.com and cdn-images-1.medium.com
     by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
 
+    # A Giphy embed names a media file the archive fetches like any
+    # image (fetch.embed_asset_urls), so the iframe becomes the file
+    # itself: an <img> for a gif or webp, localized with the images
+    # below, a <video> for an mp4 (the clip loops like the gif it stands
+    # for). Giphy's titles are its page titles ("... GIF by X - Find &
+    # Share on GIPHY"); the descriptive part becomes the alt text.
+    for iframe in body.find_all("iframe"):
+        media = giphy_media(iframe.get("src") or iframe.get("data-src") or "")
+        if not media:
+            continue
+        title = re.sub(r"\s*-\s*Find & Share on GIPHY$", "",
+                       iframe.get("title") or "").strip()
+        if media.endswith(".mp4"):
+            iframe.replace_with(doc.new_tag("video", src=media))
+        else:
+            iframe.replace_with(doc.new_tag("img", src=media, alt=title))
+
+    def localize(src: str, copy: bool):
+        """(local images/ path, used) for an asset URL the fetch step
+        mapped, else (src, False)."""
+        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
+        if not (fname and (out_dir is None or (raw / "images" / fname).exists())):
+            return src, False
+        src_file = raw / "images" / fname
+        # an image fetched from an extensionless URL was stored as
+        # .bin; the derived copy gets the extension its bytes call for
+        if fname.endswith(".bin") and src_file.exists():
+            fname = fname[:-len(".bin")] + (sniff_image_ext(src_file) or ".bin")
+        if out_dir is not None and copy:
+            (out_dir / "images").mkdir(exist_ok=True)
+            shutil.copy2(src_file, out_dir / "images" / fname)
+        return f"images/{fname}", True
+
     used_images = []
+    for video in body.find_all("video"):
+        local, used = localize(video.get("src") or "", copy=True)
+        if used:
+            used_images.append(local)
+        video.attrs = {"src": local}
+
     for img in body.find_all("img"):
         src = image_source(img)
         if not src:
             img.decompose()
             continue
-        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
-        if fname and (out_dir is None or (raw / "images" / fname).exists()):
-            src_file = raw / "images" / fname
-            # an image fetched from an extensionless URL was stored as
-            # .bin; the derived copy gets the extension its bytes call for
-            if fname.endswith(".bin") and src_file.exists():
-                fname = fname[:-len(".bin")] + (sniff_image_ext(src_file)
-                                                or ".bin")
-            if out_dir is not None:
-                (out_dir / "images").mkdir(exist_ok=True)
-                shutil.copy2(src_file, out_dir / "images" / fname)
-            local = f"images/{fname}"
+        local, used = localize(src, copy=True)   # not downloaded: remote URL stays
+        if used:
             used_images.append(local)
-        else:
-            local = src                         # not downloaded; keep remote URL
         new_img = doc.new_tag("img", src=local, alt=img.get("alt", ""))
         picture = img.find_parent("picture")
         (picture or img).replace_with(new_img)

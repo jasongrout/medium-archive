@@ -74,6 +74,25 @@ and the offline test suite.
   guaranteed to render raw HTML. `compare` sets the title aside, as it
   does fence languages, so the sources still agree. Every other iframe
   is still the `[embed: url]` link, which `lint --embeds` reports.
+- **Giphy embeds are archived files.** The embed's target is the media
+  file itself (`media.giphy.com/media/<id>/giphy.gif` or `.mp4`; a
+  giphy.com page or embed URL names the id the gif URL is built from,
+  `images.giphy_media`). `fetch` adds those files to the post's image
+  download (`fetch.embed_asset_urls`), and its skip-already-archived
+  path backfills them into `raw/<id>/images/` and `images.json` for
+  posts fetched before this existed, the way gist media is backfilled.
+  `convert` then replaces the iframe with the file: an `<img>` for a
+  gif or webp, localized with the other images, with Giphy's page-title
+  suffix trimmed from the alt; a `<video autoplay loop muted
+  playsinline>` for an mp4, one canonical line like the YouTube player
+  (`VIDEO_RE`), copied beside the post and listed in the front matter's
+  images so every exporter places it (the placer passes non-images
+  through). MyST gets `![](clip.mp4)` or a `{figure}` around it, which
+  mystmd renders as a video. `lint --embeds` leaves Giphy targets out
+  of the state's embed count, since they convert either way, and
+  reports a file still served from Giphy until `fetch` runs again.
+  Built and tested offline: the sandbox's proxy refuses media.giphy.com,
+  so the first live backfill deserves a look.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line

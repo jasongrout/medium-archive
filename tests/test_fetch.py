@@ -128,3 +128,46 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
         delay=0, no_images=True))
     assert (tmp_path / "raw" / pid / "media" / "cafe01.json").exists()
     assert (tmp_path / "raw" / pid / "media" / "cafe01.gist.json").exists()
+
+
+GIPHY = "https://media.giphy.com/media/fWgAW7WZtPMBjmpa3V/giphy.gif"
+
+
+def giphy_page(mid):
+    """A page whose state has a Giphy embed (an embedly wrapper naming
+    the gif) and a YouTube one, which is not an asset."""
+    state = {
+        f"Post:{mid}": {"id": mid, 'content({"a":1})': {"bodyModel": {
+            "paragraphs": [{"__ref": "Paragraph:p0"}, {"__ref": "Paragraph:p1"}]}}},
+        "Paragraph:p0": {"type": "IFRAME", "text": "", "markups": [],
+                         "iframe": {"mediaResource": {"__ref": "MediaResource:m1"}}},
+        "Paragraph:p1": {"type": "IFRAME", "text": "", "markups": [],
+                         "iframe": {"mediaResource": {"__ref": "MediaResource:m2"}}},
+        "MediaResource:m1": {"id": "a1", "title": "A gif", "iframeSrc":
+                             "https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2F"
+                             "giphy.com%2Fembed%2FfWgAW7WZtPMBjmpa3V%2Ftwitter%2Fiframe&url="
+                             "https%3A%2F%2Fmedia.giphy.com%2Fmedia%2FfWgAW7WZtPMBjmpa3V%2Fgiphy.gif"},
+        "MediaResource:m2": {"id": "a2", "title": "A talk", "iframeSrc":
+                             "https://cdn.embedly.com/widgets/media.html?url="
+                             "https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabcdefghijk"},
+    }
+    return "<script>window.__APOLLO_STATE__ = " + json.dumps(state) + "</script>"
+
+
+def test_embed_assets_are_fetched_with_the_images_and_backfilled(tmp_path):
+    mid = "111122223333"
+    assert fetchmod.embed_asset_urls(giphy_page(mid), mid) == [GIPHY]
+    session = FakeSession(router=lambda url: FakeResp(content=b"GIF89a")
+                          if url == GIPHY else (_ for _ in ()).throw(AssertionError(url)))
+    dest = tmp_path / mid
+    dest.mkdir()
+    (dest / "images.json").write_text(json.dumps({"https://x/a.png": "001-a.png"}))
+    # a post archived before embed assets existed: the gif joins images/
+    # and images.json after what is already there
+    assert fetchmod.backfill_embed_assets(session, giphy_page(mid), mid, dest, 0) == 1
+    assert json.loads((dest / "images.json").read_text()) == {
+        "https://x/a.png": "001-a.png", GIPHY: "002-giphy.gif"}
+    assert (dest / "images" / "002-giphy.gif").read_bytes() == b"GIF89a"
+    # incremental: nothing to do the second time
+    assert fetchmod.backfill_embed_assets(session, giphy_page(mid), mid, dest, 0) == 0
+    assert session.calls == [GIPHY]

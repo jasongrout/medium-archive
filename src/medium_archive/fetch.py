@@ -18,8 +18,9 @@ from bs4 import BeautifulSoup
 
 from .dates import in_window, parse_date
 from .discovery import discover, fetch_feed
-from .images import collect_image_urls, safe_filename
-from .state import state_image_urls, state_media_resources
+from .images import collect_image_urls, giphy_media, safe_filename
+from .state import (state_embed_targets, state_image_urls,
+                    state_media_resources)
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
@@ -152,6 +153,70 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
     return n
 
 
+def embed_asset_urls(page_text: str, mid: str) -> list:
+    """Media files behind the page's embeds that the archive can hold
+    itself -- Giphy gifs and mp4s -- so convert can serve them as local
+    images and videos instead of a link to a third party."""
+    urls = []
+    for target, _ in state_embed_targets(page_text, mid):
+        media = giphy_media(target)
+        if media and media not in urls:
+            urls.append(media)
+    return urls
+
+
+def fetch_images(session, srcs: list, img_dir: Path, img_map: dict,
+                 delay: float, start: int = 1) -> int:
+    """Download srcs into img_dir, recording url -> filename in img_map
+    (files already on disk are mapped, not re-fetched); returns the
+    number fetched. Filenames are numbered from start."""
+    n = 0
+    by_basename = {}   # the same asset appears as miro.medium.com/v2/<id> and cdn-images-1.medium.com/<id>
+    for i, src in enumerate(srcs, start=start):
+        base = Path(urlsplit(src).path).name
+        if base in by_basename:
+            img_map[src] = by_basename[base]
+            continue
+        fname = safe_filename(src, i)
+        if (img_dir / fname).exists():
+            img_map[src] = by_basename[base] = fname
+            continue
+        try:
+            resp = fetch(session, src, stream=True)
+            img_dir.mkdir(parents=True, exist_ok=True)
+            with open(img_dir / fname, "wb") as fh:
+                for chunk in resp.iter_content(1 << 16):
+                    fh.write(chunk)
+            img_map[src] = by_basename[base] = fname
+            n += 1
+            time.sleep(delay / 4)
+        except Exception as e:
+            print(f"  image failed {src}: {e}", file=sys.stderr)
+    return n
+
+
+def backfill_embed_assets(session, page_text: str, mid: str, dest: Path,
+                          delay: float) -> int:
+    """For a post archived before embed assets were fetched: download
+    the Giphy files its embeds name into dest/images/ and add them to
+    images.json, without touching anything already there. Returns the
+    number fetched."""
+    map_path = dest / "images.json"
+    img_map = {}
+    if map_path.exists():
+        try:
+            img_map = json.loads(map_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return 0
+    missing = [u for u in embed_asset_urls(page_text, mid) if u not in img_map]
+    if not missing:
+        return 0
+    n = fetch_images(session, missing, dest / "images", img_map, delay,
+                     start=len(img_map) + 1)
+    map_path.write_text(json.dumps(img_map, indent=2))
+    return n
+
+
 def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
     """Save page.html, feed_item.json, media/, images/ and images.json
@@ -172,26 +237,10 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
         # a shell capture renders no <img> tags; its editor state still names the images
         srcs += [u for u in state_image_urls(r.text, medium_id(url) or "")
                  if u not in srcs]
-        by_basename = {}   # the same asset appears as miro.medium.com/v2/<id> and cdn-images-1.medium.com/<id>
-        for i, src in enumerate(srcs, start=1):
-            base = Path(urlsplit(src).path).name
-            if base in by_basename:
-                img_map[src] = by_basename[base]
-                continue
-            fname = safe_filename(src, i)
-            if (img_dir / fname).exists():
-                img_map[src] = by_basename[base] = fname
-                continue
-            try:
-                resp = fetch(session, src, stream=True)
-                img_dir.mkdir(parents=True, exist_ok=True)
-                with open(img_dir / fname, "wb") as fh:
-                    for chunk in resp.iter_content(1 << 16):
-                        fh.write(chunk)
-                img_map[src] = by_basename[base] = fname
-                time.sleep(delay / 4)
-            except Exception as e:
-                print(f"  image failed {src}: {e}", file=sys.stderr)
+        # the media files behind embeds (Giphy), served locally by convert
+        srcs += [u for u in embed_asset_urls(r.text, medium_id(url) or "")
+                 if u not in srcs]
+        fetch_images(session, srcs, img_dir, img_map, delay)
         (dest / "images.json").write_text(json.dumps(img_map, indent=2))
 
     info = extract_metadata(BeautifulSoup(r.text, "html.parser"), url)
@@ -265,8 +314,11 @@ def cmd_fetch(args):
             # raw/<id>/media/ without re-fetching the post itself
             page = raw_dir / pid / "page.html"
             if page.exists():
-                got = fetch_media(session, page.read_text(encoding="utf-8"),
-                                  pid, raw_dir / pid, args.delay)
+                text = page.read_text(encoding="utf-8")
+                got = fetch_media(session, text, pid, raw_dir / pid, args.delay)
+                if not args.no_images:
+                    got += backfill_embed_assets(session, text, pid,
+                                                 raw_dir / pid, args.delay)
                 if got:
                     media_files += got
                     print(f"[{n}/{len(entries)}] {url}\n"

@@ -518,3 +518,50 @@ def test_feed_item_authors_reads_the_old_single_author_form():
     assert feed_item_authors({"authors": [{"name": "Ann", "url": None}],
                               "author": "ignored"}) == [{"name": "Ann", "url": None}]
     assert feed_item_authors({"author": ""}) == []
+
+
+GIPHY_GIF = "https://media.giphy.com/media/fWgAW7WZtPMBjmpa3V/giphy.gif"
+GIPHY_MP4 = "https://media.giphy.com/media/Ri327iDKuC4pnExM4L/giphy.mp4"
+
+
+def test_giphy_media_recognizes_files_and_pages():
+    from medium_archive.images import giphy_media
+    assert giphy_media(GIPHY_GIF) == GIPHY_GIF
+    assert giphy_media(GIPHY_MP4) == GIPHY_MP4
+    assert giphy_media(GIPHY_GIF + "?cid=abc#x") == GIPHY_GIF
+    assert giphy_media("https://media2.giphy.com/media/v1.Y2lkPTc5/abc123/giphy.webp") \
+        == "https://media2.giphy.com/media/v1.Y2lkPTc5/abc123/giphy.webp"
+    assert giphy_media("https://giphy.com/embed/fWgAW7WZtPMBjmpa3V/twitter/iframe") == GIPHY_GIF
+    assert giphy_media("https://giphy.com/gifs/cbc-see-ya-kiss-fWgAW7WZtPMBjmpa3V") == GIPHY_GIF
+    for url in ("", "https://www.youtube.com/watch?v=abcdefghijk",
+                "https://giphy.com/", "https://media.giphy.com/media/x/page.html"):
+        assert giphy_media(url) is None, url
+
+
+def test_giphy_embed_becomes_the_archived_file(tmp_path):
+    # the fetch step maps the gif and the mp4 like any image; convert
+    # serves the gif as an image and the mp4 as a looping clip, copied
+    # beside the post, with Giphy's page-title noise trimmed from the alt
+    raw = tmp_path / "raw"
+    (raw / "images").mkdir(parents=True)
+    (raw / "images" / "001-giphy.gif").write_bytes(b"GIF89a")
+    (raw / "images" / "002-giphy.mp4").write_bytes(b"mp4")
+    img_map = {GIPHY_GIF: "001-giphy.gif", GIPHY_MP4: "002-giphy.mp4"}
+    out = tmp_path / "post"
+    out.mkdir()
+    html = (f'<iframe src="{GIPHY_GIF}" title="See Ya Kiss GIF by CBC - Find &amp; '
+            f'Share on GIPHY"></iframe><figure><iframe src="{GIPHY_MP4}"></iframe>'
+            "<figcaption>Robot arm</figcaption></figure>")
+    body = BeautifulSoup(f"<article>{html}</article>", "html.parser")
+    md, used = to_markdown(body, URL, img_map, raw, out)
+    assert md == ("![See Ya Kiss GIF by CBC](images/001-giphy.gif)\n\n"
+                  "<figure>\n\n<video src=\"images/002-giphy.mp4\" autoplay loop "
+                  "muted playsinline></video>\n\n<figcaption>\n\nRobot arm\n\n"
+                  "</figcaption>\n\n</figure>\n")
+    assert used == ["images/002-giphy.mp4", "images/001-giphy.gif"]
+    assert (out / "images" / "002-giphy.mp4").read_bytes() == b"mp4"
+    # not fetched yet: the file is served from Giphy, which lint reports
+    md, used = to_markdown(BeautifulSoup(f"<article>{html}</article>", "html.parser"),
+                           URL, {}, raw, out)
+    assert f"![See Ya Kiss GIF by CBC]({GIPHY_GIF})" in md
+    assert f'<video src="{GIPHY_MP4}" autoplay' in md and used == []

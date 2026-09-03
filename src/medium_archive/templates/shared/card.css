@@ -161,6 +161,9 @@ a:hover { text-decoration: underline; }
    at its fixed size, which overflows a phone-width column. */
 .post iframe { width: 100%; max-width: 100%; height: auto; aspect-ratio: 16 / 9;
                border: 0; border-radius: 4px; }
+/* A looping clip (a Giphy mp4 embed) sits like the gif it stands for. */
+.post video { max-width: 100%; height: auto; border-radius: 4px; }
+.post p:has(> video:only-child) { text-align: center; }
 /* An image standing on its own -- a paragraph holding nothing but the
    image, linked or not, or a figure -- is centred, as Medium sets
    every body image; most are narrower than the column, and an

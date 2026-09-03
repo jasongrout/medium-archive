@@ -211,3 +211,35 @@ def test_youtube_player_is_content_not_a_bare_link(tmp_path):
     (raw / MID).mkdir(parents=True)
     (raw / MID / "page.html").write_text(shell_html(state))
     assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_giphy_embed_is_an_asset_not_a_link(tmp_path):
+    """A Giphy embed converts to an image or clip: not a bare link, not
+    among the embeds a body source could have dropped, and reported
+    only while it is still served from Giphy."""
+    from test_state import MID, make_state, para, shell_html
+    gif = "https://media.giphy.com/media/fWgAW7WZtPMBjmpa3V/giphy.gif"
+    mp4 = "https://media.giphy.com/media/Ri327iDKuC4pnExM4L/giphy.mp4"
+    state = make_state([
+        para(0, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m0"}}),
+        para(1, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m1"}})])
+    for i, url in enumerate((gif, mp4)):
+        state[f"MediaResource:m{i}"] = {
+            "id": f"m{i}", "title": "", "iframeSrc":
+            "https://cdn.embedly.com/widgets/media.html?url=" + url.replace("/", "%2F")}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    front = {**FRONT, "medium_id": MID, "body_source": "export"}
+    d = write_post(tmp_path, "x\n" * 100 + "![](images/001-giphy.gif)\n\n"
+                   '<video src="images/002-giphy.mp4" autoplay loop muted playsinline></video>\n',
+                   front=front)
+    (d / "images").mkdir()
+    (d / "images" / "001-giphy.gif").write_bytes(b"GIF89a")
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+    d = write_post(tmp_path, "x\n" * 100 + f"![]({gif})\n\n"
+                   f'<video src="{mp4}" autoplay loop muted playsinline></video>\n',
+                   front=front, name="2020-01-02-remote")
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert errors == [f"embed media not archived, served from Giphy: {gif} (re-run fetch)",
+                      f"embed media not archived, served from Giphy: {mp4} (re-run fetch)"]
