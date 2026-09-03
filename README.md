@@ -520,7 +520,13 @@ no longer lists, work through the steps in order:
   a link), and `convert` renders it as a blockquote: the text with its
   links, then the author and a dated link to the tweet. The account
   export's widget markup, a blockquote holding only the tweet's link,
-  takes the same path instead of converting to nothing. Code
+  takes the same path instead of converting to nothing. Embeds from a
+  few providers whose content is a player with nothing to archive (an
+  art19 podcast episode, a Carbon code screenshot, Vimeo, CodePen,
+  Spotify, SoundCloud) stay iframes on the provider's own embed URL,
+  at the size Medium showed them, the same one-line form as a YouTube
+  player; the list is `PROVIDER_EMBEDS` in `convert.py`. Everything
+  else is still the `[embed: url]` link. Code
   fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.

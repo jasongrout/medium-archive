@@ -54,7 +54,8 @@ MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
 
 # the link convert leaves where an iframe stood (--embeds); the href is
 # the embed's target, unescaped. A YouTube embed stays a player instead
-# (convert.youtube_iframe), which is content, not a bare link.
+# (convert.embed_iframe), which is content, not a bare link; so does a
+# player from a provider in convert.PROVIDER_EMBEDS.
 EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
 
 # the attribution line of the blockquote an archived tweet became

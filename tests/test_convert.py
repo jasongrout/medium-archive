@@ -186,9 +186,9 @@ def test_iframe_embed_link_text_has_no_brackets():
 
 
 YT = ("https://www.youtube-nocookie.com/embed/abcdefghijk", 'width="560" height="315" '
-      'loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; '
-      'gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" '
-      "allowfullscreen")
+      'style="aspect-ratio: 560 / 315" loading="lazy" allow="accelerometer; '
+      'clipboard-write; encrypted-media; gyroscope; picture-in-picture" '
+      'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen')
 
 
 def test_youtube_video_recognizes_every_url_form():
@@ -230,8 +230,8 @@ def test_youtube_iframe_stays_a_player():
     assert md == (f'<iframe src="{YT[0]}?start=60" title="A &quot;talk&quot;" '
                   f"{YT[1]}></iframe>\n")
     # any other iframe is still the link
-    assert md_of('<iframe src="https://vimeo.com/1"></iframe>') == (
-        "[embed: https://vimeo.com/1](https://vimeo.com/1)\n")
+    assert md_of('<iframe src="https://example.com/v/1"></iframe>') == (
+        "[embed: https://example.com/v/1](https://example.com/v/1)\n")
 
 
 def test_captioned_youtube_embed_keeps_its_shell():
@@ -617,3 +617,38 @@ def test_load_media_reads_archived_tweets(tmp_path):
     (tmp_path / "media").mkdir()
     (tmp_path / "media" / "tweet-12345.json").write_text(json.dumps(OEMBED))
     assert load_media(tmp_path) == {"tweet:12345": {"tweet": OEMBED}}
+
+
+def test_provider_embed_derives_the_players_url():
+    from medium_archive.convert import provider_embed
+    art = "https://art19.com/shows/living-corporate/episodes/ce2c3fe2-9eb5"
+    assert provider_embed(art) == art + "/embed"
+    assert provider_embed(art, art + "/embed?theme=x") == art + "/embed?theme=x"
+    assert provider_embed("https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52") == \
+        "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52"
+    assert provider_embed("https://vimeo.com/76979871") == "https://player.vimeo.com/video/76979871"
+    assert provider_embed("https://player.vimeo.com/video/1?h=2") == "https://player.vimeo.com/video/1?h=2"
+    assert provider_embed("https://codepen.io/ann/pen/AbCdEf") == "https://codepen.io/ann/embed/AbCdEf"
+    assert provider_embed("https://open.spotify.com/episode/4rOoJ6Egrf8K2IrywzwOMk") == \
+        "https://open.spotify.com/embed/episode/4rOoJ6Egrf8K2IrywzwOMk"
+    assert provider_embed("https://soundcloud.com/ann/a-track") == \
+        "https://w.soundcloud.com/player/?url=https://soundcloud.com/ann/a-track"
+    for url in ("https://twitter.com/a/status/1", "https://example.com/x",
+                "https://art19.com/shows/living-corporate", "https://vimeo.com/about", ""):
+        assert provider_embed(url) is None, url
+
+
+def test_provider_player_stays_an_iframe_at_its_own_size():
+    # the state's title, embed form and size carry over; an export iframe
+    # on the provider's host is kept as it is; a stranger stays a link
+    md = md_of('<iframe src="https://art19.com/shows/lc/episodes/ce2c" title="Ep. 248" '
+               'data-embed="https://art19.com/shows/lc/episodes/ce2c/embed" '
+               'width="720" height="200"></iframe>')
+    assert md == ('<iframe src="https://art19.com/shows/lc/episodes/ce2c/embed" title="Ep. 248" '
+                  'width="720" height="200" style="aspect-ratio: 720 / 200" loading="lazy" '
+                  "allowfullscreen></iframe>\n")
+    md = md_of('<iframe src="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?"></iframe>')
+    assert md.startswith('<iframe src="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52" '
+                         'title="Embedded content from carbon.now.sh" width="560"')
+    assert md_of('<iframe src="https://example.com/player/1"></iframe>') == (
+        "[embed: https://example.com/player/1](https://example.com/player/1)\n")

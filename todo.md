@@ -117,6 +117,24 @@ and the offline test suite.
   unarchived tweet; the quote of an archived one counts as content
   (`TWEET_QUOTE_RE`, the attribution line's dated status link).
   Photos in a tweet arrive only as their `pic.twitter.com` link.
+- **Known providers' players stay iframes.** For an embed whose
+  content is a player with nothing to archive, the editor state
+  carries the provider's own embed URL (the embedly wrapper's `src=`)
+  and the size Medium showed it at (`iframeWidth`/`iframeHeight`);
+  `_iframe` passes both through as `data-embed`, `width` and
+  `height`. `convert.provider_embed` keeps an iframe for a host in
+  `PROVIDER_EMBEDS` (art19, Carbon, Vimeo, CodePen, Spotify,
+  SoundCloud), on the state's embed form when its host is the
+  provider's, else derived from the canonical page URL, so export
+  iframes work too. `embed_iframe` is the one line for every kept
+  player, YouTube included: src, title, width, height, an inline
+  `aspect-ratio` the theme's CSS scales to the column (a 720×200
+  podcast player is not a 16:9 box), lazy loading, and YouTube's
+  allow list on its host only; YouTube keeps the 560×315 default
+  rather than Medium's size. The cost is a third-party frame at read
+  time and nothing once the provider is gone; a Carbon snippet is
+  better replaced by a real code block in a fixup when someone reads
+  the screenshot.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line

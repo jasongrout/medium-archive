@@ -233,28 +233,45 @@ def _figure(state, p) -> str:
     return f"<figure>{inner}</figure>" if inner else ""
 
 
-def _iframe_src(state, p) -> str:
-    """The embed's own URL. The state stores an embedly wrapper URL whose
-    query carries the real target (url= the canonical page, src= the
-    embed form); prefer the canonical page."""
+def _iframe_srcs(state, p) -> tuple:
+    """(the embed's own URL, the provider's embed form or ""). The state
+    stores an embedly wrapper URL whose query carries both: url= the
+    canonical page, src= the player URL the provider serves for
+    iframes; the canonical page identifies the embed, the embed form
+    is what a kept iframe should load."""
     media = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
     src = media.get("iframeSrc") or p.get("href") or ""
+    embed = ""
     if "embedly.com" in src:
         q = parse_qs(urlsplit(src).query)
+        embed = (q.get("src") or [""])[0]
         src = (q.get("url") or q.get("src") or [src])[0]
-    return src
+    return src, embed
+
+
+def _iframe_src(state, p) -> str:
+    """The embed's own URL (see _iframe_srcs)."""
+    return _iframe_srcs(state, p)[0]
 
 
 def _iframe(state, p, media: dict | None = None) -> str:
-    src = _iframe_src(state, p)
+    src, embed = _iframe_srcs(state, p)
     caption = _rich_text(p.get("text") or "", p.get("markups"), state)
     res = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
     if not src:
         return _media_embed(res, media or {}, caption)
     # the resource's title names the video or tweet; to_markdown keeps it
-    # as the player's accessible name when the embed stays an iframe
-    title = f' title="{escape(res["title"], quote=True)}"' if res.get("title") else ""
-    inner = f'<iframe src="{escape(src, quote=True)}"{title}></iframe>'
+    # as the player's accessible name when the embed stays an iframe,
+    # with the provider's embed form and the size Medium showed it at
+    attrs = ""
+    if res.get("title"):
+        attrs += f' title="{escape(res["title"], quote=True)}"'
+    if embed and embed != src:
+        attrs += f' data-embed="{escape(embed, quote=True)}"'
+    for k, v in (("width", res.get("iframeWidth")), ("height", res.get("iframeHeight"))):
+        if str(v or "").isdigit() and int(v) > 0:
+            attrs += f' {k}="{int(v)}"'
+    inner = f'<iframe src="{escape(src, quote=True)}"{attrs}></iframe>'
     if caption.strip():
         inner += f"<figcaption>{caption}</figcaption>"
     return f"<figure>{inner}</figure>"

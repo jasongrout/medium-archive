@@ -83,10 +83,11 @@ class _Converter(MarkdownConverter):
                 'autoplay loop muted playsinline></video>\n\n')
 
     def convert_iframe(self, el, text, parent_tags):
-        # the YouTube player to_markdown leaves in place (every other
-        # iframe became a link or a placeholder before conversion), as
-        # its own HTML block
-        return f"\n\n{youtube_iframe(el.get('src') or '', el.get('title') or '')}\n\n"
+        # a player to_markdown left in place (every other iframe became
+        # a link or a placeholder before conversion), as its own HTML
+        # block
+        return "\n\n" + embed_iframe(el.get("src") or "", el.get("title") or "",
+                                     el.get("width"), el.get("height")) + "\n\n"
 
     def convert_figcaption(self, el, text, parent_tags):
         if not _captioned_figure(el.find_parent("figure")):
@@ -166,19 +167,75 @@ def youtube_embed_url(video: str, start=None) -> str:
     return YOUTUBE_EMBED_BASE + video + (f"?start={start}" if start else "")
 
 
-def youtube_iframe(src: str, title: str = "") -> str:
-    """The one iframe form convert writes: YouTube's own embed snippet
-    with a title for assistive tech (the state knows the video's; an
-    export iframe does not), lazily loaded, at the 16:9 size the theme's
-    CSS scales to the column. One canonical line, so the exporters and
-    lint recognize it (IFRAME_RE in sites.py)."""
-    title = title or "YouTube video"
+YOUTUBE_ALLOW = ('allow="accelerometer; clipboard-write; encrypted-media; '
+                 'gyroscope; picture-in-picture" '
+                 'referrerpolicy="strict-origin-when-cross-origin" ')
+
+
+def embed_iframe(src: str, title: str = "", width=None, height=None) -> str:
+    """The one iframe form convert writes for a player it keeps: the
+    provider's embed URL, a title for assistive tech (the state knows
+    the embed's; an export iframe does not), the size Medium showed it
+    at (YouTube's 560x315 by default) as attributes and as an
+    aspect-ratio the theme's CSS scales to the column, lazily loaded.
+    YouTube's own embed snippet adds its allow list. One canonical
+    line, so the exporters and lint recognize it (IFRAME_RE in
+    sites.py)."""
+    host = urlsplit(src).netloc.lower()
+    if not title:
+        title = "YouTube video" if host in YOUTUBE_HOSTS else f"Embedded content from {host}"
+    w = int(width) if str(width or "").isdigit() and int(width) > 0 else 560
+    h = int(height) if str(height or "").isdigit() and int(height) > 0 else 315
     return (f'<iframe src="{escape(src, quote=True)}" '
-            f'title="{escape(title, quote=True)}" width="560" height="315" '
-            'loading="lazy" allow="accelerometer; clipboard-write; '
-            'encrypted-media; gyroscope; picture-in-picture" '
-            'referrerpolicy="strict-origin-when-cross-origin" '
-            'allowfullscreen></iframe>')
+            f'title="{escape(title, quote=True)}" width="{w}" height="{h}" '
+            f'style="aspect-ratio: {w} / {h}" loading="lazy" '
+            + (YOUTUBE_ALLOW if host in YOUTUBE_HOSTS else "")
+            + "allowfullscreen></iframe>")
+
+
+# Providers whose embed is a player with nothing to archive -- a podcast,
+# a code screenshot, a video host -- kept as an iframe on the provider's
+# own embed URL, derived from the canonical page URL Medium records (or
+# taken from the embed form the editor state carries, when its host is
+# the provider's). Each entry maps a host to (canonical path pattern,
+# embed URL template) or, for the provider's own player host, None to
+# pass the URL through. Anything else stays a link.
+PROVIDER_EMBEDS = {
+    "art19.com": (re.compile(r"^/shows/[^/]+/episodes/[^/?#]+"), "https://art19.com{path}/embed"),
+    "carbon.now.sh": (re.compile(r"^/(?:embed/)?([A-Za-z0-9]+)"), "https://carbon.now.sh/embed/{1}"),
+    "vimeo.com": (re.compile(r"^/(?:video/)?(\d+)"), "https://player.vimeo.com/video/{1}"),
+    "player.vimeo.com": None,
+    "codepen.io": (re.compile(r"^/([^/]+)/(?:pen|embed)/([A-Za-z0-9]+)"), "https://codepen.io/{1}/embed/{2}"),
+    "open.spotify.com": (re.compile(r"^/(?:embed/)?(track|album|playlist|episode|show)/([A-Za-z0-9]+)"),
+                         "https://open.spotify.com/embed/{1}/{2}"),
+    "soundcloud.com": (re.compile(r"^/[^/]+/[^/?#]+"), "https://w.soundcloud.com/player/?url={url}"),
+    "w.soundcloud.com": None,
+}
+
+
+def provider_embed(src: str, embed: str = "") -> str | None:
+    """The provider embed URL to keep an iframe on, for src (the embed's
+    canonical URL) with embed (the provider's embed form, when known),
+    or None when the provider is not one whose player is kept."""
+    for candidate in (embed, src):
+        if not candidate:
+            continue
+        parts = urlsplit(candidate)
+        host = parts.netloc.lower().removeprefix("www.")
+        if host not in PROVIDER_EMBEDS:
+            continue
+        rule = PROVIDER_EMBEDS[host]
+        if rule is None or candidate is embed:
+            # the provider's own embed form, as it came (an empty query
+            # dropped: Carbon's ends in a bare "?")
+            return candidate.rstrip("?")
+        pattern, template = rule
+        m = pattern.match(parts.path)
+        if not m:
+            continue
+        return template.format(*(("",) + m.groups()), path=m.group(0),
+                               url=f"https://{host}{parts.path}")
+    return None
 
 
 def _strip_tracking(url: str) -> str:
@@ -376,7 +433,8 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
 
     # A YouTube iframe stays an iframe: the archive has its URL, and the
     # player is the content, so it is written as one (_Converter renders
-    # it; the exporters render or rewrite that one form). Any other
+    # it; the exporters render or rewrite that one form), as is a
+    # player from a provider in PROVIDER_EMBEDS. Any other
     # iframe becomes a link to its target. An iframe with no source is
     # an embed whose content the body never carried (a feed body renders
     # a gist that way: src="", 0x0). It gets the same visible placeholder
@@ -386,11 +444,15 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         src = iframe.get("src") or iframe.get("data-src") or ""
         video = youtube_video(src) if src else None
         tweet = _archived_tweet(media or {}, src) if src else None
-        if video:
+        player = provider_embed(src, iframe.get("data-embed") or "") if src else None
+        if video:                        # always the 16:9 default size
             iframe.attrs = {"src": youtube_embed_url(*video),
                             "title": iframe.get("title") or ""}
         elif tweet:
             iframe.replace_with(BeautifulSoup(tweet, "html.parser"))
+        elif player:
+            iframe.attrs = {"src": player, "title": iframe.get("title") or "",
+                            "width": iframe.get("width"), "height": iframe.get("height")}
         elif src:
             iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
         else:
