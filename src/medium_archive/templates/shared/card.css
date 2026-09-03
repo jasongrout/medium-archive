@@ -8,6 +8,9 @@
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
         --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
         --error-soft: #b91c1c;
+        /* syntax colours for highlighted code, see the token rules */
+        --syn-keyword: #cf222e; --syn-string: #0a3069; --syn-comment: #6e7781;
+        --syn-number: #0550ae; --syn-name: #8250df; --syn-builtin: #953800;
         color-scheme: light; }
 :root[data-theme="dark"] {
 /* @include shared/dark-palette.css */
@@ -194,6 +197,34 @@ a:hover { text-decoration: underline; }
 .post code { background: var(--code-bg); font-family: var(--mono);
              font-size: .9em; }
 .post pre code { font-size: inherit; background: none; }
+/* Token colours for highlighted blocks, on the class names Pygments
+   (Pelican's codehilite) and Chroma (Hugo, with noClasses off) share:
+   keywords, strings, comments, numbers, the names of functions and
+   classes, and builtins. The block keeps the theme's background and
+   ink, so a block reads as part of the page in either scheme, where
+   an engine's own inlined style (Chroma's Monokai) would paint a
+   dark block on the light page. Light values are GitHub's light
+   scheme, dark ones its dark scheme, both chosen for contrast on
+   near-white and near-black. */
+.post .highlight .k, .post .highlight .kd, .post .highlight .kn,
+.post .highlight .kr, .post .highlight .kt, .post .highlight .kc,
+.post .highlight .ow { color: var(--syn-keyword); }
+.post .highlight .s, .post .highlight .s1, .post .highlight .s2,
+.post .highlight .sb, .post .highlight .sd, .post .highlight .sa,
+.post .highlight .se, .post .highlight .sh, .post .highlight .si,
+.post .highlight .sx, .post .highlight .sr, .post .highlight .ss,
+.post .highlight .dl { color: var(--syn-string); }
+.post .highlight .c, .post .highlight .c1, .post .highlight .cm,
+.post .highlight .cp, .post .highlight .cs,
+.post .highlight .ch { color: var(--syn-comment); font-style: italic; }
+.post .highlight .m, .post .highlight .mi, .post .highlight .mf,
+.post .highlight .mh, .post .highlight .mo, .post .highlight .mb,
+.post .highlight .il { color: var(--syn-number); }
+.post .highlight .nf, .post .highlight .fm, .post .highlight .nc,
+.post .highlight .nd, .post .highlight .ne, .post .highlight .nn,
+.post .highlight .nt { color: var(--syn-name); }
+.post .highlight .nb, .post .highlight .bp,
+.post .highlight .na { color: var(--syn-builtin); }
 /* The copy button code-copy.html gives each block, overlaid on the
    block's top-right corner as code hosts and documentation sites set
    theirs. The wrapper the script adds is the button's positioning

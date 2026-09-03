@@ -636,7 +636,14 @@ def test_code_copy(archive):
         # a screen reader hears the copy through the live region
         assert 'role="status"' in text, page
         assert 'announce("Copied to clipboard")' in text, page
+    # hugo highlights by class, never Chroma's inlined Monokai, which
+    # paints a dark block on the light page; the theme colours the
+    # tokens on the class names Pygments and Chroma share, per palette
+    config = (hugo_site / "hugo.toml").read_text()
+    assert "[markup.highlight]\nnoClasses = false" in config
     css = (hugo_site / "static/css/style.css").read_text()
+    assert css.count("--syn-keyword:") == 3      # light, and dark twice
+    assert ".post .highlight .k," in css
     assert ".code-block { position: relative; }" in css
     assert ".code-copy { position: absolute;" in css
     assert ".code-copy:focus-visible" in css
