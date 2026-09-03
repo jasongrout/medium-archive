@@ -22,47 +22,65 @@
   }
 }
 * { box-sizing: border-box; }
-/* The typography choices the header's font picker cycles through
-   (pinned as data-font on <html>, persisted like the theme choice):
-   the jupyter.org sans the site launched with, Inter, and two
-   superfamily pairs -- Noto and Source -- each offered twice, once
-   with its sans face running the article text and once with its
-   serif face doing so instead.
+/* The typography choices the header's font picker offers (pinned as
+   data-font on <html>, persisted like the theme choice): the
+   jupyter.org sans the site launched with, the reader's own platform
+   UI font, Inter, two standalone sans faces picked for their own look
+   (Atkinson Hyperlegible, Nunito Sans), and the Source and IBM Plex
+   superfamilies, each offered twice -- once with its sans face
+   running the article text, once with its serif face doing so
+   instead.
 
    --body-font is what the page is set in and --mono what its code
    is, so a choice swaps both by redefining them; the rules downstream
-   name the roles, never the families. A superfamily's sans choice
-   (Noto Sans, Source Sans) sets --body-font to its own sans face and
-   --mono to its own mono face, so the whole page, article included,
-   runs in that superfamily. Its serif sibling (Noto Serif, Source
-   Serif) leaves --body-font on the sans face -- headings and chrome
-   stay sans, as Medium's did -- and only the article's running text
-   (further down) is pointed at the serif instead. */
+   name the roles, never the families. Headings and chrome stay on
+   --body-font under every choice, so they read sans regardless: a
+   superfamily's sans choice (Source Sans, IBM Plex Sans) points
+   --body-font at its own sans face, so the whole page, article
+   included, runs in it; its serif sibling (Source Serif, IBM Plex
+   Serif) leaves --body-font on that same sans face and points only
+   the article's running text (further down) at the serif instead.
+   --mono follows to whichever face the choice ships one under: the
+   superfamilies' own mono, Atkinson Hyperlegible's own mono, or, for
+   System UI and any choice with no mono face of its own (Helvetica,
+   Inter, Nunito Sans), the platform's default ui-monospace stack. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
+                     Helvetica, Arial, sans-serif;
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --noto-sans: "Noto Sans", "Helvetica Neue", Helvetica, Arial,
-                     sans-serif;
-        --noto-serif: "Noto Serif", Georgia, Cambria,
-                      "Times New Roman", Times, serif;
-        --noto-mono: "Noto Sans Mono", ui-monospace, SFMono-Regular,
-                     Menlo, Consolas, monospace;
-        --source-serif: "Source Serif Pro", Georgia, Cambria,
-                        "Times New Roman", Times, serif;
         --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
                        Arial, sans-serif;
+        --source-serif: "Source Serif Pro", Georgia, Cambria,
+                        "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
                        Menlo, Consolas, monospace;
+        --atkinson: "Atkinson Hyperlegible", "Helvetica Neue", Helvetica,
+                    Arial, sans-serif;
+        --atkinson-mono: "Atkinson Hyperlegible Mono", ui-monospace,
+                         SFMono-Regular, Menlo, Consolas, monospace;
+        --nunito-sans: "Nunito Sans", "Helvetica Neue", Helvetica, Arial,
+                       sans-serif;
+        --ibm-plex-sans: "IBM Plex Sans", "Helvetica Neue", Helvetica,
+                         Arial, sans-serif;
+        --ibm-plex-serif: "IBM Plex Serif", Georgia, Cambria,
+                          "Times New Roman", Times, serif;
+        --ibm-plex-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular,
+                         Menlo, Consolas, monospace;
         --body-font: var(--sans);
         --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+:root[data-font="system-ui"] { --body-font: var(--system-ui); }
 :root[data-font="inter"] { --body-font: var(--inter); }
-:root[data-font="noto-sans"] { --body-font: var(--noto-sans);
-                               --mono: var(--noto-mono); }
 :root[data-font="source-sans"] { --body-font: var(--source-sans);
                                  --mono: var(--source-code); }
-:root[data-font="noto-serif"] { --body-font: var(--noto-sans);
-                                --mono: var(--noto-mono); }
 :root[data-font="source-serif"] { --body-font: var(--source-sans);
                                   --mono: var(--source-code); }
+:root[data-font="atkinson"] { --body-font: var(--atkinson);
+                              --mono: var(--atkinson-mono); }
+:root[data-font="nunito-sans"] { --body-font: var(--nunito-sans); }
+:root[data-font="ibm-plex-sans"] { --body-font: var(--ibm-plex-sans);
+                                   --mono: var(--ibm-plex-mono); }
+:root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
+                                    --mono: var(--ibm-plex-mono); }
 body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
@@ -123,35 +141,57 @@ a:hover { text-decoration-line: underline; }
 .site-header nav a[aria-current="page"] { color: var(--ink); font-weight: 700;
                                           border-bottom-color: var(--accent); }
 
-.theme-picker, .font-picker { display: inline-flex; vertical-align: middle;
-                              margin-left: 1.25rem; }
-/* the font picker pairs with the theme button beside it */
-.font-picker { margin-left: .45rem; }
-.theme-picker[hidden], .font-picker[hidden] { display: none; }
-.theme-picker button, .font-picker button {
+.theme-picker { display: inline-flex; vertical-align: middle;
+                margin-left: 1.25rem; }
+.theme-picker[hidden] { display: none; }
+.theme-picker button {
                        display: inline-flex; align-items: center;
-                       justify-content: center; height: 1.9rem;
+                       justify-content: center; width: 1.9rem; height: 1.9rem;
                        padding: 0; border: 1px solid var(--line);
                        border-radius: 999px; background: none;
                        color: var(--muted); cursor: pointer; }
-.theme-picker button { width: 1.9rem; }
-.theme-picker button:hover, .font-picker button:hover { color: var(--accent); }
+.theme-picker button:hover { color: var(--accent); }
 .theme-picker svg { width: 1rem; height: 1rem; }
-/* The font button names the choice it is on and sets that name in the
-   family it names, so it both says and shows what you are reading. A
-   name is wider than the theme picker's icon, so this button is a pill
-   rather than a circle; min-width holds it steady across the six
-   names -- sized to "Source Serif"/"Source Sans", the longest -- which
-   would otherwise shift the nav on every click. */
-.font-picker button { min-width: 7.2rem; padding: 0 .75rem;
-                      font-size: .8rem; }
-.font-sample { line-height: 1; }
-.font-picker [data-set-font="sans"] { font-family: var(--sans); }
-.font-picker [data-set-font="inter"] { font-family: var(--inter); }
-.font-picker [data-set-font="noto-sans"] { font-family: var(--noto-sans); }
-.font-picker [data-set-font="source-sans"] { font-family: var(--source-sans); }
-.font-picker [data-set-font="noto-serif"] { font-family: var(--noto-serif); }
-.font-picker [data-set-font="source-serif"] { font-family: var(--source-serif); }
+/* The font picker floats at the page's bottom-right corner, fixed to
+   the viewport instead of sitting in the header, so it stays within
+   reach once a long article has scrolled the header away. It is
+   spliced in once near the end of the body (see baseof.html/base.html)
+   rather than beside the theme button, and hidden until its script
+   runs, like the theme button, since without JS a choice could not
+   apply anyway. */
+.font-picker { position: fixed; right: 1.25rem; bottom: 1.25rem;
+               z-index: 40; }
+.font-picker[hidden] { display: none; }
+/* The select names the choice it is on and sets that name in the
+   family it names, so it both says and shows what you are reading: a
+   dropdown, not the theme button's cycling pill, since nine choices
+   are too many to cycle one click at a time. Each <option> carries
+   the family it offers as its own inline style, so the open list
+   previews every choice; the select's own font-family is set from
+   script on every change, so the closed box previews the current one
+   too. A fixed width holds the box steady as the choice changes --
+   sized to "Atkinson Hyperlegible", the longest name -- which would
+   otherwise resize the floating picker on every change. appearance:
+   none drops the UA's own arrow so the picker draws just the one
+   beside it; -webkit-appearance covers Safari, which appearance alone
+   does not clear on a <select>. The shadow matches the card and post
+   panels, so the picker reads as floating over the page rather than
+   as part of it. */
+.font-picker select { display: block; width: 12rem; height: 2.1rem;
+                      padding: 0 1.9rem 0 .9rem; border: 1px solid var(--line);
+                      border-radius: 999px; background: var(--card);
+                      color: var(--muted); font-size: .8rem; cursor: pointer;
+                      box-shadow: 0 1px 3px rgba(0,0,0,.09),
+                                  0 4px 14px rgba(0,0,0,.05);
+                      appearance: none; -webkit-appearance: none; }
+.font-picker select:hover, .font-picker select:focus-visible { color: var(--accent); }
+.font-picker-arrow { position: absolute; right: 1rem; top: 50%;
+                     transform: translateY(-50%); width: .85rem; height: .85rem;
+                     fill: none; stroke: currentColor; stroke-width: 2;
+                     stroke-linecap: round; stroke-linejoin: round;
+                     color: var(--muted); pointer-events: none; }
+.font-picker select:hover ~ .font-picker-arrow,
+.font-picker select:focus-visible ~ .font-picker-arrow { color: var(--accent); }
 
 /* the feed mark, in the header nav and beside a tag's or author's
    heading where that term has a feed of its own */
@@ -222,8 +262,8 @@ a:hover { text-decoration-line: underline; }
    (a badge in a sentence) is not matched and stays inline. */
 .post p:has(> img:only-child), .post p:has(> a:only-child > img:only-child),
 .post figure { text-align: center; }
-/* Code names the --mono role, so a superfamily font picker choice can
-   put its own mono under it. The size is stated at all
+/* Code names the --mono role, so a font picker choice with a mono
+   face of its own can put it under it. The size is stated at all
    (rather than left to the UA) because a stack ending in the generic
    `monospace` otherwise triggers the browsers' 13px monospace default.
    Inline code is em, so it tracks the prose it sits in. A block is
@@ -344,16 +384,16 @@ a:hover { text-decoration-line: underline; }
    reproduced: it works out to 0.064px per character, which no reader
    can see, and leaving it off keeps every choice on the browser's
    default tracking. */
-:root[data-font="noto-serif"] .post { font-family: var(--noto-serif); }
-:root[data-font="noto-serif"] .post :is(h1, h2, h3, h4, h5, h6),
-:root[data-font="noto-serif"] .post-meta,
-:root[data-font="noto-serif"] .post-share,
-:root[data-font="noto-serif"] .post figcaption { font-family: var(--body-font); }
 :root[data-font="source-serif"] .post { font-family: var(--source-serif); }
 :root[data-font="source-serif"] .post :is(h1, h2, h3, h4, h5, h6),
 :root[data-font="source-serif"] .post-meta,
 :root[data-font="source-serif"] .post-share,
 :root[data-font="source-serif"] .post figcaption { font-family: var(--body-font); }
+:root[data-font="ibm-plex-serif"] .post { font-family: var(--ibm-plex-serif); }
+:root[data-font="ibm-plex-serif"] .post :is(h1, h2, h3, h4, h5, h6),
+:root[data-font="ibm-plex-serif"] .post-meta,
+:root[data-font="ibm-plex-serif"] .post-share,
+:root[data-font="ibm-plex-serif"] .post figcaption { font-family: var(--body-font); }
 
 /* The share bar, carried twice by a post: under the byline, where a
    reader decides whether to read, and at the foot, where they have.

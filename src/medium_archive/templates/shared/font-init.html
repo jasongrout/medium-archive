@@ -2,8 +2,10 @@
 (function () {
   try {
     var font = localStorage.getItem("font");
-    if (font === "inter" || font === "noto-sans" || font === "source-sans" ||
-        font === "noto-serif" || font === "source-serif")
+    if (font === "system-ui" || font === "inter" || font === "source-sans" ||
+        font === "source-serif" || font === "atkinson" ||
+        font === "nunito-sans" || font === "ibm-plex-sans" ||
+        font === "ibm-plex-serif")
       document.documentElement.setAttribute("data-font", font);
   } catch (e) {}
 })();

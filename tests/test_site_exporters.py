@@ -487,15 +487,18 @@ def test_theme_picker_and_dark_scheme(archive):
         text = base.read_text()
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
-        for choice in ("sans", "inter", "noto-sans", "source-sans",
-                       "noto-serif", "source-serif"):
-            assert f'data-set-font="{choice}"' in text, base
-        # every family the picker offers beyond the launch stack is a
-        # webfont: unlinked, those choices degrade to their fallbacks
-        # silently, looking like a styling bug rather than a missing file
-        for family in ("Inter", "Noto+Sans", "Noto+Sans+Mono", "Noto+Serif",
-                       "Source+Serif+Pro", "Source+Sans+Pro",
-                       "Source+Code+Pro"):
+        for choice in ("sans", "system-ui", "inter", "source-sans",
+                       "source-serif", "atkinson", "nunito-sans",
+                       "ibm-plex-sans", "ibm-plex-serif"):
+            assert f'<option value="{choice}"' in text, base
+        # every family the picker offers beyond the launch stack and the
+        # platform's own is a webfont: unlinked, those choices degrade to
+        # their fallbacks silently, looking like a styling bug rather than
+        # a missing file
+        for family in ("Atkinson+Hyperlegible", "Atkinson+Hyperlegible+Mono",
+                       "IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
+                       "Inter", "Nunito+Sans", "Source+Serif+Pro",
+                       "Source+Sans+Pro", "Source+Code+Pro"):
             assert f"family={family}" in text, (base, family)
         # the stored choices apply before the stylesheet loads, so a
         # page cannot flash the wrong scheme or font

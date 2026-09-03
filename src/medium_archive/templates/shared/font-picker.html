@@ -1,48 +1,45 @@
 <span class="font-picker" hidden>
-<button type="button">
-<span class="font-sample" data-set-font="sans">Helvetica</span>
-<span class="font-sample" data-set-font="inter">Inter</span>
-<span class="font-sample" data-set-font="noto-sans">Noto Sans</span>
-<span class="font-sample" data-set-font="source-sans">Source Sans</span>
-<span class="font-sample" data-set-font="noto-serif">Noto Serif</span>
-<span class="font-sample" data-set-font="source-serif">Source Serif</span>
-</button>
+<select aria-label="Body font">
+<option value="sans" style="font-family: var(--sans)">Helvetica</option>
+<option value="system-ui" style="font-family: var(--system-ui)">System UI</option>
+<option value="inter" style="font-family: var(--inter)">Inter</option>
+<option value="source-sans" style="font-family: var(--source-sans)">Source Sans</option>
+<option value="source-serif" style="font-family: var(--source-serif)">Source Serif</option>
+<option value="atkinson" style="font-family: var(--atkinson)">Atkinson Hyperlegible</option>
+<option value="nunito-sans" style="font-family: var(--nunito-sans)">Nunito Sans</option>
+<option value="ibm-plex-sans" style="font-family: var(--ibm-plex-sans)">IBM Plex Sans</option>
+<option value="ibm-plex-serif" style="font-family: var(--ibm-plex-serif)">IBM Plex Serif</option>
+</select>
+<svg class="font-picker-arrow" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
 </span>
 <script>
 (function () {
   var root = document.documentElement;
   var picker = document.querySelector(".font-picker");
-  var button = picker.querySelector("button");
-  var samples = button.querySelectorAll("[data-set-font]");
-  var order = ["sans", "inter", "noto-sans", "source-sans", "noto-serif",
-               "source-serif"];
-  var names = {};
-  samples.forEach(function (sample) {
-    names[sample.dataset.setFont] = sample.textContent;
-  });
-  var current;
+  var select = picker.querySelector("select");
+  var options = select.options;
   function apply(choice) {
-    current = choice;
+    select.value = choice;
+    select.style.fontFamily = options[select.selectedIndex].style.fontFamily;
     if (choice === "sans") root.removeAttribute("data-font");
     else root.setAttribute("data-font", choice);
     try {
       if (choice === "sans") localStorage.removeItem("font");
       else localStorage.setItem("font", choice);
     } catch (e) {}
-    samples.forEach(function (sample) {
-      sample.style.display = sample.dataset.setFont === choice ? "" : "none";
-    });
-    var next = order[(order.indexOf(choice) + 1) % order.length];
-    var label = "Body font: " + names[choice] +
-                " (switch to " + names[next] + ")";
-    button.title = label;
-    button.setAttribute("aria-label", label);
   }
-  button.addEventListener("click", function () {
-    apply(order[(order.indexOf(current) + 1) % order.length]);
+  select.addEventListener("change", function () {
+    apply(select.value);
   });
-  apply(names[root.getAttribute("data-font")] ? root.getAttribute("data-font")
-                                              : "sans");
+  var stored = root.getAttribute("data-font");
+  var known = false;
+  for (var i = 0; i < options.length; i++) {
+    if (options[i].value === stored) known = true;
+  }
+  apply(known ? stored : "sans");
   picker.hidden = false;
 })();
 </script>
