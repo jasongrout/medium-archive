@@ -75,7 +75,7 @@ a { color: inherit; text-decoration-line: underline;
    nav, card covers and titles, tag pills, chips, page numbers, the
    archive list -- carry no rule at rest; hovering shows the same rule. */
 .site-title, .site-header nav a, .card-cover, .card-title a,
-.post-meta .tag, .share-link, .chip, ul.pagination .page-link,
+.tag, .share-link, .chip, ul.pagination .page-link,
 .archives a { text-decoration-line: none; }
 a:hover { text-decoration-line: underline; }
 
@@ -161,8 +161,7 @@ a:hover { text-decoration-line: underline; }
 .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .card-body { padding: 1.1rem 1.25rem 1.25rem; display: flex;
              flex-direction: column; flex: 1; }
-.card-tags { margin: 0 0 .35rem; }
-.card-tags a { font-size: .82rem; font-weight: 600; margin-right: .6rem; }
+.card-tags { margin: 0 0 .5rem; display: flex; flex-wrap: wrap; gap: .35rem; }
 .card-title { margin: 0 0 .5rem; font-size: 1.3rem; line-height: 1.3; }
 .card-title a { color: var(--ink); }
 .card-excerpt { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
@@ -180,12 +179,16 @@ a:hover { text-decoration-line: underline; }
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
-.post-meta .tag { display: inline-flex; align-items: center;
-                  background: var(--code-bg); border: 1px solid var(--line);
-                  border-radius: 999px; padding: .05rem .65rem;
-                  font-size: .82rem; color: var(--soft); }
-.post-meta .tag:hover { border-color: var(--accent); color: var(--accent);
-                        text-decoration: none; }
+/* A tag is a pill, in the article byline and on a card alike: one
+   form for the term wherever it appears. Hover colours the border, not
+   the text -- orange text is the contrast the link rule exists to
+   avoid. */
+.tag { display: inline-flex; align-items: center;
+       background: var(--code-bg); border: 1px solid var(--line);
+       border-radius: 999px; padding: .05rem .65rem;
+       font-size: .82rem; color: var(--soft); }
+.tag:hover { border-color: var(--accent); color: var(--ink);
+             text-decoration: none; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }

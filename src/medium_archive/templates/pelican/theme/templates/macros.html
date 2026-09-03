@@ -4,7 +4,7 @@
 <a class="card-cover" href="{{ SITEURL }}/{{ article.url }}"><img src="{{ SITEURL }}/{{ article.url }}{{ article.cover }}" width="640" height="360" alt="" loading="lazy"></a>
 {% endif %}
 <div class="card-body">
-{% if article.tags %}<p class="card-tags">{% for t in article.tags %}<a href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a> {% endfor %}</p>{% endif %}
+{% if article.tags %}<p class="card-tags">{% for t in article.tags %}<a class="tag" href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a> {% endfor %}</p>{% endif %}
 <h2 class="card-title"><a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></h2>
 <p class="card-excerpt">{{ article.summary | striptags | truncate(150) }}</p>
 <p class="card-meta"><time>{{ article.locale_date }}</time>{% if article.authors %} · {% for a in article.authors %}{% if not loop.first %}, {% endif %}<a href="{{ SITEURL }}/{{ a.url }}">{{ a }}</a>{% endfor %}{% endif %}</p>
