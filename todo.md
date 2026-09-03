@@ -92,7 +92,31 @@ and the offline test suite.
   of the state's embed count, since they convert either way, and
   reports a file still served from Giphy until `fetch` runs again.
   Built and tested offline: the sandbox's proxy refuses media.giphy.com,
-  so the first live backfill deserves a look.
+  so the first live backfill deserves a look. (It got one: a first run
+  merged the two `giphy.mp4` basenames of one post into a single file,
+  through the de-duplication meant for a Medium asset under two CDN
+  hosts; only Medium CDN URLs merge now, and Giphy files carry their
+  id.)
+- **Tweets are archived and quoted.** A tweet's text exists nowhere
+  in a Medium page: the state has an embedly wrapper with an empty
+  title, and the export has Twitter's widget markup, a
+  `twitter-tweet` blockquote holding only the tweet's link. `fetch`
+  now archives each tweet embed's oEmbed payload (`fetch_tweets`,
+  from `publish.x.com/oembed`, which needs no credentials; checked
+  live 2026-09, and `publish.twitter.com` redirects there) into
+  `raw/<id>/media/tweet-<tweet id>.json`, on new posts and on the
+  backfill path. `convert` renders an archived tweet as a blockquote
+  (`tweet_html`): the text with its links, `ref_src` tracking dropped,
+  a hard break per line, then "— Name (@handle), Month D, YYYY" with
+  the author and the date linked. Plain Markdown, so every generator
+  renders it and it outlives the tweet. The export's empty widget
+  blockquote is normalized to an iframe on the tweet's URL first, so
+  it takes the same path (a Ghost capture's blockquote that already
+  carries the text is left alone). A tweet the endpoint reports gone
+  stays the `[embed: url]` link, which `lint --embeds` names as an
+  unarchived tweet; the quote of an archived one counts as content
+  (`TWEET_QUOTE_RE`, the attribution line's dated status link).
+  Photos in a tweet arrive only as their `pic.twitter.com` link.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line

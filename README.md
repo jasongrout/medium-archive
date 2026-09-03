@@ -513,7 +513,14 @@ no longer lists, work through the steps in order:
   serves it from the post itself: the gif as an image, the mp4 as a
   looping muted `<video>` that the MyST exporter writes in its image
   syntax. Until the file is fetched the image or clip points at Giphy,
-  which `lint --embeds` reports. Code
+  which `lint --embeds` reports. A tweet's text is likewise nowhere in
+  the page, so `fetch` archives each tweet embed's oEmbed payload from
+  X's public endpoint into `raw/<id>/media/tweet-<tweet id>.json` (a
+  re-run backfills older posts; a deleted tweet is reported and stays
+  a link), and `convert` renders it as a blockquote: the text with its
+  links, then the author and a dated link to the tweet. The account
+  export's widget markup, a blockquote holding only the tweet's link,
+  takes the same path instead of converting to nothing. Code
   fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.

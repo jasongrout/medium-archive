@@ -106,10 +106,11 @@ def looks_gone(html: str) -> bool:
 
 MEDIA_URL = "https://medium.com/media/{id}?format=json"
 GIST_API_URL = "https://api.github.com/gists/{id}"
-# Twitter's public oEmbed endpoint: the tweet's text, author and date
-# as HTML, no credentials needed. omit_script drops the widgets.js tag;
-# dnt asks for no tracking of the archive's readers.
-TWEET_OEMBED_URL = ("https://publish.twitter.com/oembed?url={url}"
+# X's public oEmbed endpoint (publish.twitter.com redirects here since
+# the rename): the tweet's text, author and date as HTML, no
+# credentials needed, checked live 2026-09. omit_script drops the
+# widgets.js tag; dnt asks for no tracking of the archive's readers.
+TWEET_OEMBED_URL = ("https://publish.x.com/oembed?url={url}"
                     "&omit_script=true&dnt=true")
 
 
