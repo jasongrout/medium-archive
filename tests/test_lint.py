@@ -291,3 +291,18 @@ def test_archived_carbon_snippet_is_not_a_dropped_embed(tmp_path):
     assert errors and "dropped 1 embed" in errors[0]
     (raw / MID / "media" / "carbon-PaDDn2ZszZUVmuhvRP52.json").write_text("{}")
     assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_provider_link_is_not_a_dropped_embed(tmp_path):
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "Ep. 248", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Fart19.com%2Fshows%2Flc%2Fepisodes%2Fce2c"}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    d = write_post(tmp_path, "x\n" * 100 + "[Ep. 248](https://art19.com/shows/lc/episodes/ce2c)\n",
+                   front={**FRONT, "medium_id": MID, "body_source": "state"})
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])

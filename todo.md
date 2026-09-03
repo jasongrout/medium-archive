@@ -123,8 +123,8 @@ and the offline test suite.
   and the size Medium showed it at (`iframeWidth`/`iframeHeight`);
   `_iframe` passes both through as `data-embed`, `width` and
   `height`. `convert.provider_embed` keeps an iframe for a host in
-  `PROVIDER_EMBEDS` (art19, Carbon, Vimeo, CodePen, Spotify,
-  SoundCloud), on the state's embed form when its host is the
+  `PROVIDER_EMBEDS` (Carbon, Vimeo, CodePen, Spotify, SoundCloud), on
+  the state's embed form when its host is the
   provider's, else derived from the canonical page URL, so export
   iframes work too. `embed_iframe` is the one line for every kept
   player, YouTube included: src, title, width, height, an inline
@@ -132,7 +132,12 @@ and the offline test suite.
   podcast player is not a 16:9 box), lazy loading, and YouTube's
   allow list on its host only; YouTube keeps the 560×315 default
   rather than Medium's size. The cost is a third-party frame at read
-  time and nothing once the provider is gone.
+  time and nothing once the provider is gone. art19 was on the list
+  and came off it: its pages send a frame-ancestors policy, so the
+  player renders as a browser error on any other site (seen in
+  Firefox). `PROVIDER_LINKS` names such providers, and their embeds
+  become a plain link titled by the state (the episode's name), which
+  `lint --embeds` reads as content rather than an unfilled embed.
 - **Carbon snippets are archived as code.** A Carbon embed page
   (`carbon.now.sh/embed/<id>`) is a Next.js page whose `__NEXT_DATA__`
   carries the snippet itself: `code` and `language` (found by reading

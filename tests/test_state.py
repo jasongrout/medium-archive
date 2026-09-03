@@ -182,13 +182,13 @@ def test_iframe_embed_with_caption():
     p = para(0, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m1"}})
     state = make_state([p])
     state["MediaResource:m1"] = {
-        "title": "Ep. 248", "iframeWidth": "720", "iframeHeight": "200",
+        "title": "A film", "iframeWidth": "720", "iframeHeight": "405",
         "iframeSrc": "https://cdn.embedly.com/widgets/media.html"
-                     "?src=https%3A%2F%2Fart19.com%2Fshows%2Flc%2Fepisodes%2Fce2c%2Fembed"
-                     "&url=https%3A%2F%2Fart19.com%2Fshows%2Flc%2Fepisodes%2Fce2c"}
+                     "?src=https%3A%2F%2Fplayer.vimeo.com%2Fvideo%2F76979871"
+                     "&url=https%3A%2F%2Fvimeo.com%2F76979871"}
     md2 = md_of_state(state)
-    assert md2.startswith('<iframe src="https://art19.com/shows/lc/episodes/ce2c/embed" '
-                         'title="Ep. 248" width="720" height="200" style="aspect-ratio: 720 / 200"')
+    assert md2.startswith('<iframe src="https://player.vimeo.com/video/76979871" '
+                          'title="A film" width="720" height="405" style="aspect-ratio: 720 / 405"')
     # the caption rides in the figure shell, unstyled (CSS styles it)
     assert "<figcaption>\n\nWatch the demo.\n\n</figcaption>" in md
 

@@ -521,9 +521,9 @@ no longer lists, work through the steps in order:
   links, then the author and a dated link to the tweet. The account
   export's widget markup, a blockquote holding only the tweet's link,
   takes the same path instead of converting to nothing. Embeds from a
-  few providers whose content is a player with nothing to archive (an
-  art19 podcast episode, a Carbon code screenshot, Vimeo, CodePen,
-  Spotify, SoundCloud) stay iframes on the provider's own embed URL,
+  few providers whose content is a player with nothing to archive (a
+  Carbon code screenshot, Vimeo, CodePen, Spotify, SoundCloud) stay
+  iframes on the provider's own embed URL,
   at the size Medium showed them, the same one-line form as a YouTube
   player; the list is `PROVIDER_EMBEDS` in `convert.py`. A Carbon
   code screenshot is the one of those whose source is recoverable:
@@ -531,7 +531,9 @@ no longer lists, work through the steps in order:
   `fetch` archives into `raw/<id>/media/carbon-<id>.json`, and
   `convert` then writes the code block itself; the iframe is the
   fallback until it is fetched. Everything else is still the
-  `[embed: url]` link. Code
+  `[embed: url]` link, except an embed from a provider that refuses to
+  be framed (art19), which becomes a plain link titled by the editor
+  state and counts as content. Code
   fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.

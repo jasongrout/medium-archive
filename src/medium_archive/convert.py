@@ -201,7 +201,6 @@ def embed_iframe(src: str, title: str = "", width=None, height=None) -> str:
 # embed URL template) or, for the provider's own player host, None to
 # pass the URL through. Anything else stays a link.
 PROVIDER_EMBEDS = {
-    "art19.com": (re.compile(r"^/shows/[^/]+/episodes/[^/?#]+"), "https://art19.com{path}/embed"),
     "carbon.now.sh": (re.compile(r"^/(?:embed/)?([A-Za-z0-9]+)"), "https://carbon.now.sh/embed/{1}"),
     "vimeo.com": (re.compile(r"^/(?:video/)?(\d+)"), "https://player.vimeo.com/video/{1}"),
     "player.vimeo.com": None,
@@ -211,6 +210,18 @@ PROVIDER_EMBEDS = {
     "soundcloud.com": (re.compile(r"^/[^/]+/[^/?#]+"), "https://w.soundcloud.com/player/?url={url}"),
     "w.soundcloud.com": None,
 }
+
+
+# Providers whose pages refuse to be framed (a frame-ancestors policy:
+# the browser shows an error where the player would be), so the embed
+# is best a plain link, titled by the editor state (an episode's name),
+# which lint counts as content rather than an unfilled embed.
+PROVIDER_LINKS = {"art19.com"}
+
+
+def provider_link(src: str) -> bool:
+    """Whether src's provider is one whose embed becomes a titled link."""
+    return urlsplit(src).netloc.lower().removeprefix("www.") in PROVIDER_LINKS
 
 
 def provider_embed(src: str, embed: str = "") -> str | None:
@@ -502,6 +513,9 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         player = provider_embed(src, iframe.get("data-embed") or "") if src else None
         if code:                         # the snippet itself beats its screenshot
             iframe.replace_with(BeautifulSoup(code, "html.parser"))
+        elif src and provider_link(src):
+            iframe.replace_with(doc.new_tag("a", href=src,
+                                            string=iframe.get("title") or src))
         elif video:                        # always the 16:9 default size
             iframe.attrs = {"src": youtube_embed_url(*video),
                             "title": iframe.get("title") or ""}

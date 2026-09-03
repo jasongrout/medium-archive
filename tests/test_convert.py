@@ -621,9 +621,8 @@ def test_load_media_reads_archived_tweets(tmp_path):
 
 def test_provider_embed_derives_the_players_url():
     from medium_archive.convert import provider_embed
-    art = "https://art19.com/shows/living-corporate/episodes/ce2c3fe2-9eb5"
-    assert provider_embed(art) == art + "/embed"
-    assert provider_embed(art, art + "/embed?theme=x") == art + "/embed?theme=x"
+    carbon = "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?"
+    assert provider_embed("https://carbon.now.sh/x", carbon) == carbon.rstrip("?")
     assert provider_embed("https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52") == \
         "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52"
     assert provider_embed("https://vimeo.com/76979871") == "https://player.vimeo.com/video/76979871"
@@ -634,18 +633,30 @@ def test_provider_embed_derives_the_players_url():
     assert provider_embed("https://soundcloud.com/ann/a-track") == \
         "https://w.soundcloud.com/player/?url=https://soundcloud.com/ann/a-track"
     for url in ("https://twitter.com/a/status/1", "https://example.com/x",
-                "https://art19.com/shows/living-corporate", "https://vimeo.com/about", ""):
+                "https://art19.com/shows/lc/episodes/ce2c", "https://vimeo.com/about", ""):
         assert provider_embed(url) is None, url
+
+
+def test_provider_that_refuses_framing_becomes_a_titled_link():
+    # art19 sends a frame-ancestors policy: the browser would show an
+    # error where the player is, so the embed is a link named by the
+    # state's title, which lint reads as content
+    md = md_of('<iframe src="https://art19.com/shows/lc/episodes/ce2c" title="Ep. 248" '
+               'data-embed="https://art19.com/shows/lc/episodes/ce2c/embed" '
+               'width="720" height="200"></iframe>')
+    assert md == "[Ep. 248](https://art19.com/shows/lc/episodes/ce2c)\n"
+    assert md_of('<iframe src="https://art19.com/shows/lc/episodes/ce2c"></iframe>') == (
+        "<https://art19.com/shows/lc/episodes/ce2c>\n")
 
 
 def test_provider_player_stays_an_iframe_at_its_own_size():
     # the state's title, embed form and size carry over; an export iframe
     # on the provider's host is kept as it is; a stranger stays a link
-    md = md_of('<iframe src="https://art19.com/shows/lc/episodes/ce2c" title="Ep. 248" '
-               'data-embed="https://art19.com/shows/lc/episodes/ce2c/embed" '
-               'width="720" height="200"></iframe>')
-    assert md == ('<iframe src="https://art19.com/shows/lc/episodes/ce2c/embed" title="Ep. 248" '
-                  'width="720" height="200" style="aspect-ratio: 720 / 200" loading="lazy" '
+    md = md_of('<iframe src="https://vimeo.com/76979871" title="A film" '
+               'data-embed="https://player.vimeo.com/video/76979871?h=2" '
+               'width="720" height="405"></iframe>')
+    assert md == ('<iframe src="https://player.vimeo.com/video/76979871?h=2" title="A film" '
+                  'width="720" height="405" style="aspect-ratio: 720 / 405" loading="lazy" '
                   "allowfullscreen></iframe>\n")
     md = md_of('<iframe src="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?"></iframe>')
     assert md.startswith('<iframe src="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52" '
