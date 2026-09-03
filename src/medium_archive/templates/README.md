@@ -42,21 +42,25 @@ These embed verbatim in both engines' pages, so they must carry no
 - `font-picker.html` is the header's body-font switch, beside the theme
   picker and built like it: one cycling button, the choice persisted
   per browser. Where the theme button draws its state as an icon, this
-  one names it ("Helvetica", "Open Sans", "Source", "Source Sans") and
-  sets the name in the family it names, so the button says and shows
-  what the reader is on. The names are the button's own text, which the
-  script reads back for the tooltip and `aria-label`; a fixed
-  `min-width` in `card.css` keeps the four from shifting the nav as
-  they cycle. It exists to let reviewers compare candidate typography
-  before the blog settles on one: the jupyter.org Helvetica stack the
-  site launched with, Open Sans (the humanist sans nearest the logo's
-  Myriad Pro), Source, the superfamily Medium set the publication in
-  (Source Serif Pro running text, Source Sans Pro headings and chrome,
-  Source Code Pro code), and Source Sans, that same superfamily's sans
-  face running the article text as well instead of ceding it to the
-  serif. The article's reading size belongs to `.post` rather than to
-  any one choice, so the four differ in family alone. The losing
-  styles, and the picker with them, come out once that is decided.
+  one names it ("Helvetica", "Inter", "Noto Sans", "Source Sans",
+  "Noto Serif", "Source Serif") and sets the name in the family it
+  names, so the button says and shows what the reader is on. The names
+  are the button's own text, which the script reads back for the
+  tooltip and `aria-label`; a fixed `min-width` in `card.css` keeps the
+  six from shifting the nav as they cycle. It exists to let reviewers
+  compare candidate typography before the blog settles on one: the
+  jupyter.org Helvetica stack the site launched with, Inter (a
+  standalone humanist sans, not part of either superfamily below), and
+  two superfamilies -- Noto and Source -- each offered twice. A
+  superfamily's sans choice ("Noto Sans", "Source Sans") runs the whole
+  page, article included, in its own sans and mono faces. Its serif
+  sibling ("Noto Serif", "Source Serif") keeps headings and chrome on
+  that same sans face, as Medium did, and points only the article's
+  running text at the serif face instead, with the superfamily's own
+  mono under its code either way. The article's reading size belongs
+  to `.post` rather than to any one choice, so the six differ in
+  family alone. The losing styles, and the picker with them, come out
+  once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
   than another pass over the rules that use them.

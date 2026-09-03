@@ -2,7 +2,8 @@
 (function () {
   try {
     var font = localStorage.getItem("font");
-    if (font === "open-sans" || font === "source" || font === "source-sans")
+    if (font === "inter" || font === "noto-sans" || font === "source-sans" ||
+        font === "noto-serif" || font === "source-serif")
       document.documentElement.setAttribute("data-font", font);
   } catch (e) {}
 })();

@@ -1,9 +1,11 @@
 <span class="font-picker" hidden>
 <button type="button">
 <span class="font-sample" data-set-font="sans">Helvetica</span>
-<span class="font-sample" data-set-font="open-sans">Open Sans</span>
-<span class="font-sample" data-set-font="source">Source</span>
+<span class="font-sample" data-set-font="inter">Inter</span>
+<span class="font-sample" data-set-font="noto-sans">Noto Sans</span>
 <span class="font-sample" data-set-font="source-sans">Source Sans</span>
+<span class="font-sample" data-set-font="noto-serif">Noto Serif</span>
+<span class="font-sample" data-set-font="source-serif">Source Serif</span>
 </button>
 </span>
 <script>
@@ -12,7 +14,8 @@
   var picker = document.querySelector(".font-picker");
   var button = picker.querySelector("button");
   var samples = button.querySelectorAll("[data-set-font]");
-  var order = ["sans", "open-sans", "source", "source-sans"];
+  var order = ["sans", "inter", "noto-sans", "source-sans", "noto-serif",
+               "source-serif"];
   var names = {};
   samples.forEach(function (sample) {
     names[sample.dataset.setFont] = sample.textContent;

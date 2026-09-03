@@ -24,23 +24,28 @@
 * { box-sizing: border-box; }
 /* The typography choices the header's font picker cycles through
    (pinned as data-font on <html>, persisted like the theme choice):
-   the jupyter.org sans the site launched with, Open Sans (the humanist
-   sans nearest the Myriad Pro of the Jupyter logo), Source -- the
-   superfamily Medium set blog.jupyter.org's article text in -- and
-   Source Sans, that superfamily's sans face alone, running the article
-   text too instead of ceding it to the serif.
+   the jupyter.org sans the site launched with, Inter, and two
+   superfamily pairs -- Noto and Source -- each offered twice, once
+   with its sans face running the article text and once with its
+   serif face doing so instead.
 
-   --body-font is what the page is set in and --mono what its code is,
-   so a choice swaps both by redefining them; the rules downstream name
-   the roles, never the families. Source, being a superfamily, sets all
-   three faces: the serif for running text, its sibling sans for
-   headings and chrome, its sibling mono for code. Source Sans is the
-   same superfamily pairing of --body-font and --mono, but with the
-   sans face itself standing in for the serif as the article's running
-   text too, rather than ceding that to it. */
+   --body-font is what the page is set in and --mono what its code
+   is, so a choice swaps both by redefining them; the rules downstream
+   name the roles, never the families. A superfamily's sans choice
+   (Noto Sans, Source Sans) sets --body-font to its own sans face and
+   --mono to its own mono face, so the whole page, article included,
+   runs in that superfamily. Its serif sibling (Noto Serif, Source
+   Serif) leaves --body-font on the sans face -- headings and chrome
+   stay sans, as Medium's did -- and only the article's running text
+   (further down) is pointed at the serif instead. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --open-sans: "Open Sans", "Helvetica Neue", Helvetica, Arial,
+        --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --noto-sans: "Noto Sans", "Helvetica Neue", Helvetica, Arial,
                      sans-serif;
+        --noto-serif: "Noto Serif", Georgia, Cambria,
+                      "Times New Roman", Times, serif;
+        --noto-mono: "Noto Sans Mono", ui-monospace, SFMono-Regular,
+                     Menlo, Consolas, monospace;
         --source-serif: "Source Serif Pro", Georgia, Cambria,
                         "Times New Roman", Times, serif;
         --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
@@ -49,11 +54,15 @@
                        Menlo, Consolas, monospace;
         --body-font: var(--sans);
         --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-:root[data-font="open-sans"] { --body-font: var(--open-sans); }
-:root[data-font="source"] { --body-font: var(--source-sans);
-                            --mono: var(--source-code); }
+:root[data-font="inter"] { --body-font: var(--inter); }
+:root[data-font="noto-sans"] { --body-font: var(--noto-sans);
+                               --mono: var(--noto-mono); }
 :root[data-font="source-sans"] { --body-font: var(--source-sans);
                                  --mono: var(--source-code); }
+:root[data-font="noto-serif"] { --body-font: var(--noto-sans);
+                                --mono: var(--noto-mono); }
+:root[data-font="source-serif"] { --body-font: var(--source-sans);
+                                  --mono: var(--source-code); }
 body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
@@ -131,16 +140,18 @@ a:hover { text-decoration-line: underline; }
 /* The font button names the choice it is on and sets that name in the
    family it names, so it both says and shows what you are reading. A
    name is wider than the theme picker's icon, so this button is a pill
-   rather than a circle; min-width holds it steady across the four
-   names -- sized to "Source Sans", the longest -- which would
-   otherwise shift the nav on every click. */
+   rather than a circle; min-width holds it steady across the six
+   names -- sized to "Source Serif"/"Source Sans", the longest -- which
+   would otherwise shift the nav on every click. */
 .font-picker button { min-width: 7.2rem; padding: 0 .75rem;
                       font-size: .8rem; }
 .font-sample { line-height: 1; }
 .font-picker [data-set-font="sans"] { font-family: var(--sans); }
-.font-picker [data-set-font="open-sans"] { font-family: var(--open-sans); }
-.font-picker [data-set-font="source"] { font-family: var(--source-serif); }
+.font-picker [data-set-font="inter"] { font-family: var(--inter); }
+.font-picker [data-set-font="noto-sans"] { font-family: var(--noto-sans); }
 .font-picker [data-set-font="source-sans"] { font-family: var(--source-sans); }
+.font-picker [data-set-font="noto-serif"] { font-family: var(--noto-serif); }
+.font-picker [data-set-font="source-serif"] { font-family: var(--source-serif); }
 
 /* the feed mark, in the header nav and beside a tag's or author's
    heading where that term has a feed of its own */
@@ -211,8 +222,8 @@ a:hover { text-decoration-line: underline; }
    (a badge in a sentence) is not matched and stays inline. */
 .post p:has(> img:only-child), .post p:has(> a:only-child > img:only-child),
 .post figure { text-align: center; }
-/* Code names the --mono role, so the font picker's Source choice can
-   put the superfamily's own mono under it. The size is stated at all
+/* Code names the --mono role, so a superfamily font picker choice can
+   put its own mono under it. The size is stated at all
    (rather than left to the UA) because a stack ending in the generic
    `monospace` otherwise triggers the browsers' 13px monospace default.
    Inline code is em, so it tracks the prose it sits in. A block is
@@ -324,19 +335,25 @@ a:hover { text-decoration-line: underline; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
-/* The Source choice is the only one that sets the article in something
-   other than --body-font, so it is the only one with rules here. Only
-   the running text is serif -- Medium keeps its headings, byline,
-   captions and chrome in a sans -- so those pieces opt back out to
-   --body-font, which under this choice is the superfamily's own Source
-   Sans. Medium's -0.004rem tracking is not reproduced: it works out to
-   0.064px per character, which no reader can see, and leaving it off
-   keeps every choice on the browser's default tracking. */
-:root[data-font="source"] .post { font-family: var(--source-serif); }
-:root[data-font="source"] .post :is(h1, h2, h3, h4, h5, h6),
-:root[data-font="source"] .post-meta,
-:root[data-font="source"] .post-share,
-:root[data-font="source"] .post figcaption { font-family: var(--body-font); }
+/* The two serif choices are the only ones that set the article in
+   something other than --body-font, so they are the only ones with
+   rules here. Only the running text is serif -- Medium keeps its
+   headings, byline, captions and chrome in a sans -- so those pieces
+   opt back out to --body-font, which under either choice is that
+   superfamily's own sans face. Medium's -0.004rem tracking is not
+   reproduced: it works out to 0.064px per character, which no reader
+   can see, and leaving it off keeps every choice on the browser's
+   default tracking. */
+:root[data-font="noto-serif"] .post { font-family: var(--noto-serif); }
+:root[data-font="noto-serif"] .post :is(h1, h2, h3, h4, h5, h6),
+:root[data-font="noto-serif"] .post-meta,
+:root[data-font="noto-serif"] .post-share,
+:root[data-font="noto-serif"] .post figcaption { font-family: var(--body-font); }
+:root[data-font="source-serif"] .post { font-family: var(--source-serif); }
+:root[data-font="source-serif"] .post :is(h1, h2, h3, h4, h5, h6),
+:root[data-font="source-serif"] .post-meta,
+:root[data-font="source-serif"] .post-share,
+:root[data-font="source-serif"] .post figcaption { font-family: var(--body-font); }
 
 /* The share bar, carried twice by a post: under the byline, where a
    reader decides whether to read, and at the foot, where they have.
