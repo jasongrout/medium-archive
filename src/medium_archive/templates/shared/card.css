@@ -185,6 +185,30 @@ a:hover { text-decoration: underline; }
 .post code { background: var(--code-bg); font-family: var(--mono);
              font-size: .9em; }
 .post pre code { font-size: inherit; background: none; }
+/* The copy button code-copy.html sets in each block's corner. The
+   wrapper it adds is the button's positioning box: a pre scrolls
+   sideways, so a button placed inside it would scroll away with the
+   first line. The mark is faint until the block is hovered or the
+   button focused, but never absent, since touch has no hover. The
+   fading is on the icon alone: the button itself stays opaque, in the
+   block's own background, so a long first line reads as passing under
+   it rather than showing through it. The status line is the
+   screen-reader announcement of a copy; it takes no space on screen. */
+.code-block { position: relative; }
+.code-copy { position: absolute; top: .45rem; right: .45rem;
+             display: inline-flex; align-items: center; justify-content: center;
+             width: 1.9rem; height: 1.9rem; padding: 0;
+             border: 1px solid var(--line); border-radius: 6px;
+             background: var(--code-bg); color: var(--muted);
+             cursor: pointer; }
+.code-copy svg { width: 1rem; height: 1rem; opacity: .55; }
+.code-block:hover .code-copy svg, .code-copy:focus-visible svg { opacity: 1; }
+.code-copy:hover, .code-copy:focus-visible { color: var(--accent);
+                                             border-color: var(--accent); }
+.code-copy svg[hidden] { display: none; }
+.code-copy-status { position: absolute; width: 1px; height: 1px;
+                    margin: -1px; padding: 0; overflow: hidden;
+                    clip-path: inset(50%); white-space: nowrap; }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
 /* A table (a Markdown gist inlined by convert; Medium itself has no

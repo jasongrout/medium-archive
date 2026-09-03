@@ -123,6 +123,25 @@ These embed verbatim in both engines' pages, so they must carry no
   image). Images inside a link are skipped, so a linked image still
   follows its link. It closes on a click anywhere, on Esc (the dialog's
   own) and on a page scroll, like Medium's, and re-measures on resize.
+- `code-copy.html` is the copy button in the corner of every code
+  block, spliced into the post templates beside `image-zoom.html`,
+  since only article pages have code blocks. Every `<pre>` in the
+  article is one, whatever the engine wrapped it in (a fenced block
+  from convert, a Goldmark or codehilite highlight div, an inlined
+  gist or Carbon snippet inside a figure): the script wraps each in a
+  `.code-block` div, the positioning box `card.css` pins the button
+  to, so a wide block scrolls under the button rather than carrying it
+  off. The button's markup is a `<template>`, cloned per block, so
+  the two icons (a clipboard in the theme picker's stroked style, and
+  the check that replaces it for a moment after a copy) are HTML
+  rather than strings in the script. They swap by `hidden` attribute,
+  toggled as an attribute: SVG elements have no `hidden` property, so
+  assigning one, as the theme picker could on its HTML, sets nothing. The copied text is the block's
+  text content without its trailing newline. The status line beside
+  the template is a live region a screen reader announces the copy
+  through, since a changed button label is not read out. Without the
+  async clipboard API (an insecure origin) no button is added, so the
+  page never shows a button that cannot work.
 - `dark-palette.css` is included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link

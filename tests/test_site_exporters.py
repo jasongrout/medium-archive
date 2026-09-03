@@ -508,7 +508,8 @@ def test_theme_picker_and_dark_scheme(archive):
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
                  "term-sort", "announcement",
-                 "nav-current", "image-zoom", "feed-icon", "share-icons"):
+                 "nav-current", "image-zoom", "code-copy", "feed-icon",
+                 "share-icons"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -606,6 +607,39 @@ def test_image_zoom(archive):
     assert "img.zoomable { cursor: zoom-in; }" in css
     assert ".zoom-dialog::backdrop" in css
     assert "prefers-reduced-motion" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_code_copy(archive):
+    # post pages carry the code-block copy button, on both engines
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for page in (hugo_site / "layouts/_default/single.html",
+                 pelican_site / "theme/templates/article.html"):
+        text = page.read_text()
+        assert '<template class="code-copy-template">' in text, page
+        # the button follows the article whose blocks it serves, and is
+        # added only where the clipboard API can honour it
+        assert text.index("</article>") < text.index("code-copy-template"), page
+        assert "navigator.clipboard.writeText" in text, page
+        # every pre in the article, whatever the engine wrapped it in,
+        # gets a positioning box of its own and a cloned button
+        assert 'article.querySelectorAll("pre")' in text, page
+        assert 'block.className = "code-block"' in text, page
+        assert "template.content.firstElementChild.cloneNode(true)" in text, page
+        # the icons swap by attribute: an SVG element has no `hidden`
+        # property to set, so assigning one would change nothing
+        assert 'icon.toggleAttribute("hidden"' in text, page
+        assert "icon.hidden" not in text, page
+        # the copied text is the block's, without its trailing newline
+        assert 'pre.textContent.replace(/\\n$/, "")' in text, page
+        # a screen reader hears the copy through the live region
+        assert 'role="status"' in text, page
+        assert 'announce("Copied to clipboard")' in text, page
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert ".code-block { position: relative; }" in css
+    assert ".code-copy { position: absolute;" in css
+    assert ".code-copy:focus-visible" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 

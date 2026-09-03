@@ -1,0 +1,54 @@
+<template class="code-copy-template">
+<button type="button" class="code-copy" aria-label="Copy code" title="Copy code">
+<svg data-copy-state="ready" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+<svg data-copy-state="copied" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M20 6 9 17l-5-5"/></svg>
+</button>
+</template>
+<p class="code-copy-status" role="status"></p>
+<script>
+(function () {
+  function init() {
+    var article = document.querySelector(".post");
+    var template = document.querySelector(".code-copy-template");
+    var status = document.querySelector(".code-copy-status");
+    if (!article || !template || !status || !template.content) return;
+    if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+    Array.prototype.forEach.call(article.querySelectorAll("pre"), function (pre) {
+      if (pre.closest(".code-block")) return;
+      var block = document.createElement("div");
+      block.className = "code-block";
+      pre.parentNode.insertBefore(block, pre);
+      block.appendChild(pre);
+      var button = template.content.firstElementChild.cloneNode(true);
+      block.appendChild(button);
+      var icons = button.querySelectorAll("svg");
+      var timer;
+      function show(state, label) {
+        icons.forEach(function (icon) {
+          icon.toggleAttribute("hidden", icon.dataset.copyState !== state);
+        });
+        button.title = label;
+        button.setAttribute("aria-label", label);
+      }
+      function announce(text) {
+        status.textContent = "";
+        status.textContent = text;
+      }
+      button.addEventListener("click", function () {
+        var text = pre.textContent.replace(/\n$/, "");
+        navigator.clipboard.writeText(text).then(function () {
+          show("copied", "Copied");
+          announce("Copied to clipboard");
+          clearTimeout(timer);
+          timer = setTimeout(function () { show("ready", "Copy code"); }, 1500);
+        }, function () {
+          announce("Copy failed");
+        });
+      });
+    });
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
