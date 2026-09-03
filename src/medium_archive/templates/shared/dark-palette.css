@@ -4,6 +4,6 @@
   --bg: #131313; --card: #1e1e1e; --line: #333333; --code-bg: #2a2a2a;
   --mark: #7a4114; --error-bg: #2a1a1a; --error-line: #5c2828;
   --error-ink: #f87171; --error-soft: #ef4444;
-  --syn-keyword: #ff9b94; --syn-string: #a5d6ff; --syn-comment: #b0b6bd;
+  --syn-keyword: #ff7b72; --syn-string: #a5d6ff; --syn-comment: #8b949e;
   --syn-number: #79c0ff; --syn-name: #d2a8ff; --syn-builtin: #ffa657;
   color-scheme: dark;
