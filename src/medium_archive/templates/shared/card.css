@@ -59,12 +59,17 @@ body { margin: 0; background: var(--bg); color: var(--ink);
    grey's in a byline, every text token clears 7:1 -- and the colour
    still says "link". `inherit`, not `--ink`, so an author's name in a
    muted byline stays muted rather than jumping out of the line.
-   Longhands, not the shorthand, so a later `text-decoration-line`
-   leaves the rule's colour and weight in place. The same treatment in
-   both palettes: one link language, even though orange text passes on
-   the dark cards. */
+   The rule is .1em, not a pixel count, so it scales with the type the
+   way a stroke does: 2px under the 1.25rem article column, 1.6px in a
+   1rem byline, 1.3px under the .82rem card tags. A fixed 2px was
+   proportionally heavier under the small muted lines, and the orange
+   there, beside grey text on a dark card, stood out more than the
+   link warranted. Longhands, not the shorthand, so a later
+   `text-decoration-line` leaves the rule's colour and weight in place.
+   The same treatment in both palettes: one link language, even though
+   orange text passes on the dark cards. */
 a { color: inherit; text-decoration-line: underline;
-    text-decoration-color: var(--accent); text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent); text-decoration-thickness: .1em;
     text-underline-offset: .15em; }
 /* Links that are components rather than words -- the site title and
    nav, card covers and titles, tag pills, chips, page numbers, the

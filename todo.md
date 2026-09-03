@@ -604,7 +604,8 @@ Feeds and sharing:
   this archive kept it through the 2026-08 restyle. Resolved in 2026-09
   without a shade: a link now keeps the colour of the text around it
   (ink in a paragraph, the muted grey in a byline; every text token
-  clears AAA) with a 2px rule in the accent under it, so the orange,
+  clears AAA) with a .1em rule in the accent under it (2px in the
+  article column, thinner under the small metadata lines), so the orange,
   which carries no letterforms, is what says "link". Component
   links (nav, card titles, chips, pills, page numbers) carry no rule at
   rest and show it on hover; the hover state of a prose link is
