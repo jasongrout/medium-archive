@@ -597,18 +597,27 @@ Feeds and sharing:
   worked live as implemented from mediumexporter's usage. The one
   surprise was the Giphy filename collision, fixed above.
 
-- Link contrast in the card theme. Links use `--accent` (#f37626,
-  Jupyter Orange) directly, which is 2.8:1 against the light palette's
-  white cards, below WCAG AA's 4.5:1 for normal-size text, let alone
-  AAA's 7:1. jupyter.org makes the same trade-off with its orange links.
-  This was a deliberate choice, revisited and kept in the 2026-08
-  restyle; dark-mode links pass AA at 6.6:1. The text grays are held to
-  AAA: `--muted` was raised in that restyle (#6a6a6a→#525252 light,
-  #9b9791→#aeaaa4 dark) so every text token clears 7:1 on both the page
-  background and the cards. If AA or AAA links ever matter, add a link
-  shade token per palette picked to clear the chosen threshold (#b45110
-  clears AA in light; #f58d47 clears AAA in dark), rather than darkening
-  `--accent` itself, which also paints the banner and other fills.
+- Link contrast in the card theme. Links were `--accent` (#f37626,
+  Jupyter Orange) text, which is 2.8:1 against the light palette's white
+  cards, below WCAG AA's 4.5:1 for normal-size text, let alone AAA's
+  7:1; jupyter.org makes the same trade-off with its orange links, and
+  this archive kept it through the 2026-08 restyle. Resolved in 2026-09
+  without a shade: a link is now ink text with a 2px rule in the accent
+  under it, so the text clears AAA (17:1 light, 15:1 dark) and the
+  orange, which carries no letterforms, is what says "link". Component
+  links (nav, card titles, chips, pills, page numbers) carry no rule at
+  rest and show it on hover; the hover state of a prose link is
+  unchanged from its rest state, by choice. The same treatment applies
+  in both palettes, though orange text passes AA on the dark cards, so
+  that the link language does not change with the theme. The text grays
+  are held to AAA: `--muted` was raised in the 2026-08 restyle
+  (#6a6a6a→#525252 light, #9b9791→#aeaaa4 dark) so every text token
+  clears 7:1 on both the page background and the cards. Alternatives
+  weighed and not taken: a link shade token per palette (#b45110 clears
+  AA in light; #f58d47 clears AAA in dark) is a shade of the brand
+  colour, which the guidelines rule out; an always-on underline under
+  orange text fixes only the colour-alone question (1.4.1), not text
+  contrast (1.4.3).
 
 Archive-specific follow-ups (posts whose images still need fetching,
 hand-correction candidates) live in each archive's own notes, alongside
