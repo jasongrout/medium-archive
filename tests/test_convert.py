@@ -675,6 +675,13 @@ def test_archived_carbon_snippet_becomes_a_code_block():
                          'width="1024" height="480"></iframe></article>', "html.parser")
     md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
     assert md == "```python\nclass ExampleWidget(DOMWidget):\n    value = 1\n```\n"
+    from medium_archive.convert import carbon_language
+    assert carbon_language("text/typescript-jsx") == "tsx"
+    assert carbon_language("text/x-java") == "java"
+    assert carbon_language("text/x-rustsrc") == "rust"
+    assert carbon_language("text/x-unknownsrc") == "unknownsrc"
+    assert carbon_language("Python") == "python"
+    assert carbon_language("auto") == "" and carbon_language(None) == ""
     media["carbon:PaDDn2ZszZUVmuhvRP52"]["carbon"]["language"] = "auto"
     body = BeautifulSoup('<article><iframe src="https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52">'
                          "</iframe></article>", "html.parser")

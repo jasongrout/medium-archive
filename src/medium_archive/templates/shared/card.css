@@ -193,6 +193,9 @@ a:hover { text-decoration: underline; }
    caption Goldmark renders as a paragraph. */
 .post figure { margin: 1rem 0; }
 .post figure > p { margin: 0; }
+/* The centring is for the image; a captioned code block (an inlined
+   gist or Carbon snippet) would inherit it line by line. */
+.post figure pre { text-align: left; }
 /* Centred under the image, as Medium sets its captions. The size is
    em, so a caption stays in proportion to the column it annotates
    rather than shrinking against it when the reading size grows: .9rem

@@ -294,18 +294,58 @@ def _archived_tweet(media: dict, url: str) -> str | None:
     return tweet_html(entry["tweet"], url) if entry and entry.get("tweet") else None
 
 
+# Carbon names a snippet's language by its CodeMirror mode, often a MIME
+# type; the fence needs the name highlighters know. Modes not listed
+# fall back to the last path segment less its x- prefix (text/x-java ->
+# java, text/x-rustsrc -> rustsrc is wrong, hence the table).
+CARBON_LANGS = {
+    "text/typescript-jsx": "tsx", "text/typescript": "typescript",
+    "application/typescript": "typescript", "jsx": "jsx", "javascript": "javascript",
+    "htmlmixed": "html", "text/html": "html", "text/x-csrc": "c",
+    "text/x-c++src": "cpp", "text/x-csharp": "csharp", "text/x-java": "java",
+    "text/x-kotlin": "kotlin", "text/x-scala": "scala", "text/x-swift": "swift",
+    "text/x-rustsrc": "rust", "text/x-go": "go", "text/x-sh": "bash",
+    "shell": "bash", "text/x-python": "python", "text/x-ruby": "ruby",
+    "text/x-yaml": "yaml", "application/json": "json", "text/x-toml": "toml",
+    "text/x-sql": "sql", "text/x-markdown": "markdown", "text/x-diff": "diff",
+    "application/x-httpd-php": "php", "text/x-objectivec": "objectivec",
+    "text/x-lua": "lua", "text/x-rsrc": "r", "text/x-julia": "julia",
+    "text/x-dockerfile": "dockerfile", "text/x-nginx-conf": "nginx",
+    "text/css": "css", "text/x-scss": "scss", "text/x-less": "less",
+    "graphql": "graphql", "text/x-vue": "vue", "text/x-elixir": "elixir",
+    "text/x-haskell": "haskell", "text/x-clojure": "clojure",
+    "text/x-erlang": "erlang", "text/x-fsharp": "fsharp", "text/x-ocaml": "ocaml",
+    "text/x-perl": "perl", "text/x-powershell": "powershell",
+    "text/x-vb": "vbnet", "text/x-verilog": "verilog", "text/x-latex": "latex",
+    "application/xml": "xml", "text/x-nim": "nim", "text/x-dart": "dart",
+    "text/x-django": "django", "text/x-twig": "twig", "text/x-solidity": "solidity",
+    "text/x-gfm": "markdown", "text/x-crystal": "crystal", "text/x-d": "d",
+    "text/x-pascal": "pascal", "text/x-groovy": "groovy",
+}
+
+
+def carbon_language(mode: str) -> str:
+    """The fence language for a Carbon snippet's language mode; "" for
+    Carbon's "auto" (it guessed; nothing recorded) and plain text."""
+    mode = (mode or "").strip().lower()
+    if mode in ("", "auto", "text", "plaintext", "text/plain"):
+        return ""
+    if mode in CARBON_LANGS:
+        return CARBON_LANGS[mode]
+    return mode.rsplit("/", 1)[-1].removeprefix("x-")
+
+
 def _archived_carbon(media: dict, url: str) -> str | None:
     """The code block for url's Carbon snippet when it is archived
-    (raw/media/carbon-<id>.json), else None. Carbon records the
-    language it highlighted; "auto" means it guessed, and stays bare."""
+    (raw/media/carbon-<id>.json), else None."""
     cid = carbon_id(url)
     entry = media.get(f"carbon:{cid}") if cid else None
     snippet = (entry or {}).get("carbon")
     if not snippet or snippet.get("code") is None:
         return None
-    lang = (snippet.get("language") or "").lower()
-    lang = "" if lang in ("auto", "text", "plaintext") else lang.rsplit("/", 1)[-1].removeprefix("x-")
-    return gist_code_blocks({"snippet": {"language": lang, "content": snippet["code"]}})
+    return gist_code_blocks({"snippet": {
+        "language": carbon_language(snippet.get("language")),
+        "content": snippet["code"]}})
 
 
 def _archived_gist_files(media: dict, gist_id: str) -> dict | None:
