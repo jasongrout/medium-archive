@@ -418,24 +418,50 @@ Feeds and sharing:
   `page_body`, `extract_metadata` and `state.py`). One post in the
   test archive was affected; no other post's output changed.
 
+- **Share URLs checked against each network's own documentation;
+  Mastodon moved to its official share sheet.** LinkedIn's
+  `sharing/share-offsite/?url=` is the form its developer docs give,
+  the one parameter left since `shareArticle`'s title and summary were
+  retired in 2018; the share box reads everything else off the page's
+  Open Graph tags. Bluesky's `bsky.app/intent/compose?text=` is the
+  form its action-intent docs give, a single URL-escaped `text` with no
+  separate URL or title parameter, under the 300-grapheme post limit.
+  Facebook's only documented share URL is the Share Dialog,
+  `facebook.com/dialog/share?app_id=...&href=...`, which needs a
+  registered app id; `sharer.php?u=` is undocumented, but it is the
+  app-id-free form every share bar uses and Meta has kept it live while
+  stripping every parameter but `u`, so it stays, deliberately. The
+  email link follows RFC 6068. Mastodon was the one that had moved on:
+  since 2026-03 the project hosts share.joinmastodon.org, an official
+  share sheet that takes the text in `#text=` (its own instruction page
+  generates the hash form, which keeps the text out of server logs and
+  referrers; `?text=` works too), asks the reader for their server,
+  remembers their accounts, resolves each server's share template over
+  WebFinger before falling back to `https://server/share?text=`, and on
+  a phone tries the `mastodon://share` app link. That is what this
+  theme's prompt script did, done by the network itself, so the script
+  went (`shared/share-mastodon.html`), and the link is a plain href
+  like the other four: no `data-share-text`, no server-directory
+  fallback, no `localStorage` (`partials/share.html`, `macros.html`,
+  both post templates, `templates/README.md`). The `/share?text=`
+  route the script used was real, for the record: Mastodon's
+  `render_initial_state` joins its `title`, `text` and `url` params
+  into the compose box.
+
 ## Remaining
 
-- Take the share bar's marks and share URLs from each network's own
-  brand and developer material, rather than the reproductions and
-  community knowledge it runs on now. The logomarks come from Simple
-  Icons, a faithful reproduction but not the source, and one that
-  dropped LinkedIn's over that company's branding policy, so that one is
-  lifted from an old release. Per network, two things are worth
-  confirming at the source. First, the official logo file with its
-  usage rules: clear space, minimum size, and which one-color renderings
-  are permitted. The bar assumes a monochrome mark tinted by
+- Take the share bar's marks from each network's own brand material
+  rather than the reproductions they run on now. The logomarks come
+  from Simple Icons, a faithful reproduction but not the source, and
+  one that dropped LinkedIn's over that company's branding policy, so
+  that one is lifted from an old release. Per network, the official
+  logo file with its usage rules is worth confirming at the source:
+  clear space, minimum size, and which one-color renderings are
+  permitted. The bar assumes a monochrome mark tinted by
   `currentColor`, which is why hovering deepens it instead of coloring
-  it. Second, the current documented share URL with its parameters:
-  LinkedIn's `shareArticle` is already deprecated in favor of
-  `sharing/share-offsite/`, Facebook's `sharer.php` is long-lived but
-  undocumented, and the Bluesky and Mastodon intents are conventions
-  rather than specifications. Each network's guidelines may also
-  constrain the wording beside the mark.
+  it. Each network's guidelines may also constrain the wording beside
+  the mark. The share URLs themselves were checked against the
+  networks' documentation in 2026-09 (above).
 
 - Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
   gist embeds, then `convert` and `lint`. The 2026-08 audit archive

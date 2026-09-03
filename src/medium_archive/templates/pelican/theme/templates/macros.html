@@ -30,7 +30,7 @@
 <a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ enc_url }}" aria-label="Share on LinkedIn" title="Share on LinkedIn"><svg class="share-icon" aria-hidden="true"><use href="#share-linkedin"></use></svg></a>
 <a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u={{ enc_url }}" aria-label="Share on Facebook" title="Share on Facebook"><svg class="share-icon" aria-hidden="true"><use href="#share-facebook"></use></svg></a>
 <a class="share-link" href="https://bsky.app/intent/compose?text={{ enc_text }}" aria-label="Share on Bluesky" title="Share on Bluesky"><svg class="share-icon" aria-hidden="true"><use href="#share-bluesky"></use></svg></a>
-<a class="share-link share-mastodon" href="https://joinmastodon.org/servers" data-share-text="{{ share_text|e }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
+<a class="share-link" href="https://share.joinmastodon.org/#text={{ enc_text }}" aria-label="Share on Mastodon" title="Share on Mastodon"><svg class="share-icon" aria-hidden="true"><use href="#share-mastodon"></use></svg></a>
 <a class="share-link" href="mailto:?subject={{ enc_title }}&amp;body={{ enc_url }}" aria-label="Share by email" title="Share by email"><svg class="share-icon" aria-hidden="true"><use href="#share-email"></use></svg></a>
 </div>
 {% endmacro %}

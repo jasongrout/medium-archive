@@ -97,24 +97,17 @@ These embed verbatim in both engines' pages, so they must carry no
   referenced ten times. The bar itself stays with each engine, since
   only the engine knows a post's URL: hugo's `partials/share.html` and
   the pelican theme's `share()` macro in `macros.html`, each called
-  twice. The sprite carries `width`/`height` 0 as well as the
-  stylesheet's `display: none`, so it is out of the flow even before
-  the CSS lands. `card.css` keeps the marks monochrome on hover:
-  deepening a logomark is within most of these networks' brand
-  guidelines, recoloring it to the site accent is not.
-- `share-mastodon.html` is the Mastodon link's click handler. Every
-  other network has one address to send a share to. A toot goes to the
-  reader's own server, which the page cannot know, so the link asks for
-  it and remembers the answer per browser, taking a pasted server URL
-  or `@you@server` handle as readily as a bare domain. What is left has
-  to look like a host before it is stored or navigated to: a bare
-  `@you` normalizes down to `you`, and following that would fail DNS
-  and leave junk as the next prompt's default. A modified click
-  (ctrl/cmd/shift/alt, or any button but the first) is left alone, so
-  "open in a new tab" still means that. Without JS the link falls back
-  to its href, the server directory. It follows the article, so both
-  bars' anchors exist when the script runs; it binds every one of them,
-  and waits for DOMContentLoaded regardless.
+  twice. Each link is the network's own documented share URL: LinkedIn
+  and Facebook take the page address alone and read the rest off its
+  Open Graph tags, Bluesky and Mastodon take a prefilled `text` of the
+  title and address, and Mastodon's goes to share.joinmastodon.org,
+  the network's own share sheet, which asks the reader for their
+  server and remembers it, so no script of this theme's is needed. The
+  sprite carries `width`/`height` 0 as well as the stylesheet's
+  `display: none`, so it is out of the flow even before the CSS lands.
+  `card.css` keeps the marks monochrome on hover: deepening a logomark
+  is within most of these networks' brand guidelines, recoloring it to
+  the site accent is not.
 - `image-zoom.html` is click-to-zoom for body images, spliced into the
   post templates rather than the base ones, since only article pages
   have body images. An image is marked zoomable, and given the cursor,
