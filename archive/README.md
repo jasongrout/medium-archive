@@ -132,7 +132,7 @@ raw/
                                 embed's target
     media/<media_id>.gist.json  the embedded gist's files, as returned by
                                 the GitHub gists API; convert inlines them
-                                as code fences
+                                as code fences (a Markdown file verbatim)
     media/tweet-<id>.json     an embedded tweet's oEmbed payload (its text,
                                 author and date), or {"deleted": true, ...}
                                 when X no longer serves it; convert renders
@@ -220,7 +220,8 @@ Medium era keep working too.
   language Medium recorded for the block when any. Tables are not.
   Embeds convert by kind, from what `fetch` archives under
   `raw/<id>/media/` and `images/`: gists inline their files as code
-  fences; tweets become quotes of their archived text with their
+  fences, or verbatim for a Markdown file, which is how a table gets
+  into a Medium post; tweets become quotes of their archived text with their
   photos, or a link saying the tweet is no longer available when X
   answered 404; Carbon snippets become code blocks from their
   archived source; Giphy embeds become the gif or mp4 clip; YouTube

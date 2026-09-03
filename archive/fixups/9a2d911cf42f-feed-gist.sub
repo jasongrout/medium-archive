@@ -1,9 +1,0 @@
-# The RSS feed body, this post's body source, renders the "Other
-# themes" gist as an iframe with no source (src="", 0x0), so the embed
-# converted to a [missing embed] placeholder. The page's editor state
-# names the gist, and fetch archived its files under media/; naming
-# the gist the way an export body does lets convert inline them.
-
-file: 9a2d911cf42f/feed_item.json
-old: <iframe src=\"\" width=\"0\" height=\"0\" frameborder=\"0\" scrolling=\"no\">
-new: <script src=\"https://gist.github.com/krassowski/f4e4e08c907583ab563dd6f97c17c48c.js\"></script>
