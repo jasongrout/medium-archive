@@ -204,3 +204,33 @@ def test_two_giphy_clips_in_one_post_get_two_files(tmp_path):
                        b: "002-fSqNQ06Ujnuu8juH2t-giphy.mp4",
                        same[0]: "003-1_abc.png", same[1]: "003-1_abc.png"}
     assert (tmp_path / "images" / img_map[b]).read_bytes() == b.encode()
+
+
+def tweet_page(mid):
+    state = {
+        f"Post:{mid}": {"id": mid, 'content({"a":1})': {"bodyModel": {
+            "paragraphs": [{"__ref": "Paragraph:p0"}]}}},
+        "Paragraph:p0": {"type": "IFRAME", "text": "", "markups": [],
+                         "iframe": {"mediaResource": {"__ref": "MediaResource:m1"}}},
+        "MediaResource:m1": {"id": "t1", "title": "Ann on Twitter", "iframeSrc":
+                             "https://cdn.embedly.com/widgets/media.html?url="
+                             "https%3A%2F%2Ftwitter.com%2Fann%2Fstatus%2F12345"},
+    }
+    return "<script>window.__APOLLO_STATE__ = " + json.dumps(state) + "</script>"
+
+
+def test_fetch_media_archives_tweets(tmp_path):
+    mid = "111122223333"
+    oembed = fetchmod.TWEET_OEMBED_URL.format(url="https://twitter.com/ann/status/12345")
+    session = FakeSession(router=lambda url: FakeResp(json.dumps({"author_name": "Ann"}))
+                          if url == oembed else (_ for _ in ()).throw(AssertionError(url)))
+    dest = tmp_path / mid
+    assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest, 0) == 1
+    assert json.loads((dest / "media" / "tweet-12345.json").read_text()) == {"author_name": "Ann"}
+    assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest, 0) == 0
+    assert session.calls == [oembed]
+    # a deleted tweet: the endpoint's 404 is reported, nothing written
+    gone = FakeSession(router=lambda url: FakeResp("", status=404))
+    (dest / "media" / "tweet-12345.json").unlink()
+    assert fetchmod.fetch_media(gone, tweet_page(mid), mid, dest, 0) == 0
+    assert not (dest / "media" / "tweet-12345.json").exists()

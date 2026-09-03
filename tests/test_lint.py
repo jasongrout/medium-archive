@@ -185,8 +185,8 @@ def test_embeds_mode_reports_embeds_the_body_source_dropped(tmp_path):
     d = write_post(tmp_path, body, front={**front, "body_source": "state"},
                    name="2020-01-02-from-state")
     errors, _ = lint_post(d, embeds=True, raw_root=raw)
-    assert len(errors) == 2 and all(e.startswith("embed is a bare link")
-                                    for e in errors)
+    assert len(errors) == 2 and errors[0].startswith("embed is a bare link")
+    assert errors[1].startswith("tweet not archived, embed is a bare link")
     # no page (or no raw/) to compare against: only the links
     errors, _ = lint_post(d, embeds=True, raw_root=tmp_path / "nowhere")
     assert len(errors) == 2
@@ -244,3 +244,30 @@ def test_giphy_embed_is_an_asset_not_a_link(tmp_path):
     tail = " (re-run fetch; `fetch --urls` takes this post's name)"
     assert errors == [f"embed media not archived, served from Giphy: {gif}{tail}",
                       f"embed media not archived, served from Giphy: {mp4}{tail}"]
+
+
+def test_archived_tweet_quote_is_content(tmp_path):
+    """The blockquote an archived tweet became counts against the
+    state's embeds like a player; an unarchived one is reported as a
+    tweet, with fetch as the remedy."""
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "Ann on Twitter", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Ftwitter.com%2Fann%2Fstatus%2F12345"}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    front = {**FRONT, "medium_id": MID, "body_source": "export"}
+    quote = ("> Hello [world](https://e.com)\n>\n> \u2014 [Ann (@ann)](https://twitter.com/ann), "
+             "[May 1, 2020](https://twitter.com/ann/status/12345)\n")
+    d = write_post(tmp_path, "x\n" * 100 + quote, front=front)
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+    d = write_post(tmp_path, "x\n" * 100 + "[embed: https://twitter.com/ann/status/12345]"
+                   "(https://twitter.com/ann/status/12345)\n", front=front,
+                   name="2020-01-02-bare")
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert errors == ["tweet not archived, embed is a bare link: "
+                      "https://twitter.com/ann/status/12345 (re-run fetch for its "
+                      "text; a deleted tweet stays a link)"]

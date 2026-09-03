@@ -565,3 +565,55 @@ def test_giphy_embed_becomes_the_archived_file(tmp_path):
                            URL, {}, raw, out)
     assert f"![See Ya Kiss GIF by CBC]({GIPHY_GIF})" in md
     assert f'<video src="{GIPHY_MP4}" autoplay' in md and used == []
+
+
+TWEET = "https://twitter.com/ann/status/12345"
+OEMBED = {
+    "url": "https://twitter.com/ann/status/12345",
+    "author_name": "Ann Author", "author_url": "https://twitter.com/ann",
+    "html": "<blockquote class=\"twitter-tweet\"><p lang=\"en\" dir=\"ltr\">Hello "
+            "<a href=\"https://e.com/x?ref_src=twsrc%5Etfw\">world</a><br>second line "
+            "<a href=\"https://t.co/abc\">pic.twitter.com/abc</a></p>&mdash; Ann Author (@ann) "
+            "<a href=\"https://twitter.com/ann/status/12345?ref_src=twsrc%5Etfw\">May 1, 2020</a>"
+            "</blockquote>\n", "type": "rich", "version": "1.0"}
+TWEET_MD = ("> Hello [world](https://e.com/x)  \n> second line [pic.twitter.com/abc]"
+            "(https://t.co/abc)\n>\n> \u2014 [Ann Author (@ann)](https://twitter.com/ann), "
+            "[May 1, 2020](https://twitter.com/ann/status/12345)\n")
+
+
+def test_tweet_id_parses_twitter_and_x_urls():
+    from medium_archive.urls import tweet_id
+    for url in (TWEET, "https://x.com/ann/status/12345", "https://mobile.twitter.com/ann/statuses/12345",
+                TWEET + "?ref_src=twsrc%5Etfw"):
+        assert tweet_id(url) == ("12345", "ann"), url
+    assert tweet_id("https://twitter.com/i/web/status/12345") == ("12345", None)
+    for url in ("", "https://twitter.com/ann", "https://e.com/ann/status/1",
+                "https://twitter.com/ann/likes"):
+        assert tweet_id(url) is None, url
+
+
+def test_archived_tweet_renders_as_a_quote():
+    # the oEmbed payload's text, links (Twitter's ref_src tracking
+    # dropped), line breaks, author and dated link, as Markdown
+    media = {"tweet:12345": {"tweet": OEMBED}}
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == TWEET_MD
+    # the export's widget markup, a blockquote holding only the link,
+    # takes the same path; without the archived tweet it is the link
+    widget = (f'<blockquote class="twitter-tweet"><a href="{TWEET}"></a></blockquote>'
+              '<script async src="https://platform.twitter.com/widgets.js"></script>')
+    body = BeautifulSoup(f"<article>{widget}</article>", "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == TWEET_MD
+    assert md_of(widget) == f"[embed: {TWEET}]({TWEET})\n"
+    # a quote that already carries the tweet's text is left alone
+    assert md_of(f'<blockquote class="twitter-tweet"><p>Said.</p><a href="{TWEET}">x</a>'
+                 "</blockquote>").startswith("> Said.")
+
+
+def test_load_media_reads_archived_tweets(tmp_path):
+    from medium_archive.convert import load_media
+    (tmp_path / "media").mkdir()
+    (tmp_path / "media" / "tweet-12345.json").write_text(json.dumps(OEMBED))
+    assert load_media(tmp_path) == {"tweet:12345": {"tweet": OEMBED}}

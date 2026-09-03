@@ -57,6 +57,11 @@ MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
 # (convert.youtube_iframe), which is content, not a bare link.
 EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
 
+# the attribution line of the blockquote an archived tweet became
+# (convert.tweet_html): a quoted line ending in a dated link to the tweet
+TWEET_QUOTE_RE = re.compile(
+    r"^> .*\]\(https?://(?:www\.|mobile\.)?(?:twitter|x)\.com/[^/)]+/status/\d+\)\s*$")
+
 # a Giphy embed whose file the fetch step has not archived yet: the
 # image or clip still points at Giphy (--embeds)
 REMOTE_EMBED_ASSET_RE = re.compile(
@@ -129,20 +134,26 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     reported."""
     from .images import giphy_media
     from .sites import IFRAME_RE           # sites imports this module
+    from .urls import tweet_id
     problems = []
     links, players = [], 0
     for line, fenced in prose_lines(body):
         if fenced:
             continue
         links.extend(m.group(1) for m in EMBED_LINK_RE.finditer(line))
-        players += bool(IFRAME_RE.match(line))
+        players += bool(IFRAME_RE.match(line) or TWEET_QUOTE_RE.match(line))
         for m in REMOTE_EMBED_ASSET_RE.finditer(line):
             problems.append(f"embed media not archived, served from Giphy: "
                             f"{m.group(1)[:100]} (re-run fetch; "
                             "`fetch --urls` takes this post's name)")
     for url in links:
-        problems.append(f"embed is a bare link, its content is not in the "
-                        f"archive: {url[:100]} (replace it by hand)")
+        if tweet_id(url):
+            problems.append(f"tweet not archived, embed is a bare link: "
+                            f"{url[:100]} (re-run fetch for its text; a "
+                            "deleted tweet stays a link)")
+        else:
+            problems.append(f"embed is a bare link, its content is not in "
+                            f"the archive: {url[:100]} (replace it by hand)")
     page = (raw_root / (front.get("medium_id") or "") / "page.html"
             if raw_root and front.get("medium_id") else None)
     if page is None or not page.is_file():

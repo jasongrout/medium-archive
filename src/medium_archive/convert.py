@@ -30,7 +30,8 @@ from .state import (apollo_post_state, gist_code_blocks, state_body,
                     state_metadata, state_title)
 from .readme import write_readme
 from .tags import load_tag_map
-from .urls import canonical_url, medium_id, resolve_canonical, slug_of
+from .urls import (canonical_url, medium_id, resolve_canonical, slug_of,
+                   tweet_id)
 
 EMPTY_INFO = {"title": "", "authors": [], "date": "",
               "updated": None, "description": "", "tags": []}
@@ -197,6 +198,45 @@ GIST_SRC_RE = re.compile(
     r"https?://gist\.github\.com/(?:[^/\s]+/)?([0-9a-f]+)(?:\.js)?(?:\?.*)?$")
 
 
+REF_SRC_RE = re.compile(r"[?&]ref_src=[^&#]*")
+
+
+def tweet_html(payload: dict, url: str) -> str:
+    """An archived tweet (its oEmbed payload) as the blockquote convert
+    writes: the tweet's text with its links, then an attribution line
+    naming the author and dating the tweet, both linked. Plain
+    Markdown once converted, so every generator renders it, and it
+    outlives the tweet."""
+    soup = BeautifulSoup(payload.get("html") or "", "html.parser")
+    quote = soup.find("blockquote")
+    text = quote.find("p") if quote else None
+    date = ""
+    for a in (quote.find_all("a") if quote else []):
+        if tweet_id(a.get("href") or ""):
+            date = a.get_text(strip=True)
+    for a in (text.find_all("a") if text else []):
+        a["href"] = REF_SRC_RE.sub("", a.get("href") or "")
+    author = payload.get("author_name") or ""
+    author_url = payload.get("author_url") or ""
+    handle = author_url.rstrip("/").rsplit("/", 1)[-1] if author_url else ""
+    who = f"{author} (@{handle})" if author and handle else author or handle
+    link = payload.get("url") or url
+    by = f'<a href="{escape(author_url, quote=True)}">{escape(who)}</a>' \
+        if author_url else escape(who)
+    when = f'<a href="{escape(link, quote=True)}">{escape(date or "tweet")}</a>'
+    body = "".join(str(c) for c in text.contents) if text else ""
+    return (f"<blockquote><p>{body}</p><p>\u2014 {by}, {when}</p></blockquote>"
+            if body else f"<blockquote><p>\u2014 {by}, {when}</p></blockquote>")
+
+
+def _archived_tweet(media: dict, url: str) -> str | None:
+    """The blockquote for url's tweet when its oEmbed payload is archived
+    (raw/media/tweet-<id>.json), else None."""
+    tweet = tweet_id(url)
+    entry = media.get(f"tweet:{tweet[0]}") if tweet else None
+    return tweet_html(entry["tweet"], url) if entry and entry.get("tweet") else None
+
+
 def _archived_gist_files(media: dict, gist_id: str) -> dict | None:
     """The archived files of gist `gist_id`, from whichever media
     resource entry holds them (media entries are keyed by Medium's
@@ -230,15 +270,15 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     # for). Giphy's titles are its page titles ("... GIF by X - Find &
     # Share on GIPHY"); the descriptive part becomes the alt text.
     for iframe in body.find_all("iframe"):
-        media = giphy_media(iframe.get("src") or iframe.get("data-src") or "")
-        if not media:
+        asset = giphy_media(iframe.get("src") or iframe.get("data-src") or "")
+        if not asset:
             continue
         title = re.sub(r"\s*-\s*Find & Share on GIPHY$", "",
                        iframe.get("title") or "").strip()
-        if media.endswith(".mp4"):
-            iframe.replace_with(doc.new_tag("video", src=media))
+        if asset.endswith(".mp4"):
+            iframe.replace_with(doc.new_tag("video", src=asset))
         else:
-            iframe.replace_with(doc.new_tag("img", src=media, alt=title))
+            iframe.replace_with(doc.new_tag("img", src=asset, alt=title))
 
     def localize(src: str, copy: bool):
         """(local images/ path, used) for an asset URL the fetch step
@@ -323,6 +363,17 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
             script.replace_with(doc.new_tag("a", href=url,
                                             string=f"embed: {url}"))
 
+    # Export and Ghost bodies embed a tweet as Twitter's widget markup: a
+    # <blockquote class="twitter-tweet"> holding only a link to the
+    # tweet, for widgets.js to fill in. Nothing to keep but the target,
+    # so it takes the iframe path below (a quote that already carries
+    # the tweet's text, as a Ghost capture can, is left as it is).
+    for quote in body.find_all("blockquote", class_="twitter-tweet"):
+        link = next((a.get("href") for a in quote.find_all("a")
+                     if tweet_id(a.get("href") or "")), None)
+        if link and not quote.get_text(strip=True):
+            quote.replace_with(doc.new_tag("iframe", src=link))
+
     # A YouTube iframe stays an iframe: the archive has its URL, and the
     # player is the content, so it is written as one (_Converter renders
     # it; the exporters render or rewrite that one form). Any other
@@ -334,9 +385,12 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
         video = youtube_video(src) if src else None
+        tweet = _archived_tweet(media or {}, src) if src else None
         if video:
             iframe.attrs = {"src": youtube_embed_url(*video),
                             "title": iframe.get("title") or ""}
+        elif tweet:
+            iframe.replace_with(BeautifulSoup(tweet, "html.parser"))
         elif src:
             iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
         else:
@@ -394,6 +448,10 @@ def load_media(raw: Path, fixups: dict = None) -> dict:
     media = {}
     for p in sorted(media_dir.glob("*.json")):
         if p.name.endswith(".gist.json"):
+            continue
+        if p.name.startswith("tweet-"):       # a tweet's oEmbed payload
+            media[f"tweet:{p.stem[len('tweet-'):]}"] = {
+                "tweet": json.loads(read_raw(p, fixups))}
             continue
         payload = json.loads(read_raw(p, fixups))
         entry = {"value": (payload.get("payload") or {}).get("value") or {}}

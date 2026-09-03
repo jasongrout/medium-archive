@@ -25,7 +25,7 @@ from .state import (state_embed_targets, state_image_urls,
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
-from .urls import canonical_url, medium_id, norm_key, slug_of
+from .urls import canonical_url, medium_id, norm_key, slug_of, tweet_id
 
 
 def load_existing(dirs: list) -> set:
@@ -106,6 +106,11 @@ def looks_gone(html: str) -> bool:
 
 MEDIA_URL = "https://medium.com/media/{id}?format=json"
 GIST_API_URL = "https://api.github.com/gists/{id}"
+# Twitter's public oEmbed endpoint: the tweet's text, author and date
+# as HTML, no credentials needed. omit_script drops the widgets.js tag;
+# dnt asks for no tracking of the archive's readers.
+TWEET_OEMBED_URL = ("https://publish.twitter.com/oembed?url={url}"
+                    "&omit_script=true&dnt=true")
 
 
 def fetch_media(session, page_text: str, mid: str, dest: Path,
@@ -114,11 +119,13 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
     unresolved (an empty iframeSrc -- gist embeds, mostly; their content
     exists nowhere in the page itself): the medium.com/media payload
     that names the embed's target into dest/media/<id>.json, and for a
-    gist also its files, from the GitHub API, into <id>.gist.json.
-    Incremental -- files already on disk are not re-fetched, so a
-    re-run of fetch backfills posts archived before this existed.
-    Returns the number of files written."""
-    n = 0
+    gist also its files, from the GitHub API, into <id>.gist.json. And
+    for each tweet embed, whose text is likewise nowhere in the page,
+    the tweet's oEmbed payload into tweet-<tweet id>.json. Incremental
+    -- files already on disk are not re-fetched, so a re-run of fetch
+    backfills posts archived before this existed. Returns the number of
+    files written."""
+    n = fetch_tweets(session, page_text, mid, dest, delay)
     for res_id in state_media_resources(page_text, mid):
         media_path = dest / "media" / f"{res_id}.json"
         payload = None
@@ -151,6 +158,33 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
                 time.sleep(delay / 4)
             except Exception as e:
                 print(f"  gist failed {gist['gistId']}: {e}", file=sys.stderr)
+    return n
+
+
+def fetch_tweets(session, page_text: str, mid: str, dest: Path,
+                 delay: float) -> int:
+    """The oEmbed payload of every tweet the page's embeds target, into
+    dest/media/tweet-<id>.json; a deleted tweet (the endpoint answers
+    404) is reported and stays a link. Incremental."""
+    n = 0
+    for target, _ in state_embed_targets(page_text, mid):
+        tweet = tweet_id(target)
+        if not tweet:
+            continue
+        path = dest / "media" / f"tweet-{tweet[0]}.json"
+        if path.exists():
+            continue
+        try:
+            r = fetch(session, TWEET_OEMBED_URL.format(url=target))
+            payload = json.loads(r.text)
+        except Exception as e:
+            print(f"  tweet failed {target}: {e}", file=sys.stderr)
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                        encoding="utf-8")
+        n += 1
+        time.sleep(delay / 4)
     return n
 
 
