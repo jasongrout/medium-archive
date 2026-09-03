@@ -104,14 +104,21 @@ a:hover { text-decoration-line: underline; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
-.site-header nav a { margin-left: 1.25rem; color: var(--soft); font-weight: 500; }
-.site-header nav a:hover { color: var(--ink); text-decoration-line: underline; }
-/* The current page's nav item. jupyter.org's navbar sets it in orange
-   text, which is the 2.8:1 the link rule exists to avoid; here it is
-   the ink, bold, with the link rule under it -- the mark a link shows
-   on hover, held on. */
+/* The nav is a row of tabs, not a row of links: no text underline,
+   and the current page's item is bold ink with a 3px accent bar on
+   the header's bottom edge, the tab convention rather than the link
+   rule. jupyter.org's navbar sets the current item in orange text,
+   the 2.8:1 the link rule exists to avoid. The bar reaches the edge
+   by padding each item down through the bar's own bottom padding and
+   pulling it back with a matching negative margin, so the bar sits
+   on the header's border rather than under the text. */
+.site-header nav a { display: inline-block; margin-left: 1.25rem;
+                     padding-bottom: calc(.9rem - 3px); margin-bottom: -.9rem;
+                     border-bottom: 3px solid transparent;
+                     color: var(--soft); font-weight: 500; }
+.site-header nav a:hover { color: var(--ink); }
 .site-header nav a[aria-current="page"] { color: var(--ink); font-weight: 700;
-                                          text-decoration-line: underline; }
+                                          border-bottom-color: var(--accent); }
 
 .theme-picker, .font-picker { display: inline-flex; vertical-align: middle;
                               margin-left: 1.25rem; }
@@ -143,7 +150,8 @@ a:hover { text-decoration-line: underline; }
    heading where that term has a feed of its own */
 .feed-link { display: inline-flex; align-items: center; }
 .feed-icon { width: 1rem; height: 1rem; }
-.site-header nav .feed-link { vertical-align: middle; }
+.site-header nav .feed-link { vertical-align: middle; padding-bottom: 0;
+                              margin-bottom: 0; border-bottom: 0; }
 .page-title .feed-link { margin-left: .55rem; color: var(--muted);
                          vertical-align: middle; }
 .page-title .feed-link:hover { color: var(--accent); }
