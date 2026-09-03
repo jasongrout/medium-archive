@@ -57,21 +57,21 @@ These embed verbatim in both engines' pages, so they must carry no
   Helvetica stack the site launched with, the reader's own platform
   UI font, Inter, two standalone sans faces picked for their own
   look (Atkinson Hyperlegible, Nunito Sans), and Source Sans and the
-  IBM Plex superfamily as both a sans and a serif face. Headings and chrome
-  stay sans under every choice: a superfamily's sans option ("Source
+  IBM Plex superfamily as both a sans and a serif face. Headings and
+  chrome stay sans under every choice: a superfamily's sans option ("Source
   Sans", "IBM Plex Sans") runs the whole page, article included, in
   its own sans and mono faces; its serif sibling (the default "Source
   Serif", "IBM Plex Serif") keeps headings and chrome on that same
   sans face, as Medium did, and points only the article's running
   text at the serif face instead, with the superfamily's own mono
-  still under its code. A choice's code follows
-  its own mono face wherever it has one (the superfamilies',
-  Atkinson Hyperlegible's own); System UI's is the platform's
-  ui-monospace stack, already the default, and a choice with no mono
-  face of its own (Helvetica, Inter, Nunito Sans) simply stays on it.
-  The article's reading size belongs to `.post` rather than to any one
-  choice, so the nine differ in family alone. The losing styles, and
-  the picker with them, come out once that is decided.
+  still under its code. A choice's code follows its own mono face
+  wherever it has one (the superfamilies', Atkinson Hyperlegible's
+  own); System UI's is the platform's own ui-monospace stack, and a
+  choice with no mono face of its own (Helvetica, Inter, Nunito Sans)
+  falls back to that same platform stack. The article's reading size
+  belongs to `.post` rather than to any one choice, so the nine differ
+  in family alone. The losing styles, and the picker with them, come
+  out once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
   than another pass over the rules that use them.
