@@ -10,12 +10,15 @@ conversion can be tuned and re-run without hitting Medium again.
 ## Steps
 
 **`fetch`** pulls raw material from Medium into `<out>/raw/`: each post's
-page HTML, its RSS feed item, full-resolution images, and the media
-behind gist embeds (the gist's files, via medium.com/media and the
-GitHub gists API). Nothing is modified. Fetching is incremental and
-resumable, so it can be interrupted and re-run. A later run picks up
-only new posts, and backfills embed media for posts archived before it
-was collected.
+page HTML, its RSS feed item, full-resolution images, and the content
+behind its embeds that Medium's page does not carry: a gist's files
+(via medium.com/media and the GitHub gists API), a tweet's text and
+pictures (X's oEmbed and syndication endpoints), a Carbon snippet's
+code, a Giphy embed's gif or mp4. Nothing is modified. Fetching is
+incremental and resumable, so it can be interrupted and re-run. A
+later run picks up only new posts, and backfills embed content for
+posts archived before it was collected; `--urls` names posts to
+backfill by Medium id or directory name.
 
 **`import-export`** (optional) merges a Medium account export into
 `<out>/raw/`. The export is the zip from medium.com → Settings →

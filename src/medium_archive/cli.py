@@ -1,7 +1,9 @@
 """Archive a Medium publication in independent steps:
 
     fetch          pull raw material from Medium: page HTML, RSS feed item,
-                   and full-resolution images, unmodified, into <out>/raw/
+                   full-resolution images, and the content behind embeds
+                   (gist files, tweets, Carbon snippets, Giphy files),
+                   unmodified, into <out>/raw/
     import-export  merge a Medium account export into <out>/raw/
     import-ghost   recover a Ghost blog's posts from the Wayback Machine
                    into <out>/raw/; posts also archived from Medium get the

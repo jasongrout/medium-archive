@@ -577,13 +577,12 @@ Feeds and sharing:
   the mark. The share URLs themselves were checked against the
   networks' documentation in 2026-09 (above).
 
-- Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
-  gist embeds, then `convert` and `lint`. The 2026-08 audit archive
-  currently flags 26 placeholder embeds across 7 posts. The
-  medium.com/media endpoint and the anti-hijacking-prefix parsing were
-  implemented against mediumexporter's usage and canned tests only,
-  because the development sandbox could not reach medium.com, so verify
-  the first live run's output.
+- (Done 2026-09.) The reference archive's `fetch` re-run backfilled
+  every gist's media (the 26 placeholders across 7 posts went), then
+  the tweets, Carbon snippets and Giphy files as each was added; the
+  medium.com/media endpoint and the anti-hijacking-prefix parsing
+  worked live as implemented from mediumexporter's usage. The one
+  surprise was the Giphy filename collision, fixed above.
 
 - Link contrast in the card theme. Links use `--accent` (#f37626,
   Jupyter Orange) directly, which is 2.8:1 against the light palette's
