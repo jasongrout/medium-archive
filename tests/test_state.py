@@ -317,6 +317,32 @@ def test_gist_embed_inlines_archived_files():
     assert "missing embed" not in markdown
 
 
+def test_markdown_gist_file_is_inlined_as_markdown():
+    # a Markdown gist is prose Medium could not hold (a table): its
+    # source goes out verbatim, not fenced, so the table renders; a code
+    # file in the same gist still gets its fence
+    table = "| Theme | People |\n| --- | --- |\n| Large data | 15 *ish* |"
+    media = {"abc123": {"value": {}, "gist": {"files": {
+        "OTHER-THEMES.md": {"language": "Markdown", "type": "text/markdown",
+                            "content": table},
+        "tool.py": {"language": "Python", "content": "print(1)"}}}}}
+    body = state_body(gist_state(), MID, "My Post", media)
+    markdown, _ = to_markdown(body, URL, {}, None)
+    assert markdown.startswith(f"{table}\n\n```python\nprint(1)\n```\n")
+    assert "```markdown" not in markdown
+    assert "After." in markdown
+
+
+def test_captioned_markdown_gist_keeps_its_figure_shell():
+    media = {"abc123": {"value": {}, "gist": {"files": {
+        "notes.md": {"language": "Markdown", "content": "| a | b |\n| - | - |"}}}}}
+    body = state_body(gist_state("Table 1"), MID, "My Post", media)
+    markdown, _ = to_markdown(body, URL, {}, None)
+    assert markdown.startswith(
+        "<figure>\n\n| a | b |\n| - | - |\n\n<figcaption>\n\nTable 1\n\n"
+        "</figcaption>\n\n</figure>\n")
+
+
 def test_unarchived_gist_embed_gets_placeholder():
     # never silently dropped: without archived media the embed becomes a
     # visible placeholder that lint flags

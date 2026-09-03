@@ -497,14 +497,15 @@ no longer lists, work through the steps in order:
   manual replacement. Gist embeds are the exception. A gist's content
   exists nowhere in the page itself, since Medium's state names only an
   opaque media resource id, so `fetch` archives the gist's files into
-  `raw/<id>/media/` and `convert` inlines them as code fences. A gist
+  `raw/<id>/media/` and `convert` inlines them: a code file as a
+  language-tagged fence, a Markdown file (the way to get a table into
+  a Medium post) verbatim, so it renders as the prose it is. A gist
   embed whose media is not yet archived converts to a link to the gist
   (from export and Ghost bodies, which name it) or a
-  `[missing embed: <name>]` placeholder (from the state, which does
-  not). `lint` flags the placeholders until a `fetch` re-run backfills
-  the media. An RSS feed body renders a gist as an iframe with no
-  source at all; that converts to the same placeholder, and only a
-  fixup that puts the gist's `<script src>` back restores it. A
+  `[missing embed: <name>]` placeholder (from the state and from an
+  RSS feed body, which renders a gist as an iframe with no source
+  around a link naming the media resource). `lint` flags the
+  placeholders until a `fetch` re-run backfills the media. A
   YouTube embed is the other exception: its URL is all a player needs,
   so it stays an `<iframe>` (one canonical line, on the no-cookie host,
   with the state's title for assistive tech and any `t=` start time)

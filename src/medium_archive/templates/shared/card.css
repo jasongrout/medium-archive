@@ -187,6 +187,15 @@ a:hover { text-decoration: underline; }
 .post pre code { font-size: inherit; background: none; }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
+/* A table (a Markdown gist inlined by convert; Medium itself has no
+   table markup) gets a ruled, top-aligned grid: the UA default is
+   borderless cells run together. Long cells wrap; the widths are the
+   browser's. */
+.post table { border-collapse: collapse; width: 100%; margin: 1rem 0;
+              font-size: .9em; }
+.post th, .post td { padding: .45em .6em; text-align: left;
+                     vertical-align: top; border-bottom: 1px solid var(--line); }
+.post th { border-bottom: 2px solid var(--line); }
 /* the UA default indents figures 40px each side; the column is narrow.
    Captions carry no styling markup of their own (like Medium's): the
    muted italic look lives here. The p rules cover embed figures, whose

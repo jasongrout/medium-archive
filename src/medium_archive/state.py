@@ -278,9 +278,9 @@ def _iframe(state, p, media: dict | None = None) -> str:
 
 
 def gist_code_blocks(files: dict) -> str:
-    """A gist's files (the GitHub API's `files` mapping) as <pre><code>
-    blocks ready for to_markdown, each fence carrying the file's
-    language."""
+    """Files (the GitHub gists API's `files` mapping, or a Carbon
+    snippet shaped like one) as <pre><code> blocks ready for
+    to_markdown, each fence carrying the file's language."""
     blocks = []
     for f in files.values():
         lang = (f.get("language") or "").lower()
@@ -290,17 +290,41 @@ def gist_code_blocks(files: dict) -> str:
     return "".join(blocks)
 
 
+def markdown_gist_file(name: str, f: dict) -> bool:
+    """A gist file that is Markdown by the API's language or type or by
+    its extension. A Markdown gist is prose the author could not put
+    in a Medium post directly (a table, usually), not code to show, so
+    convert inlines it as Markdown rather than fencing its source."""
+    return ((f.get("language") or "").lower() == "markdown"
+            or (f.get("type") or "").lower() == "text/markdown"
+            or name.lower().endswith((".md", ".markdown")))
+
+
+def gist_blocks(files: dict) -> str:
+    """A gist's files as HTML ready for to_markdown: a Markdown file as
+    a <markdown> element whose text the converter passes through
+    verbatim (_Converter.convert_markdown), every other file as a
+    language-tagged code block (gist_code_blocks)."""
+    blocks = []
+    for name, f in files.items():
+        if markdown_gist_file(name, f):
+            blocks.append(f"<markdown>{escape(f.get('content') or '')}</markdown>")
+        else:
+            blocks.append(gist_code_blocks({name: f}))
+    return "".join(blocks)
+
+
 def _media_embed(res: dict, media: dict, caption: str) -> str:
     """An embed whose state names no target (iframeSrc empty -- a gist,
     usually). With its media resource archived (fetch saves raw/media/),
-    inline the gist's files as code blocks, or fall back to whatever URL
+    inline the gist's files (gist_blocks), or fall back to whatever URL
     the media payload names; otherwise emit a visible
     [missing embed: ...] placeholder that lint flags -- the one thing
     this must never do is drop the embed silently."""
     entry = media.get(res.get("id") or "") or {}
     files = (entry.get("gist") or {}).get("files") or {}
     if files:
-        inner = gist_code_blocks(files)
+        inner = gist_blocks(files)
         if caption.strip():
             inner += f"<figcaption>{caption}</figcaption>"
         return f"<figure>{inner}</figure>"
