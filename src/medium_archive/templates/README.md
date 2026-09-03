@@ -123,10 +123,37 @@ These embed verbatim in both engines' pages, so they must carry no
   image). Images inside a link are skipped, so a linked image still
   follows its link. It closes on a click anywhere, on Esc (the dialog's
   own) and on a page scroll, like Medium's, and re-measures on resize.
+- `code-copy.html` is the copy button in the corner of every code
+  block, spliced into the post templates beside `image-zoom.html`,
+  since only article pages have code blocks. Every `<pre>` in the
+  article is one, whatever the engine wrapped it in (a fenced block
+  from convert, a Goldmark or codehilite highlight div, an inlined
+  gist or Carbon snippet inside a figure): the script wraps each in a
+  `.code-block` div, the positioning box `card.css` pins the button
+  to, so a wide block scrolls under the button rather than carrying it
+  off; when the button shows (on hover, on keyboard focus, always
+  on touch) is the stylesheet's business, explained there. The button's markup is a `<template>`, cloned per block, so
+  the two icons (a clipboard in the theme picker's stroked style, and
+  the check that replaces it for a moment after a copy) are HTML
+  rather than strings in the script. They swap by `hidden` attribute,
+  toggled as an attribute: SVG elements have no `hidden` property, so
+  assigning one, as the theme picker could on its HTML, sets nothing. The copied text is the block's
+  text content without its trailing newline. The status line beside
+  the template is a live region a screen reader announces the copy
+  through, since a changed button label is not read out. Without the
+  async clipboard API (an insecure origin) no button is added, so the
+  page never shows a button that cannot work.
 - `dark-palette.css` is included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link
-  color and stays the same in both palettes.
+  color and stays the same in both palettes. The `--syn-*` colours
+  are the syntax-highlighting set for that palette, each at WCAG AAA
+  (7:1) on that palette's `--code-bg`, as the text grays are on
+  theirs, and a test holds them there; `card.css` names the light
+  set beside its other light values and applies both
+  through the token rules under `.post .highlight`, on the class
+  names Chroma (Hugo, with `noClasses` off in `hugo.toml.tmpl`) and
+  Pygments (Pelican's codehilite) share.
 - `card.css` is the card-grid look, written as both the hugo theme's
   and the pelican theme's stylesheet.
 
@@ -135,7 +162,10 @@ These embed verbatim in both engines' pages, so they must carry no
 The built-in theme (`hugo.TEMPLATES` maps each file into the site; the
 regular list and taxonomy pages share `list.html`), plus:
 
-- `hugo.toml.tmpl` is the generated site config.
+- `hugo.toml.tmpl` is the generated site config. Its
+  `[markup.highlight]` turns off Chroma's inline styles, whose default
+  Monokai would paint a dark block on the light page; the tokens get
+  classes instead and `card.css` colours them per palette.
 - `content/tags/_content.gotmpl` is a content adapter: it creates one
   term page per entry of `data/tags.json` (tag slug -> display name,
   written by `hugo.write_tag_names`), so the tag pages, cards, chip

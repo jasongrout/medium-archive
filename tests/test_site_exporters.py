@@ -508,7 +508,8 @@ def test_theme_picker_and_dark_scheme(archive):
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
                  "term-sort", "announcement",
-                 "nav-current", "image-zoom", "feed-icon", "share-icons"):
+                 "nav-current", "image-zoom", "code-copy", "feed-icon",
+                 "share-icons"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -607,6 +608,76 @@ def test_image_zoom(archive):
     assert ".zoom-dialog::backdrop" in css
     assert "prefers-reduced-motion" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_code_copy(archive):
+    # post pages carry the code-block copy button, on both engines
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for page in (hugo_site / "layouts/_default/single.html",
+                 pelican_site / "theme/templates/article.html"):
+        text = page.read_text()
+        assert '<template class="code-copy-template">' in text, page
+        # the button follows the article whose blocks it serves, and is
+        # added only where the clipboard API can honour it
+        assert text.index("</article>") < text.index("code-copy-template"), page
+        assert "navigator.clipboard.writeText" in text, page
+        # every pre in the article, whatever the engine wrapped it in,
+        # gets a positioning box of its own and a cloned button
+        assert 'article.querySelectorAll("pre")' in text, page
+        assert 'block.className = "code-block"' in text, page
+        assert "template.content.firstElementChild.cloneNode(true)" in text, page
+        # the icons swap by attribute: an SVG element has no `hidden`
+        # property to set, so assigning one would change nothing
+        assert 'icon.toggleAttribute("hidden"' in text, page
+        assert "icon.hidden" not in text, page
+        # the copied text is the block's, without its trailing newline
+        assert 'pre.textContent.replace(/\\n$/, "")' in text, page
+        # a screen reader hears the copy through the live region
+        assert 'role="status"' in text, page
+        assert 'announce("Copied to clipboard")' in text, page
+    # hugo highlights by class, never Chroma's inlined Monokai, which
+    # paints a dark block on the light page; the theme colours the
+    # tokens on the class names Pygments and Chroma share, per palette
+    config = (hugo_site / "hugo.toml").read_text()
+    assert "[markup.highlight]\nnoClasses = false" in config
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert css.count("--syn-keyword:") == 3      # light, and dark twice
+    assert ".post .highlight .k," in css
+    assert ".code-block { position: relative; }" in css
+    assert ".code-copy { position: absolute;" in css
+    assert ".code-copy:focus-visible" in css
+    # hidden until the block is hovered or the button reached by
+    # keyboard, and always shown where there is no hover
+    assert ".code-block:hover .code-copy, .code-copy:focus-visible { opacity: 1; }" in css
+    assert "@media (hover: none) { .code-copy { opacity: 1; } }" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def _contrast(a: str, b: str) -> float:
+    """WCAG 2 contrast ratio of two #rrggbb colours."""
+    def luminance(hex_colour):
+        channels = [int(hex_colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+                  for c in channels]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+    high, low = sorted((luminance(a), luminance(b)), reverse=True)
+    return (high + 0.05) / (low + 0.05)
+
+
+def test_syntax_colours_contrast():
+    """Every syntax colour clears WCAG AAA (7:1) on its palette's code
+    background, the level the theme holds its text grays to."""
+    import re
+    light = sites.template_text("shared/card.css").split("/* @include")[0]
+    dark = sites.template_text("shared/dark-palette.css")
+    for name, palette in (("light", light), ("dark", dark)):
+        code_bg = re.search(r"--code-bg: (#[0-9a-f]{6})", palette).group(1)
+        colours = re.findall(r"--syn-([a-z]+): (#[0-9a-f]{6})", palette)
+        assert len(colours) == 6, name
+        for token, colour in colours:
+            ratio = _contrast(colour, code_bg)
+            assert ratio >= 7, (name, token, colour, round(ratio, 2))
 
 
 def test_post_share_links(archive):

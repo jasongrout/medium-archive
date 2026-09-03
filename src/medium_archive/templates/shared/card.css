@@ -7,7 +7,12 @@
         --soft: #444444; --muted: #525252; --bg: #f4f4f4; --card: #ffffff;
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
         --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
-        --error-soft: #b91c1c; color-scheme: light; }
+        --error-soft: #b91c1c;
+        /* syntax colours for highlighted code (see the token rules),
+           each at 7:1 or better on --code-bg, like the text grays */
+        --syn-keyword: #a41b24; --syn-string: #0a3069; --syn-comment: #4e545c;
+        --syn-number: #0550ae; --syn-name: #633da9; --syn-builtin: #923700;
+        color-scheme: light; }
 :root[data-theme="dark"] {
 /* @include shared/dark-palette.css */
 }
@@ -172,19 +177,86 @@ a:hover { text-decoration: underline; }
 .post p:has(> img:only-child), .post p:has(> a:only-child > img:only-child),
 .post figure { text-align: center; }
 /* Code names the --mono role, so the font picker's Source choice can
-   put the superfamily's own mono under it. The size is em, so code
-   tracks the reading size of the column it sits in rather than
-   shrinking away from it when a choice sets the article larger; it is
-   stated at all (rather than left to the UA) because a stack ending in
-   the generic `monospace` otherwise triggers the browsers' 13px
-   monospace default. A block has already stepped down once, so the
-   code inside it must not step again. */
+   put the superfamily's own mono under it. The size is stated at all
+   (rather than left to the UA) because a stack ending in the generic
+   `monospace` otherwise triggers the browsers' 13px monospace default.
+   Inline code is em, so it tracks the prose it sits in. A block is
+   not prose but a grid of fixed-width characters, so its size is set
+   by how many columns fit the block: about 80, the terminal width
+   posts were written at, and about what Medium's column held. The
+   size and line height are Medium's own (14px on 1.4; its -0.022em
+   tracking is not taken, so the font's own fit stands). After the
+   column's padding each side, a block holds 688px, and at the 0.6em
+   advance of the mono candidates (0.602 for Menlo and DejaVu) that
+   is 81 columns; a wider column was tried for a few more and read as
+   too wide. An em size would have followed the 20px reading size up
+   to 18px and 66 columns. The code inside a block inherits, so it
+   does not step down again. */
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-family: var(--mono);
-            font-size: .9em; }
+            font-size: .875rem; line-height: 1.4; }
 .post code { background: var(--code-bg); font-family: var(--mono);
              font-size: .9em; }
 .post pre code { font-size: inherit; background: none; }
+/* Token colours for highlighted blocks, on the class names Pygments
+   (Pelican's codehilite) and Chroma (Hugo, with noClasses off) share:
+   keywords, strings, comments, numbers, the names of functions and
+   classes, and builtins. The block keeps the theme's background and
+   ink, so a block reads as part of the page in either scheme, where
+   an engine's own inlined style (Chroma's Monokai) would paint a
+   dark block on the light page. The colours start from GitHub's
+   light and dark schemes, each then blended toward black or white
+   just far enough to clear WCAG AAA (7:1) on that palette's
+   --code-bg, the level the text grays hold to; a test checks every
+   one. */
+.post .highlight .k, .post .highlight .kd, .post .highlight .kn,
+.post .highlight .kr, .post .highlight .kt, .post .highlight .kc,
+.post .highlight .ow { color: var(--syn-keyword); }
+.post .highlight .s, .post .highlight .s1, .post .highlight .s2,
+.post .highlight .sb, .post .highlight .sd, .post .highlight .sa,
+.post .highlight .se, .post .highlight .sh, .post .highlight .si,
+.post .highlight .sx, .post .highlight .sr, .post .highlight .ss,
+.post .highlight .dl { color: var(--syn-string); }
+.post .highlight .c, .post .highlight .c1, .post .highlight .cm,
+.post .highlight .cp, .post .highlight .cs,
+.post .highlight .ch { color: var(--syn-comment); font-style: italic; }
+.post .highlight .m, .post .highlight .mi, .post .highlight .mf,
+.post .highlight .mh, .post .highlight .mo, .post .highlight .mb,
+.post .highlight .il { color: var(--syn-number); }
+.post .highlight .nf, .post .highlight .fm, .post .highlight .nc,
+.post .highlight .nd, .post .highlight .ne, .post .highlight .nn,
+.post .highlight .nt { color: var(--syn-name); }
+.post .highlight .nb, .post .highlight .bp,
+.post .highlight .na { color: var(--syn-builtin); }
+/* The copy button code-copy.html gives each block, overlaid on the
+   block's top-right corner as code hosts and documentation sites set
+   theirs. The wrapper the script adds is the button's positioning
+   box: a pre scrolls sideways, so a button placed inside it would
+   scroll away with the first line. It is hidden until the block is
+   hovered or the button focused, so it covers the end of a long first
+   line only while the pointer is on the block; it is in the page and
+   the tab order throughout, so Tab reaches it (and reveals it, by the
+   same rule as hover), Enter or Space presses it, and a screen reader
+   announces it either way, opacity being no part of the accessibility
+   tree. Where there is no hover (touch) it shows always. The status
+   line is the screen-reader announcement of a copy; it takes no space
+   on screen. */
+.code-block { position: relative; }
+.code-copy { position: absolute; top: .45rem; right: .45rem;
+             display: inline-flex; align-items: center; justify-content: center;
+             width: 1.9rem; height: 1.9rem; padding: 0;
+             border: 1px solid var(--line); border-radius: 6px;
+             background: var(--code-bg); color: var(--muted);
+             cursor: pointer; opacity: 0; }
+.code-block:hover .code-copy, .code-copy:focus-visible { opacity: 1; }
+@media (hover: none) { .code-copy { opacity: 1; } }
+.code-copy svg { width: 1rem; height: 1rem; }
+.code-copy svg[hidden] { display: none; }
+.code-copy:hover, .code-copy:focus-visible { color: var(--accent);
+                                             border-color: var(--accent); }
+.code-copy-status { position: absolute; width: 1px; height: 1px;
+                    margin: -1px; padding: 0; overflow: hidden;
+                    clip-path: inset(50%); white-space: nowrap; }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
 /* A table (a Markdown gist inlined by convert; Medium itself has no
