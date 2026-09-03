@@ -240,7 +240,11 @@ def lint_post(post_dir: Path, seo: bool = False, embeds: bool = False,
         warnings.append("empty title")
     if not front.get("date"):
         warnings.append("empty date")
-    if len(body) < 200:
+    # a short body is the signature of a conversion that lost the body,
+    # unless the post really is that short: then the summary Medium
+    # derived from it (the description) is in it, whole
+    description = " ".join((front.get("description") or "").split())
+    if len(body) < 200 and not (description and description in " ".join(body.split())):
         warnings.append(f"body is only {len(body)} chars")
     if embeds:
         errors.extend(embed_problems(front, body, raw_root))

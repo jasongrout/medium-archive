@@ -332,3 +332,16 @@ def test_recorded_deleted_tweet_is_not_an_unfilled_embed(tmp_path):
                    "[A tweet by @ann, no longer available](https://twitter.com/ann/status/12345)\n",
                    front={**FRONT, "medium_id": MID, "body_source": "state"})
     assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_a_short_post_that_carries_its_own_summary_is_not_short(tmp_path):
+    # a 2015 welcome note is one sentence long, and its description is
+    # that sentence: nothing was lost in conversion
+    text = "Watch this space for announcements about Jupyter and IPython."
+    d = write_post(tmp_path, text + "\n", front={**FRONT, "description": text})
+    assert lint_post(d) == ([], [])
+    # a description the body does not carry is a lost body
+    d = write_post(tmp_path, "Watch this\n", front={**FRONT, "description": text},
+                   name="2020-01-02-lost")
+    _, warnings = lint_post(d)
+    assert warnings == ["body is only 11 chars"]
