@@ -386,13 +386,11 @@ As of 2026-09-03 the run reports 20 problems:
   (already noted under `compare --state` above) and a tweet in
   `jupyterlab-the-next-generation-of-the-jupyter-notebook`. A fixup on
   `raw/<id>/export.html` can put the embed back.
-- **1 Giphy clip still to fetch.** The gif in
-  `simpler-authentication-for-small-scale-jupyterhubs-...` and the
-  first clip in `ros-jupyter` are archived. The second `ros-jupyter`
-  clip was mapped to the first one's file by a fetch that merged the
-  two `giphy.mp4` basenames (fixed in medium-archive, which now names
-  Giphy files by id); its `images.json` entry was removed so a
-  `fetch --urls` re-run for that post downloads it.
+All three Giphy embeds are archived (`raw/<id>/images/`, named by
+Giphy id since a first fetch merged the two `giphy.mp4` basenames into
+one file; a clean refetch with the fixed tool gave the names above)
+and convert to a local image and two clips.
+
 - **1 gist hollowed out by a feed body**: the "Other themes" gist in
   `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`.
   The RSS body renders it as an iframe with no source, which now
