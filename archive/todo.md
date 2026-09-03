@@ -391,13 +391,13 @@ Giphy id since a first fetch merged the two `giphy.mp4` basenames into
 one file; a clean refetch with the fixed tool gave the names above)
 and convert to a local image and two clips.
 
-- **1 gist hollowed out by a feed body**: the "Other themes" gist in
-  `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`.
-  The RSS body renders it as an iframe with no source, which now
-  converts to a `[missing embed]` placeholder that plain `lint` also
-  flags. The gist's files are archived; a fixup that puts the gist's
-  `<script src="https://gist.github.com/.../<id>.js">` tag into
-  `raw/9a2d911cf42f/feed_item.json` lets `convert` inline them.
+- The gist a feed body hollowed out in
+  `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`
+  is fixed: `fixups/9a2d911cf42f-feed-gist.sub` puts the gist's
+  `<script src>` where the RSS body had an iframe with no source, and
+  convert inlines the archived file. It is a Markdown file
+  (`OTHER-THEMES.md`, a table), shown as a fenced `markdown` block the
+  way Medium's gist embed showed its source; rendering a `.md` gist
+  file as Markdown instead would be a medium-archive option.
 
-Because the RSS body of the 2026 survey post is the one plain `lint`
-now fails on, the "0 problems" above holds for the other 335 posts.
+With that fixup plain `lint` is back to 0 problems.
