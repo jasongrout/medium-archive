@@ -352,12 +352,14 @@ and the Mastodon account, alongside the X handle already in
 Medium posts embed videos, tweets, gists and the like as iframes.
 `convert` has no content for most of them, so an iframe becomes a
 `[embed: <url>](<url>)` link, and every generated site shows that link
-where the reader expects the tweet. Two kinds are handled: gists
+where the reader expects the tweet. Three kinds are handled: gists
 (their files are archived under `raw/<id>/media/` and inlined as
-code) and YouTube videos (the URL is all a player needs, so the iframe
+code), YouTube videos (the URL is all a player needs, so the iframe
 stays a player: 33 of them across 19 posts, on the no-cookie host,
-titled from the editor state where it knows the video). A body source
-can still lose an embed altogether. None
+titled from the editor state where it knows the video) and Giphy
+embeds (the target is the media file, which `fetch` archives with the
+post's images and `convert` serves as the gif or a looping clip). A
+body source can still lose an embed altogether. None
 of that is a conversion defect, so plain `lint` stays quiet about the
 links; `medium-archive lint --embeds` reports every one as a problem
 and exits non-zero. `.github/workflows/lint.yml` runs it on every push
@@ -372,8 +374,8 @@ medium-archive lint --embeds --out .    # one line per embed missing content
 
 As of 2026-09-03 the run reports 23 problems:
 
-- **20 bare embed links across 10 posts**: Twitter (12),
-  carbon.now.sh code screenshots (4), Giphy (3) and one art19
+- **17 bare embed links across 9 posts**: Twitter (12),
+  carbon.now.sh code screenshots (4) and one art19
   podcast episode. Each needs a decision per embed: an image or code
   block placed in a fixup, a plain link with a sentence around it, or
   leaving the link as it stands and accepting it. The tweets are the
@@ -384,6 +386,13 @@ As of 2026-09-03 the run reports 23 problems:
   (already noted under `compare --state` above) and a tweet in
   `jupyterlab-the-next-generation-of-the-jupyter-notebook`. A fixup on
   `raw/<id>/export.html` can put the embed back.
+- **3 Giphy files not yet fetched** (one gif in
+  `simpler-authentication-for-small-scale-jupyterhubs-...`, two mp4
+  clips in `ros-jupyter`): they convert to an image and two clips that
+  still point at media.giphy.com. A `medium-archive fetch` re-run from
+  a machine that can reach Giphy backfills them into `raw/<id>/images/`
+  and `images.json` (the development sandbox could not), after which
+  the three lines clear on their own.
 - **1 gist hollowed out by a feed body**: the "Other themes" gist in
   `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`.
   The RSS body renders it as an iframe with no source, which now

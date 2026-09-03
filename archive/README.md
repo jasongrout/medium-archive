@@ -212,8 +212,9 @@ Medium era keep working too.
   language Medium recorded for the block when any. Tables and embeds
   are not: iframes appear as `[embed: <url>]` links and need manual
   replacement. YouTube embeds stay players (an `<iframe>` on the
-  no-cookie host, which each site renders). Gist embeds are the other
-  exception. Their code is inlined as
+  no-cookie host, which each site renders), and Giphy embeds become
+  the gif or mp4 clip fetch archives with the post's images. Gist
+  embeds are the other exception. Their code is inlined as
   fenced blocks from `raw/<id>/media/`, where fetch archives the gist's
   files. A gist embed whose media was never archived converts to a
   `[missing embed: <name>]` placeholder (from the state, which has no
