@@ -11,7 +11,7 @@ bytes:
   A substitution shows exactly what changes. '#' lines are comments:
 
       # why this fix exists
-      file: <medium_id>/<name>
+      file: <medium_id>/<name>          (or <medium_id>/media/<name>)
       count: 2
       old: one sentence.The next
       new: one sentence. The next
@@ -28,8 +28,9 @@ bytes:
   with any a/ b/ prefix convention work.
 
 Fixup files apply in file-name order. A hunk or substitution that no
-longer applies aborts the run: a silently skipped fixup would defeat the
-point of keeping them reproducible.
+longer applies aborts the run, as does a fixup naming a file the
+archive does not have: a silently skipped fixup would defeat the point
+of keeping them reproducible.
 """
 
 import re
@@ -39,9 +40,23 @@ from pathlib import Path
 HUNK_RE = re.compile(r"@@ -(\d+)(?:,(\d+))? \+\d+(?:,(\d+))? @@")
 
 
+SUBDIRS = ("media", "images")      # a post's subdirectories fixups can target
+
+
 def _key(path: str) -> str:
-    """<medium_id>/<name> from a patch header path, any prefix convention."""
-    return "/".join(path.strip().split("\t")[0].split("/")[-2:])
+    """<medium_id>/<name> from a patch header path, any prefix convention
+    -- or <medium_id>/media/<name> for a file in one of the post's
+    subdirectories (an archived gist, tweet or Carbon snippet)."""
+    parts = path.strip().split("\t")[0].split("/")
+    n = 3 if len(parts) >= 3 and parts[-2] in SUBDIRS else 2
+    return "/".join(parts[-n:])
+
+
+def raw_key(path: Path) -> str:
+    """The fixup key of a raw file: its path under raw/ (see _key)."""
+    if path.parent.name in SUBDIRS:
+        return f"{path.parent.parent.name}/{path.parent.name}/{path.name}"
+    return f"{path.parent.name}/{path.name}"
 
 
 def _parse_patch(patch: Path, fixups: dict):
@@ -123,6 +138,15 @@ def load_fixups(out_dir: Path) -> dict:
         if fix_dir.is_dir() else []
     for f in files:
         (_parse_patch if f.suffix == ".patch" else _parse_subs)(f, fixups)
+    # a fixup naming a file the archive does not have would never apply,
+    # and a silently unused fixup defeats the point of keeping them
+    raw_dir = out_dir / "raw"
+    if raw_dir.is_dir():
+        missing = [k for k in fixups if not (raw_dir / k).is_file()]
+        if missing:
+            sys.exit("fixups: no such raw file to patch: " + ", ".join(missing)
+                     + " (a target is <medium_id>/<name>, or "
+                     "<medium_id>/media/<name> for archived embed media)")
     return fixups
 
 
@@ -163,7 +187,7 @@ def _apply_sub(text: str, kind: str, pattern: str, repl: str, count: int,
 def read_raw(path: Path, fixups: dict = None) -> str:
     """The raw file's text with any fixup operations applied."""
     text = path.read_text(encoding="utf-8")
-    key = f"{path.parent.name}/{path.name}"
+    key = raw_key(path)
     for op in (fixups or {}).get(key, []):
         if op[0] == "hunks":
             text = _apply_hunks(text, op[1], key)
