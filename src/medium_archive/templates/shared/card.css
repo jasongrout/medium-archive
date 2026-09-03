@@ -23,13 +23,13 @@
 }
 * { box-sizing: border-box; }
 /* The typography choices the header's font picker offers (pinned as
-   data-font on <html>, persisted like the theme choice): the
-   jupyter.org sans the site launched with, the reader's own platform
-   UI font, Inter, two standalone sans faces picked for their own look
-   (Atkinson Hyperlegible, Nunito Sans), and the Source and IBM Plex
-   superfamilies, each offered twice -- once with its sans face
-   running the article text, once with its serif face doing so
-   instead.
+   data-font on <html>, persisted like the theme choice): Source Serif,
+   the superfamily Medium set the publication in and the default here
+   with no attribute pinned, the jupyter.org Helvetica stack the site
+   launched with, the reader's own platform UI font, Inter, two
+   standalone sans faces picked for their own look (Atkinson
+   Hyperlegible, Nunito Sans), and Source Sans and the IBM Plex
+   superfamily, offered as both a sans and a serif face.
 
    --body-font is what the page is set in and --mono what its code
    is, so a choice swaps both by redefining them; the rules downstream
@@ -37,16 +37,19 @@
    --body-font under every choice, so they read sans regardless: a
    superfamily's sans choice (Source Sans, IBM Plex Sans) points
    --body-font at its own sans face, so the whole page, article
-   included, runs in it; its serif sibling (Source Serif, IBM Plex
-   Serif) leaves --body-font on that same sans face and points only
-   the article's running text (further down) at the serif instead.
-   --mono follows to whichever face the choice ships one under: the
-   superfamilies' own mono, Atkinson Hyperlegible's own mono, or, for
-   System UI and any choice with no mono face of its own (Helvetica,
-   Inter, Nunito Sans), the platform's default ui-monospace stack. */
+   included, runs in it; its serif sibling (the default Source Serif,
+   IBM Plex Serif) leaves --body-font on that same sans face and
+   points only the article's running text (further down) at the serif
+   instead. --mono follows to whichever face the choice ships one
+   under: the superfamilies' own mono, Atkinson Hyperlegible's own
+   mono, or, for System UI and any choice with no mono face of its own
+   (Helvetica, Inter, Nunito Sans), the platform's default
+   --system-mono stack. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
                      Helvetica, Arial, sans-serif;
+        --system-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
+                       monospace;
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
         --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
                        Arial, sans-serif;
@@ -66,23 +69,25 @@
                           "Times New Roman", Times, serif;
         --ibm-plex-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular,
                          Menlo, Consolas, monospace;
-        --body-font: var(--sans);
-        --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-:root[data-font="system-ui"] { --body-font: var(--system-ui); }
-:root[data-font="inter"] { --body-font: var(--inter); }
+        /* the default: Source Serif's own sans/mono pair, with the
+           serif face set on .post alone, further down */
+        --body-font: var(--source-sans);
+        --mono: var(--source-code); }
+:root[data-font="sans"] { --body-font: var(--sans); --mono: var(--system-mono); }
+:root[data-font="system-ui"] { --body-font: var(--system-ui);
+                               --mono: var(--system-mono); }
+:root[data-font="inter"] { --body-font: var(--inter); --mono: var(--system-mono); }
 :root[data-font="source-sans"] { --body-font: var(--source-sans);
                                  --mono: var(--source-code); }
-:root[data-font="source-serif"] { --body-font: var(--source-sans);
-                                  --mono: var(--source-code); }
 :root[data-font="atkinson"] { --body-font: var(--atkinson);
                               --mono: var(--atkinson-mono); }
-:root[data-font="nunito-sans"] { --body-font: var(--nunito-sans); }
+:root[data-font="nunito-sans"] { --body-font: var(--nunito-sans);
+                                 --mono: var(--system-mono); }
 :root[data-font="ibm-plex-sans"] { --body-font: var(--ibm-plex-sans);
                                    --mono: var(--ibm-plex-mono); }
 :root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
                                     --mono: var(--ibm-plex-mono); }
 body { margin: 0; background: var(--bg); color: var(--ink);
-       /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
 /* Links provide a splash of the accent color on the page */
@@ -383,12 +388,15 @@ a:hover { text-decoration-line: underline; }
    superfamily's own sans face. Medium's -0.004rem tracking is not
    reproduced: it works out to 0.064px per character, which no reader
    can see, and leaving it off keeps every choice on the browser's
-   default tracking. */
-:root[data-font="source-serif"] .post { font-family: var(--source-serif); }
-:root[data-font="source-serif"] .post :is(h1, h2, h3, h4, h5, h6),
-:root[data-font="source-serif"] .post-meta,
-:root[data-font="source-serif"] .post-share,
-:root[data-font="source-serif"] .post figcaption { font-family: var(--body-font); }
+   default tracking. Source Serif is the default -- no data-font
+   pinned -- so its rule matches :not([data-font]) rather than an
+   explicit value, the same way its --body-font/--mono live on the
+   bare :root above. */
+:root:not([data-font]) .post { font-family: var(--source-serif); }
+:root:not([data-font]) .post :is(h1, h2, h3, h4, h5, h6),
+:root:not([data-font]) .post-meta,
+:root:not([data-font]) .post-share,
+:root:not([data-font]) .post figcaption { font-family: var(--body-font); }
 :root[data-font="ibm-plex-serif"] .post { font-family: var(--ibm-plex-serif); }
 :root[data-font="ibm-plex-serif"] .post :is(h1, h2, h3, h4, h5, h6),
 :root[data-font="ibm-plex-serif"] .post-meta,

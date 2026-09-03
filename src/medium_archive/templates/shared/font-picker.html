@@ -24,10 +24,10 @@
   function apply(choice) {
     select.value = choice;
     select.style.fontFamily = options[select.selectedIndex].style.fontFamily;
-    if (choice === "sans") root.removeAttribute("data-font");
+    if (choice === "source-serif") root.removeAttribute("data-font");
     else root.setAttribute("data-font", choice);
     try {
-      if (choice === "sans") localStorage.removeItem("font");
+      if (choice === "source-serif") localStorage.removeItem("font");
       else localStorage.setItem("font", choice);
     } catch (e) {}
   }
@@ -39,7 +39,7 @@
   for (var i = 0; i < options.length; i++) {
     if (options[i].value === stored) known = true;
   }
-  apply(known ? stored : "sans");
+  apply(known ? stored : "source-serif");
   picker.hidden = false;
 })();
 </script>
