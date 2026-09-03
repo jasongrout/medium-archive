@@ -123,7 +123,9 @@ raw/
                                 at fetch time (title, authors, tags, date,
                                 content_html). Only ~10 recent posts have one.
     images.json               {source_url: filename} for images/
-    images/<filename>         full-resolution images referenced by the post
+    images/<filename>         full-resolution images referenced by the post,
+                                plus the files behind its embeds: a Giphy
+                                gif or mp4, a tweet's photos
     media/<media_id>.json     embed media resources the page's state leaves
                                 unresolved (gist embeds, mostly): the
                                 medium.com/media payload that names the
@@ -131,6 +133,14 @@ raw/
     media/<media_id>.gist.json  the embedded gist's files, as returned by
                                 the GitHub gists API; convert inlines them
                                 as code fences
+    media/tweet-<id>.json     an embedded tweet's oEmbed payload (its text,
+                                author and date), or {"deleted": true, ...}
+                                when X no longer serves it; convert renders
+                                a quote, or a link saying the tweet is gone
+    media/tweet-<id>.media.json  X's syndication payload for a tweet with
+                                pictures, naming the photos in images/
+    media/carbon-<id>.json    an embedded Carbon snippet's code and
+                                language; convert inlines a code fence
 fixups/*.sub, *.patch         optional hand-written corrections, applied to
                                 raw files in memory by convert and compare
 tags.json                     optional hand-written tag cleanup ("drop",
@@ -207,15 +217,21 @@ Medium era keep working too.
 
 * Bodies are Markdown produced by markdownify from Medium HTML. Code
   blocks, lists and headings are generally fine, and fences carry the
-  language Medium recorded for the block when any. Tables and embeds
-  are not: iframes appear as `[embed: <url>]` links and need manual
-  replacement. Gist embeds are the exception. Their code is inlined as
-  fenced blocks from `raw/<id>/media/`, where fetch archives the gist's
-  files. A gist embed whose media was never archived converts to a
-  `[missing embed: <name>]` placeholder (from the state, which has no
-  URL for it) or an `[embed: <gist url>]` link (from an export or Ghost
-  body, which names the gist). `lint` flags the placeholders; re-run
-  fetch to recover them.
+  language Medium recorded for the block when any. Tables are not.
+  Embeds convert by kind, from what `fetch` archives under
+  `raw/<id>/media/` and `images/`: gists inline their files as code
+  fences; tweets become quotes of their archived text with their
+  photos, or a link saying the tweet is no longer available when X
+  answered 404; Carbon snippets become code blocks from their
+  archived source; Giphy embeds become the gif or mp4 clip; YouTube
+  embeds and a few other providers' players stay `<iframe>`s (YouTube
+  on the no-cookie host); an art19 episode is a titled link, since
+  art19 refuses framing. Any other iframe is a `[embed: <url>]` link,
+  and a gist whose media was never archived a `[missing embed:
+  <name>]` placeholder. `lint` flags the placeholders and `lint
+  --embeds` the links, the embeds a body source dropped, and any
+  embed file not yet fetched; the `Lint embeds` workflow runs it on
+  every push and pull request. See `todo.md`, section 5.
 * Medium boilerplate is stripped in `convert` and still present in
   `raw/page.html`: "was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, the author header.
