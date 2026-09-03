@@ -5,6 +5,7 @@ convert works from.
 """
 
 import json
+import math
 import re
 import shutil
 import sys
@@ -117,6 +118,12 @@ TWEET_OEMBED_URL = ("https://publish.x.com/oembed?url={url}"
 # data carries the snippet itself: its code and language, which the
 # screenshot the iframe would show is drawn from.
 CARBON_EMBED_URL = "https://carbon.now.sh/embed/{id}"
+# X's syndication endpoint, which static tweet renderers read: the
+# tweet with its media (photo URLs on pbs.twimg.com, a video's poster),
+# unauthenticated, keyed by a token derived from the id the way
+# react-tweet derives it. The oEmbed payload names photos only as
+# pic.twitter.com links.
+TWEET_MEDIA_URL = "https://cdn.syndication.twimg.com/tweet-result?id={id}&token={token}"
 NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', re.S)
 
@@ -170,31 +177,85 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
     return n
 
 
+def tweet_token(tweet: str) -> str:
+    """react-tweet's token for the syndication endpoint:
+    ((id / 1e15) * pi).toString(36) with its zeros and point removed."""
+    x = int(tweet) / 1e15 * math.pi
+    whole, frac = int(x), x - int(x)
+    digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+    s = ""
+    while whole:
+        s, whole = digits[whole % 36] + s, whole // 36
+    for _ in range(12):
+        frac *= 36
+        s += digits[int(frac)]
+        frac -= int(frac)
+    return s.replace("0", "")
+
+
+def tweet_has_media(payload: dict) -> bool:
+    """Whether a tweet's oEmbed html links a picture or video."""
+    return bool(re.search(r"pic\.(?:twitter|x)\.com/", payload.get("html") or ""))
+
+
 def fetch_tweets(session, page_text: str, mid: str, dest: Path,
                  delay: float) -> int:
     """The oEmbed payload of every tweet the page's embeds target, into
-    dest/media/tweet-<id>.json; a deleted tweet (the endpoint answers
-    404) is reported and stays a link. Incremental."""
+    dest/media/tweet-<id>.json, and for a tweet with a picture or video
+    also the syndication payload naming the media files, into
+    tweet-<id>.media.json; a deleted tweet (the endpoint answers 404)
+    is reported and stays a link. Incremental."""
     n = 0
     for target, _ in state_embed_targets(page_text, mid):
         tweet = tweet_id(target)
         if not tweet:
             continue
         path = dest / "media" / f"tweet-{tweet[0]}.json"
+        payload = None
         if path.exists():
-            continue
-        try:
-            r = fetch(session, TWEET_OEMBED_URL.format(url=target))
-            payload = json.loads(r.text)
-        except Exception as e:
-            print(f"  tweet failed {target}: {e}", file=sys.stderr)
-            continue
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
-                        encoding="utf-8")
-        n += 1
-        time.sleep(delay / 4)
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                pass
+        if payload is None:
+            try:
+                r = fetch(session, TWEET_OEMBED_URL.format(url=target))
+                payload = json.loads(r.text)
+            except Exception as e:
+                print(f"  tweet failed {target}: {e}", file=sys.stderr)
+                continue
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                            encoding="utf-8")
+            n += 1
+            time.sleep(delay / 4)
+        media_path = path.with_name(f"tweet-{tweet[0]}.media.json")
+        if tweet_has_media(payload) and not media_path.exists():
+            try:
+                r = fetch(session, TWEET_MEDIA_URL.format(
+                    id=tweet[0], token=tweet_token(tweet[0])))
+                media = json.loads(r.text)
+            except Exception as e:
+                print(f"  tweet media failed {target}: {e}", file=sys.stderr)
+                continue
+            media_path.write_text(json.dumps(media, indent=2, ensure_ascii=False),
+                                  encoding="utf-8")
+            n += 1
+            time.sleep(delay / 4)
     return n
+
+
+def tweet_media_urls(media: dict) -> list:
+    """The files to archive for a tweet's syndication payload: each
+    photo (the default size X serves, 1200 px wide, is past the width
+    the themes render) and a video's or animated gif's poster frame
+    (the clip itself lives on X's CDN under changing URLs)."""
+    urls = []
+    for m in media.get("mediaDetails") or []:
+        url = m.get("media_url_https")
+        if url and url not in urls:
+            urls.append(url)
+    return urls
 
 
 def carbon_snippet(page_html: str) -> dict | None:
@@ -240,15 +301,25 @@ def fetch_carbon(session, page_text: str, mid: str, dest: Path,
     return n
 
 
-def embed_asset_urls(page_text: str, mid: str) -> list:
+def embed_asset_urls(page_text: str, mid: str, dest: Path | None = None) -> list:
     """Media files behind the page's embeds that the archive can hold
-    itself -- Giphy gifs and mp4s -- so convert can serve them as local
-    images and videos instead of a link to a third party."""
+    itself -- Giphy gifs and mp4s, and the photos of tweets whose
+    syndication payload is archived under dest/media/ -- so convert can
+    serve them as local images and videos instead of a link to a third
+    party."""
     urls = []
     for target, _ in state_embed_targets(page_text, mid):
         media = giphy_media(target)
         if media and media not in urls:
             urls.append(media)
+        tweet = tweet_id(target)
+        media_path = dest / "media" / f"tweet-{tweet[0]}.media.json" if tweet and dest else None
+        if media_path and media_path.is_file():
+            try:
+                payload = json.loads(media_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            urls.extend(u for u in tweet_media_urls(payload) if u not in urls)
     return urls
 
 
@@ -297,7 +368,7 @@ def backfill_embed_assets(session, page_text: str, mid: str, dest: Path,
             img_map = json.loads(map_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             return 0
-    missing = [u for u in embed_asset_urls(page_text, mid) if u not in img_map]
+    missing = [u for u in embed_asset_urls(page_text, mid, dest) if u not in img_map]
     if not missing:
         return 0
     n = fetch_images(session, missing, dest / "images", img_map, delay,
@@ -327,7 +398,7 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
         srcs += [u for u in state_image_urls(r.text, medium_id(url) or "")
                  if u not in srcs]
         # the media files behind embeds (Giphy), served locally by convert
-        srcs += [u for u in embed_asset_urls(r.text, medium_id(url) or "")
+        srcs += [u for u in embed_asset_urls(r.text, medium_id(url) or "", dest)
                  if u not in srcs]
         fetch_images(session, srcs, img_dir, img_map, delay)
         (dest / "images.json").write_text(json.dumps(img_map, indent=2))

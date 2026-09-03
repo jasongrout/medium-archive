@@ -269,12 +269,34 @@ GIST_SRC_RE = re.compile(
 REF_SRC_RE = re.compile(r"[?&]ref_src=[^&#]*")
 
 
-def tweet_html(payload: dict, url: str) -> str:
+PIC_LINK_RE = re.compile(r"^pic\.(?:twitter|x)\.com/")
+
+
+def tweet_pictures(media: dict, url: str) -> str:
+    """The tweet's photos as <img> tags, and a video's or animated
+    gif's poster frame linked to the tweet, from its syndication
+    payload (fetch_tweets); "" without one. The URLs are the ones fetch
+    archived with the post's images, so to_markdown localizes them."""
+    parts = []
+    for m in (media or {}).get("mediaDetails") or []:
+        src = m.get("media_url_https")
+        if not src:
+            continue
+        if m.get("type") == "photo":
+            parts.append(f'<img src="{escape(src, quote=True)}" alt="">')
+        else:
+            parts.append(f'<a href="{escape(url, quote=True)}">'
+                         f'<img src="{escape(src, quote=True)}" alt="Video"></a>')
+    return "".join(f"<p>{p}</p>" for p in parts)
+
+
+def tweet_html(payload: dict, url: str, media: dict | None = None) -> str:
     """An archived tweet (its oEmbed payload) as the blockquote convert
-    writes: the tweet's text with its links, then an attribution line
-    naming the author and dating the tweet, both linked. Plain
-    Markdown once converted, so every generator renders it, and it
-    outlives the tweet."""
+    writes: the tweet's text with its links, its pictures when their
+    syndication payload is archived (the pic.twitter.com link they
+    stood behind goes), then an attribution line naming the author and
+    dating the tweet, both linked. Plain Markdown once converted, so
+    every generator renders it, and it outlives the tweet."""
     soup = BeautifulSoup(payload.get("html") or "", "html.parser")
     quote = soup.find("blockquote")
     text = quote.find("p") if quote else None
@@ -282,7 +304,14 @@ def tweet_html(payload: dict, url: str) -> str:
     for a in (quote.find_all("a") if quote else []):
         if tweet_id(a.get("href") or ""):
             date = a.get_text(strip=True)
+    pictures = tweet_pictures(media, payload.get("url") or url)
     for a in (text.find_all("a") if text else []):
+        if pictures and PIC_LINK_RE.match(a.get_text(strip=True)):
+            prev = a.previous_sibling
+            a.decompose()
+            if isinstance(prev, str) and not prev.strip():
+                prev.extract()
+            continue
         a["href"] = REF_SRC_RE.sub("", a.get("href") or "")
     author = payload.get("author_name") or ""
     author_url = payload.get("author_url") or ""
@@ -292,9 +321,9 @@ def tweet_html(payload: dict, url: str) -> str:
     by = f'<a href="{escape(author_url, quote=True)}">{escape(who)}</a>' \
         if author_url else escape(who)
     when = f'<a href="{escape(link, quote=True)}">{escape(date or "tweet")}</a>'
-    body = "".join(str(c) for c in text.contents) if text else ""
-    return (f"<blockquote><p>{body}</p><p>\u2014 {by}, {when}</p></blockquote>"
-            if body else f"<blockquote><p>\u2014 {by}, {when}</p></blockquote>")
+    body = "".join(str(c) for c in text.contents).strip() if text else ""
+    return ("<blockquote>" + (f"<p>{body}</p>" if body else "") + pictures
+            + f"<p>\u2014 {by}, {when}</p></blockquote>")
 
 
 def _archived_tweet(media: dict, url: str) -> str | None:
@@ -302,7 +331,9 @@ def _archived_tweet(media: dict, url: str) -> str | None:
     (raw/media/tweet-<id>.json), else None."""
     tweet = tweet_id(url)
     entry = media.get(f"tweet:{tweet[0]}") if tweet else None
-    return tweet_html(entry["tweet"], url) if entry and entry.get("tweet") else None
+    if not entry or not entry.get("tweet"):
+        return None
+    return tweet_html(entry["tweet"], url, entry.get("media"))
 
 
 # Carbon names a snippet's language by its CodeMirror mode, often a MIME
@@ -391,6 +422,24 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     # below, a <video> for an mp4 (the clip loops like the gif it stands
     # for). Giphy's titles are its page titles ("... GIF by X - Find &
     # Share on GIPHY"); the descriptive part becomes the alt text.
+    # Export and Ghost bodies embed a tweet as Twitter's widget markup: a
+    # <blockquote class="twitter-tweet"> holding only a link to the
+    # tweet, for widgets.js to fill in. Nothing to keep but the target,
+    # so it takes the iframe path below (a quote that already carries
+    # the tweet's text, as a Ghost capture can, is left as it is).
+    for quote in body.find_all("blockquote", class_="twitter-tweet"):
+        link = next((a.get("href") for a in quote.find_all("a")
+                     if tweet_id(a.get("href") or "")), None)
+        if link and not quote.get_text(strip=True):
+            quote.replace_with(doc.new_tag("iframe", src=link))
+
+    # An archived tweet becomes its quote here, ahead of the image pass,
+    # so the photos the quote carries are localized with the post's images.
+    for iframe in body.find_all("iframe"):
+        tweet = _archived_tweet(media or {}, iframe.get("src") or "")
+        if tweet:
+            iframe.replace_with(BeautifulSoup(tweet, "html.parser"))
+
     for iframe in body.find_all("iframe"):
         asset = giphy_media(iframe.get("src") or iframe.get("data-src") or "")
         if not asset:
@@ -485,17 +534,6 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
             script.replace_with(doc.new_tag("a", href=url,
                                             string=f"embed: {url}"))
 
-    # Export and Ghost bodies embed a tweet as Twitter's widget markup: a
-    # <blockquote class="twitter-tweet"> holding only a link to the
-    # tweet, for widgets.js to fill in. Nothing to keep but the target,
-    # so it takes the iframe path below (a quote that already carries
-    # the tweet's text, as a Ghost capture can, is left as it is).
-    for quote in body.find_all("blockquote", class_="twitter-tweet"):
-        link = next((a.get("href") for a in quote.find_all("a")
-                     if tweet_id(a.get("href") or "")), None)
-        if link and not quote.get_text(strip=True):
-            quote.replace_with(doc.new_tag("iframe", src=link))
-
     # A YouTube iframe stays an iframe: the archive has its URL, and the
     # player is the content, so it is written as one (_Converter renders
     # it; the exporters render or rewrite that one form), as is a
@@ -508,7 +546,6 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
         video = youtube_video(src) if src else None
-        tweet = _archived_tweet(media or {}, src) if src else None
         code = _archived_carbon(media or {}, src) if src else None
         player = provider_embed(src, iframe.get("data-embed") or "") if src else None
         if code:                         # the snippet itself beats its screenshot
@@ -519,8 +556,6 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         elif video:                        # always the 16:9 default size
             iframe.attrs = {"src": youtube_embed_url(*video),
                             "title": iframe.get("title") or ""}
-        elif tweet:
-            iframe.replace_with(BeautifulSoup(tweet, "html.parser"))
         elif player:
             iframe.attrs = {"src": player, "title": iframe.get("title") or "",
                             "width": iframe.get("width"), "height": iframe.get("height")}
@@ -582,9 +617,12 @@ def load_media(raw: Path, fixups: dict = None) -> dict:
     for p in sorted(media_dir.glob("*.json")):
         if p.name.endswith(".gist.json"):
             continue
-        if p.name.startswith("tweet-"):       # a tweet's oEmbed payload
-            media[f"tweet:{p.stem[len('tweet-'):]}"] = {
-                "tweet": json.loads(read_raw(p, fixups))}
+        if p.name.startswith("tweet-"):       # a tweet's oEmbed payload, and
+            # the syndication payload naming its photos (fetch_tweets)
+            tid, kind = p.name[len("tweet-"):-len(".json")], "tweet"
+            if tid.endswith(".media"):
+                tid, kind = tid[:-len(".media")], "media"
+            media.setdefault(f"tweet:{tid}", {})[kind] = json.loads(read_raw(p, fixups))
             continue
         if p.name.startswith("carbon-"):      # a Carbon snippet
             media[f"carbon:{p.stem[len('carbon-'):]}"] = {

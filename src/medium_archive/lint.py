@@ -63,10 +63,10 @@ EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
 TWEET_QUOTE_RE = re.compile(
     r"^> .*\]\(https?://(?:www\.|mobile\.)?(?:twitter|x)\.com/[^/)]+/status/\d+\)\s*$")
 
-# a Giphy embed whose file the fetch step has not archived yet: the
-# image or clip still points at Giphy (--embeds)
+# a Giphy embed or a tweet's photo whose file the fetch step has not
+# archived yet: the image or clip still points at the provider (--embeds)
 REMOTE_EMBED_ASSET_RE = re.compile(
-    r'(?:!\[[^\]]*\]\(|<video src=")(https?://[^)"]*giphy\.com/[^)"]*)')
+    r'(?:!\[[^\]]*\]\(|<video src=")(https?://[^)"]*(?:giphy\.com|pbs\.twimg\.com)/[^)"]*)')
 
 FENCE_RE = re.compile(r"^`{3,}")
 
@@ -144,7 +144,7 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
         links.extend(m.group(1) for m in EMBED_LINK_RE.finditer(line))
         players += bool(IFRAME_RE.match(line) or TWEET_QUOTE_RE.match(line))
         for m in REMOTE_EMBED_ASSET_RE.finditer(line):
-            problems.append(f"embed media not archived, served from Giphy: "
+            problems.append(f"embed media not archived, served remotely: "
                             f"{m.group(1)[:100]} (re-run fetch; "
                             "`fetch --urls` takes this post's name)")
     for url in links:

@@ -116,7 +116,20 @@ and the offline test suite.
   stays the `[embed: url]` link, which `lint --embeds` names as an
   unarchived tweet; the quote of an archived one counts as content
   (`TWEET_QUOTE_RE`, the attribution line's dated status link).
-  Photos in a tweet arrive only as their `pic.twitter.com` link.
+  A tweet's photos come from X's syndication endpoint
+  (`cdn.syndication.twimg.com/tweet-result`, the one static tweet
+  renderers read; unauthenticated, keyed by react-tweet's token
+  derivation from the id, `tweet_token`, checked live 2026-09):
+  `fetch_tweets` archives that payload as `tweet-<id>.media.json`
+  for a tweet whose oEmbed html links a picture, `embed_asset_urls`
+  adds each photo (X's default 1200 px size, past what the themes
+  render) and each video's poster
+  frame to the post's image download, and `tweet_pictures` puts them
+  in the quote, the photos as images and a poster linked to the
+  tweet, dropping the `pic.twitter.com` link they stood behind. The
+  archived tweet is swapped in ahead of the image pass so those
+  images localize like the rest. A video itself is not archived: its
+  mp4 lives on X's CDN under changing URLs.
 - **Known providers' players stay iframes.** For an embed whose
   content is a player with nothing to archive, the editor state
   carries the provider's own embed URL (the embedly wrapper's `src=`)

@@ -266,3 +266,49 @@ def test_fetch_media_archives_carbon_snippets(tmp_path):
     assert session.calls == [embed]
     # a page without the snippet data archives nothing
     assert fetchmod.carbon_snippet("<html>gone</html>") is None
+
+
+SYNDICATION = {"id_str": "12345", "text": "Hello pic", "mediaDetails": [
+        {"type": "photo", "media_url_https": "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg",
+         "url": "https://t.co/BSxjRlMomu"},
+        {"type": "video", "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/abc.jpg",
+         "url": "https://t.co/vid"}],
+    "photos": [{"url": "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg", "width": 2048, "height": 1537}]}
+
+
+def test_tweet_token_matches_react_tweet():
+    # the value the live endpoint accepted for this id
+    assert fetchmod.tweet_token("753714190599151616") == "1trv2egapj3oifu"
+
+
+def test_fetch_media_archives_a_tweets_pictures(tmp_path):
+    mid = "111122223333"
+    oembed = fetchmod.TWEET_OEMBED_URL.format(url="https://twitter.com/ann/status/12345")
+    synd = fetchmod.TWEET_MEDIA_URL.format(id="12345", token=fetchmod.tweet_token("12345"))
+    with_pic = {"author_name": "Ann", "html": '<blockquote><p>Hello <a href="https://t.co/x">'
+                'pic.twitter.com/x</a></p></blockquote>'}
+    def router(url):
+        if url == oembed:
+            return FakeResp(json.dumps(with_pic))
+        if url == synd:
+            return FakeResp(json.dumps(SYNDICATION))
+        raise AssertionError(url)
+    session = FakeSession(router=router)
+    dest = tmp_path / mid
+    # the oEmbed payload and, since it links a picture, the syndication one
+    assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest, 0) == 2
+    assert json.loads((dest / "media" / "tweet-12345.media.json").read_text())["photos"]
+    assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest, 0) == 0
+    assert session.calls == [oembed, synd]
+    # the photo (full size) and the video's poster join the post's images
+    assert fetchmod.embed_asset_urls(tweet_page(mid), mid, dest) == [
+        "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg",
+        "https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/abc.jpg"]
+    assert fetchmod.embed_asset_urls(tweet_page(mid), mid, None) == []
+    # a tweet without a picture never touches the syndication endpoint
+    plain = {"author_name": "Ann", "html": "<blockquote><p>Hello</p></blockquote>"}
+    session = FakeSession(router=lambda url: FakeResp(json.dumps(plain)) if url == oembed
+                          else (_ for _ in ()).throw(AssertionError(url)))
+    dest2 = tmp_path / "two" / mid
+    assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest2, 0) == 1
+    assert not (dest2 / "media" / "tweet-12345.media.json").exists()

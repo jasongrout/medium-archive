@@ -518,9 +518,14 @@ no longer lists, work through the steps in order:
   X's public endpoint into `raw/<id>/media/tweet-<tweet id>.json` (a
   re-run backfills older posts; a deleted tweet is reported and stays
   a link), and `convert` renders it as a blockquote: the text with its
-  links, then the author and a dated link to the tweet. The account
-  export's widget markup, a blockquote holding only the tweet's link,
-  takes the same path instead of converting to nothing. Embeds from a
+  links, then the author and a dated link to the tweet. For a tweet
+  with pictures, `fetch` also archives X's syndication payload
+  (`tweet-<id>.media.json`), which names the photos, and downloads
+  them with the post's images; the quote then carries the photos
+  (and a video's poster, linked to the tweet) in place of the
+  `pic.twitter.com` link. The account export's widget markup, a
+  blockquote holding only the tweet's link, takes the same path
+  instead of converting to nothing. Embeds from a
   few providers whose content is a player with nothing to archive (a
   Carbon code screenshot, Vimeo, CodePen, Spotify, SoundCloud) stay
   iframes on the provider's own embed URL,

@@ -706,3 +706,55 @@ def test_load_media_reads_carbon_snippets(tmp_path):
     (tmp_path / "media" / "carbon-abc").with_suffix(".json").write_text(
         json.dumps({"language": "python", "code": "x = 1"}))
     assert load_media(tmp_path) == {"carbon:abc": {"carbon": {"language": "python", "code": "x = 1"}}}
+
+
+SYNDICATION = {"id_str": "12345", "text": "Hello pic", "mediaDetails": [
+        {"type": "photo", "media_url_https": "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg",
+         "url": "https://t.co/BSxjRlMomu"},
+        {"type": "video", "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/abc.jpg",
+         "url": "https://t.co/vid"}],
+    "photos": [{"url": "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg", "width": 2048, "height": 1537}]}
+
+
+def test_tweet_pictures_join_the_quote_localized(tmp_path):
+    # with the syndication payload archived, the pic.twitter.com link
+    # goes and the photo (fetched with the post's images) and the
+    # video's poster, linked to the tweet, follow the text in the quote
+    photo = "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg"
+    poster = "https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/abc.jpg"
+    raw = tmp_path / "raw"
+    (raw / "images").mkdir(parents=True)
+    (raw / "images" / "003-CnW7DC6VUAE7NaZ.jpg").write_bytes(b"jpg")
+    (raw / "images" / "004-abc.jpg").write_bytes(b"jpg")
+    img_map = {photo: "003-CnW7DC6VUAE7NaZ.jpg", poster: "004-abc.jpg"}
+    oembed = dict(OEMBED, html='<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Hello '
+                  '<a href="https://t.co/BSxjRlMomu">pic.twitter.com/BSxjRlMomu</a></p>&mdash; '
+                  'Ann Author (@ann) <a href="https://twitter.com/ann/status/12345">May 1, 2020</a>'
+                  '</blockquote>')
+    media = {"tweet:12345": {"tweet": oembed, "media": SYNDICATION}}
+    out = tmp_path / "post"
+    out.mkdir()
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, used = to_markdown(body, URL, img_map, raw, out, media=media)
+    assert md == ("> Hello\n>\n> ![](images/003-CnW7DC6VUAE7NaZ.jpg)\n>\n"
+                  "> [![Video](images/004-abc.jpg)](https://twitter.com/ann/status/12345)\n>\n"
+                  "> \u2014 [Ann Author (@ann)](https://twitter.com/ann), "
+                  "[May 1, 2020](https://twitter.com/ann/status/12345)\n")
+    assert used == ["images/003-CnW7DC6VUAE7NaZ.jpg", "images/004-abc.jpg"]
+    # not fetched yet: the photo is served from X, which lint reports
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, raw, out, media=media)
+    assert f"> ![]({photo})" in md
+    # without the syndication payload the pic link stays, as before
+    media = {"tweet:12345": {"tweet": oembed}}
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, raw, out, media=media)
+    assert "> Hello [pic.twitter.com/BSxjRlMomu](https://t.co/BSxjRlMomu)" in md
+
+
+def test_load_media_pairs_a_tweet_with_its_media(tmp_path):
+    from medium_archive.convert import load_media
+    (tmp_path / "media").mkdir()
+    (tmp_path / "media" / "tweet-12345.json").write_text(json.dumps({"a": 1}))
+    (tmp_path / "media" / "tweet-12345.media.json").write_text(json.dumps({"b": 2}))
+    assert load_media(tmp_path) == {"tweet:12345": {"tweet": {"a": 1}, "media": {"b": 2}}}

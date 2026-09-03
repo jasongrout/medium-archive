@@ -242,8 +242,8 @@ def test_giphy_embed_is_an_asset_not_a_link(tmp_path):
                    front=front, name="2020-01-02-remote")
     errors, _ = lint_post(d, embeds=True, raw_root=raw)
     tail = " (re-run fetch; `fetch --urls` takes this post's name)"
-    assert errors == [f"embed media not archived, served from Giphy: {gif}{tail}",
-                      f"embed media not archived, served from Giphy: {mp4}{tail}"]
+    assert errors == [f"embed media not archived, served remotely: {gif}{tail}",
+                      f"embed media not archived, served remotely: {mp4}{tail}"]
 
 
 def test_archived_tweet_quote_is_content(tmp_path):
@@ -306,3 +306,12 @@ def test_provider_link_is_not_a_dropped_embed(tmp_path):
     d = write_post(tmp_path, "x\n" * 100 + "[Ep. 248](https://art19.com/shows/lc/episodes/ce2c)\n",
                    front={**FRONT, "medium_id": MID, "body_source": "state"})
     assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_unfetched_tweet_photo_is_reported(tmp_path):
+    d = write_post(tmp_path, "x\n" * 100 +
+                   "> ![](https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg)\n")
+    errors, _ = lint_post(d, embeds=True)
+    assert errors == ["embed media not archived, served remotely: "
+                      "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg "
+                      "(re-run fetch; `fetch --urls` takes this post's name)"]
