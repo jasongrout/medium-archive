@@ -129,7 +129,14 @@ and the offline test suite.
   tweet, dropping the `pic.twitter.com` link they stood behind. The
   archived tweet is swapped in ahead of the image pass so those
   images localize like the rest. A video itself is not archived: its
-  mp4 lives on X's CDN under changing URLs.
+  mp4 lives on X's CDN under changing URLs. A deleted tweet (404 from
+  the oEmbed endpoint) is recorded in `tweet-<id>.json` as
+  `{"deleted": true, "url", "status", "checked_at"}` rather than left
+  to be asked about on every run: convert writes a link saying the
+  tweet is no longer available, and lint treats the record as the
+  embed's content. Deleting the file asks again; a hand-written
+  oEmbed-shaped payload (text recovered from a Wayback capture, say)
+  replaces the record with a real quote.
 - **Known providers' players stay iframes.** For an embed whose
   content is a player with nothing to archive, the editor state
   carries the provider's own embed URL (the embedly wrapper's `src=`)

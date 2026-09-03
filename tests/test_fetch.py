@@ -229,11 +229,6 @@ def test_fetch_media_archives_tweets(tmp_path):
     assert json.loads((dest / "media" / "tweet-12345.json").read_text()) == {"author_name": "Ann"}
     assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest, 0) == 0
     assert session.calls == [oembed]
-    # a deleted tweet: the endpoint's 404 is reported, nothing written
-    gone = FakeSession(router=lambda url: FakeResp("", status=404))
-    (dest / "media" / "tweet-12345.json").unlink()
-    assert fetchmod.fetch_media(gone, tweet_page(mid), mid, dest, 0) == 0
-    assert not (dest / "media" / "tweet-12345.json").exists()
 
 
 CARBON_PAGE = '<html><body><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"snippet":{"userId":"u","createdAt":1627625663,"language":"python","code":"class ExampleWidget(DOMWidget):\\n    value = 1","id":"PaDDn2ZszZUVmuhvRP52"}},"__N_SSP":true},"page":"/embed/[id]"}</script></body></html>'
@@ -312,3 +307,19 @@ def test_fetch_media_archives_a_tweets_pictures(tmp_path):
     dest2 = tmp_path / "two" / mid
     assert fetchmod.fetch_media(session, tweet_page(mid), mid, dest2, 0) == 1
     assert not (dest2 / "media" / "tweet-12345.media.json").exists()
+
+
+def test_deleted_tweet_is_recorded(tmp_path):
+    mid = "111122223333"
+    gone = FakeSession(router=lambda url: FakeResp("", status=404))
+    dest = tmp_path / mid
+    assert fetchmod.fetch_media(gone, tweet_page(mid), mid, dest, 0) == 1
+    record = json.loads((dest / "media" / "tweet-12345.json").read_text())
+    assert record["deleted"] is True and record["status"] == 404
+    assert record["url"] == "https://twitter.com/ann/status/12345"
+    # recorded: not asked again; any other failure records nothing
+    assert fetchmod.fetch_media(gone, tweet_page(mid), mid, dest, 0) == 0
+    broken = FakeSession(router=lambda url: FakeResp("", status=503))
+    dest2 = tmp_path / "two" / mid
+    assert fetchmod.fetch_media(broken, tweet_page(mid), mid, dest2, 0) == 0
+    assert not (dest2 / "media").exists()

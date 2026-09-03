@@ -526,7 +526,12 @@ no longer lists, work through the steps in order:
   (`tweet-<id>.media.json`), which names the photos, and downloads
   them with the post's images; the quote then carries the photos
   (and a video's poster, linked to the tweet) in place of the
-  `pic.twitter.com` link. The account export's widget markup, a
+  `pic.twitter.com` link. A tweet X no longer serves is recorded in
+  the same file (`{"deleted": true, ...}`, written when the endpoint
+  answers 404), converts to a link saying the tweet is no longer
+  available, and satisfies `lint --embeds`; delete the file to ask X
+  again, or replace it with a hand-written payload of the oEmbed shape
+  when the text is recovered elsewhere. The account export's widget markup, a
   blockquote holding only the tweet's link, takes the same path
   instead of converting to nothing. Embeds from a
   few providers whose content is a player with nothing to archive (a

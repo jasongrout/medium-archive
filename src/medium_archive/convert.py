@@ -333,6 +333,12 @@ def _archived_tweet(media: dict, url: str) -> str | None:
     entry = media.get(f"tweet:{tweet[0]}") if tweet else None
     if not entry or not entry.get("tweet"):
         return None
+    if entry["tweet"].get("deleted"):
+        # recorded by fetch when X answered 404: a link that says so,
+        # rather than an embed lint keeps asking about
+        who = f"@{tweet[1]}" if tweet[1] else "X"
+        return (f'<p><a href="{escape(url, quote=True)}">A tweet by {who}, '
+                "no longer available</a></p>")
     return tweet_html(entry["tweet"], url, entry.get("media"))
 
 

@@ -161,17 +161,24 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
         return problems
     from .state import state_embed_targets     # sites imports this module
     # a Giphy embed converts to an image or clip, archived or not, an
-    # archived Carbon snippet to a code block, and an embed from a
-    # provider that refuses framing to a titled link, so none is among
-    # the embed links a body source could have dropped
+    # archived Carbon snippet to a code block, an archived tweet to a
+    # quote (or, recorded deleted, to a link saying so), and an embed
+    # from a provider that refuses framing to a titled link, so none is
+    # among the embed links a body source could have dropped
     from .convert import provider_link
+    def archived(kind, ident):
+        return (page.parent / "media" / f"{kind}-{ident}.json").is_file()
     def archived_carbon(url):
         cid = carbon_id(url)
-        return cid and (page.parent / "media" / f"carbon-{cid}.json").is_file()
+        return cid and archived("carbon", cid)
+    def archived_tweet(url):
+        # a quote, or the link fetch's record of a deleted tweet becomes
+        tweet = tweet_id(url)
+        return tweet and archived("tweet", tweet[0])
     expected = [t for t in state_embed_targets(
         page.read_text(encoding="utf-8", errors="replace"), front["medium_id"])
         if not giphy_media(t[0]) and not archived_carbon(t[0])
-        and not provider_link(t[0])]
+        and not archived_tweet(t[0]) and not provider_link(t[0])]
     # the state's targets and the body's links name one embed in different
     # forms (a canonical page vs an embed URL), so they are compared by
     # count: fewer links and players than the state has embeds means the

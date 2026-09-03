@@ -758,3 +758,10 @@ def test_load_media_pairs_a_tweet_with_its_media(tmp_path):
     (tmp_path / "media" / "tweet-12345.json").write_text(json.dumps({"a": 1}))
     (tmp_path / "media" / "tweet-12345.media.json").write_text(json.dumps({"b": 2}))
     assert load_media(tmp_path) == {"tweet:12345": {"tweet": {"a": 1}, "media": {"b": 2}}}
+
+
+def test_deleted_tweet_becomes_a_link_that_says_so():
+    media = {"tweet:12345": {"tweet": {"deleted": True, "status": 404, "url": TWEET}}}
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == f"[A tweet by @ann, no longer available]({TWEET})\n"

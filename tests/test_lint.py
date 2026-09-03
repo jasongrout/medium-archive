@@ -315,3 +315,20 @@ def test_unfetched_tweet_photo_is_reported(tmp_path):
     assert errors == ["embed media not archived, served remotely: "
                       "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg "
                       "(re-run fetch; `fetch --urls` takes this post's name)"]
+
+
+def test_recorded_deleted_tweet_is_not_an_unfilled_embed(tmp_path):
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Ftwitter.com%2Fann%2Fstatus%2F12345"}
+    raw = tmp_path / "raw"
+    (raw / MID / "media").mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    (raw / MID / "media" / "tweet-12345.json").write_text('{"deleted": true}')
+    d = write_post(tmp_path, "x\n" * 100 +
+                   "[A tweet by @ann, no longer available](https://twitter.com/ann/status/12345)\n",
+                   front={**FRONT, "medium_id": MID, "body_source": "state"})
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])

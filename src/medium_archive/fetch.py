@@ -203,8 +203,10 @@ def fetch_tweets(session, page_text: str, mid: str, dest: Path,
     """The oEmbed payload of every tweet the page's embeds target, into
     dest/media/tweet-<id>.json, and for a tweet with a picture or video
     also the syndication payload naming the media files, into
-    tweet-<id>.media.json; a deleted tweet (the endpoint answers 404)
-    is reported and stays a link. Incremental."""
+    tweet-<id>.media.json. A tweet X no longer serves (the endpoint
+    answers 404) is recorded in the same file as {"deleted": true, ...},
+    so the archive knows and convert can say so; delete that file to
+    ask again. Incremental."""
     n = 0
     for target, _ in state_embed_targets(page_text, mid):
         tweet = tweet_id(target)
@@ -222,8 +224,14 @@ def fetch_tweets(session, page_text: str, mid: str, dest: Path,
                 r = fetch(session, TWEET_OEMBED_URL.format(url=target))
                 payload = json.loads(r.text)
             except Exception as e:
-                print(f"  tweet failed {target}: {e}", file=sys.stderr)
-                continue
+                status = getattr(getattr(e, "response", None), "status_code", None)
+                if status != 404:
+                    print(f"  tweet failed {target}: {e}", file=sys.stderr)
+                    continue
+                payload = {"deleted": True, "url": target, "status": 404,
+                           "checked_at": datetime.now(timezone.utc)
+                           .strftime("%Y-%m-%dT%H:%M:%SZ")}
+                print(f"  tweet gone (404), recorded: {target}", file=sys.stderr)
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
                             encoding="utf-8")
