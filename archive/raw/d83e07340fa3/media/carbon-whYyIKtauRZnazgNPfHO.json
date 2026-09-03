@@ -1,0 +1,11 @@
+{
+  "userId": "pMTzMjtJ0FhiZ6jLnRCsqojQRX12",
+  "createdAt": 1627543635,
+  "name": "color added to example.py",
+  "backgroundColor": "rgba(255,255,255,1)",
+  "dropShadow": false,
+  "language": "javascript",
+  "code": "import ColorPicker from './ColorPicker';\n...\nfunction ReactWidget(props: WidgetProps) {\n  return <ColorPicker />;\n}",
+  "updatedAt": 1627544194,
+  "id": "whYyIKtauRZnazgNPfHO"
+}
