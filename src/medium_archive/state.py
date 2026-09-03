@@ -106,6 +106,29 @@ def state_media_resources(text: str, medium_id: str) -> dict:
     return out
 
 
+def state_embed_targets(text: str, medium_id: str) -> list:
+    """(target URL, title) of every IFRAME paragraph the page's state
+    resolves to a target -- the embeds that convert renders as
+    `[embed: url]` links from any body source. Embeds the state cannot
+    resolve (gists; see state_media_resources) are not included. Empty
+    when the page carries no usable state."""
+    if '"IFRAME"' not in text:
+        return []
+    state = apollo_post_state(text, medium_id)
+    if not state:
+        return []
+    post = state.get(f"Post:{medium_id}") or {}
+    out = []
+    for p in _paragraphs(state, post):
+        if p.get("type") != "IFRAME":
+            continue
+        src = _iframe_src(state, p)
+        if src:
+            media = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
+            out.append((src, media.get("title") or ""))
+    return out
+
+
 def state_metadata(state: dict, medium_id: str) -> dict:
     """Front-matter fields from the state; same shape as extract_metadata."""
     post = state[f"Post:{medium_id}"]

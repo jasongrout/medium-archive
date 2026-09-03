@@ -73,7 +73,13 @@ feature set. The myst site is a simpler alternate. See
 leftover Medium chrome, unclosed code fences, images referenced but
 missing on disk, remote Medium CDN images, embeds whose media was never
 archived. It exits non-zero when a defect is found, so regressions
-surface on every convert instead of waiting for a reader.
+surface on every convert instead of waiting for a reader. `lint
+--embeds` also fails on every embed whose content the archive does not
+carry: one still rendered as the bare `[embed: url]` link an iframe
+becomes (the sites show that link, not the video or tweet), and one
+the post's body source dropped while the page's editor state still
+carries it. Those are the posts that need hand work, so a CI job
+running `lint --embeds` stays red until each is fixed.
 
 **`stats`** summarizes the converted archive: posts per year, provenance
 (how each post was discovered, which sources were recovered for it, and
@@ -493,8 +499,11 @@ no longer lists, work through the steps in order:
   (from export and Ghost bodies, which name it) or a
   `[missing embed: <name>]` placeholder (from the state, which does
   not). `lint` flags the placeholders until a `fetch` re-run backfills
-  the media. Code fences carry the language Medium recorded for the
-  block (`codeBlockMetadata`), and user mentions resolve to the author's
+  the media. An RSS feed body renders a gist as an iframe with no
+  source at all; that converts to the same placeholder, and only a
+  fixup that puts the gist's `<script src>` back restores it. Code
+  fences carry the language Medium recorded for the block
+  (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.
 * A post's `description` is its summary and nothing else. Medium writes
   the summary it puts in JSON-LD and `<meta name="description">` as

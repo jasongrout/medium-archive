@@ -331,3 +331,20 @@ def test_convert_post_inlines_gist_from_media(tmp_path):
     convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
     out = (tmp_path / "posts" / "2019-12-29-my-post" / "index.md").read_text()
     assert "```python\nprint(1)\n```" in out
+
+
+def test_state_embed_targets_lists_resolvable_embeds_only():
+    from medium_archive.state import state_embed_targets
+    p = para(0, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m1"}})
+    state = gist_state()                      # m1: a gist, no target
+    state["Paragraph:v_2"] = {**p, "id": "v_2",
+                              "iframe": {"mediaResource": {"__ref": "MediaResource:m2"}}}
+    state[f"Post:{MID}"]['content({"postMeteringOptions":null})']["bodyModel"][
+        "paragraphs"].append({"__ref": "Paragraph:v_2"})
+    state["MediaResource:m2"] = {
+        "id": "def456", "title": "A talk",
+        "iframeSrc": "https://cdn.embedly.com/widgets/media.html"
+                     "?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabc"}
+    assert state_embed_targets(shell_html(state), MID) == [
+        ("https://www.youtube.com/watch?v=abc", "A talk")]
+    assert state_embed_targets("<html>no state</html>", MID) == []

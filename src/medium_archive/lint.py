@@ -6,6 +6,17 @@ the conversion surface on every run instead of waiting for a reader.
 Exits non-zero when a defect (not a warning) is found, so it can gate
 scripts the way compare does.
 
+`--embeds` adds, as problems, every embed whose content the archive
+does not carry: one that converted to a bare `[embed: url]` link (the
+sites render the link, not the video, tweet or gist it stood for, so
+the post is missing content until the embed is replaced by hand), and
+one the post's body source dropped altogether while the page's editor
+state still carries it (an export or feed body that lost an embed).
+Neither is a conversion defect, and both are what a post looks like
+until someone fixes it, so they are asked for rather than reported on
+every run; a CI job that runs `lint --embeds` fails until every post
+is fixed.
+
 `--seo` adds the page analysis WordPress's SEO plugins run on every
 post, as warnings: a description that is missing or longer than a
 search result shows, a title longer than one shows, a body image with
@@ -37,9 +48,13 @@ MEDIUM_CDN_RE = re.compile(
 IMAGE_RE = re.compile(r"!\[[^\]]*\]\((images/[^)]+)\)")
 
 # convert's placeholder for an embed whose content was never archived
-# (a gist embed with no raw/<id>/media/ files); markdownify may escape
-# the bracket
+# (a gist embed with no raw/<id>/media/ files, an iframe with no
+# source); markdownify may escape the bracket
 MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
+
+# the link convert leaves where an iframe stood (--embeds); the href is
+# the embed's target, unescaped
+EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
 
 FENCE_RE = re.compile(r"^`{3,}")
 
@@ -101,9 +116,45 @@ def seo_warnings(front: dict, body: str, post_dir: Path) -> list:
     return warnings
 
 
-def lint_post(post_dir: Path, seo: bool = False) -> tuple[list, list]:
-    """(errors, warnings) for one converted post directory; seo adds
-    the page-analysis warnings (see seo_warnings)."""
+def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
+    """The --embeds problems for one post (see the module docstring).
+    raw_root is the archive's raw/ directory, for the page's editor
+    state; without it, or without a page, only the bare links are
+    reported."""
+    problems = []
+    links = [m.group(1) for line, fenced in prose_lines(body) if not fenced
+             for m in EMBED_LINK_RE.finditer(line)]
+    for url in links:
+        problems.append(f"embed is a bare link, its content is not in the "
+                        f"archive: {url[:100]} (replace it by hand)")
+    page = (raw_root / (front.get("medium_id") or "") / "page.html"
+            if raw_root and front.get("medium_id") else None)
+    if page is None or not page.is_file():
+        return problems
+    from .state import state_embed_targets     # sites imports this module
+    expected = state_embed_targets(page.read_text(encoding="utf-8",
+                                                  errors="replace"),
+                                   front["medium_id"])
+    # the state's targets and the body's links name one embed in different
+    # forms (a canonical page vs an embed URL), so they are compared by
+    # count: fewer links than the state has embeds means the body source
+    # dropped some -- name the state's, since those are what is missing
+    dropped = len(expected) - len(links)
+    if dropped > 0:
+        names = ", ".join(repr(title or url[:60]) for url, title in expected)
+        problems.append(
+            f"body source {front.get('body_source', '?')!r} dropped "
+            f"{dropped} embed(s) the page's editor state carries "
+            f"(state has {len(expected)}: {names}); restore them in a fixup")
+    return problems
+
+
+def lint_post(post_dir: Path, seo: bool = False, embeds: bool = False,
+              raw_root: Path | None = None) -> tuple[list, list]:
+    """(errors, warnings) for one converted post directory; embeds adds
+    the missing-embed-content problems (see embed_problems, which reads
+    the page's editor state under raw_root), seo the page-analysis
+    warnings (see seo_warnings)."""
     errors, warnings = [], []
     text = (post_dir / "index.md").read_text(encoding="utf-8")
     front, body = split_post(text)
@@ -115,7 +166,9 @@ def lint_post(post_dir: Path, seo: bool = False) -> tuple[list, list]:
             errors.append(f"Medium chrome in body: {line.strip()[:80]!r}")
         if not fenced and MISSING_EMBED_RE.search(line):
             errors.append(f"embed content not archived: {line.strip()[:80]!r} "
-                          "(re-run fetch to archive its media)")
+                          "(a gist: re-run fetch for its media; an iframe "
+                          "with no source: the body lost the embed, restore "
+                          "it in a fixup)")
         if not fenced:
             m = MEDIUM_CDN_RE.search(line)
             if m:
@@ -144,6 +197,8 @@ def lint_post(post_dir: Path, seo: bool = False) -> tuple[list, list]:
         warnings.append("empty date")
     if len(body) < 200:
         warnings.append(f"body is only {len(body)} chars")
+    if embeds:
+        errors.extend(embed_problems(front, body, raw_root))
     if seo:
         warnings.extend(seo_warnings(front, body, post_dir))
     return errors, warnings
@@ -171,9 +226,11 @@ def cmd_lint(args):
         sys.exit(f"nothing to lint: no posts under {posts_root} (run convert first)")
     n_err = n_warn = 0
     seo = getattr(args, "seo", False)
+    embeds = getattr(args, "embeds", False)
     titles = {}
     for d in dirs:
-        errors, warnings = lint_post(d, seo=seo)
+        errors, warnings = lint_post(d, seo=seo, embeds=embeds,
+                                     raw_root=args.out / "raw")
         for msg in errors:
             print(f"{d.name}: {msg}")
         for msg in warnings:

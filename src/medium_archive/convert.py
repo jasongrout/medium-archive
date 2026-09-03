@@ -227,9 +227,16 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
             script.replace_with(doc.new_tag("a", href=url,
                                             string=f"embed: {url}"))
 
+    # An iframe with no source is an embed whose content the body never
+    # carried (a feed body renders a gist that way: src="", 0x0). It gets
+    # the same visible placeholder the state conversion uses, which lint
+    # flags -- a link with no target would read as a dangling "embed:".
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
-        iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
+        if src:
+            iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
+        else:
+            iframe.replace_with(doc.new_tag("p", string="[missing embed]"))
 
     # Medium's editor emits things like <strong> </strong> between runs;
     # markdownify drops whitespace-only emphasis, losing the space.

@@ -13,7 +13,9 @@
                    converted posts, ready for `myst start` / `myst build`
     hugo           build a Hugo site in <out>/site-hugo/
     pelican        build a Pelican site in <out>/site-pelican/
-    lint           scan converted posts for conversion-defect signatures (--seo: SEO page analysis)
+    lint           scan converted posts for conversion-defect signatures
+                   (--embeds: embeds whose content the archive lacks;
+                   --seo: SEO page analysis)
     stats          summarize the converted archive
 
 Only `fetch` (and `all`) touches the network; the other steps can be re-run
@@ -304,6 +306,13 @@ def main():
                                  "signatures (leftover Medium chrome, unclosed "
                                  "code fences, missing image files, remote CDN "
                                  "images); exits non-zero if any are found")
+    lint_p.add_argument("--embeds", action="store_true",
+                        help="also report, as problems, every embed whose "
+                             "content is not in the archive: one that "
+                             "converted to a bare [embed: url] link (the "
+                             "sites show the link, not the video, tweet or "
+                             "gist), and one the post's body source dropped "
+                             "that the page's editor state carries")
     lint_p.add_argument("--seo", action="store_true",
                         help="also warn about what an SEO plugin's page "
                              "analysis would: a missing or overlong "
