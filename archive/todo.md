@@ -283,3 +283,64 @@ third being the `Jupyter Games` post that carried `ipycanvas` via
 `"add"`). The Medium tag `canvas` now renames straight to `widgets`,
 which left the `ipycanvas` rename with nothing to match; `convert` said
 so, and it went. 56 tags.
+
+## 4. Share image (site.json `share_image`), not yet chosen
+
+medium-archive's card themes take an optional `"share_image"`: an
+archive-relative raster used as the `og:image` of every page that has
+no cover of its own. That is the listings, the tag and author pages,
+and 73 posts (70 with no image at all, 3 whose only images are svg or
+oversized). Those pages currently share as text-only cards: Facebook
+and LinkedIn show a bare title and blurb, X falls back to its small
+`summary` card. The key is deliberately left unset here.
+
+**Why not just the Jupyter logo.** The natural candidate is a card
+built from the Project Jupyter logo (jupyter/design, `logos/Rectangle
+Logo/rectanglelogo-greytext-orangebody-greymoons`, SVG and PNG; the
+header avatar here is the same set's logo mark). But a site-wide image
+lands on every coverless post alike, and some of those are third-party
+content: guest posts from member companies (the Positron post),
+posts whose canonical points at someone's own blog (the 700 JupyterLab
+extensions post, taletskiy.com). A share of one of those would carry
+the Jupyter logo as if it were the post's picture, which misattributes
+it. A logo card also says nothing about the page it stands in for.
+
+**Format, whatever the choice.** 1200×630 (1.91:1) serves every
+target: Facebook, LinkedIn, Bluesky, Mastodon, Slack and Discord crop
+to that shape, X's large card is 2:1 and trims a few pixels, and
+Google Discover wants at least 1200 px wide. Neither logo file fits
+as-is (the rectangle logo is 3.7:1, the square one 0.86:1); a card has
+to be composed. The themes declare `og:image:width`/`height` from the
+file, so any size works technically.
+
+**Options, in rough order of preference:**
+
+1. *Per-post generated cards.* Have medium-archive render a 1200×630
+   image per coverless post at export: the post title large, the
+   date, and the blog name small in a corner (the logo mark at most,
+   as a masthead). The title is the picture's subject and the blog is
+   plainly the source, which is how GitHub, dev.to and most static
+   sites solve the same problem, and it reads correctly on a guest
+   post. Needs Pillow text rendering with a bundled font; a
+   medium-archive feature, not a file in this repo.
+2. *A publication card.* "Jupyter Blog" as a masthead (wordmark or
+   title text on a plain light field, logo mark small), used as-is.
+   Says "published on the Jupyter Blog", like a newspaper's name on any
+   article, but it is still a Jupyter-branded image on a third-party
+   post. If chosen, pair it with a per-post opt-out in medium-archive:
+   no site-wide image on a post whose canonical points elsewhere
+   (already known from `canonical_url`), and a fixup key to switch it
+   off by hand for guest posts.
+3. *Hand-picked covers via fixups.* 70 of the 73 have no image at all,
+   so this means finding an image for each; realistic for the handful
+   of high-traffic ones only.
+4. *Leave it unset.* Text-only share cards for those pages, as now.
+   Facebook shows nothing where the picture would be; LinkedIn a grey
+   placeholder. Honest, and the least work.
+
+Whichever card is made should go in this repo as `share.png` with
+`"share_image": "share.png"` in `site.json`. The related `"profiles"`
+key (the publication's addresses elsewhere, for the `Organization`'s
+`sameAs`) is also unset; the values would be the GitHub organization
+and the Mastodon account, alongside the X handle already in
+`"twitter"`.
