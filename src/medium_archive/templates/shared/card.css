@@ -172,16 +172,24 @@ a:hover { text-decoration: underline; }
 .post p:has(> img:only-child), .post p:has(> a:only-child > img:only-child),
 .post figure { text-align: center; }
 /* Code names the --mono role, so the font picker's Source choice can
-   put the superfamily's own mono under it. The size is em, so code
-   tracks the reading size of the column it sits in rather than
-   shrinking away from it when a choice sets the article larger; it is
-   stated at all (rather than left to the UA) because a stack ending in
-   the generic `monospace` otherwise triggers the browsers' 13px
-   monospace default. A block has already stepped down once, so the
-   code inside it must not step again. */
+   put the superfamily's own mono under it. The size is stated at all
+   (rather than left to the UA) because a stack ending in the generic
+   `monospace` otherwise triggers the browsers' 13px monospace default.
+   Inline code is em, so it tracks the prose it sits in. A block is
+   not prose but a grid of fixed-width characters, so its size is set
+   by how many columns fit the block: about 80, the terminal width
+   posts were written at, and about what Medium's column held. The
+   size and line height are Medium's own (14px on 1.4; its -0.022em
+   tracking is not taken, so the font's own fit stands). After the
+   column's padding each side, a block holds 688px, and at the 0.6em
+   advance of the mono candidates (0.602 for Menlo and DejaVu) that
+   is 81 columns; a wider column was tried for a few more and read as
+   too wide. An em size would have followed the 20px reading size up
+   to 18px and 66 columns. The code inside a block inherits, so it
+   does not step down again. */
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-family: var(--mono);
-            font-size: .9em; }
+            font-size: .875rem; line-height: 1.4; }
 .post code { background: var(--code-bg); font-family: var(--mono);
              font-size: .9em; }
 .post pre code { font-size: inherit; background: none; }
