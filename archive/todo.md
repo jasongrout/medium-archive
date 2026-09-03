@@ -77,7 +77,7 @@ Status after the 2026-08-23 sessions: all 333 posts convert
 `compare`, `compare --state` and `compare --ghost` results are explained
 below. No required work remains on the conversion itself. The posts
 whose embeds have no content in the archive are listed in section 5;
-the `Lint embeds` workflow fails until those are fixed.
+the `Lint embeds` workflow fails should any come back.
 
 ## 1. Expected compare results
 
@@ -363,8 +363,8 @@ body source can still lose an embed altogether. None
 of that is a conversion defect, so plain `lint` stays quiet about the
 links; `medium-archive lint --embeds` reports every one as a problem
 and exits non-zero. `.github/workflows/lint.yml` runs it on every push
-and pull request, separately from the preview build, and is expected
-to stay red until each post below is fixed by hand. To run it locally:
+and pull request, separately from the preview build, and is red
+whenever a post has an embed without content. To run it locally:
 
 ```sh
 pip install "medium-archive @ git+https://github.com/jasongrout/medium-archive"
@@ -372,32 +372,24 @@ medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
 medium-archive lint --embeds --out .    # one line per embed missing content
 ```
 
-As of 2026-09-03 the run reports 3 problems, all tweets X no longer
-serves:
+As of 2026-09-03 the run reports 0 problems. Fourteen tweets are
+accounted for under `raw/<id>/media/tweet-<tweet id>.json`: eleven as
+their oEmbed payloads (fetched from X's public endpoint), rendering
+as quotes, the nine with pictures also carrying X's syndication
+payload (`tweet-<id>.media.json`) and their photos under `images/`,
+shown in the quote; and three X no longer serves, recorded by `fetch`
+as `{"deleted": true, ...}` when the endpoint answered 404:
 
 - `lucy-dagostino-mcgowan`: <https://twitter.com/lucystats/status/1291022874644492288>
 - `tema-okun`: <https://twitter.com/billions_inst/status/1219477928335020032>
   and <https://twitter.com/reshamas/status/1278081433165279232>
 
-Eleven other tweets are archived under `raw/<id>/media/tweet-<tweet
-id>.json` (their oEmbed payloads, fetched from X's public endpoint)
-and render as quotes; the nine with pictures also carry X's
-syndication payload (`tweet-<id>.media.json`) and their photos under
-`images/`, shown in the quote. For the three, medium-archive's
-`fetch` now records a 404 in the same file as `{"deleted": true, ...}`
-instead of asking every run; convert then writes a link saying the
-tweet is no longer available, and the lint passes. A re-run for the
-two posts records them:
-
-```sh
-printf '2020-08-16-lucy-dagostino-mcgowan\n2020-10-12-tema-okun\n' > /tmp/gone.txt
-medium-archive fetch https://blog.jupyter.org/ --out . --urls /tmp/gone.txt
-```
-
+Those three render as a link saying the tweet is no longer available.
 Should a tweet's text turn up later (a Wayback Machine capture of the
 tweet page, say), a hand-written file of the oEmbed shape in place of
 the record restores the quote; a `"note"` key recording the source is
-ignored by convert.
+ignored by convert. Deleting a record makes the next `fetch` ask X
+again.
 
 Everything else that was on this list is handled by conversion now:
 YouTube players, the three Giphy files, gists, and the art19 podcast
