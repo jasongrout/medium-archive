@@ -25,14 +25,19 @@
 /* The typography choices the header's font picker cycles through
    (pinned as data-font on <html>, persisted like the theme choice):
    the jupyter.org sans the site launched with, Open Sans (the humanist
-   sans nearest the Myriad Pro of the Jupyter logo), and Source -- the
-   superfamily Medium set blog.jupyter.org's article text in.
+   sans nearest the Myriad Pro of the Jupyter logo), Source -- the
+   superfamily Medium set blog.jupyter.org's article text in -- and
+   Source Sans, that superfamily's sans face alone, running the article
+   text too instead of ceding it to the serif.
 
    --body-font is what the page is set in and --mono what its code is,
    so a choice swaps both by redefining them; the rules downstream name
    the roles, never the families. Source, being a superfamily, sets all
    three faces: the serif for running text, its sibling sans for
-   headings and chrome, its sibling mono for code. */
+   headings and chrome, its sibling mono for code. Source Sans is the
+   same superfamily pairing of --body-font and --mono, but with the
+   sans face itself standing in for the serif as the article's running
+   text too, rather than ceding that to it. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --open-sans: "Open Sans", "Helvetica Neue", Helvetica, Arial,
                      sans-serif;
@@ -47,6 +52,8 @@
 :root[data-font="open-sans"] { --body-font: var(--open-sans); }
 :root[data-font="source"] { --body-font: var(--source-sans);
                             --mono: var(--source-code); }
+:root[data-font="source-sans"] { --body-font: var(--source-sans);
+                                 --mono: var(--source-code); }
 body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
@@ -101,14 +108,16 @@ a:hover { text-decoration: underline; }
 /* The font button names the choice it is on and sets that name in the
    family it names, so it both says and shows what you are reading. A
    name is wider than the theme picker's icon, so this button is a pill
-   rather than a circle; min-width holds it steady across the three
-   names, which would otherwise shift the nav on every click. */
-.font-picker button { min-width: 6.2rem; padding: 0 .75rem;
+   rather than a circle; min-width holds it steady across the four
+   names -- sized to "Source Sans", the longest -- which would
+   otherwise shift the nav on every click. */
+.font-picker button { min-width: 7.2rem; padding: 0 .75rem;
                       font-size: .8rem; }
 .font-sample { line-height: 1; }
 .font-picker [data-set-font="sans"] { font-family: var(--sans); }
 .font-picker [data-set-font="open-sans"] { font-family: var(--open-sans); }
 .font-picker [data-set-font="source"] { font-family: var(--source-serif); }
+.font-picker [data-set-font="source-sans"] { font-family: var(--source-sans); }
 
 /* the feed mark, in the header nav and beside a tag's or author's
    heading where that term has a feed of its own */

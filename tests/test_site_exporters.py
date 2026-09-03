@@ -486,7 +486,7 @@ def test_theme_picker_and_dark_scheme(archive):
         text = base.read_text()
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
-        for choice in ("sans", "open-sans", "source"):
+        for choice in ("sans", "open-sans", "source", "source-sans"):
             assert f'data-set-font="{choice}"' in text, base
         # every family the picker offers beyond the launch stack is a
         # webfont: unlinked, those choices degrade to their fallbacks
