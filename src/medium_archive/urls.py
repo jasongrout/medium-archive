@@ -76,3 +76,17 @@ def tweet_id(url: str):
         return None
     m = TWEET_PATH_RE.match(parts.path)
     return (m.group(2), m.group(1)) if m else None
+
+
+CARBON_PATH_RE = re.compile(r"^/(?:embed/)?([A-Za-z0-9]{10,})/?$")
+
+
+def carbon_id(url: str) -> str | None:
+    """The snippet id of a carbon.now.sh page or embed URL, else None."""
+    if not url:
+        return None
+    parts = urlsplit(url)
+    if parts.netloc.lower().removeprefix("www.") != "carbon.now.sh":
+        return None
+    m = CARBON_PATH_RE.match(parts.path)
+    return m.group(1) if m else None

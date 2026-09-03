@@ -652,3 +652,39 @@ def test_provider_player_stays_an_iframe_at_its_own_size():
                          'title="Embedded content from carbon.now.sh" width="560"')
     assert md_of('<iframe src="https://example.com/player/1"></iframe>') == (
         "[embed: https://example.com/player/1](https://example.com/player/1)\n")
+
+
+def test_carbon_id_parses_page_and_embed_urls():
+    from medium_archive.urls import carbon_id
+    for url in ("https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52",
+                "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?",
+                "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52/"):
+        assert carbon_id(url) == "PaDDn2ZszZUVmuhvRP52", url
+    for url in ("", "https://carbon.now.sh/", "https://carbon.now.sh/about",
+                "https://example.com/PaDDn2ZszZUVmuhvRP52"):
+        assert carbon_id(url) is None, url
+
+
+def test_archived_carbon_snippet_becomes_a_code_block():
+    # the snippet's own code and language, in place of its screenshot;
+    # Carbon's "auto" language stays a bare fence
+    media = {"carbon:PaDDn2ZszZUVmuhvRP52": {"carbon": {
+        "language": "python", "code": "class ExampleWidget(DOMWidget):\n    value = 1"}}}
+    body = BeautifulSoup('<article><iframe src="https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52" '
+                         'data-embed="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?" '
+                         'width="1024" height="480"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == "```python\nclass ExampleWidget(DOMWidget):\n    value = 1\n```\n"
+    media["carbon:PaDDn2ZszZUVmuhvRP52"]["carbon"]["language"] = "auto"
+    body = BeautifulSoup('<article><iframe src="https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52">'
+                         "</iframe></article>", "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md.startswith("```\nclass ExampleWidget")
+
+
+def test_load_media_reads_carbon_snippets(tmp_path):
+    from medium_archive.convert import load_media
+    (tmp_path / "media").mkdir()
+    (tmp_path / "media" / "carbon-abc").with_suffix(".json").write_text(
+        json.dumps({"language": "python", "code": "x = 1"}))
+    assert load_media(tmp_path) == {"carbon:abc": {"carbon": {"language": "python", "code": "x = 1"}}}

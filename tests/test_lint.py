@@ -271,3 +271,23 @@ def test_archived_tweet_quote_is_content(tmp_path):
     assert errors == ["tweet not archived, embed is a bare link: "
                       "https://twitter.com/ann/status/12345 (re-run fetch for its "
                       "text; a deleted tweet stays a link)"]
+
+
+def test_archived_carbon_snippet_is_not_a_dropped_embed(tmp_path):
+    """An archived Carbon snippet converts to a fence, which the
+    cross-check cannot count, so its target leaves the state's list."""
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "Carbon snippet", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Fcarbon.now.sh%2FPaDDn2ZszZUVmuhvRP52"}
+    raw = tmp_path / "raw"
+    (raw / MID / "media").mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    front = {**FRONT, "medium_id": MID, "body_source": "state"}
+    d = write_post(tmp_path, "x\n" * 100 + "```python\nx = 1\n```\n", front=front)
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert errors and "dropped 1 embed" in errors[0]
+    (raw / MID / "media" / "carbon-PaDDn2ZszZUVmuhvRP52.json").write_text("{}")
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])

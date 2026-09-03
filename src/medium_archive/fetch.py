@@ -25,7 +25,8 @@ from .state import (state_embed_targets, state_image_urls,
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
-from .urls import canonical_url, medium_id, norm_key, slug_of, tweet_id
+from .urls import (canonical_url, carbon_id, medium_id, norm_key, slug_of,
+                   tweet_id)
 
 
 def load_existing(dirs: list) -> set:
@@ -112,6 +113,12 @@ GIST_API_URL = "https://api.github.com/gists/{id}"
 # widgets.js tag; dnt asks for no tracking of the archive's readers.
 TWEET_OEMBED_URL = ("https://publish.x.com/oembed?url={url}"
                     "&omit_script=true&dnt=true")
+# A Carbon snippet's embed page is a Next.js page whose server-rendered
+# data carries the snippet itself: its code and language, which the
+# screenshot the iframe would show is drawn from.
+CARBON_EMBED_URL = "https://carbon.now.sh/embed/{id}"
+NEXT_DATA_RE = re.compile(
+    r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', re.S)
 
 
 def fetch_media(session, page_text: str, mid: str, dest: Path,
@@ -127,6 +134,7 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
     backfills posts archived before this existed. Returns the number of
     files written."""
     n = fetch_tweets(session, page_text, mid, dest, delay)
+    n += fetch_carbon(session, page_text, mid, dest, delay)
     for res_id in state_media_resources(page_text, mid):
         media_path = dest / "media" / f"{res_id}.json"
         payload = None
@@ -183,6 +191,49 @@ def fetch_tweets(session, page_text: str, mid: str, dest: Path,
             continue
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                        encoding="utf-8")
+        n += 1
+        time.sleep(delay / 4)
+    return n
+
+
+def carbon_snippet(page_html: str) -> dict | None:
+    """The snippet (id, code, language, ...) from a Carbon embed page's
+    __NEXT_DATA__, else None."""
+    m = NEXT_DATA_RE.search(page_html)
+    if not m:
+        return None
+    try:
+        data = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return None
+    snippet = ((data.get("props") or {}).get("pageProps") or {}).get("snippet")
+    return snippet if snippet and snippet.get("code") is not None else None
+
+
+def fetch_carbon(session, page_text: str, mid: str, dest: Path,
+                 delay: float) -> int:
+    """The snippet behind every Carbon embed the page targets, into
+    dest/media/carbon-<id>.json, so convert can write the code itself
+    instead of an iframe of its screenshot. Incremental."""
+    n = 0
+    for target, _ in state_embed_targets(page_text, mid):
+        cid = carbon_id(target)
+        if not cid:
+            continue
+        path = dest / "media" / f"carbon-{cid}.json"
+        if path.exists():
+            continue
+        try:
+            r = fetch(session, CARBON_EMBED_URL.format(id=cid))
+            snippet = carbon_snippet(r.text)
+            if snippet is None:
+                raise ValueError("no snippet in the embed page's __NEXT_DATA__")
+        except Exception as e:
+            print(f"  carbon snippet failed {target}: {e}", file=sys.stderr)
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(snippet, indent=2, ensure_ascii=False),
                         encoding="utf-8")
         n += 1
         time.sleep(delay / 4)

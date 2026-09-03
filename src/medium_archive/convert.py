@@ -30,8 +30,8 @@ from .state import (apollo_post_state, gist_code_blocks, state_body,
                     state_metadata, state_title)
 from .readme import write_readme
 from .tags import load_tag_map
-from .urls import (canonical_url, medium_id, resolve_canonical, slug_of,
-                   tweet_id)
+from .urls import (canonical_url, carbon_id, medium_id, resolve_canonical,
+                   slug_of, tweet_id)
 
 EMPTY_INFO = {"title": "", "authors": [], "date": "",
               "updated": None, "description": "", "tags": []}
@@ -294,6 +294,20 @@ def _archived_tweet(media: dict, url: str) -> str | None:
     return tweet_html(entry["tweet"], url) if entry and entry.get("tweet") else None
 
 
+def _archived_carbon(media: dict, url: str) -> str | None:
+    """The code block for url's Carbon snippet when it is archived
+    (raw/media/carbon-<id>.json), else None. Carbon records the
+    language it highlighted; "auto" means it guessed, and stays bare."""
+    cid = carbon_id(url)
+    entry = media.get(f"carbon:{cid}") if cid else None
+    snippet = (entry or {}).get("carbon")
+    if not snippet or snippet.get("code") is None:
+        return None
+    lang = (snippet.get("language") or "").lower()
+    lang = "" if lang in ("auto", "text", "plaintext") else lang.rsplit("/", 1)[-1].removeprefix("x-")
+    return gist_code_blocks({"snippet": {"language": lang, "content": snippet["code"]}})
+
+
 def _archived_gist_files(media: dict, gist_id: str) -> dict | None:
     """The archived files of gist `gist_id`, from whichever media
     resource entry holds them (media entries are keyed by Medium's
@@ -444,8 +458,11 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         src = iframe.get("src") or iframe.get("data-src") or ""
         video = youtube_video(src) if src else None
         tweet = _archived_tweet(media or {}, src) if src else None
+        code = _archived_carbon(media or {}, src) if src else None
         player = provider_embed(src, iframe.get("data-embed") or "") if src else None
-        if video:                        # always the 16:9 default size
+        if code:                         # the snippet itself beats its screenshot
+            iframe.replace_with(BeautifulSoup(code, "html.parser"))
+        elif video:                        # always the 16:9 default size
             iframe.attrs = {"src": youtube_embed_url(*video),
                             "title": iframe.get("title") or ""}
         elif tweet:
@@ -514,6 +531,10 @@ def load_media(raw: Path, fixups: dict = None) -> dict:
         if p.name.startswith("tweet-"):       # a tweet's oEmbed payload
             media[f"tweet:{p.stem[len('tweet-'):]}"] = {
                 "tweet": json.loads(read_raw(p, fixups))}
+            continue
+        if p.name.startswith("carbon-"):      # a Carbon snippet
+            media[f"carbon:{p.stem[len('carbon-'):]}"] = {
+                "carbon": json.loads(read_raw(p, fixups))}
             continue
         payload = json.loads(read_raw(p, fixups))
         entry = {"value": (payload.get("payload") or {}).get("value") or {}}

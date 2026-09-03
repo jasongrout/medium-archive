@@ -75,9 +75,10 @@ Notes:
     slug; redirects.csv collects these for every converted post.
   * Medium's "was originally published in ... on Medium" footer and stat
     tracking pixels are removed. Embedded gists inline their archived
-    files, tweets become quotes of their archived text, YouTube and
-    other known providers' embeds stay players, Giphy embeds become the
-    fetched gif or clip, other iframes become links.
+    files, tweets become quotes of their archived text, Carbon embeds
+    their archived code, YouTube and other known providers' embeds stay
+    players, Giphy embeds become the fetched gif or clip, other iframes
+    become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
   * Fixups: files in <out>/fixups/ are applied to the in-memory raw
     sources by convert and compare, so authored defects -- a broken href

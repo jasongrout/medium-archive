@@ -135,7 +135,7 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     reported."""
     from .images import giphy_media
     from .sites import IFRAME_RE           # sites imports this module
-    from .urls import tweet_id
+    from .urls import carbon_id, tweet_id
     problems = []
     links, players = [], 0
     for line, fenced in prose_lines(body):
@@ -160,11 +160,15 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     if page is None or not page.is_file():
         return problems
     from .state import state_embed_targets     # sites imports this module
-    # a Giphy embed converts to an image or clip, archived or not, so it
-    # is never among the links a body source could have dropped
+    # a Giphy embed converts to an image or clip, archived or not, and an
+    # archived Carbon snippet to a code block, so neither is among the
+    # links a body source could have dropped
+    def archived_carbon(url):
+        cid = carbon_id(url)
+        return cid and (page.parent / "media" / f"carbon-{cid}.json").is_file()
     expected = [t for t in state_embed_targets(
         page.read_text(encoding="utf-8", errors="replace"), front["medium_id"])
-        if not giphy_media(t[0])]
+        if not giphy_media(t[0]) and not archived_carbon(t[0])]
     # the state's targets and the body's links name one embed in different
     # forms (a canonical page vs an embed URL), so they are compared by
     # count: fewer links and players than the state has embeds means the

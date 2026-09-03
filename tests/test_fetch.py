@@ -234,3 +234,35 @@ def test_fetch_media_archives_tweets(tmp_path):
     (dest / "media" / "tweet-12345.json").unlink()
     assert fetchmod.fetch_media(gone, tweet_page(mid), mid, dest, 0) == 0
     assert not (dest / "media" / "tweet-12345.json").exists()
+
+
+CARBON_PAGE = '<html><body><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"snippet":{"userId":"u","createdAt":1627625663,"language":"python","code":"class ExampleWidget(DOMWidget):\\n    value = 1","id":"PaDDn2ZszZUVmuhvRP52"}},"__N_SSP":true},"page":"/embed/[id]"}</script></body></html>'
+
+
+def carbon_page(mid):
+    state = {
+        f"Post:{mid}": {"id": mid, 'content({"a":1})': {"bodyModel": {
+            "paragraphs": [{"__ref": "Paragraph:p0"}]}}},
+        "Paragraph:p0": {"type": "IFRAME", "text": "", "markups": [],
+                         "iframe": {"mediaResource": {"__ref": "MediaResource:m1"}}},
+        "MediaResource:m1": {"id": "c1", "title": "Carbon snippet", "iframeSrc":
+                             "https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2F"
+                             "carbon.now.sh%2Fembed%2FPaDDn2ZszZUVmuhvRP52%3F&url="
+                             "https%3A%2F%2Fcarbon.now.sh%2FPaDDn2ZszZUVmuhvRP52"},
+    }
+    return "<script>window.__APOLLO_STATE__ = " + json.dumps(state) + "</script>"
+
+
+def test_fetch_media_archives_carbon_snippets(tmp_path):
+    mid = "111122223333"
+    embed = fetchmod.CARBON_EMBED_URL.format(id="PaDDn2ZszZUVmuhvRP52")
+    session = FakeSession(router=lambda url: FakeResp(CARBON_PAGE) if url == embed
+                          else (_ for _ in ()).throw(AssertionError(url)))
+    dest = tmp_path / mid
+    assert fetchmod.fetch_media(session, carbon_page(mid), mid, dest, 0) == 1
+    snippet = json.loads((dest / "media" / "carbon-PaDDn2ZszZUVmuhvRP52.json").read_text())
+    assert snippet["language"] == "python" and snippet["code"].startswith("class ExampleWidget")
+    assert fetchmod.fetch_media(session, carbon_page(mid), mid, dest, 0) == 0
+    assert session.calls == [embed]
+    # a page without the snippet data archives nothing
+    assert fetchmod.carbon_snippet("<html>gone</html>") is None

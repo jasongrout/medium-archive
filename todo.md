@@ -132,9 +132,18 @@ and the offline test suite.
   podcast player is not a 16:9 box), lazy loading, and YouTube's
   allow list on its host only; YouTube keeps the 560×315 default
   rather than Medium's size. The cost is a third-party frame at read
-  time and nothing once the provider is gone; a Carbon snippet is
-  better replaced by a real code block in a fixup when someone reads
-  the screenshot.
+  time and nothing once the provider is gone.
+- **Carbon snippets are archived as code.** A Carbon embed page
+  (`carbon.now.sh/embed/<id>`) is a Next.js page whose `__NEXT_DATA__`
+  carries the snippet itself: `code` and `language` (found by reading
+  one in a browser). `fetch_carbon` archives that object into
+  `raw/<id>/media/carbon-<id>.json` on the same incremental path as
+  gists and tweets, and `convert` inlines it as a language-tagged
+  fence (`_archived_carbon`; Carbon's "auto" stays bare), with the
+  provider iframe as the fallback until fetched. `lint --embeds`
+  leaves an archived snippet's target out of the state's embed count,
+  as a fence cannot be told from any other. Tested against the pasted
+  page data only; the sandbox cannot reach carbon.now.sh.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line
