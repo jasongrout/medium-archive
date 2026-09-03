@@ -131,7 +131,8 @@ These embed verbatim in both engines' pages, so they must carry no
   gist or Carbon snippet inside a figure): the script wraps each in a
   `.code-block` div, the positioning box `card.css` pins the button
   to, so a wide block scrolls under the button rather than carrying it
-  off. The button's markup is a `<template>`, cloned per block, so
+  off; when the button shows (on hover, on keyboard focus, always
+  on touch) is the stylesheet's business, explained there. The button's markup is a `<template>`, cloned per block, so
   the two icons (a clipboard in the theme picker's stroked style, and
   the check that replaces it for a moment after a copy) are HTML
   rather than strings in the script. They swap by `hidden` attribute,

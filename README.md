@@ -167,10 +167,12 @@ with none stored, the system scheme decides. The theme provides:
   affordance the archive would otherwise lose, since Medium's own
   "click to view image in full size" hint is stripped as chrome on
   conversion.
-- A copy button in the corner of every code block, as code hosts and
-  documentation sites show one: it puts the block's text on the
-  clipboard and shows a check mark for a moment. Gists and Carbon
-  snippets the archive inlined as code blocks get one too.
+- A copy button on every code block, in the corner where code hosts
+  and documentation sites put theirs: it puts the block's text on the
+  clipboard and shows a check mark for a moment. It appears when the
+  block is hovered or the button is reached by keyboard, and always on
+  a touch screen. Gists and Carbon snippets the archive inlined as
+  code blocks get one too.
 - Share links under every article's byline and again at its foot:
   LinkedIn, Facebook, Bluesky, Mastodon and email, under each network's
   own logomark. A hover deepens the mark rather than recoloring it,

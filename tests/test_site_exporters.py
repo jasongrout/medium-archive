@@ -640,6 +640,10 @@ def test_code_copy(archive):
     assert ".code-block { position: relative; }" in css
     assert ".code-copy { position: absolute;" in css
     assert ".code-copy:focus-visible" in css
+    # hidden until the block is hovered or the button reached by
+    # keyboard, and always shown where there is no hover
+    assert ".code-block:hover .code-copy, .code-copy:focus-visible { opacity: 1; }" in css
+    assert "@media (hover: none) { .code-copy { opacity: 1; } }" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 
