@@ -63,6 +63,20 @@ ANNOUNCEMENT = $announcement
 NOINDEX = $noindex
 # the publication's @handle, credited on links shared to X/Twitter
 TWITTER = $twitter
+# the publication's addresses elsewhere (site.json "profiles", plus the
+# X/Twitter profile the handle names): the Organization's sameAs in
+# every page's structured data
+PROFILES = $profiles
+# the og:image of a page with no cover of its own (site.json
+# "share_image"), with its pixel size; and the size covers are baked
+# to (None when they kept their source size, without Pillow)
+SHARE_IMAGE = $share_image
+SHARE_IMAGE_SIZE = $share_image_size
+COVER_SIZE = $cover_size
+# author name -> profile address (the Medium profile of every byline):
+# the Person's sameAs in a post's structured data, and the author
+# page's. Edit to add or correct one.
+AUTHOR_LINKS = $author_links
 # tag slug -> the name the tag is shown under. Tags reach Pelican as
 # slugs, so tag.slug and every /tags/<slug>/ URL are exact rather than
 # whatever Pelican's slugify would make of a name like "C++"; the site

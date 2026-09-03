@@ -709,7 +709,8 @@ def test_a_title_is_plain_text_not_html(archive):
     base = (pelican_site / "theme/templates/base.html").read_text()
     og_title = next(line for line in base.splitlines()
                     if 'property="og:title"' in line)
-    assert 'content="{{ self.name() }}' in og_title, og_title
+    assert 'content="{{ page_title }}' in og_title, og_title
+    assert "{% set page_title = self.name() %}" in base
     assert "<title>{% block name %}{{ SITENAME }}{% endblock %}" in base
     assert "striptags" not in og_title, og_title
     # the summary, though, really is HTML -- pelican formats that one,
@@ -1030,7 +1031,8 @@ def test_page_metadata_search_engines_read(archive):
     # matter, and every value escaped for a <script>
     ld = (hugo_site / "layouts/partials/jsonld.html").read_text()
     assert 'type="application/ld+json"' in ld
-    assert 'type="application/ld+json"' in heads["pelican"]
+    pelican_ld = (pelican_site / "theme/templates/jsonld.html").read_text()
+    assert 'type="application/ld+json"' in pelican_ld
     for key in ("BlogPosting", "headline", "datePublished", "dateModified",
                 "author", "publisher", "mainEntityOfPage"):
         assert key in ld, key
@@ -1038,8 +1040,9 @@ def test_page_metadata_search_engines_read(archive):
     assert 'partial "jsonld.html"' in heads["hugo"]
     for key in ("BlogPosting", "headline", "datePublished", "dateModified",
                 "author", "publisher", "mainEntityOfPage"):
-        assert key in heads["pelican"], key
-    assert "{{ ld|tojson }}" in heads["pelican"]
+        assert key in pelican_ld, key
+    assert "|tojson }}" in pelican_ld
+    assert '{% include "jsonld.html" %}' in heads["pelican"]
     # a post page's description is the post's, not the site's
     desc = next(line for line in heads["pelican"].splitlines()
                 if 'name="description"' in line)
@@ -1048,8 +1051,189 @@ def test_page_metadata_search_engines_read(archive):
     # in hugo (one partial for the head and the list templates), the
     # output file in pelican
     assert 'partial "paginator.html"' in heads["hugo"]
-    assert '<link rel="canonical" href="{{ $url }}">' in heads["hugo"]
+    assert '<link rel="canonical" href="{{ or .Params.canonical $url }}">' in heads["hugo"]
     for layout in ("index.html", "_default/list.html"):
         assert 'partial "paginator.html"' in (hugo_site / "layouts" / layout).read_text()
     assert "output_file" in heads["pelican"]
-    assert '<link rel="canonical" href="{{ page_url }}">' in heads["pelican"]
+    assert ('<link rel="canonical" href="{{ article.canonical if article '
+            'and article.canonical else page_url }}">') in heads["pelican"]
+
+
+def _graph_source(engine_site, engine):
+    if engine == "hugo":
+        return (engine_site / "layouts/partials/jsonld.html").read_text()
+    return (engine_site / "theme/templates/jsonld.html").read_text()
+
+
+def test_external_canonical_reaches_the_head(archive):
+    """A post that declared a canonical on another host (Medium's
+    "originally published at") is a copy of that page and says so, as a
+    WordPress per-post canonical does; one naming the publication's own
+    host (a Ghost-era slug) is the same post and is ignored. With
+    site.json "canonical_original", every other post names its Medium
+    original, for an archive deployed beside a still-live publication."""
+    gist = {"canonical_url": "https://gist.github.com/ada/1",
+            "original_url": f"{BASE}/x-1"}
+    own = {"canonical_url": f"{BASE}/old-slug", "original_url": f"{BASE}/x-1"}
+    assert sites.canonical_for(gist, {}) == "https://gist.github.com/ada/1"
+    assert sites.canonical_for(own, {}) is None
+    assert sites.canonical_for(own, {"canonical_original": True}) == f"{BASE}/x-1"
+    assert sites.canonical_for(gist, {"canonical_original": True}) == gist["canonical_url"]
+
+    manifest = json.loads((archive / "posts.json").read_text())
+    url = next(u for u in manifest if "second-post" in u)
+    manifest[url]["canonical_url"] = "https://gist.github.com/ada/1"
+    (archive / "posts.json").write_text(json.dumps(manifest))
+    hugo_site = hugo.build_site(archive)
+    second = json.loads((hugo_site / "content/posts/second-post/index.md")
+                        .read_text().split("\n\n", 1)[0])
+    assert second["canonical"] == "https://gist.github.com/ada/1"
+    first = json.loads((hugo_site / "content/posts/first-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert "canonical" not in first
+    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    assert '<link rel="canonical" href="{{ or .Params.canonical $url }}">' in baseof
+    pelican_site = pelican.build_site(archive)
+    page = (pelican_site / "content/posts/second-post/index.md").read_text()
+    assert "Canonical: https://gist.github.com/ada/1\n" in page
+    assert "Canonical:" not in (pelican_site / "content/posts/first-post/index.md").read_text()
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    assert 'href="{{ article.canonical if article and article.canonical else page_url }}"' in base
+
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["canonical_original"] = True
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    first = json.loads((hugo_site / "content/posts/first-post/index.md")
+                       .read_text().split("\n\n", 1)[0])
+    assert first["canonical"] == f"{BASE}/first-post-aaa111aaa111"
+    page = (pelican.build_site(archive) / "content/posts/first-post/index.md").read_text()
+    assert f"Canonical: {BASE}/first-post-aaa111aaa111\n" in page
+
+
+def test_share_image_stands_in_for_a_missing_cover(archive):
+    """site.json "share_image": the og:image of every page without a
+    cover of its own, so a listing or a coverless post still shares
+    with a picture; both heads declare the image's dimensions, so
+    Facebook renders the large card on the first share."""
+    pytest.importorskip("PIL")
+    from PIL import Image
+    Image.new("RGB", (1200, 630)).save(archive / "share.png")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["share_image"] = "share.png"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    assert 'share_image = "img/share.png"' in (hugo_site / "hugo.toml").read_text()
+    assert (hugo_site / "assets/img/share.png").is_file()   # readable dims
+    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    assert 'with site.Params.share_image }}{{ with resources.Get .' in baseof
+    for prop in ("og:image:width", "og:image:height"):
+        assert f'property="{prop}"' in baseof, prop
+    pelican_site = pelican.build_site(archive)
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert 'SHARE_IMAGE = "theme/img/share.png"' in config
+    assert "SHARE_IMAGE_SIZE = [1200, 630]" in config
+    assert "COVER_SIZE = [640, 360]" in config
+    assert (pelican_site / "theme/static/img/share.png").is_file()
+    base = (pelican_site / "theme/templates/base.html").read_text()
+    assert "SHARE_IMAGE if SHARE_IMAGE" in base
+    for prop in ("og:image:width", "og:image:height"):
+        assert f'property="{prop}"' in base, prop
+    # unset: no fallback, no size, nothing declared
+    del cfg["share_image"]
+    (archive / "site.json").write_text(json.dumps(cfg))
+    assert "share_image" not in (hugo.build_site(archive) / "hugo.toml").read_text()
+    config = (pelican.build_site(archive) / "pelicanconf.py").read_text()
+    assert "SHARE_IMAGE = None" in config and "SHARE_IMAGE_SIZE = None" in config
+
+
+def test_structured_data_graph(archive):
+    """Every page carries one schema.org graph, as WordPress's SEO
+    plugins emit it: the Organization (publisher, with its profiles
+    elsewhere as sameAs) and the WebSite (with the search page as its
+    SearchAction), a BreadcrumbList placing the page, the post's
+    BlogPosting with each author's Medium profile as sameAs, and an
+    author page as a ProfilePage of that Person. The author profiles
+    come from the bylines through one data file per site."""
+    assert sites.site_profiles({"twitter": "@ex", "profiles": ["https://a.b/"]}) \
+        == ["https://a.b/", "https://x.com/ex"]
+    assert sites.site_profiles({}) == []
+    manifest = json.loads((archive / "posts.json").read_text())
+    assert sites.author_links(manifest) == {"Ada Lovelace": "https://medium.com/@ada"}
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["twitter"] = "@example"
+    cfg["profiles"] = ["https://github.com/example"]
+    (archive / "site.json").write_text(json.dumps(cfg))
+
+    hugo_site = hugo.build_site(archive)
+    assert json.loads((hugo_site / "data/authors.json").read_text()) \
+        == {"Ada Lovelace": "https://medium.com/@ada"}
+    config = (hugo_site / "hugo.toml").read_text()
+    assert 'profiles = ["https://github.com/example", "https://x.com/example"]' in config
+    # the graph on every page, not only posts
+    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    assert '{{ end }}{{ partial "jsonld.html"' in baseof
+    # the tag and author indexes are titled as the nav names them, which
+    # the breadcrumbs repeat
+    for plural, title in (("tags", "Tags"), ("authors", "Authors")):
+        assert json.loads((hugo_site / "content" / plural / "_index.md").read_text()) == {"title": title}
+    pelican_site = pelican.build_site(archive)
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert 'PROFILES = ["https://github.com/example", "https://x.com/example"]' in config
+    assert '"Ada Lovelace": "https://medium.com/@ada"' in config
+    assert '{% include "jsonld.html" %}' in (pelican_site / "theme/templates/base.html").read_text()
+    for engine, site in (("hugo", hugo_site), ("pelican", pelican_site)):
+        src = _graph_source(site, engine)
+        for key in ("@graph", "Organization", "WebSite", "SearchAction",
+                    "search/?q={search_term_string}", "BreadcrumbList",
+                    "ListItem", "BlogPosting", "ProfilePage", "sameAs",
+                    "isPartOf", "ImageObject", "articleSection"):
+            assert key in src, (engine, key)
+    assert "site.Data.authors" in _graph_source(hugo_site, "hugo")
+    assert "AUTHOR_LINKS" in _graph_source(pelican_site, "pelican")
+
+
+def test_related_posts(archive):
+    """Each post page closes with related posts, by shared tags, then
+    author, then date: Hugo's related content, configured in the
+    generated config; the pelican plugin scores the same way."""
+    hugo_site = hugo.build_site(archive)
+    config = (hugo_site / "hugo.toml").read_text()
+    assert "[related]" in config and 'name = "tags"' in config
+    assert 'partial "related.html"' in (hugo_site / "layouts/_default/single.html").read_text()
+    related = (hugo_site / "layouts/partials/related.html").read_text()
+    assert '(where site.RegularPages "Type" "posts").Related' in related and 'partial "card.html"' in related
+    pelican_site = pelican.build_site(archive)
+    assert "article.related_posts" in (pelican_site / "theme/templates/article.html").read_text()
+    namespace = {}
+    exec(compile((pelican_site / "pelicanconf.py").read_text(), "pelicanconf.py",
+                 "exec"), namespace)
+    from datetime import datetime
+    day = lambda n: datetime(2020, 1, n)
+    tag = lambda s: SimpleNamespace(slug=s)
+    author = lambda n: SimpleNamespace(name=n)
+    a = SimpleNamespace(tags=[tag("x"), tag("y")], authors=[author("Ada")], date=day(1))
+    b = SimpleNamespace(tags=[tag("x")], authors=[author("Bob")], date=day(2))
+    c = SimpleNamespace(tags=[tag("x"), tag("y")], authors=[author("Bob")], date=day(9))
+    d = SimpleNamespace(tags=[tag("z")], authors=[author("Ada")], date=day(3))
+    e = SimpleNamespace(tags=[tag("z")], authors=[author("Eve")], date=day(4))
+    got = namespace["related_posts"](a, [a, b, c, d, e])
+    assert got == [c, b, d]          # two tags, one tag, shared author; not e
+    assert namespace["related_posts"](e, [a, b, c, d, e]) == [d]
+    assert namespace["related_posts"](a, [a, b, c, d, e], limit=1) == [c]
+
+
+def test_alt_text_falls_back_to_the_caption():
+    """An image with no alt inside a captioned figure takes the
+    caption's plain text as its alt in both sites: most Medium images
+    carry none, while the caption describes them exactly."""
+    assert sites.caption_text("The [dashboard](https://x.y) *running*, **now**") \
+        == "The dashboard running, now"
+    assert sites.caption_text("a * b = 5*3 and snake_case <br> x") == "a * b = 5*3 and snake_case x"
+    shell = ("<figure>\n\n![](images/1.png)\n\n<figcaption>\n\nA [chart](https://x.y) of *it*"
+             "\n\n</figcaption>\n\n</figure>")
+    assert 'alt="A chart of it"' in hugo.figure_shortcodes(shell)
+    assert 'alt="A chart of it"' in pelican.figure_blocks(shell)
+    given = shell.replace("![]", "![Given]")
+    assert 'alt="Given"' in hugo.figure_shortcodes(given)
+    assert 'alt="Given"' in pelican.figure_blocks(given)

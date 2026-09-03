@@ -5,6 +5,14 @@ chrome, an unclosed code fence, a missing image file -- so regressions in
 the conversion surface on every run instead of waiting for a reader.
 Exits non-zero when a defect (not a warning) is found, so it can gate
 scripts the way compare does.
+
+`--seo` adds the page analysis WordPress's SEO plugins run on every
+post, as warnings: a description that is missing or longer than a
+search result shows, a title longer than one shows, a body image with
+no alt text, a post with no image a card or a share could carry, and
+two posts with the same title. None is a conversion defect -- each is
+a fact about the post as it was written -- so they are asked for
+rather than reported on every run.
 """
 
 import json
@@ -35,6 +43,12 @@ MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
 
 FENCE_RE = re.compile(r"^`{3,}")
 
+# The page analysis WordPress's SEO plugins run (--seo): where a search
+# result cuts a title and a description, per their own defaults
+TITLE_MAX = 60
+DESCRIPTION_MAX = 160
+BARE_IMAGE_RE = re.compile(r"!\[\]\((images/[^)]+)\)")
+
 
 def split_post(text: str):
     """(front matter dict, body) of an index.md."""
@@ -55,8 +69,41 @@ def prose_lines(body: str):
         yield line, fence
 
 
-def lint_post(post_dir: Path) -> tuple[list, list]:
-    """(errors, warnings) for one converted post directory."""
+def seo_warnings(front: dict, body: str, post_dir: Path) -> list:
+    """The --seo page analysis for one post (see the module docstring),
+    as warnings. An image with an empty alt inside a captioned figure
+    is not reported: the site exporters fill that alt from the caption
+    (sites.caption_text)."""
+    warnings = []
+    title, description = front.get("title") or "", front.get("description") or ""
+    if len(title) > TITLE_MAX:
+        warnings.append(f"title is {len(title)} chars; a search result "
+                        f"shows about {TITLE_MAX}")
+    if not description:
+        warnings.append("no description: search results and share cards "
+                        "get the site's, or none")
+    elif len(description) > DESCRIPTION_MAX:
+        warnings.append(f"description is {len(description)} chars; a "
+                        f"search result shows about {DESCRIPTION_MAX}")
+    lines = [line for line, fenced in prose_lines(body) if not fenced]
+    for i, line in enumerate(lines):
+        m = BARE_IMAGE_RE.search(line)
+        if not m:
+            continue
+        following = [x for x in lines[i + 1:i + 3] if x.strip()]
+        if following and following[0].startswith("<figcaption>"):
+            continue
+        warnings.append(f"image without alt text: {m.group(1)}")
+    from .sites import pick_cover       # sites imports this module
+    if not pick_cover(front, post_dir):
+        warnings.append("no image a card cover or a share preview could "
+                        "use (site.json \"share_image\" stands in)")
+    return warnings
+
+
+def lint_post(post_dir: Path, seo: bool = False) -> tuple[list, list]:
+    """(errors, warnings) for one converted post directory; seo adds
+    the page-analysis warnings (see seo_warnings)."""
     errors, warnings = [], []
     text = (post_dir / "index.md").read_text(encoding="utf-8")
     front, body = split_post(text)
@@ -97,7 +144,23 @@ def lint_post(post_dir: Path) -> tuple[list, list]:
         warnings.append("empty date")
     if len(body) < 200:
         warnings.append(f"body is only {len(body)} chars")
+    if seo:
+        warnings.extend(seo_warnings(front, body, post_dir))
     return errors, warnings
+
+
+def duplicate_titles(titles: dict) -> list:
+    """Warnings for titles shared by several posts (post dir -> title):
+    two pages with one title compete for the same query, and a search
+    result cannot tell them apart."""
+    by_title = {}
+    for name, title in titles.items():
+        if title:
+            by_title.setdefault(title.strip().lower(), []).append(name)
+    return [f"title shared by {len(names)} posts: {names[0]!r} and "
+            f"{', '.join(repr(n) for n in names[1:])} "
+            f"({titles[names[0]]!r})"
+            for names in by_title.values() if len(names) > 1]
 
 
 def cmd_lint(args):
@@ -107,14 +170,22 @@ def cmd_lint(args):
     if not dirs:
         sys.exit(f"nothing to lint: no posts under {posts_root} (run convert first)")
     n_err = n_warn = 0
+    seo = getattr(args, "seo", False)
+    titles = {}
     for d in dirs:
-        errors, warnings = lint_post(d)
+        errors, warnings = lint_post(d, seo=seo)
         for msg in errors:
             print(f"{d.name}: {msg}")
         for msg in warnings:
             print(f"{d.name}: warning: {msg}")
         n_err += len(errors)
         n_warn += len(warnings)
+        if seo:
+            front, _ = split_post((d / "index.md").read_text(encoding="utf-8"))
+            titles[d.name] = (front or {}).get("title") or ""
+    for msg in duplicate_titles(titles):
+        print(f"warning: {msg}")
+        n_warn += 1
     print(f"lint done: {len(dirs)} posts, {n_err} problem(s), "
           f"{n_warn} warning(s)", file=sys.stderr)
     if n_err:

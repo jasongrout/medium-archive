@@ -47,25 +47,35 @@ pages Hugo renders for aliases, working on any static host -- plus the
 same map as a `_redirects` file for hosts that turn one into HTTP 301s.
 The plugin also writes what Pelican has no built-in for and Hugo emits
 on its own: a sitemap.xml of the site's pages (post lastmod from the
-updated date) and a robots.txt naming it; the theme's pages carry the
-metadata search engines and share targets read (see
-templates/README.md).
+updated date) and a robots.txt naming it, and the related posts each
+post page closes with (by shared tags, then author, then date); the
+theme's pages carry the metadata search engines and share targets read
+(see templates/README.md): the structured data's author and publisher
+profiles come from AUTHOR_LINKS (the Medium profile of every byline)
+and site.json's "profiles"/"twitter", the og:image of a page with no
+cover from its "share_image", and a post that declared a canonical on
+another host (Medium's "originally published at") carries it as a
+Canonical: header, as does every post when site.json sets
+"canonical_original".
 """
 
 import json
 import re
 import sys
 
-from .sites import (Covers, ImagePlacer, clean_site, copy_site_asset,
-                    export_content, fill_template, load_site_inputs,
-                    page_stems, rewrite_figures, tag_names, template_text,
-                    write_redirects_csv, write_templates)
+from .sites import (COVER_SIZE, Covers, ImagePlacer, author_links,
+                    canonical_for, caption_text, clean_site,
+                    copy_site_asset, export_content, fill_template,
+                    image_size, load_site_inputs, page_stems,
+                    rewrite_figures, site_profiles, tag_names,
+                    template_text, write_redirects_csv, write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
 # templates/README.md). The stylesheet is the card look shared with the
 # hugo theme.
 TEMPLATES = {
     "theme/templates/base.html": "pelican/theme/templates/base.html",
+    "theme/templates/jsonld.html": "pelican/theme/templates/jsonld.html",
     "theme/templates/macros.html": "pelican/theme/templates/macros.html",
     "theme/templates/pagination.html":
         "pelican/theme/templates/pagination.html",
@@ -108,6 +118,7 @@ def figure_blocks(markdown: str) -> str:
     def block(alt, src, link, caption):
         esc = lambda v: (v.replace("&", "&amp;").replace('"', "&quot;")
                          .replace("<", "&lt;"))
+        alt = alt or caption_text(caption)    # the caption describes it
         img = f'<img alt="{esc(alt)}" src="{src}" loading="lazy">'
         if link:
             img = f'<a href="{esc(link)}">{img}</a>'
@@ -150,6 +161,8 @@ def build_site(out):
             text += _meta("Cover", covers.path(url))
         if post.get("description"):
             text += _meta("Summary", post["description"])
+        if canonical_for(post, config):   # a copy of that page, and says so
+            text += _meta("Canonical", canonical_for(post, config))
         return text + "\n"
 
     pages = export_content(out, site, manifest, stems, front_matter,
@@ -163,6 +176,12 @@ def build_site(out):
                              site / "theme" / "static" / "img", "avatar")
     favicon = copy_site_asset(out, config.get("favicon"),
                               site / "theme" / "static", "favicon")
+    # the og:image of every page without a cover of its own, with its
+    # dimensions read here (the theme has no image pipeline)
+    share = copy_site_asset(out, config.get("share_image"),
+                            site / "theme" / "static" / "img", "share")
+    share_size = (image_size(site / "theme" / "static" / "img" / share)
+                  if share else None)
     setting = lambda v: json.dumps(v) if v else "None"   # Python literals
     (site / "pelicanconf.py").write_text(fill_template(
         "pelican/pelicanconf.py.tmpl",
@@ -179,6 +198,12 @@ def build_site(out):
                       if config.get("announcement") else "None"),
         noindex="True" if config.get("noindex") else "False",
         twitter=setting(config.get("twitter")),
+        profiles=json.dumps(site_profiles(config)),
+        share_image=setting(share and f"theme/img/{share}"),
+        share_image_size=setting(share_size and list(share_size)),
+        cover_size=setting(list(COVER_SIZE) if covers.pillow else None),
+        author_links=json.dumps(author_links(manifest), ensure_ascii=False,
+                                indent=4),
         tag_display=json.dumps(dict(sorted(tag_names(manifest, out).items())),
                                ensure_ascii=False, indent=4),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")

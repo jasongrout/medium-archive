@@ -192,6 +192,42 @@ with none stored, the system scheme decides. The theme provides:
   at the site root, one `old new 301` rule per line, which Netlify,
   Cloudflare Pages and their imitators answer with a real HTTP 301;
   hosts that ignore it (GitHub Pages) serve the meta-refresh stubs.
+- What WordPress's SEO plugins add on top, in both themes:
+  - One schema.org graph on every page rather than a lone node: the
+    `Organization` (publisher, with its logo and its profiles elsewhere
+    as `sameAs`, from `site.json`'s `"profiles"` and `"twitter"`), the
+    `WebSite` (with the search page as its `SearchAction`), a
+    `BreadcrumbList` placing the page (home, the tag or author index,
+    the page), the post's `BlogPosting` with each author's Medium
+    profile as `sameAs` (from the bylines, through `data/authors.json`
+    in the hugo site and `AUTHOR_LINKS` in the pelican config), and
+    each author page as a `ProfilePage` of that `Person`.
+  - Per-post canonicals. A post that declared a canonical on another
+    host (Medium's "originally published at", for a story imported
+    from a gist, a Notion page or someone's own blog) is a copy of
+    that page and says so in its canonical link. `"canonical_original":
+    true` in `site.json` points every other post's canonical at its
+    Medium original instead, for an archive deployed beside a
+    still-live publication, which search engines would otherwise treat
+    as a duplicate of every post it holds.
+  - A site-wide share image, `site.json`'s `"share_image"`: the
+    `og:image` of every page without a cover of its own (listings,
+    posts with no usable image), so every share carries a picture.
+    Both themes declare `og:image:width`/`og:image:height`, so
+    Facebook renders the large card on the first share instead of
+    after a fetch of its own.
+  - Related posts under every article (up to four, by shared tags,
+    then author, then date): the links that give a post ten years
+    deep in the listings a path in from another, for readers and
+    crawlers alike. Hugo's related content, configured in the
+    generated config; the pelican plugin scores the same way.
+  - Alt text from captions: a captioned image with no alt of its own
+    (most Medium images) takes its caption's plain text as its alt in
+    the built sites, for screen readers and image search.
+  - `lint --seo` runs the page analysis those plugins run, as
+    warnings: a missing or overlong description, an overlong title,
+    images without alt text, a post with no cover image, two posts
+    with one title.
 - The first body image of a post loads eagerly at high priority and
   every later one lazily, as WordPress treats the first content image:
   the first is usually on screen at load, and lazy-loading it delays
@@ -301,7 +337,10 @@ publication rather than the tool. Every key is optional.
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
 | `noindex` | `true` keeps search engines off the whole deployment (a `noindex` robots tag on every page, a `robots.txt` that disallows all): for previews and staging, which would otherwise be indexed as a copy of the real site |
-| `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`) |
+| `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
+| `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
+| `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |
+| `canonical_original` | `true` points every post's canonical link at its Medium original, for an archive deployed beside a still-live publication. A post that declared a canonical on another host carries that one regardless |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
 | `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`favicon`, and extra `params` for the generated config |
 

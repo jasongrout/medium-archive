@@ -214,6 +214,8 @@ a:hover { text-decoration: underline; }
 /* the byline copy takes no rule: one there would cut the head off the
    article. .post-meta carries the tighter margin that pairs with it. */
 .post-meta + .post-share { margin: 0 0 2rem; padding-top: 0; border-top: 0; }
+.related { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.related .page-title { font-size: 1.6rem; margin: 1rem 0; }
 .share-label { color: var(--muted); font-size: .9rem; margin-right: .2rem; }
 .share-link { display: inline-flex; align-items: center; justify-content: center;
               width: 2.1rem; height: 2.1rem; border: 1px solid var(--line);

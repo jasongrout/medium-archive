@@ -170,10 +170,19 @@ regular list and taxonomy pages share `list.html`), plus:
   rather than page one, which search engines would fold every page
   into. Hugo keeps the first paginator a page builds, so head and body
   asking with the same arguments get the same one.
-- `layouts/partials/jsonld.html` is a post's structured data: a
-  schema.org `BlogPosting` (headline, dates, author, publisher with
-  logo, cover, keywords), built as a dict and jsonified so every value
-  is escaped for a `<script>`.
+- `layouts/partials/jsonld.html` is every page's structured data: one
+  schema.org graph, as WordPress's SEO plugins emit it -- the
+  `Organization` (publisher: logo, `site.Params.profiles` as `sameAs`)
+  and the `WebSite` (the search page as its `SearchAction`) on every
+  page, referenced by `@id` from a `BreadcrumbList` placing the page,
+  a post's `BlogPosting` (headline, dates, authors with their profile
+  from `data/authors.json` as `sameAs`, cover with dimensions,
+  keywords) and an author page's `ProfilePage`. Built as dicts and
+  jsonified so every value is escaped for a `<script>`.
+- `layouts/partials/related.html` closes a post page with up to four
+  related posts (Hugo's related content, by the `[related]` indices
+  the generated config sets: shared tags, then author, then date), as
+  listing cards, kept out of the search index.
 - `layouts/robots.txt` names the sitemap Hugo generates, or disallows
   everything when site.json sets `"noindex"` (the same switch puts a
   `noindex` robots tag on every page, as a page's own front matter
@@ -198,11 +207,18 @@ regular list and taxonomy pages share `list.html`), plus:
   gives Pelican the redirect stubs Hugo renders for aliases (and the
   `_redirects` file both exporters write), the responsive body images
   the hugo theme's render hook produces (with the first one eager, as
-  there), the sitemap and robots.txt Hugo generates on its own, and the
+  there), the sitemap and robots.txt Hugo generates on its own, the
+  related posts Hugo's related content gives each post (scored the
+  same way: shared tags, then author, then date; `article.html` reads
+  `article.related_posts`), and the
   names tags are shown under (from `TAG_DISPLAY`, set on the `Tag`
   objects so the theme and the per-tag feeds both pick them up). It
   refers to names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
   `NOINDEX`), so it is not importable on its own.
+- `theme/templates/jsonld.html` is the hugo partial of the same name
+  in Jinja, included by `base.html` after the page's address, name
+  and share image are set; author profiles come from `AUTHOR_LINKS`
+  and the publisher's from `PROFILES`, both in the config.
 - `theme/templates/` is the Jinja theme. `author.html` is `tag.html`
   with the `tag` variable swapped for `author`; keep them in step. Each
   template names its page in a `name` block; `base.html` composes the

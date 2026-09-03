@@ -13,7 +13,7 @@
                    converted posts, ready for `myst start` / `myst build`
     hugo           build a Hugo site in <out>/site-hugo/
     pelican        build a Pelican site in <out>/site-pelican/
-    lint           scan converted posts for conversion-defect signatures
+    lint           scan converted posts for conversion-defect signatures (--seo: SEO page analysis)
     stats          summarize the converted archive
 
 Only `fetch` (and `all`) touches the network; the other steps can be re-run
@@ -300,10 +300,16 @@ def main():
                             "image renames, line wrapping) normalized away. "
                             "Informational (exit 0) -- what it reports is dropped "
                             "or edited content, to guide convert --prefer-ghost")
-    parser("lint", help="scan <out>/posts/ for conversion-defect signatures "
-                         "(leftover Medium chrome, unclosed code fences, "
-                         "missing image files, remote CDN images); exits "
-                         "non-zero if any are found")
+    lint_p = parser("lint", help="scan <out>/posts/ for conversion-defect "
+                                 "signatures (leftover Medium chrome, unclosed "
+                                 "code fences, missing image files, remote CDN "
+                                 "images); exits non-zero if any are found")
+    lint_p.add_argument("--seo", action="store_true",
+                        help="also warn about what an SEO plugin's page "
+                             "analysis would: a missing or overlong "
+                             "description, an overlong title, images without "
+                             "alt text, a post with no cover image, two "
+                             "posts with one title")
     stats_p = parser("stats", help="summarize the converted archive "
                                    "(posts, provenance, authors, lengths, tags)")
     stats_p.add_argument("--top", type=int, default=15, metavar="N",

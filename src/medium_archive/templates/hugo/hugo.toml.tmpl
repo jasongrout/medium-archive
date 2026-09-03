@@ -23,6 +23,23 @@ limit = 20
 tag = "tags"
 author = "authors"
 
+# related posts at the foot of each post (partials/related.html): by
+# shared tags first, then a shared author, then closeness in time;
+# includeNewer, since an archive is read in any order
+[related]
+threshold = 60
+includeNewer = true
+toLower = true
+[[related.indices]]
+name = "tags"
+weight = 100
+[[related.indices]]
+name = "authors"
+weight = 30
+[[related.indices]]
+name = "date"
+weight = 10
+
 $params
 
 [markup.goldmark.renderer]

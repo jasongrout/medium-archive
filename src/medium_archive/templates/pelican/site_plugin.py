@@ -266,11 +266,41 @@ def _name_tags(article_generator):
     print(f"tag names: {len(canonical)} tags named across {articles} articles")
 
 
+def related_posts(article, articles, limit=4):
+    # The posts most like this one, for the "Related posts" block at
+    # the foot of its page: scored the way the hugo site's [related]
+    # config scores them -- a shared tag counts for most, a shared
+    # author for some, and among equals the nearer in time comes
+    # first -- and only posts that share something at all.
+    tags = {t.slug for t in getattr(article, "tags", ())}
+    authors = {a.name for a in getattr(article, "authors", ())}
+
+    def score(other):
+        return (100 * len(tags & {t.slug for t in getattr(other, "tags", ())})
+                + 30 * len(authors & {a.name for a in getattr(other, "authors", ())}))
+
+    ranked = sorted(((score(o), -abs((o.date - article.date).total_seconds()), o)
+                     for o in articles if o is not article),
+                    key=lambda t: (t[0], t[1]), reverse=True)
+    return [o for s, _, o in ranked[:limit] if s > 0]
+
+
+def _relate_articles(article_generator):
+    # Runs on article_generator_finalized, once every article and its
+    # tags exist and before anything is written; article.html reads
+    # article.related_posts.
+    articles = article_generator.articles
+    for article in articles:
+        article.related_posts = related_posts(article, articles)
+    print(f"related posts: {len(articles)} articles")
+
+
 class _SitePlugins:
     @staticmethod
     def register():
         from pelican import signals
         signals.article_generator_finalized.connect(_name_tags)
+        signals.article_generator_finalized.connect(_relate_articles)
         signals.article_generator_finalized.connect(_collect_sitemap)
         signals.finalized.connect(_prioritize_first_images)
         signals.finalized.connect(_optimize_article_images)
