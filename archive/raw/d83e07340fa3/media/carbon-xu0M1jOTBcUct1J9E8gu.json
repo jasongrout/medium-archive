@@ -1,0 +1,10 @@
+{
+  "code": "const defaultModelProperties = {\n  value: 'Hello World',\n  color: '',\n};",
+  "userId": "pMTzMjtJ0FhiZ6jLnRCsqojQRX12",
+  "createdAt": 1627625390,
+  "backgroundColor": "rgba(255,255,255,1)",
+  "dropShadow": false,
+  "language": "javascript",
+  "updatedAt": 1627625408,
+  "id": "xu0M1jOTBcUct1J9E8gu"
+}

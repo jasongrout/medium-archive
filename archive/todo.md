@@ -75,7 +75,9 @@ Last full validation, all three against all 333 posts:
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and the
 `compare`, `compare --state` and `compare --ghost` results are explained
-below. No required work remains.
+below. No required work remains on the conversion itself. The posts
+whose embeds have no content in the archive are listed in section 5;
+the `Lint embeds` workflow fails should any come back.
 
 ## 1. Expected compare results
 
@@ -344,3 +346,64 @@ key (the publication's addresses elsewhere, for the `Organization`'s
 `sameAs`) is also unset; the values would be the GitHub organization
 and the Mastodon account, alongside the X handle already in
 `"twitter"`.
+
+## 5. Embeds without content (`lint --embeds`, the `Lint embeds` workflow)
+
+Medium posts embed videos, tweets, gists and the like as iframes.
+`convert` has no content for most of them, so an iframe becomes a
+`[embed: <url>](<url>)` link, and every generated site shows that link
+where the reader expects the tweet. Three kinds are handled: gists
+(their files are archived under `raw/<id>/media/` and inlined as
+code), YouTube videos (the URL is all a player needs, so the iframe
+stays a player: 33 of them across 19 posts, on the no-cookie host,
+titled from the editor state where it knows the video) and Giphy
+embeds (the target is the media file, which `fetch` archives with the
+post's images and `convert` serves as the gif or a looping clip). A
+body source can still lose an embed altogether. None
+of that is a conversion defect, so plain `lint` stays quiet about the
+links; `medium-archive lint --embeds` reports every one as a problem
+and exits non-zero. `.github/workflows/lint.yml` runs it on every push
+and pull request, separately from the preview build, and is red
+whenever a post has an embed without content. To run it locally:
+
+```sh
+pip install "medium-archive @ git+https://github.com/jasongrout/medium-archive"
+medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
+medium-archive lint --embeds --out .    # one line per embed missing content
+```
+
+As of 2026-09-03 the run reports 0 problems. Fourteen tweets are
+accounted for under `raw/<id>/media/tweet-<tweet id>.json`: eleven as
+their oEmbed payloads (fetched from X's public endpoint), rendering
+as quotes, the nine with pictures also carrying X's syndication
+payload (`tweet-<id>.media.json`) and their photos under `images/`,
+shown in the quote; and three X no longer serves, recorded by `fetch`
+as `{"deleted": true, ...}` when the endpoint answered 404:
+
+- `lucy-dagostino-mcgowan`: <https://twitter.com/lucystats/status/1291022874644492288>
+- `tema-okun`: <https://twitter.com/billions_inst/status/1219477928335020032>
+  and <https://twitter.com/reshamas/status/1278081433165279232>
+
+Those three render as a link saying the tweet is no longer available.
+Should a tweet's text turn up later (a Wayback Machine capture of the
+tweet page, say), a hand-written file of the oEmbed shape in place of
+the record restores the quote; a `"note"` key recording the source is
+ignored by convert. Deleting a record makes the next `fetch` ask X
+again.
+
+Everything else that was on this list is handled by conversion now:
+YouTube players, the three Giphy files, gists, and the art19 podcast
+player and four Carbon code screenshots, which stay iframes on the
+provider's own embed URL at the size Medium showed them. The Carbon
+snippets in `build-a-jupyter-widget-with-react-and-typescript` can do
+better: Carbon's embed page carries each snippet's code and language,
+and medium-archive's `fetch` archives that into
+`raw/<id>/media/carbon-<id>.json`, after which `convert` writes real
+code blocks instead of the screenshot iframes. To backfill:
+
+```sh
+echo 2021-07-30-build-a-jupyter-widget-with-react-and-typescript > /tmp/carbon.txt
+medium-archive fetch https://blog.jupyter.org/ --out . --urls /tmp/carbon.txt
+```
+
+Plain `lint` is at 0 problems.

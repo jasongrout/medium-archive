@@ -1,0 +1,254 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 13,
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2018-05-10T14:22:13.000Z",
+  "display_text_range": [
+    0,
+    265
+  ],
+  "entities": {
+    "hashtags": [
+      {
+        "indices": [
+          0,
+          12
+        ],
+        "text": "eLifeSprint"
+      },
+      {
+        "indices": [
+          63,
+          80
+        ],
+        "text": "JupyterNotebooks"
+      },
+      {
+        "indices": [
+          83,
+          90
+        ],
+        "text": "Binder"
+      },
+      {
+        "indices": [
+          102,
+          110
+        ],
+        "text": "Texture"
+      }
+    ],
+    "media": [
+      {
+        "display_url": "pic.x.com/sZ8bbE9SsM",
+        "expanded_url": "https://x.com/eLifeInnovation/status/994583390895697920/photo/1",
+        "indices": [
+          266,
+          289
+        ],
+        "url": "https://t.co/sZ8bbE9SsM"
+      }
+    ],
+    "urls": [
+      {
+        "display_url": "buff.ly/2rysbKo",
+        "expanded_url": "https://buff.ly/2rysbKo",
+        "indices": [
+          198,
+          221
+        ],
+        "url": "https://t.co/2GoGNydsmX"
+      }
+    ],
+    "user_mentions": [
+      {
+        "id_str": "15423006",
+        "indices": [
+          17,
+          23
+        ],
+        "name": "Min RK",
+        "screen_name": "minrk"
+      },
+      {
+        "id_str": "594278352",
+        "indices": [
+          113,
+          122
+        ],
+        "name": "Stencila",
+        "screen_name": "Stencila"
+      },
+      {
+        "id_str": "933014576647548928",
+        "indices": [
+          223,
+          236
+        ],
+        "name": "Binder Team",
+        "screen_name": "mybinderteam"
+      },
+      {
+        "id_str": "2460368252",
+        "indices": [
+          237,
+          252
+        ],
+        "name": "Project Jupyter",
+        "screen_name": "ProjectJupyter"
+      },
+      {
+        "id_str": "1858787746770300928",
+        "indices": [
+          253,
+          264
+        ],
+        "name": "SUBSTANCE",
+        "screen_name": "_substance"
+      }
+    ]
+  },
+  "id_str": "994583390895697920",
+  "text": "#eLifeSprint-ers @minrk and @nordholmen are working to connect #JupyterNotebooks / #Binder with DAR / #Texture / @Stencila, so that users can edit reproducible documents as part of a Binder project https://t.co/2GoGNydsmX (@mybinderteam @ProjectJupyter @_substance) https://t.co/sZ8bbE9SsM",
+  "user": {
+    "id_str": "819927704850038785",
+    "name": "eLife Innovation",
+    "screen_name": "eLifeInnovation",
+    "is_blue_verified": false,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1501954114875498503/zLpDaGHo_normal.jpg"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "994583390895697920"
+    ],
+    "editable_until_msecs": "1525963933512",
+    "edits_remaining": "5",
+    "is_edit_eligible": true
+  },
+  "mediaDetails": [
+    {
+      "display_url": "pic.x.com/sZ8bbE9SsM",
+      "expanded_url": "https://x.com/eLifeInnovation/status/994583390895697920/photo/1",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        266,
+        289
+      ],
+      "media_url_https": "https://pbs.twimg.com/media/Dc14Uo1W0AEwdk9.jpg",
+      "original_info": {
+        "focus_rects": [
+          {
+            "h": 1061,
+            "w": 1894,
+            "x": 0,
+            "y": 274
+          },
+          {
+            "h": 1338,
+            "w": 1338,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 1338,
+            "w": 1174,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 1338,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 1338,
+            "w": 1894,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "height": 1338,
+        "width": 1894
+      },
+      "sizes": {
+        "large": {
+          "h": 1338,
+          "resize": "fit",
+          "w": 1894
+        },
+        "medium": {
+          "h": 848,
+          "resize": "fit",
+          "w": 1200
+        },
+        "small": {
+          "h": 480,
+          "resize": "fit",
+          "w": 680
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "photo",
+      "url": "https://t.co/sZ8bbE9SsM"
+    }
+  ],
+  "photos": [
+    {
+      "backgroundColor": {
+        "red": 204,
+        "green": 214,
+        "blue": 221
+      },
+      "cropCandidates": [
+        {
+          "h": 1061,
+          "w": 1894,
+          "x": 0,
+          "y": 274
+        },
+        {
+          "h": 1338,
+          "w": 1338,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 1338,
+          "w": 1174,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 1338,
+          "w": 669,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 1338,
+          "w": 1894,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "expandedUrl": "https://x.com/eLifeInnovation/status/994583390895697920/photo/1",
+      "url": "https://pbs.twimg.com/media/Dc14Uo1W0AEwdk9.jpg",
+      "width": 1894,
+      "height": 1338
+    }
+  ],
+  "conversation_count": 0,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}

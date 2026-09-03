@@ -1,0 +1,115 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 5,
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2016-05-25T21:04:02.000Z",
+  "display_text_range": [
+    0,
+    60
+  ],
+  "entities": {
+    "media": [
+      {
+        "display_url": "pic.x.com/jG6kPTcZin",
+        "expanded_url": "https://x.com/LorenaABarba/status/735577185965117441/photo/1",
+        "indices": [
+          61,
+          84
+        ],
+        "url": "https://t.co/jG6kPTcZin"
+      }
+    ],
+    "user_mentions": [
+      {
+        "id_str": "303569935",
+        "indices": [
+          48,
+          60
+        ],
+        "name": "omoju",
+        "screen_name": "omojumiller"
+      }
+    ]
+  },
+  "id_str": "735577185965117441",
+  "text": "Blowing each other's minds in conversation with @omojumiller https://t.co/jG6kPTcZin",
+  "user": {
+    "id_str": "369758524",
+    "name": "Lorena Barba @labarba@fosstodon.org",
+    "screen_name": "LorenaABarba",
+    "is_blue_verified": false,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1870376708/Barba-Lorena-2011a-square_normal.png"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "735577185965117441"
+    ],
+    "editable_until_msecs": "1464212042154",
+    "edits_remaining": "5",
+    "is_edit_eligible": true
+  },
+  "mediaDetails": [
+    {
+      "display_url": "pic.x.com/jG6kPTcZin",
+      "expanded_url": "https://x.com/LorenaABarba/status/735577185965117441/photo/1",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        61,
+        84
+      ],
+      "media_url_https": "https://pbs.twimg.com/media/CjVLjZrUgAAVDv_.jpg",
+      "original_info": {
+        "focus_rects": [],
+        "height": 872,
+        "width": 895
+      },
+      "sizes": {
+        "large": {
+          "h": 872,
+          "resize": "fit",
+          "w": 895
+        },
+        "medium": {
+          "h": 872,
+          "resize": "fit",
+          "w": 895
+        },
+        "small": {
+          "h": 663,
+          "resize": "fit",
+          "w": 680
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "photo",
+      "url": "https://t.co/jG6kPTcZin"
+    }
+  ],
+  "photos": [
+    {
+      "backgroundColor": {
+        "red": 204,
+        "green": 214,
+        "blue": 221
+      },
+      "cropCandidates": [],
+      "expandedUrl": "https://x.com/LorenaABarba/status/735577185965117441/photo/1",
+      "url": "https://pbs.twimg.com/media/CjVLjZrUgAAVDv_.jpg",
+      "width": 895,
+      "height": 872
+    }
+  ],
+  "conversation_count": 1,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}
