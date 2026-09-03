@@ -1,0 +1,8 @@
+# The ColorPicker.tsx snippet was saved on Carbon without a language
+# (the other three name theirs), so its code block would carry no
+# language and get no highlighting. The file is a .tsx component per
+# the prose above it.
+
+file: d83e07340fa3/media/carbon-63wwYLNZXwkffry3HO9D.json
+old: "id": "63wwYLNZXwkffry3HO9D"
+new: "language": "text/typescript-jsx", "id": "63wwYLNZXwkffry3HO9D"
