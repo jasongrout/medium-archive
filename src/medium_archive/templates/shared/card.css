@@ -51,16 +51,19 @@ body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
-/* A link is ink with a 2px rule in the accent under it, not accent
-   text: Jupyter Orange on the white cards is 2.8:1, below WCAG AA's
-   4.5:1 for text, and the brand guidelines rule out a darker shade. As
-   a rule the orange carries no text, so the link reads at the ink's
-   contrast (17:1 light, 15:1 dark) and the colour still says "link".
+/* A link is the surrounding text with a 2px rule in the accent under
+   it, not accent text: Jupyter Orange on the white cards is 2.8:1,
+   below WCAG AA's 4.5:1 for text, and the brand guidelines rule out a
+   darker shade. As a rule the orange carries no text, so the link reads
+   at its line's own contrast -- the ink's in a paragraph, the muted
+   grey's in a byline, every text token clears 7:1 -- and the colour
+   still says "link". `inherit`, not `--ink`, so an author's name in a
+   muted byline stays muted rather than jumping out of the line.
    Longhands, not the shorthand, so a later `text-decoration-line`
    leaves the rule's colour and weight in place. The same treatment in
    both palettes: one link language, even though orange text passes on
    the dark cards. */
-a { color: var(--ink); text-decoration-line: underline;
+a { color: inherit; text-decoration-line: underline;
     text-decoration-color: var(--accent); text-decoration-thickness: 2px;
     text-underline-offset: .15em; }
 /* Links that are components rather than words -- the site title and

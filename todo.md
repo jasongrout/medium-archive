@@ -602,9 +602,10 @@ Feeds and sharing:
   cards, below WCAG AA's 4.5:1 for normal-size text, let alone AAA's
   7:1; jupyter.org makes the same trade-off with its orange links, and
   this archive kept it through the 2026-08 restyle. Resolved in 2026-09
-  without a shade: a link is now ink text with a 2px rule in the accent
-  under it, so the text clears AAA (17:1 light, 15:1 dark) and the
-  orange, which carries no letterforms, is what says "link". Component
+  without a shade: a link now keeps the colour of the text around it
+  (ink in a paragraph, the muted grey in a byline; every text token
+  clears AAA) with a 2px rule in the accent under it, so the orange,
+  which carries no letterforms, is what says "link". Component
   links (nav, card titles, chips, pills, page numbers) carry no rule at
   rest and show it on hover; the hover state of a prose link is
   unchanged from its rest state, by choice. The same treatment applies
