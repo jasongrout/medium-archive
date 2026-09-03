@@ -55,8 +55,7 @@ profiles come from AUTHOR_LINKS (the Medium profile of every byline)
 and site.json's "profiles"/"twitter", the og:image of a page with no
 cover from its "share_image", and a post that declared a canonical on
 another host (Medium's "originally published at") carries it as a
-Canonical: header, as does every post when site.json sets
-"canonical_original".
+Canonical: header; the Medium copy is never a page's canonical.
 """
 
 import json
@@ -161,8 +160,8 @@ def build_site(out):
             text += _meta("Cover", covers.path(url))
         if post.get("description"):
             text += _meta("Summary", post["description"])
-        if canonical_for(post, config):   # a copy of that page, and says so
-            text += _meta("Canonical", canonical_for(post, config))
+        if canonical_for(post):       # a copy of that page, and says so
+            text += _meta("Canonical", canonical_for(post))
         return text + "\n"
 
     pages = export_content(out, site, manifest, stems, front_matter,

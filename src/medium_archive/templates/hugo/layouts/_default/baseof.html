@@ -34,10 +34,11 @@
 {{ if not $cover }}{{ with site.Params.share_image }}{{ with resources.Get . }}{{ $cover = . }}{{ end }}{{ end }}{{ end }}
 {{ $card := "" }}{{ with $cover }}{{ $card = .Permalink }}{{ end }}
 {{/* a post that is a copy of a page elsewhere (front matter canonical:
-     the address the post itself declared, or its Medium original with
-     site.json "canonical_original") names that page as its canonical,
-     as WordPress's per-post canonical field does; og:url stays the
-     page, since a share of this page previews this page */}}
+     the address the post itself declared on another host) names that
+     page as its canonical, as WordPress's per-post canonical field
+     does; og:url stays the page, since a share of this page previews
+     this page. Every other page is its own canonical: the archive is
+     the posts' home, not a copy of Medium's */}}
 <link rel="canonical" href="{{ or .Params.canonical $url }}">
 <meta property="og:site_name" content="{{ site.Title }}">
 {{ $post := eq .Type "posts" }}

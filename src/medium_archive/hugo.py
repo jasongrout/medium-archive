@@ -24,9 +24,9 @@ author and publisher profiles come from data/authors.json (the Medium
 profile of every byline) and site.json's "profiles"/"twitter", the
 og:image of a page with no cover from its "share_image", and a post
 that declared a canonical on another host (Medium's "originally
-published at") carries it as `canonical` in its front matter, as does
-every post when site.json sets "canonical_original". Each post page
-closes with related posts (Hugo's related content, by shared tags).
+published at") carries it as `canonical` in its front matter; the
+Medium copy is never a page's canonical. Each post page closes with
+related posts (Hugo's related content, by shared tags).
 
 Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
 are exactly the archive's tag; the names tags are shown under
@@ -227,7 +227,7 @@ def build_site(out):
     pages = export_content(
         out, site, manifest, stems,
         lambda url, p: front_matter(url, p, cover=covers.path(url),
-                                    canonical=canonical_for(p, config)),
+                                    canonical=canonical_for(p)),
         placer=ImagePlacer(out, config), transform=figure_shortcodes,
         covers=covers)
     write_tag_names(site, tag_names(manifest, out))

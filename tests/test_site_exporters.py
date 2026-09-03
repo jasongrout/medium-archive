@@ -1069,16 +1069,15 @@ def test_external_canonical_reaches_the_head(archive):
     """A post that declared a canonical on another host (Medium's
     "originally published at") is a copy of that page and says so, as a
     WordPress per-post canonical does; one naming the publication's own
-    host (a Ghost-era slug) is the same post and is ignored. With
-    site.json "canonical_original", every other post names its Medium
-    original, for an archive deployed beside a still-live publication."""
+    host (a Ghost-era slug) is the same post and is ignored. Every
+    other page is its own canonical: the archive is the posts' home,
+    and the Medium copy is never named as one."""
     gist = {"canonical_url": "https://gist.github.com/ada/1",
             "original_url": f"{BASE}/x-1"}
     own = {"canonical_url": f"{BASE}/old-slug", "original_url": f"{BASE}/x-1"}
-    assert sites.canonical_for(gist, {}) == "https://gist.github.com/ada/1"
-    assert sites.canonical_for(own, {}) is None
-    assert sites.canonical_for(own, {"canonical_original": True}) == f"{BASE}/x-1"
-    assert sites.canonical_for(gist, {"canonical_original": True}) == gist["canonical_url"]
+    assert sites.canonical_for(gist) == "https://gist.github.com/ada/1"
+    assert sites.canonical_for(own) is None
+    assert sites.canonical_for({"canonical_url": None, "original_url": f"{BASE}/x-1"}) is None
 
     manifest = json.loads((archive / "posts.json").read_text())
     url = next(u for u in manifest if "second-post" in u)
@@ -1099,16 +1098,9 @@ def test_external_canonical_reaches_the_head(archive):
     assert "Canonical:" not in (pelican_site / "content/posts/first-post/index.md").read_text()
     base = (pelican_site / "theme/templates/base.html").read_text()
     assert 'href="{{ article.canonical if article and article.canonical else page_url }}"' in base
-
-    cfg = json.loads((archive / "site.json").read_text())
-    cfg["canonical_original"] = True
-    (archive / "site.json").write_text(json.dumps(cfg))
-    hugo_site = hugo.build_site(archive)
-    first = json.loads((hugo_site / "content/posts/first-post/index.md")
-                       .read_text().split("\n\n", 1)[0])
-    assert first["canonical"] == f"{BASE}/first-post-aaa111aaa111"
-    page = (pelican.build_site(archive) / "content/posts/first-post/index.md").read_text()
-    assert f"Canonical: {BASE}/first-post-aaa111aaa111\n" in page
+    # neither head knows the Medium address: a post without a declared
+    # canonical (first-post above) is its own
+    assert "original_url" not in baseof and "original_url" not in base
 
 
 def test_share_image_stands_in_for_a_missing_cover(archive):

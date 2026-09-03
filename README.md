@@ -202,14 +202,12 @@ with none stored, the system scheme decides. The theme provides:
     profile as `sameAs` (from the bylines, through `data/authors.json`
     in the hugo site and `AUTHOR_LINKS` in the pelican config), and
     each author page as a `ProfilePage` of that `Person`.
-  - Per-post canonicals. A post that declared a canonical on another
-    host (Medium's "originally published at", for a story imported
-    from a gist, a Notion page or someone's own blog) is a copy of
-    that page and says so in its canonical link. `"canonical_original":
-    true` in `site.json` points every other post's canonical at its
-    Medium original instead, for an archive deployed beside a
-    still-live publication, which search engines would otherwise treat
-    as a duplicate of every post it holds.
+  - Per-post canonicals. Every page is its own canonical: the archive
+    is the posts' home, and the Medium copy is never named as one. The
+    exception is a post that declared a canonical on another host
+    (Medium's "originally published at", for a story imported from a
+    gist, a Notion page or someone's own blog): that page is a copy of
+    it and says so in its canonical link.
   - A site-wide share image, `site.json`'s `"share_image"`: the
     `og:image` of every page without a cover of its own (listings,
     posts with no usable image), so every share carries a picture.
@@ -340,7 +338,6 @@ publication rather than the tool. Every key is optional.
 | `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
 | `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |
-| `canonical_original` | `true` points every post's canonical link at its Medium original, for an archive deployed beside a still-live publication. A post that declared a canonical on another host carries that one regardless |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
 | `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`favicon`, and extra `params` for the generated config |
 

@@ -133,9 +133,9 @@ def load_site_inputs(out: Path):
     # robots meta tag on every page and a robots.txt that disallows
     # all), "twitter" (the publication's @handle, for twitter:site),
     # "profiles" (its addresses elsewhere, for the Organization's
-    # sameAs -- see site_profiles), "share_image" (an archive-relative
-    # raster, the og:image of every page without a cover of its own)
-    # and "canonical_original" (see canonical_for).
+    # sameAs -- see site_profiles) and "share_image" (an
+    # archive-relative raster, the og:image of every page without a
+    # cover of its own).
     # Absolute links -- feed URLs, redirect stubs, the Open Graph tags
     # and the share links a reader hands to LinkedIn or Facebook -- are
     # built from base_url. Without it each exporter falls back to a
@@ -828,25 +828,21 @@ def redirects_file(rules) -> str:
     return "".join(f"{old} {new} 301\n" for old, new, *_ in rules)
 
 
-def canonical_for(post: dict, config: dict) -> str | None:
+def canonical_for(post: dict) -> str | None:
     """The address a post page's canonical link should name instead of
-    the page itself, or None. A canonical the post itself declared on
-    another host -- Medium's "originally published at" for a story
-    imported from a gist, a Notion page, someone's own blog -- is
-    carried through, as WordPress's SEO plugins carry a per-post
-    canonical: the archive is a copy of that page and says so, rather
-    than competing with it. One that names the publication's own host
-    (a Ghost-era slug) is the same post and is ignored; the link map
-    already resolves it. With site.json "canonical_original", every
-    other post points at its Medium original: for an archive deployed
-    beside a still-live publication, which would otherwise be indexed
-    as a duplicate of every post it holds."""
+    the page itself, or None. The archive is the post's home -- the
+    Medium copy is never its canonical -- except where the post itself
+    declared one on another host (Medium's "originally published at"
+    for a story imported from a gist, a Notion page, someone's own
+    blog): that is carried through, as WordPress's SEO plugins carry a
+    per-post canonical, since the page is a copy of that one and says
+    so rather than competing with it. A canonical naming the
+    publication's own host (a Ghost-era slug) is the same post and is
+    ignored; the link map already resolves it."""
     declared = post.get("canonical_url")
     if declared and (urlsplit(declared).netloc.lower()
                      != urlsplit(post["original_url"]).netloc.lower()):
         return declared
-    if config.get("canonical_original"):
-        return post["original_url"]
     return None
 
 
