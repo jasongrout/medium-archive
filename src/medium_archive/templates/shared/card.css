@@ -34,9 +34,10 @@
    so a choice swaps both by redefining them; the rules downstream name
    the roles, never the families. Source, being a superfamily, sets all
    three faces: the serif for running text, its sibling sans for
-   headings and chrome, its sibling mono for code. Source Sans reuses
-   the same --source-sans family for --body-font and leaves --mono at
-   the default: it is a candidate for the running text, not for code. */
+   headings and chrome, its sibling mono for code. Source Sans is the
+   same superfamily pairing of --body-font and --mono, but with the
+   sans face itself standing in for the serif as the article's running
+   text too, rather than ceding that to it. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --open-sans: "Open Sans", "Helvetica Neue", Helvetica, Arial,
                      sans-serif;
@@ -51,7 +52,8 @@
 :root[data-font="open-sans"] { --body-font: var(--open-sans); }
 :root[data-font="source"] { --body-font: var(--source-sans);
                             --mono: var(--source-code); }
-:root[data-font="source-sans"] { --body-font: var(--source-sans); }
+:root[data-font="source-sans"] { --body-font: var(--source-sans);
+                                 --mono: var(--source-code); }
 body { margin: 0; background: var(--bg); color: var(--ink);
        /* jupyter.org's body stack */
        font: 1rem/1.65 var(--body-font); }
