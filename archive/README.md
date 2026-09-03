@@ -36,7 +36,9 @@ that belong with the archive.
   landing-page intro), the optional extras a site can carry, and
   `base_url`, the domain the site is served from. Every absolute URL a
   generated site bakes in comes from `base_url`, so set it before
-  deploying and re-run the exporter.
+  deploying and re-run the exporter. The preview workflow also sets
+  `noindex`, which keeps search engines off a deployment; leave it
+  unset for the real site.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files. Defects
   authored into the sources themselves, such as a broken href, a typo
@@ -292,7 +294,12 @@ their full size).
 Before deploying, set `base_url` in `site.json` to the site's real
 domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
 exporter step. Every absolute URL a generated site bakes in is built
-from it.
+from it: the canonical links and Open Graph tags, the sitemap the
+generated `robots.txt` names, the redirect stubs and the `_redirects`
+file (HTTP 301s on hosts that read one). Old Medium links only reach
+any of that once the publication's domain itself points at the new
+host; until then Medium keeps serving them and the archive is a
+duplicate of it.
 
 hugo (preferred):
 

@@ -26,9 +26,10 @@ so the generators can be compared on identical content.
 three sites from `raw/` on every push to main, or on demand, and
 publishes them to GitHub Pages under `/hugo/`, `/pelican/` and `/myst/`,
 behind a landing page (`.github/preview-index.html`) linking the three.
-Each exporter runs with `site.json`'s `base_url` pointed at its subpath,
-patched only in the runner's workspace, so baked-in absolute links land
-in the right place. The sites carry capped display copies of the images
+Each exporter runs with `site.json`'s `base_url` pointed at its subpath
+and `noindex` set, patched only in the runner's workspace, so baked-in
+absolute links land in the right place and search engines do not index
+the previews as copies of the eventual site. The sites carry capped display copies of the images
 rather than the full-resolution originals, which is what keeps the
 three previews within GitHub Pages' documented 1 GB site limit.
 
