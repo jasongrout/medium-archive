@@ -391,9 +391,15 @@ Everything else that was on this list is handled by conversion now:
 YouTube players, the three Giphy files, gists, and the art19 podcast
 player and four Carbon code screenshots, which stay iframes on the
 provider's own embed URL at the size Medium showed them. The Carbon
-snippets in `build-a-jupyter-widget-with-react-and-typescript` would
-read better as real code blocks; that takes someone reading the four
-screenshots and writing a fixup, and would also drop the post's last
-dependency on a third party.
+snippets in `build-a-jupyter-widget-with-react-and-typescript` can do
+better: Carbon's embed page carries each snippet's code and language,
+and medium-archive's `fetch` archives that into
+`raw/<id>/media/carbon-<id>.json`, after which `convert` writes real
+code blocks instead of the screenshot iframes. To backfill:
+
+```sh
+echo 2021-07-30-build-a-jupyter-widget-with-react-and-typescript > /tmp/carbon.txt
+medium-archive fetch https://blog.jupyter.org/ --out . --urls /tmp/carbon.txt
+```
 
 Plain `lint` is at 0 problems.
