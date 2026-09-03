@@ -38,25 +38,40 @@ These embed verbatim in both engines' pages, so they must carry no
 - `font-init.html` is the theme-init of the font experiment. It runs
   before the stylesheet loads so a stored choice cannot flash the
   default family first. A stored choice pins `data-font` on `<html>`;
-  no attribute means the jupyter.org sans (see `card.css`).
-- `font-picker.html` is the header's body-font switch, beside the theme
-  picker and built like it: one cycling button, the choice persisted
-  per browser. Where the theme button draws its state as an icon, this
-  one names it ("Helvetica", "Open Sans", "Source", "Source Sans") and
-  sets the name in the family it names, so the button says and shows
-  what the reader is on. The names are the button's own text, which the
-  script reads back for the tooltip and `aria-label`; a fixed
-  `min-width` in `card.css` keeps the four from shifting the nav as
-  they cycle. It exists to let reviewers compare candidate typography
-  before the blog settles on one: the jupyter.org Helvetica stack the
-  site launched with, Open Sans (the humanist sans nearest the logo's
-  Myriad Pro), Source, the superfamily Medium set the publication in
-  (Source Serif Pro running text, Source Sans Pro headings and chrome,
-  Source Code Pro code), and Source Sans, that same superfamily's sans
-  face running the article text as well instead of ceding it to the
-  serif. The article's reading size belongs to `.post` rather than to
-  any one choice, so the four differ in family alone. The losing
-  styles, and the picker with them, come out once that is decided.
+  no attribute means Source Serif, the default (see `card.css`).
+- `font-picker.html` is the body-font switch: a `<select>`, not a
+  button like the theme picker, since it offers nine choices, too many
+  to cycle one click at a time. It floats fixed at the page's
+  bottom-right corner instead of sitting beside the theme button in
+  the header (`card.css`), so it stays reachable once a long article
+  has scrolled the header away; it is spliced in once, near the end of
+  the body, rather than into the nav. Each `<option>` carries the
+  family it offers as its own inline style, so the open list previews
+  every choice in the face it names; the select's own font-family is
+  set from script on every change, so the closed box previews the
+  current choice too, the way the old cycling button's own text did.
+  The choice persists per browser, like the theme picker's. It exists
+  to let reviewers compare candidate typography before the blog
+  settles on one: Source Serif, the superfamily Medium set the
+  publication in and this picker's default, the jupyter.org
+  Helvetica stack the site launched with, the reader's own platform
+  UI font, Inter, two standalone sans faces picked for their own
+  look (Atkinson Hyperlegible, Nunito Sans), and Source Sans and the
+  IBM Plex superfamily as both a sans and a serif face. Headings and
+  chrome stay sans under every choice: a superfamily's sans option ("Source
+  Sans", "IBM Plex Sans") runs the whole page, article included, in
+  its own sans and mono faces; its serif sibling (the default "Source
+  Serif", "IBM Plex Serif") keeps headings and chrome on that same
+  sans face, as Medium did, and points only the article's running
+  text at the serif face instead, with the superfamily's own mono
+  still under its code. A choice's code follows its own mono face
+  wherever it has one (the superfamilies', Atkinson Hyperlegible's
+  own); System UI's is the platform's own ui-monospace stack, and a
+  choice with no mono face of its own (Helvetica, Inter, Nunito Sans)
+  falls back to that same platform stack. The article's reading size
+  belongs to `.post` rather than to any one choice, so the nine differ
+  in family alone. The losing styles, and the picker with them, come
+  out once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
   than another pass over the rules that use them.

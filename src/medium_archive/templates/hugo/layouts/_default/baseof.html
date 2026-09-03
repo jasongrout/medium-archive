@@ -70,7 +70,7 @@
 {{ with site.Params.favicon }}<link rel="icon" href="{{ . | relURL }}">
 {{ end }}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Inter:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap">
 <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
@@ -88,7 +88,6 @@
 <!-- @include shared/feed-icon.html -->
 </a>
 <!-- @include shared/theme-picker.html -->
-<!-- @include shared/font-picker.html -->
 </nav>
 </div></header>
 <!-- @include shared/nav-current.html -->
@@ -96,5 +95,6 @@
 {{ block "main" . }}{{ end }}
 </main>
 <footer class="wrap site-footer">{{ site.Params.description }}</footer>
+<!-- @include shared/font-picker.html -->
 </body>
 </html>
