@@ -1,0 +1,167 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 37,
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2018-11-12T15:29:22.000Z",
+  "display_text_range": [
+    0,
+    178
+  ],
+  "entities": {
+    "media": [
+      {
+        "display_url": "pic.x.com/Wjyf1kiH9B",
+        "expanded_url": "https://x.com/betatim/status/1062004432806785024/photo/1",
+        "indices": [
+          179,
+          202
+        ],
+        "url": "https://t.co/Wjyf1kiH9B"
+      }
+    ],
+    "urls": [
+      {
+        "display_url": "repo2docker.readthedocs.io",
+        "expanded_url": "http://repo2docker.readthedocs.io/",
+        "indices": [
+          55,
+          78
+        ],
+        "url": "https://t.co/Zlj6FrYgBw"
+      },
+      {
+        "display_url": "mybinder.org/v2/gh/nuest/st…",
+        "expanded_url": "https://mybinder.org/v2/gh/nuest/stencila-py/master?urlpath=stencila",
+        "indices": [
+          155,
+          178
+        ],
+        "url": "https://t.co/ToIuQPq0Fy"
+      }
+    ],
+    "user_mentions": [
+      {
+        "id_str": "594278352",
+        "indices": [
+          33,
+          42
+        ],
+        "name": "Stencila",
+        "screen_name": "stencila"
+      },
+      {
+        "id_str": "933014576647548928",
+        "indices": [
+          127,
+          140
+        ],
+        "name": "Binder Team",
+        "screen_name": "mybinderteam"
+      }
+    ]
+  },
+  "id_str": "1062004432806785024",
+  "text": "Thanks to @nordholmen working on @stencila support for https://t.co/Zlj6FrYgBw you now have reactive cells with Python code on @mybinderteam! Give it a go https://t.co/ToIuQPq0Fy https://t.co/Wjyf1kiH9B",
+  "user": {
+    "id_str": "18881614",
+    "name": "Tim Head, @betatim on the internet",
+    "screen_name": "betatim",
+    "is_blue_verified": false,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1093263055138349056/tPPa7CyY_normal.jpg"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "1062004432806785024"
+    ],
+    "editable_until_msecs": "1542038362526",
+    "edits_remaining": "5",
+    "is_edit_eligible": true
+  },
+  "mediaDetails": [
+    {
+      "display_url": "pic.x.com/Wjyf1kiH9B",
+      "expanded_url": "https://x.com/betatim/status/1062004432806785024/photo/1",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        179,
+        202
+      ],
+      "media_url_https": "https://pbs.twimg.com/tweet_video_thumb/Drz_AZeXQAAdMmn.jpg",
+      "original_info": {
+        "focus_rects": [],
+        "height": 1038,
+        "width": 1468
+      },
+      "sizes": {
+        "large": {
+          "h": 1038,
+          "resize": "fit",
+          "w": 1468
+        },
+        "medium": {
+          "h": 849,
+          "resize": "fit",
+          "w": 1200
+        },
+        "small": {
+          "h": 481,
+          "resize": "fit",
+          "w": 680
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "animated_gif",
+      "url": "https://t.co/Wjyf1kiH9B",
+      "video_info": {
+        "aspect_ratio": [
+          734,
+          519
+        ],
+        "variants": [
+          {
+            "bitrate": 0,
+            "content_type": "video/mp4",
+            "url": "https://video.twimg.com/tweet_video/Drz_AZeXQAAdMmn.mp4"
+          }
+        ]
+      }
+    }
+  ],
+  "photos": [],
+  "video": {
+    "aspectRatio": [
+      734,
+      519
+    ],
+    "contentType": "gif",
+    "durationMs": 0,
+    "mediaAvailability": {
+      "status": "available"
+    },
+    "poster": "https://pbs.twimg.com/tweet_video_thumb/Drz_AZeXQAAdMmn.jpg",
+    "variants": [
+      {
+        "type": "video/mp4",
+        "src": "https://video.twimg.com/tweet_video/Drz_AZeXQAAdMmn.mp4"
+      }
+    ],
+    "videoId": {
+      "type": "tweet",
+      "id": "1062004432806785024"
+    },
+    "viewCount": 0
+  },
+  "conversation_count": 1,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}

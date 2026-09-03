@@ -2554,6 +2554,7 @@
     ],
     "images": [
       "images/001-1_dioQ00ymlsIb1PPH_SBdjg.gif",
+      "images/009-F6k0IzXbQAA1afQ.jpg",
       "images/002-1__KUkFmq1lO3H-tx4XJPNew.gif",
       "images/003-1_ndB49_FE9Mq8-9YSNFLuWw.png",
       "images/004-1_m6aEUA3UifW-qNnPu8etPw.png",
@@ -4842,7 +4843,9 @@
       "images/002-0_BHjQbPTLV3XHoNqG.png",
       "images/001-1_H28MLVCxQzhuXzKzbMyiZA.png",
       "images/003-0_osOwhBZGwlnr5FNk.png",
-      "images/001-1_H28MLVCxQzhuXzKzbMyiZA.png"
+      "images/001-1_H28MLVCxQzhuXzKzbMyiZA.png",
+      "images/004-Drz_AZeXQAAdMmn.jpg",
+      "images/005-Dc14Uo1W0AEwdk9.jpg"
     ],
     "body_source": "state",
     "dir": "posts/2018-12-10-elife-sprint-integrating-stencila-and-binder"
@@ -5192,6 +5195,7 @@
       "jupyterlab"
     ],
     "images": [
+      "images/005-CnW7DC6VUAE7NaZ.jpg",
       "images/g001-jlab-screenshot-nb-con-term-2.png",
       "images/g002-jlab-screenshot-console-editor-2.png"
     ],
@@ -6146,7 +6150,8 @@
     ],
     "images": [
       "images/001-0_HvwrxmA_sBtU0SaO.gif",
-      "images/002-1_BBSKYgAom2NJoQLvOwyJLg.gif"
+      "images/002-1_BBSKYgAom2NJoQLvOwyJLg.gif",
+      "images/003-Q9a7WbZP3-6tQUoJ.jpg"
     ],
     "body_source": "state",
     "dir": "posts/2021-06-04-how-we-made-jupyter-notebooks-collaborative-with-yjs"
@@ -6644,7 +6649,8 @@
       "education"
     ],
     "images": [
-      "images/001-1_wOfBLJW4hIryREyEtsYHmg.jpeg"
+      "images/001-1_wOfBLJW4hIryREyEtsYHmg.jpeg",
+      "images/002-DtLNcpnX4AAZP_k.jpg"
     ],
     "body_source": "state",
     "dir": "posts/2019-01-07-teaching-and-learning-with-jupyter"
@@ -7230,6 +7236,8 @@
     ],
     "images": [
       "images/001-1_XfG5wBdnXZ-vHu0bHhSCVA.jpeg",
+      "images/003-CXWfIEkUMAASDye.jpg",
+      "images/004-CjVLjZrUgAAVDv_.jpg",
       "images/002-1_zYJGVYB9SJGnrhiq1IzVqA.png"
     ],
     "body_source": "state",
@@ -8899,6 +8907,7 @@
     "images": [
       "images/001-1_4gB92wu3PVYsKabkNCkgjg.png",
       "images/002-1_wU7C4LRdnyFC5a09B-LMrA.jpeg",
+      "images/005-DbxDT6kV4AAVu2b.jpg",
       "images/003-1_IBExnuyXvjLul_Cba75wWw.png",
       "images/004-1_Msgqb8LKmLJSKLLOXZs7Bw.png"
     ],
