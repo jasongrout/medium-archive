@@ -169,12 +169,15 @@ def test_iframe_embed_with_caption():
              iframe={"mediaResource": {"__ref": "MediaResource:m1"}})
     state = make_state([p])
     state["MediaResource:m1"] = {
+        "title": "A talk",
         "iframeSrc": "https://cdn.embedly.com/widgets/media.html"
-                     "?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2Fabc"
-                     "&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabc"}
+                     "?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2Fabcdefghijk"
+                     "&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabcdefghijk"}
     md = md_of_state(state)
-    # the embedly wrapper unwraps to the canonical watch URL
-    assert "[embed: https://www.youtube.com/watch?v=abc]" in md
+    # the embedly wrapper unwraps to the canonical watch URL; a YouTube
+    # target is a player, titled by the resource, rather than a link
+    assert ('<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk" '
+            'title="A talk"') in md
     # the caption rides in the figure shell, unstyled (CSS styles it)
     assert "<figcaption>\n\nWatch the demo.\n\n</figcaption>" in md
 

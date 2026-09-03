@@ -10,6 +10,7 @@ import re
 import shutil
 import sys
 from pathlib import Path
+from html import escape
 from urllib.parse import (parse_qsl, urlencode, urljoin, urlparse, urlsplit,
                           urlunsplit)
 
@@ -72,6 +73,12 @@ class _Converter(MarkdownConverter):
             return text
         return f"\n\n<figure>\n\n{text.strip()}\n\n</figure>\n\n"
 
+    def convert_iframe(self, el, text, parent_tags):
+        # the YouTube player to_markdown leaves in place (every other
+        # iframe became a link or a placeholder before conversion), as
+        # its own HTML block
+        return f"\n\n{youtube_iframe(el.get('src') or '', el.get('title') or '')}\n\n"
+
     def convert_figcaption(self, el, text, parent_tags):
         if not _captioned_figure(el.find_parent("figure")):
             return text
@@ -110,6 +117,59 @@ def _captioned_figure(figure) -> bool:
                 and any(t.find_parent("figcaption") is None
                         for t in figure.find_all(["img", "a", "iframe",
                                                   "script", "pre"])))
+
+
+YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com",
+                 "youtu.be", "youtube-nocookie.com", "www.youtube-nocookie.com"}
+YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
+YOUTUBE_PATH_RE = re.compile(r"^/(?:embed|v|shorts|live)/([^/?#]+)")
+YOUTUBE_TIME_RE = re.compile(r"^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$")
+YOUTUBE_EMBED_BASE = "https://www.youtube-nocookie.com/embed/"
+
+
+def youtube_video(url: str):
+    """(video id, start second or None) of a YouTube URL in any of the
+    forms Medium's embeds and the editor state carry -- watch?v=,
+    youtu.be/, /embed/, /v/, /shorts/, /live/ -- or None for any other
+    URL, including a playlist with no video. The start time comes from
+    `t=` (4m15s, 255, 255s) or `start=`."""
+    parts = urlsplit(url)
+    if parts.netloc.lower() not in YOUTUBE_HOSTS:
+        return None
+    q = dict(parse_qsl(parts.query))
+    video = q.get("v") if parts.netloc.lower() != "youtu.be" else parts.path[1:]
+    if not video:
+        m = YOUTUBE_PATH_RE.match(parts.path)
+        video = m.group(1) if m else None
+    if not video or not YOUTUBE_ID_RE.match(video) or video == "videoseries":
+        return None                       # embed/videoseries?list= is a playlist
+    start = None
+    m = YOUTUBE_TIME_RE.match(q.get("start") or q.get("t") or "")
+    if m and m.group(0):
+        h, mi, s = (int(x or 0) for x in m.groups())
+        start = h * 3600 + mi * 60 + s
+    return video, start or None
+
+
+def youtube_embed_url(video: str, start=None) -> str:
+    """The player URL for a video: the no-cookie host, so a page with an
+    embed sets no YouTube cookies until the reader plays it."""
+    return YOUTUBE_EMBED_BASE + video + (f"?start={start}" if start else "")
+
+
+def youtube_iframe(src: str, title: str = "") -> str:
+    """The one iframe form convert writes: YouTube's own embed snippet
+    with a title for assistive tech (the state knows the video's; an
+    export iframe does not), lazily loaded, at the 16:9 size the theme's
+    CSS scales to the column. One canonical line, so the exporters and
+    lint recognize it (IFRAME_RE in sites.py)."""
+    title = title or "YouTube video"
+    return (f'<iframe src="{escape(src, quote=True)}" '
+            f'title="{escape(title, quote=True)}" width="560" height="315" '
+            'loading="lazy" allow="accelerometer; clipboard-write; '
+            'encrypted-media; gyroscope; picture-in-picture" '
+            'referrerpolicy="strict-origin-when-cross-origin" '
+            'allowfullscreen></iframe>')
 
 
 def _strip_tracking(url: str) -> str:
@@ -227,13 +287,21 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
             script.replace_with(doc.new_tag("a", href=url,
                                             string=f"embed: {url}"))
 
-    # An iframe with no source is an embed whose content the body never
-    # carried (a feed body renders a gist that way: src="", 0x0). It gets
-    # the same visible placeholder the state conversion uses, which lint
-    # flags -- a link with no target would read as a dangling "embed:".
+    # A YouTube iframe stays an iframe: the archive has its URL, and the
+    # player is the content, so it is written as one (_Converter renders
+    # it; the exporters render or rewrite that one form). Any other
+    # iframe becomes a link to its target. An iframe with no source is
+    # an embed whose content the body never carried (a feed body renders
+    # a gist that way: src="", 0x0). It gets the same visible placeholder
+    # the state conversion uses, which lint flags -- a link with no
+    # target would read as a dangling "embed:".
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
-        if src:
+        video = youtube_video(src) if src else None
+        if video:
+            iframe.attrs = {"src": youtube_embed_url(*video),
+                            "title": iframe.get("title") or ""}
+        elif src:
             iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
         else:
             iframe.replace_with(doc.new_tag("p", string="[missing embed]"))

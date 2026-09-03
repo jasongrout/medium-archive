@@ -156,6 +156,11 @@ a:hover { text-decoration: underline; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
+/* An embedded player (convert writes YouTube embeds as 560x315 iframes)
+   fills the column at the 16:9 its attributes state, instead of sitting
+   at its fixed size, which overflows a phone-width column. */
+.post iframe { width: 100%; max-width: 100%; height: auto; aspect-ratio: 16 / 9;
+               border: 0; border-radius: 4px; }
 /* An image standing on its own -- a paragraph holding nothing but the
    image, linked or not, or a figure -- is centred, as Medium sets
    every body image; most are narrower than the column, and an

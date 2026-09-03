@@ -74,7 +74,8 @@ Notes:
     old inbound link carries), medium_id (Medium also resolves /p/<id>) and
     slug; redirects.csv collects these for every converted post.
   * Medium's "was originally published in ... on Medium" footer and stat
-    tracking pixels are removed. Embedded gists/iframes become links.
+    tracking pixels are removed. Embedded gists inline their archived
+    files, YouTube embeds stay players, other iframes become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
   * Fixups: files in <out>/fixups/ are applied to the in-memory raw
     sources by convert and compare, so authored defects -- a broken href

@@ -31,7 +31,7 @@ import re
 import sys
 from pathlib import Path
 
-from .sites import (Covers, ImagePlacer, LinkMap, by_year, clean_site,
+from .sites import (IFRAME_RE, Covers, ImagePlacer, LinkMap, by_year, clean_site,
                     load_site_inputs, page_stems, place_images,
                     read_post_body, retarget_images, rewrite_body as _rewrite,
                     rewrite_figures, tag_names, template_text,
@@ -110,6 +110,29 @@ def escape_prose(line: str) -> str:
 
 FIGURE_TAG_LINE_RE = re.compile(r"^</?fig(?:ure|caption)>\n\n?", re.M)
 
+# a captioned player: the shell around convert's iframe line
+IFRAME_SHELL_RE = re.compile(
+    r"<figure>\n\n(<iframe [^\n]+></iframe>)\n\n"
+    r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")
+
+
+def _iframe_directive(line: str, caption: str = "") -> str:
+    """convert's YouTube player line as MyST's {iframe} directive,
+    which mystmd renders as a responsive player; raw HTML would not be
+    guaranteed to render. The caption, when any, is the directive body,
+    as with {figure}."""
+    m = IFRAME_RE.match(line)
+    src, title = m.group(1), m.group(2)
+    body = f"\n{caption}\n" if caption else ""
+    return f":::{{iframe}} {src}\n:width: 100%\n{body}:::"
+
+
+def myst_iframes(markdown: str) -> str:
+    """Every player line, captioned or not, as an {iframe} directive."""
+    markdown = IFRAME_SHELL_RE.sub(
+        lambda m: _iframe_directive(m.group(1), m.group(2)), markdown)
+    return IFRAME_RE.sub(lambda m: _iframe_directive(m.group(0)), markdown)
+
 
 def myst_figures(markdown: str) -> str:
     """The <figure>/<figcaption> shells convert writes around captioned
@@ -126,6 +149,7 @@ def myst_figures(markdown: str) -> str:
         opt = f":alt: {alt}\n" if alt else ""
         return f":::{{figure}} {src}\n{opt}\n{caption}\n:::"
     markdown = rewrite_figures(markdown, directive)
+    markdown = myst_iframes(markdown)
     markdown = FIGURE_TAG_LINE_RE.sub("", markdown)
     return re.sub(r"\n{3,}", "\n\n", markdown)
 

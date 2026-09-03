@@ -303,3 +303,17 @@ def test_multiple_authors(tmp_path):
     assert ('authors:\n  - name: "Ada Lovelace"\n    url: "https://medium.com/@ada"\n'
             '  - name:\n      literal: "yuvipanda"\n') in text
     assert "Ada Lovelace, yuvipanda" in (site / "archive.md").read_text()
+
+
+def test_youtube_player_becomes_an_iframe_directive():
+    # raw HTML is not guaranteed to render in mystmd; the player line
+    # convert writes becomes the {iframe} directive, the caption its body
+    line = ('<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk" '
+            'title="A talk" width="560" height="315" loading="lazy" '
+            'allowfullscreen></iframe>')
+    md = f"Intro.\n\n<figure>\n\n{line}\n\n<figcaption>\n\n*Cap.*\n\n</figcaption>\n\n</figure>\n\n{line}\n"
+    assert myst_figures(md) == (
+        "Intro.\n\n:::{iframe} https://www.youtube-nocookie.com/embed/abcdefghijk\n"
+        ":width: 100%\n\n*Cap.*\n:::\n\n"
+        ":::{iframe} https://www.youtube-nocookie.com/embed/abcdefghijk\n"
+        ":width: 100%\n:::\n")

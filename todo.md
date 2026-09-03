@@ -58,6 +58,22 @@ and the offline test suite.
   fixed by hand. An iframe with no source (how a feed body renders a
   gist) now converts to the `[missing embed]` placeholder instead of a
   dangling `embed:` with no link, so plain `lint` catches it too.
+- **YouTube embeds are players, not links.** The archive has the
+  video's URL, which is all the player needs, so `to_markdown` keeps a
+  YouTube iframe as an iframe: one canonical line
+  (`convert.youtube_iframe`) with the video on the no-cookie host, any
+  `t=`/`start=` start time, the resource title the state knows as the
+  accessible name (an export iframe has none; "YouTube video" then),
+  lazy loading and YouTube's own `allow` list. `youtube_video`
+  recognizes every URL form Medium and the state produce (watch?v=,
+  youtu.be, /embed/, /v/, /shorts/, /live/) and refuses playlists.
+  Hugo and Pelican render the line as the raw HTML block it is (as
+  they do the figure shells), with `card.css` scaling the 560×315
+  player to the column at 16:9; the MyST exporter rewrites it to the
+  `{iframe}` directive, captioned or not, since mystmd is not
+  guaranteed to render raw HTML. `compare` sets the title aside, as it
+  does fence languages, so the sources still agree. Every other iframe
+  is still the `[embed: url]` link, which `lint --embeds` reports.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line

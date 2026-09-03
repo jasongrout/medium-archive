@@ -47,3 +47,13 @@ def test_fence_language_is_not_a_page_export_difference():
 def test_fence_language_is_not_a_ghost_difference():
     assert ghost_comparable_blocks("```js\ncode\n```\n") == \
         ghost_comparable_blocks("```\ncode\n```\n")
+
+
+def test_comparable_lines_drop_player_titles():
+    # only the state conversion knows a video's title; the player line
+    # agrees between sources once the title is set aside
+    from medium_archive.compare import comparable_lines
+    a = '<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk" title="A talk" width="560"></iframe>'
+    b = a.replace('title="A talk"', 'title="YouTube video"')
+    assert comparable_lines(a) == comparable_lines(b)
+    assert comparable_lines(a)[0].startswith('<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk" title=""')

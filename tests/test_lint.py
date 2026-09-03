@@ -190,3 +190,24 @@ def test_embeds_mode_reports_embeds_the_body_source_dropped(tmp_path):
     # no page (or no raw/) to compare against: only the links
     errors, _ = lint_post(d, embeds=True, raw_root=tmp_path / "nowhere")
     assert len(errors) == 2
+
+
+def test_youtube_player_is_content_not_a_bare_link(tmp_path):
+    """A YouTube embed convert kept as a player is filled in: --embeds
+    does not report it, and it counts against the state's embeds."""
+    from test_state import MID, make_state, para, shell_html
+    player = ('<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk" '
+              'title="A talk" width="560" height="315" loading="lazy" '
+              "allowfullscreen></iframe>")
+    d = write_post(tmp_path, "x\n" * 100 + player + "\n",
+                   front={**FRONT, "medium_id": MID, "body_source": "export"})
+    p = para(0, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m0"}})
+    state = make_state([p])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "A talk",
+        "iframeSrc": "https://cdn.embedly.com/widgets/media.html"
+                     "?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabcdefghijk"}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])

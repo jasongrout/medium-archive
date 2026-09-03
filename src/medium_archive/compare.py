@@ -29,14 +29,17 @@ from .urls import canonical_url
 
 
 FENCE_INFO_RE = re.compile(r"^(`{3,})\S+")
+IFRAME_TITLE_RE = re.compile(r'^(<iframe src="[^"]+" title=)"[^"]*"')
 
 
 def comparable_lines(markdown: str) -> list:
     """Lines that matter for agreement: blank-line layout is noise, the
     page and export sometimes encode the same URL differently (%20 vs +
     vs a literal space), and only the state conversion knows code-fence
-    languages (codeBlockMetadata), so fence info strings are dropped."""
-    return [unquote_plus(FENCE_INFO_RE.sub(r"\1", l.rstrip()))
+    languages (codeBlockMetadata) and a video embed's title, so fence
+    info strings and player titles are dropped."""
+    return [unquote_plus(IFRAME_TITLE_RE.sub(r'\1""',
+                                             FENCE_INFO_RE.sub(r"\1", l.rstrip())))
             for l in markdown.splitlines() if l.strip()]
 
 

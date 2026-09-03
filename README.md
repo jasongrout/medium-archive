@@ -501,7 +501,13 @@ no longer lists, work through the steps in order:
   not). `lint` flags the placeholders until a `fetch` re-run backfills
   the media. An RSS feed body renders a gist as an iframe with no
   source at all; that converts to the same placeholder, and only a
-  fixup that puts the gist's `<script src>` back restores it. Code
+  fixup that puts the gist's `<script src>` back restores it. A
+  YouTube embed is the other exception: its URL is all a player needs,
+  so it stays an `<iframe>` (one canonical line, on the no-cookie host,
+  with the state's title for assistive tech and any `t=` start time)
+  that Hugo and Pelican render as raw HTML and the MyST exporter
+  rewrites to the `{iframe}` directive; `lint --embeds` counts it as
+  content. Code
   fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.

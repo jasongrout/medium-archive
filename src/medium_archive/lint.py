@@ -53,7 +53,8 @@ IMAGE_RE = re.compile(r"!\[[^\]]*\]\((images/[^)]+)\)")
 MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
 
 # the link convert leaves where an iframe stood (--embeds); the href is
-# the embed's target, unescaped
+# the embed's target, unescaped. A YouTube embed stays a player instead
+# (convert.youtube_iframe), which is content, not a bare link.
 EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
 
 FENCE_RE = re.compile(r"^`{3,}")
@@ -121,9 +122,14 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     raw_root is the archive's raw/ directory, for the page's editor
     state; without it, or without a page, only the bare links are
     reported."""
+    from .sites import IFRAME_RE           # sites imports this module
     problems = []
-    links = [m.group(1) for line, fenced in prose_lines(body) if not fenced
-             for m in EMBED_LINK_RE.finditer(line)]
+    links, players = [], 0
+    for line, fenced in prose_lines(body):
+        if fenced:
+            continue
+        links.extend(m.group(1) for m in EMBED_LINK_RE.finditer(line))
+        players += bool(IFRAME_RE.match(line))
     for url in links:
         problems.append(f"embed is a bare link, its content is not in the "
                         f"archive: {url[:100]} (replace it by hand)")
@@ -137,9 +143,10 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
                                    front["medium_id"])
     # the state's targets and the body's links name one embed in different
     # forms (a canonical page vs an embed URL), so they are compared by
-    # count: fewer links than the state has embeds means the body source
-    # dropped some -- name the state's, since those are what is missing
-    dropped = len(expected) - len(links)
+    # count: fewer links and players than the state has embeds means the
+    # body source dropped some -- name the state's, since those are what
+    # is missing
+    dropped = len(expected) - len(links) - players
     if dropped > 0:
         names = ", ".join(repr(title or url[:60]) for url, title in expected)
         problems.append(

@@ -185,6 +185,63 @@ def test_iframe_embed_link_text_has_no_brackets():
                   "(https://www.youtube.com/embed/x)\n")
 
 
+YT = ("https://www.youtube-nocookie.com/embed/abcdefghijk", 'width="560" height="315" '
+      'loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; '
+      'gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" '
+      "allowfullscreen")
+
+
+def test_youtube_video_recognizes_every_url_form():
+    from medium_archive.convert import youtube_video
+    for url in ("https://www.youtube.com/watch?v=abcdefghijk",
+                "http://youtube.com/watch?v=abcdefghijk&feature=x",
+                "https://m.youtube.com/watch?v=abcdefghijk",
+                "https://www.youtube.com/embed/abcdefghijk?feature=oembed",
+                "https://www.youtube-nocookie.com/embed/abcdefghijk",
+                "https://youtu.be/abcdefghijk",
+                "https://www.youtube.com/v/abcdefghijk",
+                "https://www.youtube.com/shorts/abcdefghijk",
+                "https://www.youtube.com/live/abcdefghijk"):
+        assert youtube_video(url) == ("abcdefghijk", None), url
+    assert youtube_video("https://youtu.be/abcdefghijk?t=4m15s") == ("abcdefghijk", 255)
+    assert youtube_video("https://www.youtube.com/watch?v=abcdefghijk&t=90") == ("abcdefghijk", 90)
+    assert youtube_video("https://www.youtube.com/watch?v=abcdefghijk&t=90s") == ("abcdefghijk", 90)
+    assert youtube_video("https://www.youtube.com/embed/abcdefghijk?start=7") == ("abcdefghijk", 7)
+    assert youtube_video("https://www.youtube.com/watch?v=abcdefghijk&t=0") == ("abcdefghijk", None)
+    for url in ("https://vimeo.com/123", "https://www.youtube.com/",
+                "https://www.youtube.com/embed/videoseries?list=PL1",
+                "https://www.youtube.com/playlist?list=PL1",
+                "https://www.youtube.com/watch?v=short",
+                "https://twitter.com/youtube.com/status/1"):
+        assert youtube_video(url) is None, url
+
+
+def test_youtube_iframe_stays_a_player():
+    # the archive has the video's URL, and the player is the content: one
+    # canonical iframe line on the no-cookie host, lazily loaded, with a
+    # title for assistive tech (the export iframe has none)
+    md = md_of('<p>See:</p><iframe src="https://www.youtube.com/embed/abcdefghijk'
+               '?feature=oembed" width="700" height="393" frameborder="0"></iframe>')
+    assert md == (f'See:\n\n<iframe src="{YT[0]}" title="YouTube video" {YT[1]}>'
+                  "</iframe>\n")
+    # the state's title and a start time carry over; quotes are escaped
+    md = md_of('<iframe src="https://youtu.be/abcdefghijk?t=1m" '
+               'title="A &quot;talk&quot;"></iframe>')
+    assert md == (f'<iframe src="{YT[0]}?start=60" title="A &quot;talk&quot;" '
+                  f"{YT[1]}></iframe>\n")
+    # any other iframe is still the link
+    assert md_of('<iframe src="https://vimeo.com/1"></iframe>') == (
+        "[embed: https://vimeo.com/1](https://vimeo.com/1)\n")
+
+
+def test_captioned_youtube_embed_keeps_its_shell():
+    md = md_of('<figure><iframe src="https://youtu.be/abcdefghijk"></iframe>'
+               "<figcaption>Watch it</figcaption></figure>")
+    assert md == (f'<figure>\n\n<iframe src="{YT[0]}" title="YouTube video" '
+                  f"{YT[1]}></iframe>\n\n<figcaption>\n\nWatch it\n\n"
+                  "</figcaption>\n\n</figure>\n")
+
+
 def test_iframe_without_a_source_becomes_a_missing_embed_placeholder():
     # a feed body renders a gist as <iframe src="" width="0" height="0">;
     # a link with no target would read as a dangling "embed:", so it gets

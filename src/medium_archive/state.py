@@ -248,10 +248,13 @@ def _iframe_src(state, p) -> str:
 def _iframe(state, p, media: dict | None = None) -> str:
     src = _iframe_src(state, p)
     caption = _rich_text(p.get("text") or "", p.get("markups"), state)
+    res = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
     if not src:
-        res = _deref(state, (p.get("iframe") or {}).get("mediaResource") or {})
         return _media_embed(res, media or {}, caption)
-    inner = f'<iframe src="{escape(src, quote=True)}"></iframe>'
+    # the resource's title names the video or tweet; to_markdown keeps it
+    # as the player's accessible name when the embed stays an iframe
+    title = f' title="{escape(res["title"], quote=True)}"' if res.get("title") else ""
+    inner = f'<iframe src="{escape(src, quote=True)}"{title}></iframe>'
     if caption.strip():
         inner += f"<figcaption>{caption}</figcaption>"
     return f"<figure>{inner}</figure>"
