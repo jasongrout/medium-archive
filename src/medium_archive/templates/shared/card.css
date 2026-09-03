@@ -108,9 +108,10 @@ a:hover { text-decoration-line: underline; }
 .site-header nav a:hover { color: var(--ink); text-decoration-line: underline; }
 /* The current page's nav item. jupyter.org's navbar sets it in orange
    text, which is the 2.8:1 the link rule exists to avoid; here it is
-   the ink with the link rule under it, the same mark a link shows on
-   hover, held on. */
-.site-header nav a[aria-current="page"] { color: var(--ink); text-decoration-line: underline; }
+   the ink, bold, with the link rule under it -- the mark a link shows
+   on hover, held on. */
+.site-header nav a[aria-current="page"] { color: var(--ink); font-weight: 700;
+                                          text-decoration-line: underline; }
 
 .theme-picker, .font-picker { display: inline-flex; vertical-align: middle;
                               margin-left: 1.25rem; }
