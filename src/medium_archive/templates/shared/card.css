@@ -8,9 +8,10 @@
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
         --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
         --error-soft: #b91c1c;
-        /* syntax colours for highlighted code, see the token rules */
-        --syn-keyword: #cf222e; --syn-string: #0a3069; --syn-comment: #6e7781;
-        --syn-number: #0550ae; --syn-name: #8250df; --syn-builtin: #953800;
+        /* syntax colours for highlighted code (see the token rules),
+           each at 7:1 or better on --code-bg, like the text grays */
+        --syn-keyword: #a41b24; --syn-string: #0a3069; --syn-comment: #4e545c;
+        --syn-number: #0550ae; --syn-name: #633da9; --syn-builtin: #923700;
         color-scheme: light; }
 :root[data-theme="dark"] {
 /* @include shared/dark-palette.css */
@@ -203,9 +204,11 @@ a:hover { text-decoration: underline; }
    classes, and builtins. The block keeps the theme's background and
    ink, so a block reads as part of the page in either scheme, where
    an engine's own inlined style (Chroma's Monokai) would paint a
-   dark block on the light page. Light values are GitHub's light
-   scheme, dark ones its dark scheme, both chosen for contrast on
-   near-white and near-black. */
+   dark block on the light page. The colours start from GitHub's
+   light and dark schemes, each then blended toward black or white
+   just far enough to clear WCAG AAA (7:1) on that palette's
+   --code-bg, the level the text grays hold to; a test checks every
+   one. */
 .post .highlight .k, .post .highlight .kd, .post .highlight .kn,
 .post .highlight .kr, .post .highlight .kt, .post .highlight .kc,
 .post .highlight .ow { color: var(--syn-keyword); }

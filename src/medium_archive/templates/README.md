@@ -147,8 +147,10 @@ These embed verbatim in both engines' pages, so they must carry no
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link
   color and stays the same in both palettes. The `--syn-*` colours
-  are the syntax-highlighting set for that palette; `card.css` names
-  the light set beside its other light values and applies both
+  are the syntax-highlighting set for that palette, each at WCAG AAA
+  (7:1) on that palette's `--code-bg`, as the text grays are on
+  theirs, and a test holds them there; `card.css` names the light
+  set beside its other light values and applies both
   through the token rules under `.post .highlight`, on the class
   names Chroma (Hugo, with `noClasses` off in `hugo.toml.tmpl`) and
   Pygments (Pelican's codehilite) share.

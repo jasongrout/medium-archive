@@ -654,6 +654,32 @@ def test_code_copy(archive):
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 
+def _contrast(a: str, b: str) -> float:
+    """WCAG 2 contrast ratio of two #rrggbb colours."""
+    def luminance(hex_colour):
+        channels = [int(hex_colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+                  for c in channels]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+    high, low = sorted((luminance(a), luminance(b)), reverse=True)
+    return (high + 0.05) / (low + 0.05)
+
+
+def test_syntax_colours_contrast():
+    """Every syntax colour clears WCAG AAA (7:1) on its palette's code
+    background, the level the theme holds its text grays to."""
+    import re
+    light = sites.template_text("shared/card.css").split("/* @include")[0]
+    dark = sites.template_text("shared/dark-palette.css")
+    for name, palette in (("light", light), ("dark", dark)):
+        code_bg = re.search(r"--code-bg: (#[0-9a-f]{6})", palette).group(1)
+        colours = re.findall(r"--syn-([a-z]+): (#[0-9a-f]{6})", palette)
+        assert len(colours) == 6, name
+        for token, colour in colours:
+            ratio = _contrast(colour, code_bg)
+            assert ratio >= 7, (name, token, colour, round(ratio, 2))
+
+
 def test_post_share_links(archive):
     """A post carries the five share links twice -- under the byline and
     at the foot -- from one definition per engine, each mark coming from
