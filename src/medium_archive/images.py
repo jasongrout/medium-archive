@@ -65,8 +65,26 @@ def is_avatar(img_tag) -> bool:
     return bool(m) and int(m.group(1)) <= 176 and int(m.group(2)) <= 176
 
 
+MEDIUM_CDN_HOSTS = {"miro.medium.com", "cdn-images-1.medium.com",
+                    "cdn-images-2.medium.com"}
+
+
+def same_medium_asset(url: str) -> bool:
+    """Whether url is a Medium CDN image, which the same asset appears
+    as under more than one host (miro.medium.com/v2/<id> and
+    cdn-images-1.medium.com/<id>), so one download serves both names.
+    Files elsewhere are told apart by their full URL: every Giphy file
+    is called giphy.gif or giphy.mp4."""
+    return urlsplit(url).netloc.lower() in MEDIUM_CDN_HOSTS
+
+
 def safe_filename(url: str, index: int) -> str:
-    name = unquote(Path(urlsplit(url).path).name) or "image"
+    path = Path(unquote(urlsplit(url).path))
+    name = path.name or "image"
+    # a Giphy file is named for its format only; the id is the parent
+    # segment, and two clips in one post must not share a filename
+    if name.split(".")[0] == "giphy" and path.parent.name:
+        name = f"{path.parent.name}-{name}"
     name = re.sub(r"[^A-Za-z0-9._-]", "_", name)[:80]
     if name.endswith("."):      # extension-less asset ids can end in "."
         name += "bin"

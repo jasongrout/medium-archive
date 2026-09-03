@@ -18,7 +18,8 @@ from bs4 import BeautifulSoup
 
 from .dates import in_window, parse_date
 from .discovery import discover, fetch_feed
-from .images import collect_image_urls, giphy_media, safe_filename
+from .images import (collect_image_urls, giphy_media, safe_filename,
+                     same_medium_asset)
 from .state import (state_embed_targets, state_image_urls,
                     state_media_resources)
 from .net import fetch, make_session
@@ -173,7 +174,9 @@ def fetch_images(session, srcs: list, img_dir: Path, img_map: dict,
     n = 0
     by_basename = {}   # the same asset appears as miro.medium.com/v2/<id> and cdn-images-1.medium.com/<id>
     for i, src in enumerate(srcs, start=start):
-        base = Path(urlsplit(src).path).name
+        # only Medium's own assets share a file across hosts; anything
+        # else (a Giphy clip, always giphy.mp4) is keyed by its full URL
+        base = Path(urlsplit(src).path).name if same_medium_asset(src) else src
         if base in by_basename:
             img_map[src] = by_basename[base]
             continue

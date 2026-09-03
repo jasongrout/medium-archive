@@ -166,8 +166,8 @@ def test_embed_assets_are_fetched_with_the_images_and_backfilled(tmp_path):
     # and images.json after what is already there
     assert fetchmod.backfill_embed_assets(session, giphy_page(mid), mid, dest, 0) == 1
     assert json.loads((dest / "images.json").read_text()) == {
-        "https://x/a.png": "001-a.png", GIPHY: "002-giphy.gif"}
-    assert (dest / "images" / "002-giphy.gif").read_bytes() == b"GIF89a"
+        "https://x/a.png": "001-a.png", GIPHY: "002-fWgAW7WZtPMBjmpa3V-giphy.gif"}
+    assert (dest / "images" / "002-fWgAW7WZtPMBjmpa3V-giphy.gif").read_bytes() == b"GIF89a"
     # incremental: nothing to do the second time
     assert fetchmod.backfill_embed_assets(session, giphy_page(mid), mid, dest, 0) == 0
     assert session.calls == [GIPHY]
@@ -187,3 +187,20 @@ def test_urls_file_may_name_archived_posts(tmp_path):
         assert fetchmod.resolve_post_ref(ref, tmp_path, index).startswith(GOOD), ref
     assert fetchmod.resolve_post_ref("2019-01-01-unknown", tmp_path, index) == "2019-01-01-unknown"
     assert fetchmod.resolve_post_ref("deadbeef", tmp_path, index) == "deadbeef"
+
+
+def test_two_giphy_clips_in_one_post_get_two_files(tmp_path):
+    # every Giphy file is giphy.mp4: the basename de-duplication that
+    # merges one Medium asset's two CDN hosts must not merge them
+    a = "https://media.giphy.com/media/Ri327iDKuC4pnExM4L/giphy.mp4"
+    b = "https://media.giphy.com/media/fSqNQ06Ujnuu8juH2t/giphy.mp4"
+    same = ("https://miro.medium.com/v2/1*abc.png",
+            "https://cdn-images-1.medium.com/1*abc.png")
+    session = FakeSession(router=lambda url: FakeResp(content=url.encode()))
+    img_map = {}
+    n = fetchmod.fetch_images(session, [a, b, *same], tmp_path / "images", img_map, 0)
+    assert n == 3 and session.calls == [a, b, same[0]]
+    assert img_map == {a: "001-Ri327iDKuC4pnExM4L-giphy.mp4",
+                       b: "002-fSqNQ06Ujnuu8juH2t-giphy.mp4",
+                       same[0]: "003-1_abc.png", same[1]: "003-1_abc.png"}
+    assert (tmp_path / "images" / img_map[b]).read_bytes() == b.encode()

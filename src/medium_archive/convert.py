@@ -21,7 +21,8 @@ from .dates import parse_date
 from .export import export_body, parse_export
 from .fetch import archive_base, read_index
 from .fixup import load_fixups, read_raw
-from .images import giphy_media, image_source, sniff_image_ext
+from .images import (giphy_media, image_source, same_medium_asset,
+                     sniff_image_ext)
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json, strip_title_prefix)
@@ -219,7 +220,8 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     (markdown, used_images)."""
     doc = BeautifulSoup("", "html.parser")        # owner for new_tag()
     # the same asset appears under miro.medium.com and cdn-images-1.medium.com
-    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
+    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()
+                   if same_medium_asset(u)}
 
     # A Giphy embed names a media file the archive fetches like any
     # image (fetch.embed_asset_urls), so the iframe becomes the file
