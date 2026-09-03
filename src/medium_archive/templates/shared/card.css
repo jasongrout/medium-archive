@@ -355,8 +355,9 @@ a:hover { text-decoration-line: underline; }
 /* hover deepens the mark rather than coloring it: these are the
    networks' logos, and most of their brand guidelines allow a
    one-color rendering but not a recoloring, which the site accent
-   would be. Contrast carries the affordance instead. */
-.share-link:hover { color: var(--ink); border-color: var(--muted);
+   would be. The ring around it is ours, so it takes the accent on
+   hover as a tag's does. */
+.share-link:hover { color: var(--ink); border-color: var(--accent);
                     text-decoration: none; }
 .share-icon { width: 1.05rem; height: 1.05rem; fill: currentColor; }
 
