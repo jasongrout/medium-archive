@@ -352,9 +352,12 @@ and the Mastodon account, alongside the X handle already in
 Medium posts embed videos, tweets, gists and the like as iframes.
 `convert` has no content for most of them, so an iframe becomes a
 `[embed: <url>](<url>)` link, and every generated site shows that link
-where the reader expects the video or the tweet. Gists are the
-exception (their files are archived under `raw/<id>/media/` and
-inlined as code), but a body source can lose an embed altogether. None
+where the reader expects the tweet. Two kinds are handled: gists
+(their files are archived under `raw/<id>/media/` and inlined as
+code) and YouTube videos (the URL is all a player needs, so the iframe
+stays a player: 33 of them across 19 posts, on the no-cookie host,
+titled from the editor state where it knows the video). A body source
+can still lose an embed altogether. None
 of that is a conversion defect, so plain `lint` stays quiet about the
 links; `medium-archive lint --embeds` reports every one as a problem
 and exits non-zero. `.github/workflows/lint.yml` runs it on every push
@@ -367,13 +370,15 @@ medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
 medium-archive lint --embeds --out .    # one line per embed missing content
 ```
 
-As of 2026-09-03 the run reports 56 problems:
+As of 2026-09-03 the run reports 23 problems:
 
-- **53 bare embed links across 25 posts**: YouTube (33), Twitter (12),
-  carbon.now.sh code screenshots (4), Giphy (3) and one art19 podcast
-  episode. Each needs a decision per embed: an image or code block
-  placed in a fixup, a plain link with a sentence around it, or leaving
-  the link as it stands and accepting it.
+- **20 bare embed links across 10 posts**: Twitter (12),
+  carbon.now.sh code screenshots (4), Giphy (3) and one art19
+  podcast episode. Each needs a decision per embed: an image or code
+  block placed in a fixup, a plain link with a sentence around it, or
+  leaving the link as it stands and accepting it. The tweets are the
+  bulk; a tweet's text is not in the archive, so a fixup would have to
+  quote it (Medium's export carries only the embedly wrapper).
 - **2 embeds an export body dropped** that the page's editor state still
   carries: the tweet in `jupyter-receives-the-acm-software-system-award`
   (already noted under `compare --state` above) and a tweet in
