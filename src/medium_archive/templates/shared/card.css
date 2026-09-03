@@ -104,6 +104,9 @@ a:hover { text-decoration-line: underline; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
+/* the masthead is the site's name, not a link among links: no rule on
+   hover either (a:hover outranks .site-title, so it says so itself) */
+.site-title:hover { text-decoration-line: none; }
 /* The nav is a row of tabs, not a row of links: no text underline,
    and the current page's item is bold ink with a 3px accent bar on
    the header's bottom edge, the tab convention rather than the link
