@@ -1,6 +1,7 @@
 """Medium URL and post-identifier helpers."""
 
 import re
+from urllib.parse import urlsplit
 from urllib.parse import unquote, urljoin, urlparse
 
 POST_ID_RE = re.compile(r"-([0-9a-f]{8,12})/?$")   # Medium post slugs end in a hex id
@@ -58,3 +59,34 @@ def is_post_url(url: str, base_host: str) -> bool:
     if p.path.startswith(("/tagged/", "/search", "/archive", "/about", "/sitemap")):
         return False
     return bool(POST_ID_RE.search(p.path))
+
+
+TWEET_HOSTS = {"twitter.com", "www.twitter.com", "mobile.twitter.com",
+               "x.com", "www.x.com", "mobile.x.com"}
+TWEET_PATH_RE = re.compile(r"^/(?:([A-Za-z0-9_]{1,15})|i/web)/status(?:es)?/(\d+)")
+
+
+def tweet_id(url: str):
+    """(tweet id, author handle or None) of a tweet URL on twitter.com
+    or x.com, or None for any other URL."""
+    if not url:
+        return None
+    parts = urlsplit(url)
+    if parts.netloc.lower() not in TWEET_HOSTS:
+        return None
+    m = TWEET_PATH_RE.match(parts.path)
+    return (m.group(2), m.group(1)) if m else None
+
+
+CARBON_PATH_RE = re.compile(r"^/(?:embed/)?([A-Za-z0-9]{10,})/?$")
+
+
+def carbon_id(url: str) -> str | None:
+    """The snippet id of a carbon.now.sh page or embed URL, else None."""
+    if not url:
+        return None
+    parts = urlsplit(url)
+    if parts.netloc.lower().removeprefix("www.") != "carbon.now.sh":
+        return None
+    m = CARBON_PATH_RE.match(parts.path)
+    return m.group(1) if m else None

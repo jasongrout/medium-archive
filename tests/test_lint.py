@@ -185,8 +185,163 @@ def test_embeds_mode_reports_embeds_the_body_source_dropped(tmp_path):
     d = write_post(tmp_path, body, front={**front, "body_source": "state"},
                    name="2020-01-02-from-state")
     errors, _ = lint_post(d, embeds=True, raw_root=raw)
-    assert len(errors) == 2 and all(e.startswith("embed is a bare link")
-                                    for e in errors)
+    assert len(errors) == 2 and errors[0].startswith("embed is a bare link")
+    assert errors[1].startswith("tweet not archived, embed is a bare link")
     # no page (or no raw/) to compare against: only the links
     errors, _ = lint_post(d, embeds=True, raw_root=tmp_path / "nowhere")
     assert len(errors) == 2
+
+
+def test_youtube_player_is_content_not_a_bare_link(tmp_path):
+    """A YouTube embed convert kept as a player is filled in: --embeds
+    does not report it, and it counts against the state's embeds."""
+    from test_state import MID, make_state, para, shell_html
+    player = ('<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk" '
+              'title="A talk" width="560" height="315" loading="lazy" '
+              "allowfullscreen></iframe>")
+    d = write_post(tmp_path, "x\n" * 100 + player + "\n",
+                   front={**FRONT, "medium_id": MID, "body_source": "export"})
+    p = para(0, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m0"}})
+    state = make_state([p])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "A talk",
+        "iframeSrc": "https://cdn.embedly.com/widgets/media.html"
+                     "?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabcdefghijk"}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_giphy_embed_is_an_asset_not_a_link(tmp_path):
+    """A Giphy embed converts to an image or clip: not a bare link, not
+    among the embeds a body source could have dropped, and reported
+    only while it is still served from Giphy."""
+    from test_state import MID, make_state, para, shell_html
+    gif = "https://media.giphy.com/media/fWgAW7WZtPMBjmpa3V/giphy.gif"
+    mp4 = "https://media.giphy.com/media/Ri327iDKuC4pnExM4L/giphy.mp4"
+    state = make_state([
+        para(0, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m0"}}),
+        para(1, "IFRAME", "", iframe={"mediaResource": {"__ref": "MediaResource:m1"}})])
+    for i, url in enumerate((gif, mp4)):
+        state[f"MediaResource:m{i}"] = {
+            "id": f"m{i}", "title": "", "iframeSrc":
+            "https://cdn.embedly.com/widgets/media.html?url=" + url.replace("/", "%2F")}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    front = {**FRONT, "medium_id": MID, "body_source": "export"}
+    d = write_post(tmp_path, "x\n" * 100 + "![](images/001-giphy.gif)\n\n"
+                   '<video src="images/002-giphy.mp4" autoplay loop muted playsinline></video>\n',
+                   front=front)
+    (d / "images").mkdir()
+    (d / "images" / "001-giphy.gif").write_bytes(b"GIF89a")
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+    d = write_post(tmp_path, "x\n" * 100 + f"![]({gif})\n\n"
+                   f'<video src="{mp4}" autoplay loop muted playsinline></video>\n',
+                   front=front, name="2020-01-02-remote")
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    tail = " (re-run fetch; `fetch --urls` takes this post's name)"
+    assert errors == [f"embed media not archived, served remotely: {gif}{tail}",
+                      f"embed media not archived, served remotely: {mp4}{tail}"]
+
+
+def test_archived_tweet_quote_is_content(tmp_path):
+    """The blockquote an archived tweet became counts against the
+    state's embeds like a player; an unarchived one is reported as a
+    tweet, with fetch as the remedy."""
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "Ann on Twitter", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Ftwitter.com%2Fann%2Fstatus%2F12345"}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    front = {**FRONT, "medium_id": MID, "body_source": "export"}
+    quote = ("> Hello [world](https://e.com)\n>\n> \u2014 [Ann (@ann)](https://twitter.com/ann), "
+             "[May 1, 2020](https://twitter.com/ann/status/12345)\n")
+    d = write_post(tmp_path, "x\n" * 100 + quote, front=front)
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+    d = write_post(tmp_path, "x\n" * 100 + "[embed: https://twitter.com/ann/status/12345]"
+                   "(https://twitter.com/ann/status/12345)\n", front=front,
+                   name="2020-01-02-bare")
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert errors == ["tweet not archived, embed is a bare link: "
+                      "https://twitter.com/ann/status/12345 (re-run fetch for its "
+                      "text; a deleted tweet stays a link)"]
+
+
+def test_archived_carbon_snippet_is_not_a_dropped_embed(tmp_path):
+    """An archived Carbon snippet converts to a fence, which the
+    cross-check cannot count, so its target leaves the state's list."""
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "Carbon snippet", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Fcarbon.now.sh%2FPaDDn2ZszZUVmuhvRP52"}
+    raw = tmp_path / "raw"
+    (raw / MID / "media").mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    front = {**FRONT, "medium_id": MID, "body_source": "state"}
+    d = write_post(tmp_path, "x\n" * 100 + "```python\nx = 1\n```\n", front=front)
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert errors and "dropped 1 embed" in errors[0]
+    (raw / MID / "media" / "carbon-PaDDn2ZszZUVmuhvRP52.json").write_text("{}")
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_provider_link_is_not_a_dropped_embed(tmp_path):
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "Ep. 248", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Fart19.com%2Fshows%2Flc%2Fepisodes%2Fce2c"}
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    d = write_post(tmp_path, "x\n" * 100 + "[Ep. 248](https://art19.com/shows/lc/episodes/ce2c)\n",
+                   front={**FRONT, "medium_id": MID, "body_source": "state"})
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_unfetched_tweet_photo_is_reported(tmp_path):
+    d = write_post(tmp_path, "x\n" * 100 +
+                   "> ![](https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg)\n")
+    errors, _ = lint_post(d, embeds=True)
+    assert errors == ["embed media not archived, served remotely: "
+                      "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg "
+                      "(re-run fetch; `fetch --urls` takes this post's name)"]
+
+
+def test_recorded_deleted_tweet_is_not_an_unfilled_embed(tmp_path):
+    from test_state import MID, make_state, para, shell_html
+    state = make_state([para(0, "IFRAME", "",
+                             iframe={"mediaResource": {"__ref": "MediaResource:m0"}})])
+    state["MediaResource:m0"] = {
+        "id": "m0", "title": "", "iframeSrc":
+        "https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Ftwitter.com%2Fann%2Fstatus%2F12345"}
+    raw = tmp_path / "raw"
+    (raw / MID / "media").mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+    (raw / MID / "media" / "tweet-12345.json").write_text('{"deleted": true}')
+    d = write_post(tmp_path, "x\n" * 100 +
+                   "[A tweet by @ann, no longer available](https://twitter.com/ann/status/12345)\n",
+                   front={**FRONT, "medium_id": MID, "body_source": "state"})
+    assert lint_post(d, embeds=True, raw_root=raw) == ([], [])
+
+
+def test_a_short_post_that_carries_its_own_summary_is_not_short(tmp_path):
+    # a 2015 welcome note is one sentence long, and its description is
+    # that sentence: nothing was lost in conversion
+    text = "Watch this space for announcements about Jupyter and IPython."
+    d = write_post(tmp_path, text + "\n", front={**FRONT, "description": text})
+    assert lint_post(d) == ([], [])
+    # a description the body does not carry is a lost body
+    d = write_post(tmp_path, "Watch this\n", front={**FRONT, "description": text},
+                   name="2020-01-02-lost")
+    _, warnings = lint_post(d)
+    assert warnings == ["body is only 11 chars"]

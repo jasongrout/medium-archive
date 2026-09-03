@@ -1,7 +1,9 @@
 """Archive a Medium publication in independent steps:
 
     fetch          pull raw material from Medium: page HTML, RSS feed item,
-                   and full-resolution images, unmodified, into <out>/raw/
+                   full-resolution images, and the content behind embeds
+                   (gist files, tweets, Carbon snippets, Giphy files),
+                   unmodified, into <out>/raw/
     import-export  merge a Medium account export into <out>/raw/
     import-ghost   recover a Ghost blog's posts from the Wayback Machine
                    into <out>/raw/; posts also archived from Medium get the
@@ -74,7 +76,11 @@ Notes:
     old inbound link carries), medium_id (Medium also resolves /p/<id>) and
     slug; redirects.csv collects these for every converted post.
   * Medium's "was originally published in ... on Medium" footer and stat
-    tracking pixels are removed. Embedded gists/iframes become links.
+    tracking pixels are removed. Embedded gists inline their archived
+    files, tweets become quotes of their archived text, Carbon embeds
+    their archived code, YouTube and other known providers' embeds stay
+    players, Giphy embeds become the fetched gif or clip, other iframes
+    become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
   * Fixups: files in <out>/fixups/ are applied to the in-memory raw
     sources by convert and compare, so authored defects -- a broken href
@@ -143,7 +149,10 @@ def add_fetch_args(p):
                         "/sitemap/sitemap.xml and /feed must resolve under it")
     p.add_argument("--urls", type=Path, metavar="FILE",
                    help="read post URLs from FILE (one per line, '#' comments) "
-                        "instead of discovering them from sitemap + feed")
+                        "instead of discovering them from sitemap + feed; a "
+                        "line may also name an archived post by its Medium id "
+                        "or its posts/ directory name (as lint prints it), "
+                        "e.g. to backfill one post's embed media")
     p.add_argument("--no-wayback", action="store_true",
                    help="skip the Wayback Machine's index of past captures "
                         "(web.archive.org) during discovery; Medium's sitemap only "

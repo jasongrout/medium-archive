@@ -185,6 +185,63 @@ def test_iframe_embed_link_text_has_no_brackets():
                   "(https://www.youtube.com/embed/x)\n")
 
 
+YT = ("https://www.youtube-nocookie.com/embed/abcdefghijk", 'width="560" height="315" '
+      'style="aspect-ratio: 560 / 315" loading="lazy" allow="accelerometer; '
+      'clipboard-write; encrypted-media; gyroscope; picture-in-picture" '
+      'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen')
+
+
+def test_youtube_video_recognizes_every_url_form():
+    from medium_archive.convert import youtube_video
+    for url in ("https://www.youtube.com/watch?v=abcdefghijk",
+                "http://youtube.com/watch?v=abcdefghijk&feature=x",
+                "https://m.youtube.com/watch?v=abcdefghijk",
+                "https://www.youtube.com/embed/abcdefghijk?feature=oembed",
+                "https://www.youtube-nocookie.com/embed/abcdefghijk",
+                "https://youtu.be/abcdefghijk",
+                "https://www.youtube.com/v/abcdefghijk",
+                "https://www.youtube.com/shorts/abcdefghijk",
+                "https://www.youtube.com/live/abcdefghijk"):
+        assert youtube_video(url) == ("abcdefghijk", None), url
+    assert youtube_video("https://youtu.be/abcdefghijk?t=4m15s") == ("abcdefghijk", 255)
+    assert youtube_video("https://www.youtube.com/watch?v=abcdefghijk&t=90") == ("abcdefghijk", 90)
+    assert youtube_video("https://www.youtube.com/watch?v=abcdefghijk&t=90s") == ("abcdefghijk", 90)
+    assert youtube_video("https://www.youtube.com/embed/abcdefghijk?start=7") == ("abcdefghijk", 7)
+    assert youtube_video("https://www.youtube.com/watch?v=abcdefghijk&t=0") == ("abcdefghijk", None)
+    for url in ("https://vimeo.com/123", "https://www.youtube.com/",
+                "https://www.youtube.com/embed/videoseries?list=PL1",
+                "https://www.youtube.com/playlist?list=PL1",
+                "https://www.youtube.com/watch?v=short",
+                "https://twitter.com/youtube.com/status/1"):
+        assert youtube_video(url) is None, url
+
+
+def test_youtube_iframe_stays_a_player():
+    # the archive has the video's URL, and the player is the content: one
+    # canonical iframe line on the no-cookie host, lazily loaded, with a
+    # title for assistive tech (the export iframe has none)
+    md = md_of('<p>See:</p><iframe src="https://www.youtube.com/embed/abcdefghijk'
+               '?feature=oembed" width="700" height="393" frameborder="0"></iframe>')
+    assert md == (f'See:\n\n<iframe src="{YT[0]}" title="YouTube video" {YT[1]}>'
+                  "</iframe>\n")
+    # the state's title and a start time carry over; quotes are escaped
+    md = md_of('<iframe src="https://youtu.be/abcdefghijk?t=1m" '
+               'title="A &quot;talk&quot;"></iframe>')
+    assert md == (f'<iframe src="{YT[0]}?start=60" title="A &quot;talk&quot;" '
+                  f"{YT[1]}></iframe>\n")
+    # any other iframe is still the link
+    assert md_of('<iframe src="https://example.com/v/1"></iframe>') == (
+        "[embed: https://example.com/v/1](https://example.com/v/1)\n")
+
+
+def test_captioned_youtube_embed_keeps_its_shell():
+    md = md_of('<figure><iframe src="https://youtu.be/abcdefghijk"></iframe>'
+               "<figcaption>Watch it</figcaption></figure>")
+    assert md == (f'<figure>\n\n<iframe src="{YT[0]}" title="YouTube video" '
+                  f"{YT[1]}></iframe>\n\n<figcaption>\n\nWatch it\n\n"
+                  "</figcaption>\n\n</figure>\n")
+
+
 def test_iframe_without_a_source_becomes_a_missing_embed_placeholder():
     # a feed body renders a gist as <iframe src="" width="0" height="0">;
     # a link with no target would read as a dangling "embed:", so it gets
@@ -461,3 +518,250 @@ def test_feed_item_authors_reads_the_old_single_author_form():
     assert feed_item_authors({"authors": [{"name": "Ann", "url": None}],
                               "author": "ignored"}) == [{"name": "Ann", "url": None}]
     assert feed_item_authors({"author": ""}) == []
+
+
+GIPHY_GIF = "https://media.giphy.com/media/fWgAW7WZtPMBjmpa3V/giphy.gif"
+GIPHY_MP4 = "https://media.giphy.com/media/Ri327iDKuC4pnExM4L/giphy.mp4"
+
+
+def test_giphy_media_recognizes_files_and_pages():
+    from medium_archive.images import giphy_media
+    assert giphy_media(GIPHY_GIF) == GIPHY_GIF
+    assert giphy_media(GIPHY_MP4) == GIPHY_MP4
+    assert giphy_media(GIPHY_GIF + "?cid=abc#x") == GIPHY_GIF
+    assert giphy_media("https://media2.giphy.com/media/v1.Y2lkPTc5/abc123/giphy.webp") \
+        == "https://media2.giphy.com/media/v1.Y2lkPTc5/abc123/giphy.webp"
+    assert giphy_media("https://giphy.com/embed/fWgAW7WZtPMBjmpa3V/twitter/iframe") == GIPHY_GIF
+    assert giphy_media("https://giphy.com/gifs/cbc-see-ya-kiss-fWgAW7WZtPMBjmpa3V") == GIPHY_GIF
+    for url in ("", "https://www.youtube.com/watch?v=abcdefghijk",
+                "https://giphy.com/", "https://media.giphy.com/media/x/page.html"):
+        assert giphy_media(url) is None, url
+
+
+def test_giphy_embed_becomes_the_archived_file(tmp_path):
+    # the fetch step maps the gif and the mp4 like any image; convert
+    # serves the gif as an image and the mp4 as a looping clip, copied
+    # beside the post, with Giphy's page-title noise trimmed from the alt
+    raw = tmp_path / "raw"
+    (raw / "images").mkdir(parents=True)
+    (raw / "images" / "001-giphy.gif").write_bytes(b"GIF89a")
+    (raw / "images" / "002-giphy.mp4").write_bytes(b"mp4")
+    img_map = {GIPHY_GIF: "001-giphy.gif", GIPHY_MP4: "002-giphy.mp4"}
+    out = tmp_path / "post"
+    out.mkdir()
+    html = (f'<iframe src="{GIPHY_GIF}" title="See Ya Kiss GIF by CBC - Find &amp; '
+            f'Share on GIPHY"></iframe><figure><iframe src="{GIPHY_MP4}"></iframe>'
+            "<figcaption>Robot arm</figcaption></figure>")
+    body = BeautifulSoup(f"<article>{html}</article>", "html.parser")
+    md, used = to_markdown(body, URL, img_map, raw, out)
+    assert md == ("![See Ya Kiss GIF by CBC](images/001-giphy.gif)\n\n"
+                  "<figure>\n\n<video src=\"images/002-giphy.mp4\" autoplay loop "
+                  "muted playsinline></video>\n\n<figcaption>\n\nRobot arm\n\n"
+                  "</figcaption>\n\n</figure>\n")
+    assert used == ["images/002-giphy.mp4", "images/001-giphy.gif"]
+    assert (out / "images" / "002-giphy.mp4").read_bytes() == b"mp4"
+    # not fetched yet: the file is served from Giphy, which lint reports
+    md, used = to_markdown(BeautifulSoup(f"<article>{html}</article>", "html.parser"),
+                           URL, {}, raw, out)
+    assert f"![See Ya Kiss GIF by CBC]({GIPHY_GIF})" in md
+    assert f'<video src="{GIPHY_MP4}" autoplay' in md and used == []
+
+
+TWEET = "https://twitter.com/ann/status/12345"
+OEMBED = {
+    "url": "https://twitter.com/ann/status/12345",
+    "author_name": "Ann Author", "author_url": "https://twitter.com/ann",
+    "html": "<blockquote class=\"twitter-tweet\"><p lang=\"en\" dir=\"ltr\">Hello "
+            "<a href=\"https://e.com/x?ref_src=twsrc%5Etfw\">world</a><br>second line "
+            "<a href=\"https://t.co/abc\">pic.twitter.com/abc</a></p>&mdash; Ann Author (@ann) "
+            "<a href=\"https://twitter.com/ann/status/12345?ref_src=twsrc%5Etfw\">May 1, 2020</a>"
+            "</blockquote>\n", "type": "rich", "version": "1.0"}
+TWEET_MD = ("> Hello [world](https://e.com/x)  \n> second line [pic.twitter.com/abc]"
+            "(https://t.co/abc)\n>\n> \u2014 [Ann Author (@ann)](https://twitter.com/ann), "
+            "[May 1, 2020](https://twitter.com/ann/status/12345)\n")
+
+
+def test_tweet_id_parses_twitter_and_x_urls():
+    from medium_archive.urls import tweet_id
+    for url in (TWEET, "https://x.com/ann/status/12345", "https://mobile.twitter.com/ann/statuses/12345",
+                TWEET + "?ref_src=twsrc%5Etfw"):
+        assert tweet_id(url) == ("12345", "ann"), url
+    assert tweet_id("https://twitter.com/i/web/status/12345") == ("12345", None)
+    for url in ("", "https://twitter.com/ann", "https://e.com/ann/status/1",
+                "https://twitter.com/ann/likes"):
+        assert tweet_id(url) is None, url
+
+
+def test_archived_tweet_renders_as_a_quote():
+    # the oEmbed payload's text, links (Twitter's ref_src tracking
+    # dropped), line breaks, author and dated link, as Markdown
+    media = {"tweet:12345": {"tweet": OEMBED}}
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == TWEET_MD
+    # the export's widget markup, a blockquote holding only the link,
+    # takes the same path; without the archived tweet it is the link
+    widget = (f'<blockquote class="twitter-tweet"><a href="{TWEET}"></a></blockquote>'
+              '<script async src="https://platform.twitter.com/widgets.js"></script>')
+    body = BeautifulSoup(f"<article>{widget}</article>", "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == TWEET_MD
+    assert md_of(widget) == f"[embed: {TWEET}]({TWEET})\n"
+    # a quote that already carries the tweet's text is left alone
+    assert md_of(f'<blockquote class="twitter-tweet"><p>Said.</p><a href="{TWEET}">x</a>'
+                 "</blockquote>").startswith("> Said.")
+
+
+def test_load_media_reads_archived_tweets(tmp_path):
+    from medium_archive.convert import load_media
+    (tmp_path / "media").mkdir()
+    (tmp_path / "media" / "tweet-12345.json").write_text(json.dumps(OEMBED))
+    assert load_media(tmp_path) == {"tweet:12345": {"tweet": OEMBED}}
+
+
+def test_provider_embed_derives_the_players_url():
+    from medium_archive.convert import provider_embed
+    carbon = "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?"
+    assert provider_embed("https://carbon.now.sh/x", carbon) == carbon.rstrip("?")
+    assert provider_embed("https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52") == \
+        "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52"
+    assert provider_embed("https://vimeo.com/76979871") == "https://player.vimeo.com/video/76979871"
+    assert provider_embed("https://player.vimeo.com/video/1?h=2") == "https://player.vimeo.com/video/1?h=2"
+    assert provider_embed("https://codepen.io/ann/pen/AbCdEf") == "https://codepen.io/ann/embed/AbCdEf"
+    assert provider_embed("https://open.spotify.com/episode/4rOoJ6Egrf8K2IrywzwOMk") == \
+        "https://open.spotify.com/embed/episode/4rOoJ6Egrf8K2IrywzwOMk"
+    assert provider_embed("https://soundcloud.com/ann/a-track") == \
+        "https://w.soundcloud.com/player/?url=https://soundcloud.com/ann/a-track"
+    for url in ("https://twitter.com/a/status/1", "https://example.com/x",
+                "https://art19.com/shows/lc/episodes/ce2c", "https://vimeo.com/about", ""):
+        assert provider_embed(url) is None, url
+
+
+def test_provider_that_refuses_framing_becomes_a_titled_link():
+    # art19 sends a frame-ancestors policy: the browser would show an
+    # error where the player is, so the embed is a link named by the
+    # state's title, which lint reads as content
+    md = md_of('<iframe src="https://art19.com/shows/lc/episodes/ce2c" title="Ep. 248" '
+               'data-embed="https://art19.com/shows/lc/episodes/ce2c/embed" '
+               'width="720" height="200"></iframe>')
+    assert md == "[Ep. 248](https://art19.com/shows/lc/episodes/ce2c)\n"
+    assert md_of('<iframe src="https://art19.com/shows/lc/episodes/ce2c"></iframe>') == (
+        "<https://art19.com/shows/lc/episodes/ce2c>\n")
+
+
+def test_provider_player_stays_an_iframe_at_its_own_size():
+    # the state's title, embed form and size carry over; an export iframe
+    # on the provider's host is kept as it is; a stranger stays a link
+    md = md_of('<iframe src="https://vimeo.com/76979871" title="A film" '
+               'data-embed="https://player.vimeo.com/video/76979871?h=2" '
+               'width="720" height="405"></iframe>')
+    assert md == ('<iframe src="https://player.vimeo.com/video/76979871?h=2" title="A film" '
+                  'width="720" height="405" style="aspect-ratio: 720 / 405" loading="lazy" '
+                  "allowfullscreen></iframe>\n")
+    md = md_of('<iframe src="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?"></iframe>')
+    assert md.startswith('<iframe src="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52" '
+                         'title="Embedded content from carbon.now.sh" width="560"')
+    assert md_of('<iframe src="https://example.com/player/1"></iframe>') == (
+        "[embed: https://example.com/player/1](https://example.com/player/1)\n")
+
+
+def test_carbon_id_parses_page_and_embed_urls():
+    from medium_archive.urls import carbon_id
+    for url in ("https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52",
+                "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?",
+                "https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52/"):
+        assert carbon_id(url) == "PaDDn2ZszZUVmuhvRP52", url
+    for url in ("", "https://carbon.now.sh/", "https://carbon.now.sh/about",
+                "https://example.com/PaDDn2ZszZUVmuhvRP52"):
+        assert carbon_id(url) is None, url
+
+
+def test_archived_carbon_snippet_becomes_a_code_block():
+    # the snippet's own code and language, in place of its screenshot;
+    # Carbon's "auto" language stays a bare fence
+    media = {"carbon:PaDDn2ZszZUVmuhvRP52": {"carbon": {
+        "language": "python", "code": "class ExampleWidget(DOMWidget):\n    value = 1"}}}
+    body = BeautifulSoup('<article><iframe src="https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52" '
+                         'data-embed="https://carbon.now.sh/embed/PaDDn2ZszZUVmuhvRP52?" '
+                         'width="1024" height="480"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == "```python\nclass ExampleWidget(DOMWidget):\n    value = 1\n```\n"
+    from medium_archive.convert import carbon_language
+    assert carbon_language("text/typescript-jsx") == "tsx"
+    assert carbon_language("text/x-java") == "java"
+    assert carbon_language("text/x-rustsrc") == "rust"
+    assert carbon_language("text/x-unknownsrc") == "unknownsrc"
+    assert carbon_language("Python") == "python"
+    assert carbon_language("auto") == "" and carbon_language(None) == ""
+    media["carbon:PaDDn2ZszZUVmuhvRP52"]["carbon"]["language"] = "auto"
+    body = BeautifulSoup('<article><iframe src="https://carbon.now.sh/PaDDn2ZszZUVmuhvRP52">'
+                         "</iframe></article>", "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md.startswith("```\nclass ExampleWidget")
+
+
+def test_load_media_reads_carbon_snippets(tmp_path):
+    from medium_archive.convert import load_media
+    (tmp_path / "media").mkdir()
+    (tmp_path / "media" / "carbon-abc").with_suffix(".json").write_text(
+        json.dumps({"language": "python", "code": "x = 1"}))
+    assert load_media(tmp_path) == {"carbon:abc": {"carbon": {"language": "python", "code": "x = 1"}}}
+
+
+SYNDICATION = {"id_str": "12345", "text": "Hello pic", "mediaDetails": [
+        {"type": "photo", "media_url_https": "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg",
+         "url": "https://t.co/BSxjRlMomu"},
+        {"type": "video", "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/abc.jpg",
+         "url": "https://t.co/vid"}],
+    "photos": [{"url": "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg", "width": 2048, "height": 1537}]}
+
+
+def test_tweet_pictures_join_the_quote_localized(tmp_path):
+    # with the syndication payload archived, the pic.twitter.com link
+    # goes and the photo (fetched with the post's images) and the
+    # video's poster, linked to the tweet, follow the text in the quote
+    photo = "https://pbs.twimg.com/media/CnW7DC6VUAE7NaZ.jpg"
+    poster = "https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/abc.jpg"
+    raw = tmp_path / "raw"
+    (raw / "images").mkdir(parents=True)
+    (raw / "images" / "003-CnW7DC6VUAE7NaZ.jpg").write_bytes(b"jpg")
+    (raw / "images" / "004-abc.jpg").write_bytes(b"jpg")
+    img_map = {photo: "003-CnW7DC6VUAE7NaZ.jpg", poster: "004-abc.jpg"}
+    oembed = dict(OEMBED, html='<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Hello '
+                  '<a href="https://t.co/BSxjRlMomu">pic.twitter.com/BSxjRlMomu</a></p>&mdash; '
+                  'Ann Author (@ann) <a href="https://twitter.com/ann/status/12345">May 1, 2020</a>'
+                  '</blockquote>')
+    media = {"tweet:12345": {"tweet": oembed, "media": SYNDICATION}}
+    out = tmp_path / "post"
+    out.mkdir()
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, used = to_markdown(body, URL, img_map, raw, out, media=media)
+    assert md == ("> Hello\n>\n> ![](images/003-CnW7DC6VUAE7NaZ.jpg)\n>\n"
+                  "> [![Video](images/004-abc.jpg)](https://twitter.com/ann/status/12345)\n>\n"
+                  "> \u2014 [Ann Author (@ann)](https://twitter.com/ann), "
+                  "[May 1, 2020](https://twitter.com/ann/status/12345)\n")
+    assert used == ["images/003-CnW7DC6VUAE7NaZ.jpg", "images/004-abc.jpg"]
+    # not fetched yet: the photo is served from X, which lint reports
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, raw, out, media=media)
+    assert f"> ![]({photo})" in md
+    # without the syndication payload the pic link stays, as before
+    media = {"tweet:12345": {"tweet": oembed}}
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, raw, out, media=media)
+    assert "> Hello [pic.twitter.com/BSxjRlMomu](https://t.co/BSxjRlMomu)" in md
+
+
+def test_load_media_pairs_a_tweet_with_its_media(tmp_path):
+    from medium_archive.convert import load_media
+    (tmp_path / "media").mkdir()
+    (tmp_path / "media" / "tweet-12345.json").write_text(json.dumps({"a": 1}))
+    (tmp_path / "media" / "tweet-12345.media.json").write_text(json.dumps({"b": 2}))
+    assert load_media(tmp_path) == {"tweet:12345": {"tweet": {"a": 1}, "media": {"b": 2}}}
+
+
+def test_deleted_tweet_becomes_a_link_that_says_so():
+    media = {"tweet:12345": {"tweet": {"deleted": True, "status": 404, "url": TWEET}}}
+    body = BeautifulSoup(f'<article><iframe src="{TWEET}"></iframe></article>', "html.parser")
+    md, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert md == f"[A tweet by @ann, no longer available]({TWEET})\n"

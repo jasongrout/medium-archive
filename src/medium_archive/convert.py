@@ -10,6 +10,7 @@ import re
 import shutil
 import sys
 from pathlib import Path
+from html import escape
 from urllib.parse import (parse_qsl, urlencode, urljoin, urlparse, urlsplit,
                           urlunsplit)
 
@@ -20,7 +21,8 @@ from .dates import parse_date
 from .export import export_body, parse_export
 from .fetch import archive_base, read_index
 from .fixup import load_fixups, read_raw
-from .images import image_source, sniff_image_ext
+from .images import (giphy_media, image_source, same_medium_asset,
+                     sniff_image_ext)
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json, strip_title_prefix)
@@ -28,7 +30,8 @@ from .state import (apollo_post_state, gist_code_blocks, state_body,
                     state_metadata, state_title)
 from .readme import write_readme
 from .tags import load_tag_map
-from .urls import canonical_url, medium_id, resolve_canonical, slug_of
+from .urls import (canonical_url, carbon_id, medium_id, resolve_canonical,
+                   slug_of, tweet_id)
 
 EMPTY_INFO = {"title": "", "authors": [], "date": "",
               "updated": None, "description": "", "tags": []}
@@ -72,6 +75,20 @@ class _Converter(MarkdownConverter):
             return text
         return f"\n\n<figure>\n\n{text.strip()}\n\n</figure>\n\n"
 
+    def convert_video(self, el, text, parent_tags):
+        # the looping clip a Giphy mp4 embed became (see to_markdown): the
+        # gif's behaviour, as one canonical HTML block the exporters and
+        # lint recognize (VIDEO_RE in sites.py)
+        return (f'\n\n<video src="{escape(el.get("src") or "", quote=True)}" '
+                'autoplay loop muted playsinline></video>\n\n')
+
+    def convert_iframe(self, el, text, parent_tags):
+        # a player to_markdown left in place (every other iframe became
+        # a link or a placeholder before conversion), as its own HTML
+        # block
+        return "\n\n" + embed_iframe(el.get("src") or "", el.get("title") or "",
+                                     el.get("width"), el.get("height")) + "\n\n"
+
     def convert_figcaption(self, el, text, parent_tags):
         if not _captioned_figure(el.find_parent("figure")):
             return text
@@ -109,7 +126,127 @@ def _captioned_figure(figure) -> bool:
     return bool(cap and cap.get_text(strip=True)
                 and any(t.find_parent("figcaption") is None
                         for t in figure.find_all(["img", "a", "iframe",
-                                                  "script", "pre"])))
+                                                  "video", "script", "pre"])))
+
+
+YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com",
+                 "youtu.be", "youtube-nocookie.com", "www.youtube-nocookie.com"}
+YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
+YOUTUBE_PATH_RE = re.compile(r"^/(?:embed|v|shorts|live)/([^/?#]+)")
+YOUTUBE_TIME_RE = re.compile(r"^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$")
+YOUTUBE_EMBED_BASE = "https://www.youtube-nocookie.com/embed/"
+
+
+def youtube_video(url: str):
+    """(video id, start second or None) of a YouTube URL in any of the
+    forms Medium's embeds and the editor state carry -- watch?v=,
+    youtu.be/, /embed/, /v/, /shorts/, /live/ -- or None for any other
+    URL, including a playlist with no video. The start time comes from
+    `t=` (4m15s, 255, 255s) or `start=`."""
+    parts = urlsplit(url)
+    if parts.netloc.lower() not in YOUTUBE_HOSTS:
+        return None
+    q = dict(parse_qsl(parts.query))
+    video = q.get("v") if parts.netloc.lower() != "youtu.be" else parts.path[1:]
+    if not video:
+        m = YOUTUBE_PATH_RE.match(parts.path)
+        video = m.group(1) if m else None
+    if not video or not YOUTUBE_ID_RE.match(video) or video == "videoseries":
+        return None                       # embed/videoseries?list= is a playlist
+    start = None
+    m = YOUTUBE_TIME_RE.match(q.get("start") or q.get("t") or "")
+    if m and m.group(0):
+        h, mi, s = (int(x or 0) for x in m.groups())
+        start = h * 3600 + mi * 60 + s
+    return video, start or None
+
+
+def youtube_embed_url(video: str, start=None) -> str:
+    """The player URL for a video: the no-cookie host, so a page with an
+    embed sets no YouTube cookies until the reader plays it."""
+    return YOUTUBE_EMBED_BASE + video + (f"?start={start}" if start else "")
+
+
+YOUTUBE_ALLOW = ('allow="accelerometer; clipboard-write; encrypted-media; '
+                 'gyroscope; picture-in-picture" '
+                 'referrerpolicy="strict-origin-when-cross-origin" ')
+
+
+def embed_iframe(src: str, title: str = "", width=None, height=None) -> str:
+    """The one iframe form convert writes for a player it keeps: the
+    provider's embed URL, a title for assistive tech (the state knows
+    the embed's; an export iframe does not), the size Medium showed it
+    at (YouTube's 560x315 by default) as attributes and as an
+    aspect-ratio the theme's CSS scales to the column, lazily loaded.
+    YouTube's own embed snippet adds its allow list. One canonical
+    line, so the exporters and lint recognize it (IFRAME_RE in
+    sites.py)."""
+    host = urlsplit(src).netloc.lower()
+    if not title:
+        title = "YouTube video" if host in YOUTUBE_HOSTS else f"Embedded content from {host}"
+    w = int(width) if str(width or "").isdigit() and int(width) > 0 else 560
+    h = int(height) if str(height or "").isdigit() and int(height) > 0 else 315
+    return (f'<iframe src="{escape(src, quote=True)}" '
+            f'title="{escape(title, quote=True)}" width="{w}" height="{h}" '
+            f'style="aspect-ratio: {w} / {h}" loading="lazy" '
+            + (YOUTUBE_ALLOW if host in YOUTUBE_HOSTS else "")
+            + "allowfullscreen></iframe>")
+
+
+# Providers whose embed is a player with nothing to archive -- a podcast,
+# a code screenshot, a video host -- kept as an iframe on the provider's
+# own embed URL, derived from the canonical page URL Medium records (or
+# taken from the embed form the editor state carries, when its host is
+# the provider's). Each entry maps a host to (canonical path pattern,
+# embed URL template) or, for the provider's own player host, None to
+# pass the URL through. Anything else stays a link.
+PROVIDER_EMBEDS = {
+    "carbon.now.sh": (re.compile(r"^/(?:embed/)?([A-Za-z0-9]+)"), "https://carbon.now.sh/embed/{1}"),
+    "vimeo.com": (re.compile(r"^/(?:video/)?(\d+)"), "https://player.vimeo.com/video/{1}"),
+    "player.vimeo.com": None,
+    "codepen.io": (re.compile(r"^/([^/]+)/(?:pen|embed)/([A-Za-z0-9]+)"), "https://codepen.io/{1}/embed/{2}"),
+    "open.spotify.com": (re.compile(r"^/(?:embed/)?(track|album|playlist|episode|show)/([A-Za-z0-9]+)"),
+                         "https://open.spotify.com/embed/{1}/{2}"),
+    "soundcloud.com": (re.compile(r"^/[^/]+/[^/?#]+"), "https://w.soundcloud.com/player/?url={url}"),
+    "w.soundcloud.com": None,
+}
+
+
+# Providers whose pages refuse to be framed (a frame-ancestors policy:
+# the browser shows an error where the player would be), so the embed
+# is best a plain link, titled by the editor state (an episode's name),
+# which lint counts as content rather than an unfilled embed.
+PROVIDER_LINKS = {"art19.com"}
+
+
+def provider_link(src: str) -> bool:
+    """Whether src's provider is one whose embed becomes a titled link."""
+    return urlsplit(src).netloc.lower().removeprefix("www.") in PROVIDER_LINKS
+
+
+def provider_embed(src: str, embed: str = "") -> str | None:
+    """The provider embed URL to keep an iframe on, for src (the embed's
+    canonical URL) with embed (the provider's embed form, when known),
+    or None when the provider is not one whose player is kept."""
+    for candidate in (embed, src):
+        if not candidate:
+            continue
+        parts = urlsplit(candidate)
+        host = parts.netloc.lower().removeprefix("www.")
+        if host not in PROVIDER_EMBEDS:
+            continue
+        rule = PROVIDER_EMBEDS[host]
+        if rule is None or candidate is embed:
+            # the provider's own embed form, as it came (an empty query
+            # dropped: Carbon's ends in a bare "?")
+            return candidate.rstrip("?")
+        pattern, template = rule
+        m = pattern.match(parts.path)
+        if not m:
+            continue
+        return template.format(*(("",) + m.groups()), path=m.group(0),
+                               url=f"https://{host}{parts.path}")
+    return None
 
 
 def _strip_tracking(url: str) -> str:
@@ -127,6 +264,136 @@ def _strip_tracking(url: str) -> str:
 
 GIST_SRC_RE = re.compile(
     r"https?://gist\.github\.com/(?:[^/\s]+/)?([0-9a-f]+)(?:\.js)?(?:\?.*)?$")
+
+
+REF_SRC_RE = re.compile(r"[?&]ref_src=[^&#]*")
+
+
+PIC_LINK_RE = re.compile(r"^pic\.(?:twitter|x)\.com/")
+
+
+def tweet_pictures(media: dict, url: str) -> str:
+    """The tweet's photos as <img> tags, and a video's or animated
+    gif's poster frame linked to the tweet, from its syndication
+    payload (fetch_tweets); "" without one. The URLs are the ones fetch
+    archived with the post's images, so to_markdown localizes them."""
+    parts = []
+    for m in (media or {}).get("mediaDetails") or []:
+        src = m.get("media_url_https")
+        if not src:
+            continue
+        if m.get("type") == "photo":
+            parts.append(f'<img src="{escape(src, quote=True)}" alt="">')
+        else:
+            parts.append(f'<a href="{escape(url, quote=True)}">'
+                         f'<img src="{escape(src, quote=True)}" alt="Video"></a>')
+    return "".join(f"<p>{p}</p>" for p in parts)
+
+
+def tweet_html(payload: dict, url: str, media: dict | None = None) -> str:
+    """An archived tweet (its oEmbed payload) as the blockquote convert
+    writes: the tweet's text with its links, its pictures when their
+    syndication payload is archived (the pic.twitter.com link they
+    stood behind goes), then an attribution line naming the author and
+    dating the tweet, both linked. Plain Markdown once converted, so
+    every generator renders it, and it outlives the tweet."""
+    soup = BeautifulSoup(payload.get("html") or "", "html.parser")
+    quote = soup.find("blockquote")
+    text = quote.find("p") if quote else None
+    date = ""
+    for a in (quote.find_all("a") if quote else []):
+        if tweet_id(a.get("href") or ""):
+            date = a.get_text(strip=True)
+    pictures = tweet_pictures(media, payload.get("url") or url)
+    for a in (text.find_all("a") if text else []):
+        if pictures and PIC_LINK_RE.match(a.get_text(strip=True)):
+            prev = a.previous_sibling
+            a.decompose()
+            if isinstance(prev, str) and not prev.strip():
+                prev.extract()
+            continue
+        a["href"] = REF_SRC_RE.sub("", a.get("href") or "")
+    author = payload.get("author_name") or ""
+    author_url = payload.get("author_url") or ""
+    handle = author_url.rstrip("/").rsplit("/", 1)[-1] if author_url else ""
+    who = f"{author} (@{handle})" if author and handle else author or handle
+    link = payload.get("url") or url
+    by = f'<a href="{escape(author_url, quote=True)}">{escape(who)}</a>' \
+        if author_url else escape(who)
+    when = f'<a href="{escape(link, quote=True)}">{escape(date or "tweet")}</a>'
+    body = "".join(str(c) for c in text.contents).strip() if text else ""
+    return ("<blockquote>" + (f"<p>{body}</p>" if body else "") + pictures
+            + f"<p>\u2014 {by}, {when}</p></blockquote>")
+
+
+def _archived_tweet(media: dict, url: str) -> str | None:
+    """The blockquote for url's tweet when its oEmbed payload is archived
+    (raw/media/tweet-<id>.json), else None."""
+    tweet = tweet_id(url)
+    entry = media.get(f"tweet:{tweet[0]}") if tweet else None
+    if not entry or not entry.get("tweet"):
+        return None
+    if entry["tweet"].get("deleted"):
+        # recorded by fetch when X answered 404: a link that says so,
+        # rather than an embed lint keeps asking about
+        who = f"@{tweet[1]}" if tweet[1] else "X"
+        return (f'<p><a href="{escape(url, quote=True)}">A tweet by {who}, '
+                "no longer available</a></p>")
+    return tweet_html(entry["tweet"], url, entry.get("media"))
+
+
+# Carbon names a snippet's language by its CodeMirror mode, often a MIME
+# type; the fence needs the name highlighters know. Modes not listed
+# fall back to the last path segment less its x- prefix (text/x-java ->
+# java, text/x-rustsrc -> rustsrc is wrong, hence the table).
+CARBON_LANGS = {
+    "text/typescript-jsx": "tsx", "text/typescript": "typescript",
+    "application/typescript": "typescript", "jsx": "jsx", "javascript": "javascript",
+    "htmlmixed": "html", "text/html": "html", "text/x-csrc": "c",
+    "text/x-c++src": "cpp", "text/x-csharp": "csharp", "text/x-java": "java",
+    "text/x-kotlin": "kotlin", "text/x-scala": "scala", "text/x-swift": "swift",
+    "text/x-rustsrc": "rust", "text/x-go": "go", "text/x-sh": "bash",
+    "shell": "bash", "text/x-python": "python", "text/x-ruby": "ruby",
+    "text/x-yaml": "yaml", "application/json": "json", "text/x-toml": "toml",
+    "text/x-sql": "sql", "text/x-markdown": "markdown", "text/x-diff": "diff",
+    "application/x-httpd-php": "php", "text/x-objectivec": "objectivec",
+    "text/x-lua": "lua", "text/x-rsrc": "r", "text/x-julia": "julia",
+    "text/x-dockerfile": "dockerfile", "text/x-nginx-conf": "nginx",
+    "text/css": "css", "text/x-scss": "scss", "text/x-less": "less",
+    "graphql": "graphql", "text/x-vue": "vue", "text/x-elixir": "elixir",
+    "text/x-haskell": "haskell", "text/x-clojure": "clojure",
+    "text/x-erlang": "erlang", "text/x-fsharp": "fsharp", "text/x-ocaml": "ocaml",
+    "text/x-perl": "perl", "text/x-powershell": "powershell",
+    "text/x-vb": "vbnet", "text/x-verilog": "verilog", "text/x-latex": "latex",
+    "application/xml": "xml", "text/x-nim": "nim", "text/x-dart": "dart",
+    "text/x-django": "django", "text/x-twig": "twig", "text/x-solidity": "solidity",
+    "text/x-gfm": "markdown", "text/x-crystal": "crystal", "text/x-d": "d",
+    "text/x-pascal": "pascal", "text/x-groovy": "groovy",
+}
+
+
+def carbon_language(mode: str) -> str:
+    """The fence language for a Carbon snippet's language mode; "" for
+    Carbon's "auto" (it guessed; nothing recorded) and plain text."""
+    mode = (mode or "").strip().lower()
+    if mode in ("", "auto", "text", "plaintext", "text/plain"):
+        return ""
+    if mode in CARBON_LANGS:
+        return CARBON_LANGS[mode]
+    return mode.rsplit("/", 1)[-1].removeprefix("x-")
+
+
+def _archived_carbon(media: dict, url: str) -> str | None:
+    """The code block for url's Carbon snippet when it is archived
+    (raw/media/carbon-<id>.json), else None."""
+    cid = carbon_id(url)
+    entry = media.get(f"carbon:{cid}") if cid else None
+    snippet = (entry or {}).get("carbon")
+    if not snippet or snippet.get("code") is None:
+        return None
+    return gist_code_blocks({"snippet": {
+        "language": carbon_language(snippet.get("language")),
+        "content": snippet["code"]}})
 
 
 def _archived_gist_files(media: dict, gist_id: str) -> dict | None:
@@ -152,29 +419,75 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     (markdown, used_images)."""
     doc = BeautifulSoup("", "html.parser")        # owner for new_tag()
     # the same asset appears under miro.medium.com and cdn-images-1.medium.com
-    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()}
+    by_basename = {Path(urlsplit(u).path).name: f for u, f in img_map.items()
+                   if same_medium_asset(u)}
+
+    # A Giphy embed names a media file the archive fetches like any
+    # image (fetch.embed_asset_urls), so the iframe becomes the file
+    # itself: an <img> for a gif or webp, localized with the images
+    # below, a <video> for an mp4 (the clip loops like the gif it stands
+    # for). Giphy's titles are its page titles ("... GIF by X - Find &
+    # Share on GIPHY"); the descriptive part becomes the alt text.
+    # Export and Ghost bodies embed a tweet as Twitter's widget markup: a
+    # <blockquote class="twitter-tweet"> holding only a link to the
+    # tweet, for widgets.js to fill in. Nothing to keep but the target,
+    # so it takes the iframe path below (a quote that already carries
+    # the tweet's text, as a Ghost capture can, is left as it is).
+    for quote in body.find_all("blockquote", class_="twitter-tweet"):
+        link = next((a.get("href") for a in quote.find_all("a")
+                     if tweet_id(a.get("href") or "")), None)
+        if link and not quote.get_text(strip=True):
+            quote.replace_with(doc.new_tag("iframe", src=link))
+
+    # An archived tweet becomes its quote here, ahead of the image pass,
+    # so the photos the quote carries are localized with the post's images.
+    for iframe in body.find_all("iframe"):
+        tweet = _archived_tweet(media or {}, iframe.get("src") or "")
+        if tweet:
+            iframe.replace_with(BeautifulSoup(tweet, "html.parser"))
+
+    for iframe in body.find_all("iframe"):
+        asset = giphy_media(iframe.get("src") or iframe.get("data-src") or "")
+        if not asset:
+            continue
+        title = re.sub(r"\s*-\s*Find & Share on GIPHY$", "",
+                       iframe.get("title") or "").strip()
+        if asset.endswith(".mp4"):
+            iframe.replace_with(doc.new_tag("video", src=asset))
+        else:
+            iframe.replace_with(doc.new_tag("img", src=asset, alt=title))
+
+    def localize(src: str, copy: bool):
+        """(local images/ path, used) for an asset URL the fetch step
+        mapped, else (src, False)."""
+        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
+        if not (fname and (out_dir is None or (raw / "images" / fname).exists())):
+            return src, False
+        src_file = raw / "images" / fname
+        # an image fetched from an extensionless URL was stored as
+        # .bin; the derived copy gets the extension its bytes call for
+        if fname.endswith(".bin") and src_file.exists():
+            fname = fname[:-len(".bin")] + (sniff_image_ext(src_file) or ".bin")
+        if out_dir is not None and copy:
+            (out_dir / "images").mkdir(exist_ok=True)
+            shutil.copy2(src_file, out_dir / "images" / fname)
+        return f"images/{fname}", True
 
     used_images = []
+    for video in body.find_all("video"):
+        local, used = localize(video.get("src") or "", copy=True)
+        if used:
+            used_images.append(local)
+        video.attrs = {"src": local}
+
     for img in body.find_all("img"):
         src = image_source(img)
         if not src:
             img.decompose()
             continue
-        fname = img_map.get(src) or by_basename.get(Path(urlsplit(src).path).name)
-        if fname and (out_dir is None or (raw / "images" / fname).exists()):
-            src_file = raw / "images" / fname
-            # an image fetched from an extensionless URL was stored as
-            # .bin; the derived copy gets the extension its bytes call for
-            if fname.endswith(".bin") and src_file.exists():
-                fname = fname[:-len(".bin")] + (sniff_image_ext(src_file)
-                                                or ".bin")
-            if out_dir is not None:
-                (out_dir / "images").mkdir(exist_ok=True)
-                shutil.copy2(src_file, out_dir / "images" / fname)
-            local = f"images/{fname}"
+        local, used = localize(src, copy=True)   # not downloaded: remote URL stays
+        if used:
             used_images.append(local)
-        else:
-            local = src                         # not downloaded; keep remote URL
         new_img = doc.new_tag("img", src=local, alt=img.get("alt", ""))
         picture = img.find_parent("picture")
         (picture or img).replace_with(new_img)
@@ -227,13 +540,32 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
             script.replace_with(doc.new_tag("a", href=url,
                                             string=f"embed: {url}"))
 
-    # An iframe with no source is an embed whose content the body never
-    # carried (a feed body renders a gist that way: src="", 0x0). It gets
-    # the same visible placeholder the state conversion uses, which lint
-    # flags -- a link with no target would read as a dangling "embed:".
+    # A YouTube iframe stays an iframe: the archive has its URL, and the
+    # player is the content, so it is written as one (_Converter renders
+    # it; the exporters render or rewrite that one form), as is a
+    # player from a provider in PROVIDER_EMBEDS. Any other
+    # iframe becomes a link to its target. An iframe with no source is
+    # an embed whose content the body never carried (a feed body renders
+    # a gist that way: src="", 0x0). It gets the same visible placeholder
+    # the state conversion uses, which lint flags -- a link with no
+    # target would read as a dangling "embed:".
     for iframe in body.find_all("iframe"):
         src = iframe.get("src") or iframe.get("data-src") or ""
-        if src:
+        video = youtube_video(src) if src else None
+        code = _archived_carbon(media or {}, src) if src else None
+        player = provider_embed(src, iframe.get("data-embed") or "") if src else None
+        if code:                         # the snippet itself beats its screenshot
+            iframe.replace_with(BeautifulSoup(code, "html.parser"))
+        elif src and provider_link(src):
+            iframe.replace_with(doc.new_tag("a", href=src,
+                                            string=iframe.get("title") or src))
+        elif video:                        # always the 16:9 default size
+            iframe.attrs = {"src": youtube_embed_url(*video),
+                            "title": iframe.get("title") or ""}
+        elif player:
+            iframe.attrs = {"src": player, "title": iframe.get("title") or "",
+                            "width": iframe.get("width"), "height": iframe.get("height")}
+        elif src:
             iframe.replace_with(doc.new_tag("a", href=src, string=f"embed: {src}"))
         else:
             iframe.replace_with(doc.new_tag("p", string="[missing embed]"))
@@ -290,6 +622,17 @@ def load_media(raw: Path, fixups: dict = None) -> dict:
     media = {}
     for p in sorted(media_dir.glob("*.json")):
         if p.name.endswith(".gist.json"):
+            continue
+        if p.name.startswith("tweet-"):       # a tweet's oEmbed payload, and
+            # the syndication payload naming its photos (fetch_tweets)
+            tid, kind = p.name[len("tweet-"):-len(".json")], "tweet"
+            if tid.endswith(".media"):
+                tid, kind = tid[:-len(".media")], "media"
+            media.setdefault(f"tweet:{tid}", {})[kind] = json.loads(read_raw(p, fixups))
+            continue
+        if p.name.startswith("carbon-"):      # a Carbon snippet
+            media[f"carbon:{p.stem[len('carbon-'):]}"] = {
+                "carbon": json.loads(read_raw(p, fixups))}
             continue
         payload = json.loads(read_raw(p, fixups))
         entry = {"value": (payload.get("payload") or {}).get("value") or {}}

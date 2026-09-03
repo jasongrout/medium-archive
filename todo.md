@@ -58,6 +58,117 @@ and the offline test suite.
   fixed by hand. An iframe with no source (how a feed body renders a
   gist) now converts to the `[missing embed]` placeholder instead of a
   dangling `embed:` with no link, so plain `lint` catches it too.
+- **YouTube embeds are players, not links.** The archive has the
+  video's URL, which is all the player needs, so `to_markdown` keeps a
+  YouTube iframe as an iframe: one canonical line
+  (`convert.youtube_iframe`) with the video on the no-cookie host, any
+  `t=`/`start=` start time, the resource title the state knows as the
+  accessible name (an export iframe has none; "YouTube video" then),
+  lazy loading and YouTube's own `allow` list. `youtube_video`
+  recognizes every URL form Medium and the state produce (watch?v=,
+  youtu.be, /embed/, /v/, /shorts/, /live/) and refuses playlists.
+  Hugo and Pelican render the line as the raw HTML block it is (as
+  they do the figure shells), with `card.css` scaling the 560×315
+  player to the column at 16:9; the MyST exporter rewrites it to the
+  `{iframe}` directive, captioned or not, since mystmd is not
+  guaranteed to render raw HTML. `compare` sets the title aside, as it
+  does fence languages, so the sources still agree. Every other iframe
+  is still the `[embed: url]` link, which `lint --embeds` reports.
+- **Giphy embeds are archived files.** The embed's target is the media
+  file itself (`media.giphy.com/media/<id>/giphy.gif` or `.mp4`; a
+  giphy.com page or embed URL names the id the gif URL is built from,
+  `images.giphy_media`). `fetch` adds those files to the post's image
+  download (`fetch.embed_asset_urls`), and its skip-already-archived
+  path backfills them into `raw/<id>/images/` and `images.json` for
+  posts fetched before this existed, the way gist media is backfilled.
+  `convert` then replaces the iframe with the file: an `<img>` for a
+  gif or webp, localized with the other images, with Giphy's page-title
+  suffix trimmed from the alt; a `<video autoplay loop muted
+  playsinline>` for an mp4, one canonical line like the YouTube player
+  (`VIDEO_RE`), copied beside the post and listed in the front matter's
+  images so every exporter places it (the placer passes non-images
+  through). MyST gets `![](clip.mp4)` or a `{figure}` around it, which
+  mystmd renders as a video. `lint --embeds` leaves Giphy targets out
+  of the state's embed count, since they convert either way, and
+  reports a file still served from Giphy until `fetch` runs again.
+  Built and tested offline: the sandbox's proxy refuses media.giphy.com,
+  so the first live backfill deserves a look. (It got one: a first run
+  merged the two `giphy.mp4` basenames of one post into a single file,
+  through the de-duplication meant for a Medium asset under two CDN
+  hosts; only Medium CDN URLs merge now, and Giphy files carry their
+  id.)
+- **Tweets are archived and quoted.** A tweet's text exists nowhere
+  in a Medium page: the state has an embedly wrapper with an empty
+  title, and the export has Twitter's widget markup, a
+  `twitter-tweet` blockquote holding only the tweet's link. `fetch`
+  now archives each tweet embed's oEmbed payload (`fetch_tweets`,
+  from `publish.x.com/oembed`, which needs no credentials; checked
+  live 2026-09, and `publish.twitter.com` redirects there) into
+  `raw/<id>/media/tweet-<tweet id>.json`, on new posts and on the
+  backfill path. `convert` renders an archived tweet as a blockquote
+  (`tweet_html`): the text with its links, `ref_src` tracking dropped,
+  a hard break per line, then "— Name (@handle), Month D, YYYY" with
+  the author and the date linked. Plain Markdown, so every generator
+  renders it and it outlives the tweet. The export's empty widget
+  blockquote is normalized to an iframe on the tweet's URL first, so
+  it takes the same path (a Ghost capture's blockquote that already
+  carries the text is left alone). A tweet the endpoint reports gone
+  stays the `[embed: url]` link, which `lint --embeds` names as an
+  unarchived tweet; the quote of an archived one counts as content
+  (`TWEET_QUOTE_RE`, the attribution line's dated status link).
+  A tweet's photos come from X's syndication endpoint
+  (`cdn.syndication.twimg.com/tweet-result`, the one static tweet
+  renderers read; unauthenticated, keyed by react-tweet's token
+  derivation from the id, `tweet_token`, checked live 2026-09):
+  `fetch_tweets` archives that payload as `tweet-<id>.media.json`
+  for a tweet whose oEmbed html links a picture, `embed_asset_urls`
+  adds each photo (X's default 1200 px size, past what the themes
+  render) and each video's poster
+  frame to the post's image download, and `tweet_pictures` puts them
+  in the quote, the photos as images and a poster linked to the
+  tweet, dropping the `pic.twitter.com` link they stood behind. The
+  archived tweet is swapped in ahead of the image pass so those
+  images localize like the rest. A video itself is not archived: its
+  mp4 lives on X's CDN under changing URLs. A deleted tweet (404 from
+  the oEmbed endpoint) is recorded in `tweet-<id>.json` as
+  `{"deleted": true, "url", "status", "checked_at"}` rather than left
+  to be asked about on every run: convert writes a link saying the
+  tweet is no longer available, and lint treats the record as the
+  embed's content. Deleting the file asks again; a hand-written
+  oEmbed-shaped payload (text recovered from a Wayback capture, say)
+  replaces the record with a real quote.
+- **Known providers' players stay iframes.** For an embed whose
+  content is a player with nothing to archive, the editor state
+  carries the provider's own embed URL (the embedly wrapper's `src=`)
+  and the size Medium showed it at (`iframeWidth`/`iframeHeight`);
+  `_iframe` passes both through as `data-embed`, `width` and
+  `height`. `convert.provider_embed` keeps an iframe for a host in
+  `PROVIDER_EMBEDS` (Carbon, Vimeo, CodePen, Spotify, SoundCloud), on
+  the state's embed form when its host is the
+  provider's, else derived from the canonical page URL, so export
+  iframes work too. `embed_iframe` is the one line for every kept
+  player, YouTube included: src, title, width, height, an inline
+  `aspect-ratio` the theme's CSS scales to the column (a 720×200
+  podcast player is not a 16:9 box), lazy loading, and YouTube's
+  allow list on its host only; YouTube keeps the 560×315 default
+  rather than Medium's size. The cost is a third-party frame at read
+  time and nothing once the provider is gone. art19 was on the list
+  and came off it: its pages send a frame-ancestors policy, so the
+  player renders as a browser error on any other site (seen in
+  Firefox). `PROVIDER_LINKS` names such providers, and their embeds
+  become a plain link titled by the state (the episode's name), which
+  `lint --embeds` reads as content rather than an unfilled embed.
+- **Carbon snippets are archived as code.** A Carbon embed page
+  (`carbon.now.sh/embed/<id>`) is a Next.js page whose `__NEXT_DATA__`
+  carries the snippet itself: `code` and `language` (found by reading
+  one in a browser). `fetch_carbon` archives that object into
+  `raw/<id>/media/carbon-<id>.json` on the same incremental path as
+  gists and tweets, and `convert` inlines it as a language-tagged
+  fence (`_archived_carbon`; Carbon's "auto" stays bare), with the
+  provider iframe as the fallback until fetched. `lint --embeds`
+  leaves an archived snippet's target out of the state's embed count,
+  as a fence cannot be told from any other. Tested against the pasted
+  page data only; the sandbox cannot reach carbon.now.sh.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line
@@ -473,13 +584,12 @@ Feeds and sharing:
   the mark. The share URLs themselves were checked against the
   networks' documentation in 2026-09 (above).
 
-- Re-run `fetch` on real archives to backfill `raw/<id>/media/` for
-  gist embeds, then `convert` and `lint`. The 2026-08 audit archive
-  currently flags 26 placeholder embeds across 7 posts. The
-  medium.com/media endpoint and the anti-hijacking-prefix parsing were
-  implemented against mediumexporter's usage and canned tests only,
-  because the development sandbox could not reach medium.com, so verify
-  the first live run's output.
+- (Done 2026-09.) The reference archive's `fetch` re-run backfilled
+  every gist's media (the 26 placeholders across 7 posts went), then
+  the tweets, Carbon snippets and Giphy files as each was added; the
+  medium.com/media endpoint and the anti-hijacking-prefix parsing
+  worked live as implemented from mediumexporter's usage. The one
+  surprise was the Giphy filename collision, fixed above.
 
 - Link contrast in the card theme. Links use `--accent` (#f37626,
   Jupyter Orange) directly, which is 2.8:1 against the light palette's

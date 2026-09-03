@@ -156,6 +156,14 @@ a:hover { text-decoration: underline; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
+/* An embedded player (convert writes YouTube embeds as 560x315 iframes)
+   fills the column at the 16:9 its attributes state, instead of sitting
+   at its fixed size, which overflows a phone-width column. */
+.post iframe { width: 100%; max-width: 100%; height: auto; aspect-ratio: 16 / 9;
+               border: 0; border-radius: 4px; }
+/* A looping clip (a Giphy mp4 embed) sits like the gif it stands for. */
+.post video { max-width: 100%; height: auto; border-radius: 4px; }
+.post p:has(> video:only-child) { text-align: center; }
 /* An image standing on its own -- a paragraph holding nothing but the
    image, linked or not, or a figure -- is centred, as Medium sets
    every body image; most are narrower than the column, and an
@@ -185,6 +193,9 @@ a:hover { text-decoration: underline; }
    caption Goldmark renders as a paragraph. */
 .post figure { margin: 1rem 0; }
 .post figure > p { margin: 0; }
+/* The centring is for the image; a captioned code block (an inlined
+   gist or Carbon snippet) would inherit it line by line. */
+.post figure pre { text-align: left; }
 /* Centred under the image, as Medium sets its captions. The size is
    em, so a caption stays in proportion to the column it annotates
    rather than shrinking against it when the reading size grows: .9rem

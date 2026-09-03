@@ -89,6 +89,12 @@ def copy_site_asset(out: Path, rel, dst_dir: Path, stem: str):
 # lines and the single image and caption lines between them, all
 # blank-line separated. Groups: link-open marker, alt, src, link,
 # caption.
+# The player line convert writes for a kept embed (convert.embed_iframe):
+# src, then title, then the fixed attributes
+IFRAME_RE = re.compile(r'^<iframe src="([^"]+)" title="([^"]*)"[^\n]*></iframe>$', re.M)
+# The looping clip convert writes for a Giphy mp4 embed (_Converter.convert_video)
+VIDEO_RE = re.compile(r'^<video src="([^"]+)"[^\n]*></video>$', re.M)
+
 FIGURE_SHELL_RE = re.compile(
     r"<figure>\n\n(\[)?!\[([^\]\n]*)\]\(([^)\s]+)\)(?(1)\]\(([^)\s]+)\))\n\n"
     r"<figcaption>\n\n([^\n]+)\n\n</figcaption>\n\n</figure>")

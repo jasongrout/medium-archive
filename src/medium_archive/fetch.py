@@ -5,6 +5,7 @@ convert works from.
 """
 
 import json
+import math
 import re
 import shutil
 import sys
@@ -18,12 +19,15 @@ from bs4 import BeautifulSoup
 
 from .dates import in_window, parse_date
 from .discovery import discover, fetch_feed
-from .images import collect_image_urls, safe_filename
-from .state import state_image_urls, state_media_resources
+from .images import (collect_image_urls, giphy_media, safe_filename,
+                     same_medium_asset)
+from .state import (state_embed_targets, state_image_urls,
+                    state_media_resources)
 from .net import fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
-from .urls import canonical_url, medium_id, norm_key, slug_of
+from .urls import (canonical_url, carbon_id, medium_id, norm_key, slug_of,
+                   tweet_id)
 
 
 def load_existing(dirs: list) -> set:
@@ -104,6 +108,24 @@ def looks_gone(html: str) -> bool:
 
 MEDIA_URL = "https://medium.com/media/{id}?format=json"
 GIST_API_URL = "https://api.github.com/gists/{id}"
+# X's public oEmbed endpoint (publish.twitter.com redirects here since
+# the rename): the tweet's text, author and date as HTML, no
+# credentials needed, checked live 2026-09. omit_script drops the
+# widgets.js tag; dnt asks for no tracking of the archive's readers.
+TWEET_OEMBED_URL = ("https://publish.x.com/oembed?url={url}"
+                    "&omit_script=true&dnt=true")
+# A Carbon snippet's embed page is a Next.js page whose server-rendered
+# data carries the snippet itself: its code and language, which the
+# screenshot the iframe would show is drawn from.
+CARBON_EMBED_URL = "https://carbon.now.sh/embed/{id}"
+# X's syndication endpoint, which static tweet renderers read: the
+# tweet with its media (photo URLs on pbs.twimg.com, a video's poster),
+# unauthenticated, keyed by a token derived from the id the way
+# react-tweet derives it. The oEmbed payload names photos only as
+# pic.twitter.com links.
+TWEET_MEDIA_URL = "https://cdn.syndication.twimg.com/tweet-result?id={id}&token={token}"
+NEXT_DATA_RE = re.compile(
+    r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', re.S)
 
 
 def fetch_media(session, page_text: str, mid: str, dest: Path,
@@ -112,11 +134,14 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
     unresolved (an empty iframeSrc -- gist embeds, mostly; their content
     exists nowhere in the page itself): the medium.com/media payload
     that names the embed's target into dest/media/<id>.json, and for a
-    gist also its files, from the GitHub API, into <id>.gist.json.
-    Incremental -- files already on disk are not re-fetched, so a
-    re-run of fetch backfills posts archived before this existed.
-    Returns the number of files written."""
-    n = 0
+    gist also its files, from the GitHub API, into <id>.gist.json. And
+    for each tweet embed, whose text is likewise nowhere in the page,
+    the tweet's oEmbed payload into tweet-<tweet id>.json. Incremental
+    -- files already on disk are not re-fetched, so a re-run of fetch
+    backfills posts archived before this existed. Returns the number of
+    files written."""
+    n = fetch_tweets(session, page_text, mid, dest, delay)
+    n += fetch_carbon(session, page_text, mid, dest, delay)
     for res_id in state_media_resources(page_text, mid):
         media_path = dest / "media" / f"{res_id}.json"
         payload = None
@@ -152,6 +177,214 @@ def fetch_media(session, page_text: str, mid: str, dest: Path,
     return n
 
 
+def tweet_token(tweet: str) -> str:
+    """react-tweet's token for the syndication endpoint:
+    ((id / 1e15) * pi).toString(36) with its zeros and point removed."""
+    x = int(tweet) / 1e15 * math.pi
+    whole, frac = int(x), x - int(x)
+    digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+    s = ""
+    while whole:
+        s, whole = digits[whole % 36] + s, whole // 36
+    for _ in range(12):
+        frac *= 36
+        s += digits[int(frac)]
+        frac -= int(frac)
+    return s.replace("0", "")
+
+
+def tweet_has_media(payload: dict) -> bool:
+    """Whether a tweet's oEmbed html links a picture or video."""
+    return bool(re.search(r"pic\.(?:twitter|x)\.com/", payload.get("html") or ""))
+
+
+def fetch_tweets(session, page_text: str, mid: str, dest: Path,
+                 delay: float) -> int:
+    """The oEmbed payload of every tweet the page's embeds target, into
+    dest/media/tweet-<id>.json, and for a tweet with a picture or video
+    also the syndication payload naming the media files, into
+    tweet-<id>.media.json. A tweet X no longer serves (the endpoint
+    answers 404) is recorded in the same file as {"deleted": true, ...},
+    so the archive knows and convert can say so; delete that file to
+    ask again. Incremental."""
+    n = 0
+    for target, _ in state_embed_targets(page_text, mid):
+        tweet = tweet_id(target)
+        if not tweet:
+            continue
+        path = dest / "media" / f"tweet-{tweet[0]}.json"
+        payload = None
+        if path.exists():
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                pass
+        if payload is None:
+            try:
+                r = fetch(session, TWEET_OEMBED_URL.format(url=target))
+                payload = json.loads(r.text)
+            except Exception as e:
+                status = getattr(getattr(e, "response", None), "status_code", None)
+                if status != 404:
+                    print(f"  tweet failed {target}: {e}", file=sys.stderr)
+                    continue
+                payload = {"deleted": True, "url": target, "status": 404,
+                           "checked_at": datetime.now(timezone.utc)
+                           .strftime("%Y-%m-%dT%H:%M:%SZ")}
+                print(f"  tweet gone (404), recorded: {target}", file=sys.stderr)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                            encoding="utf-8")
+            n += 1
+            time.sleep(delay / 4)
+        media_path = path.with_name(f"tweet-{tweet[0]}.media.json")
+        if tweet_has_media(payload) and not media_path.exists():
+            try:
+                r = fetch(session, TWEET_MEDIA_URL.format(
+                    id=tweet[0], token=tweet_token(tweet[0])))
+                media = json.loads(r.text)
+            except Exception as e:
+                print(f"  tweet media failed {target}: {e}", file=sys.stderr)
+                continue
+            media_path.write_text(json.dumps(media, indent=2, ensure_ascii=False),
+                                  encoding="utf-8")
+            n += 1
+            time.sleep(delay / 4)
+    return n
+
+
+def tweet_media_urls(media: dict) -> list:
+    """The files to archive for a tweet's syndication payload: each
+    photo (the default size X serves, 1200 px wide, is past the width
+    the themes render) and a video's or animated gif's poster frame
+    (the clip itself lives on X's CDN under changing URLs)."""
+    urls = []
+    for m in media.get("mediaDetails") or []:
+        url = m.get("media_url_https")
+        if url and url not in urls:
+            urls.append(url)
+    return urls
+
+
+def carbon_snippet(page_html: str) -> dict | None:
+    """The snippet (id, code, language, ...) from a Carbon embed page's
+    __NEXT_DATA__, else None."""
+    m = NEXT_DATA_RE.search(page_html)
+    if not m:
+        return None
+    try:
+        data = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return None
+    snippet = ((data.get("props") or {}).get("pageProps") or {}).get("snippet")
+    return snippet if snippet and snippet.get("code") is not None else None
+
+
+def fetch_carbon(session, page_text: str, mid: str, dest: Path,
+                 delay: float) -> int:
+    """The snippet behind every Carbon embed the page targets, into
+    dest/media/carbon-<id>.json, so convert can write the code itself
+    instead of an iframe of its screenshot. Incremental."""
+    n = 0
+    for target, _ in state_embed_targets(page_text, mid):
+        cid = carbon_id(target)
+        if not cid:
+            continue
+        path = dest / "media" / f"carbon-{cid}.json"
+        if path.exists():
+            continue
+        try:
+            r = fetch(session, CARBON_EMBED_URL.format(id=cid))
+            snippet = carbon_snippet(r.text)
+            if snippet is None:
+                raise ValueError("no snippet in the embed page's __NEXT_DATA__")
+        except Exception as e:
+            print(f"  carbon snippet failed {target}: {e}", file=sys.stderr)
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(snippet, indent=2, ensure_ascii=False),
+                        encoding="utf-8")
+        n += 1
+        time.sleep(delay / 4)
+    return n
+
+
+def embed_asset_urls(page_text: str, mid: str, dest: Path | None = None) -> list:
+    """Media files behind the page's embeds that the archive can hold
+    itself -- Giphy gifs and mp4s, and the photos of tweets whose
+    syndication payload is archived under dest/media/ -- so convert can
+    serve them as local images and videos instead of a link to a third
+    party."""
+    urls = []
+    for target, _ in state_embed_targets(page_text, mid):
+        media = giphy_media(target)
+        if media and media not in urls:
+            urls.append(media)
+        tweet = tweet_id(target)
+        media_path = dest / "media" / f"tweet-{tweet[0]}.media.json" if tweet and dest else None
+        if media_path and media_path.is_file():
+            try:
+                payload = json.loads(media_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            urls.extend(u for u in tweet_media_urls(payload) if u not in urls)
+    return urls
+
+
+def fetch_images(session, srcs: list, img_dir: Path, img_map: dict,
+                 delay: float, start: int = 1) -> int:
+    """Download srcs into img_dir, recording url -> filename in img_map
+    (files already on disk are mapped, not re-fetched); returns the
+    number fetched. Filenames are numbered from start."""
+    n = 0
+    by_basename = {}   # the same asset appears as miro.medium.com/v2/<id> and cdn-images-1.medium.com/<id>
+    for i, src in enumerate(srcs, start=start):
+        # only Medium's own assets share a file across hosts; anything
+        # else (a Giphy clip, always giphy.mp4) is keyed by its full URL
+        base = Path(urlsplit(src).path).name if same_medium_asset(src) else src
+        if base in by_basename:
+            img_map[src] = by_basename[base]
+            continue
+        fname = safe_filename(src, i)
+        if (img_dir / fname).exists():
+            img_map[src] = by_basename[base] = fname
+            continue
+        try:
+            resp = fetch(session, src, stream=True)
+            img_dir.mkdir(parents=True, exist_ok=True)
+            with open(img_dir / fname, "wb") as fh:
+                for chunk in resp.iter_content(1 << 16):
+                    fh.write(chunk)
+            img_map[src] = by_basename[base] = fname
+            n += 1
+            time.sleep(delay / 4)
+        except Exception as e:
+            print(f"  image failed {src}: {e}", file=sys.stderr)
+    return n
+
+
+def backfill_embed_assets(session, page_text: str, mid: str, dest: Path,
+                          delay: float) -> int:
+    """For a post archived before embed assets were fetched: download
+    the Giphy files its embeds name into dest/images/ and add them to
+    images.json, without touching anything already there. Returns the
+    number fetched."""
+    map_path = dest / "images.json"
+    img_map = {}
+    if map_path.exists():
+        try:
+            img_map = json.loads(map_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return 0
+    missing = [u for u in embed_asset_urls(page_text, mid, dest) if u not in img_map]
+    if not missing:
+        return 0
+    n = fetch_images(session, missing, dest / "images", img_map, delay,
+                     start=len(img_map) + 1)
+    map_path.write_text(json.dumps(img_map, indent=2))
+    return n
+
+
 def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
     """Save page.html, feed_item.json, media/, images/ and images.json
@@ -172,31 +405,50 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
         # a shell capture renders no <img> tags; its editor state still names the images
         srcs += [u for u in state_image_urls(r.text, medium_id(url) or "")
                  if u not in srcs]
-        by_basename = {}   # the same asset appears as miro.medium.com/v2/<id> and cdn-images-1.medium.com/<id>
-        for i, src in enumerate(srcs, start=1):
-            base = Path(urlsplit(src).path).name
-            if base in by_basename:
-                img_map[src] = by_basename[base]
-                continue
-            fname = safe_filename(src, i)
-            if (img_dir / fname).exists():
-                img_map[src] = by_basename[base] = fname
-                continue
-            try:
-                resp = fetch(session, src, stream=True)
-                img_dir.mkdir(parents=True, exist_ok=True)
-                with open(img_dir / fname, "wb") as fh:
-                    for chunk in resp.iter_content(1 << 16):
-                        fh.write(chunk)
-                img_map[src] = by_basename[base] = fname
-                time.sleep(delay / 4)
-            except Exception as e:
-                print(f"  image failed {src}: {e}", file=sys.stderr)
+        # the media files behind embeds (Giphy), served locally by convert
+        srcs += [u for u in embed_asset_urls(r.text, medium_id(url) or "", dest)
+                 if u not in srcs]
+        fetch_images(session, srcs, img_dir, img_map, delay)
         (dest / "images.json").write_text(json.dumps(img_map, indent=2))
 
     info = extract_metadata(BeautifulSoup(r.text, "html.parser"), url)
     return {"published": info["date"], "title": info["title"],
             "image_count": len(img_map), "media_count": media_count}
+
+
+MEDIUM_ID_RE = re.compile(r"^[0-9a-f]{8,12}$")
+
+
+def resolve_post_ref(line: str, out: Path, index: dict) -> str:
+    """The archived URL a --urls line refers to, when it names an
+    archived post rather than a URL: a Medium id, or a converted post's
+    directory name as lint and stats print it (with or without a
+    posts/ prefix). Anything else is a URL and comes back as it is. A
+    name that resolves nowhere comes back unchanged too, so the
+    soft-404 it then earns says what happened."""
+    ref = line.strip().rstrip("/")
+    if "://" in ref:
+        return ref
+    if MEDIUM_ID_RE.match(ref):
+        for url, entry in index.items():
+            if entry.get("medium_id") == ref:
+                return url
+        return ref
+    name = ref.split("/")[-1]
+    md = out / "posts" / name / "index.md"
+    if md.is_file():
+        text = md.read_text(encoding="utf-8")
+        m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+        try:
+            front = json.loads(m.group(1)) if m else {}
+        except json.JSONDecodeError:
+            front = {}
+        if front.get("original_url"):
+            return front["original_url"]
+        for url, entry in index.items():
+            if entry.get("medium_id") == front.get("medium_id"):
+                return url
+    return ref
 
 
 def cmd_fetch(args):
@@ -210,7 +462,11 @@ def cmd_fetch(args):
     feed = {}
     if args.urls:
         lines = [l.strip() for l in args.urls.read_text().splitlines()]
-        entries = [(canonical_url(l), None, "file") for l in lines if l and not l.startswith("#")]
+        # a line may name an archived post instead of a URL (its Medium
+        # id, or the posts/ directory name lint prints)
+        known = read_index(raw_dir)
+        entries = [(canonical_url(resolve_post_ref(l, args.out, known)), None, "file")
+                   for l in lines if l and not l.startswith("#")]
         try:
             feed = fetch_feed(session, args.base, raw_dir)
         except Exception:
@@ -265,8 +521,11 @@ def cmd_fetch(args):
             # raw/<id>/media/ without re-fetching the post itself
             page = raw_dir / pid / "page.html"
             if page.exists():
-                got = fetch_media(session, page.read_text(encoding="utf-8"),
-                                  pid, raw_dir / pid, args.delay)
+                text = page.read_text(encoding="utf-8")
+                got = fetch_media(session, text, pid, raw_dir / pid, args.delay)
+                if not args.no_images:
+                    got += backfill_embed_assets(session, text, pid,
+                                                 raw_dir / pid, args.delay)
                 if got:
                     media_files += got
                     print(f"[{n}/{len(entries)}] {url}\n"

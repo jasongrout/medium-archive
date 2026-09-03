@@ -173,3 +173,31 @@ def test_pure_insertion(tmp_path):
         "a/abc123/ghost.html", "b/abc123/ghost.html", lineterm="", n=0)) + "\n"
     out = write_out(tmp_path, patches=[("fix.patch", bare)])
     assert read_raw(out / "raw" / "abc123" / "ghost.html", load_fixups(out)) == inserted
+
+
+def test_embed_media_files_are_keyed_under_their_post(tmp_path):
+    # an archived gist, tweet or Carbon snippet lives in the post's
+    # media/ directory; the fixup names it as <medium_id>/media/<name>
+    out = write_out(tmp_path, patches=[("lang.sub", (
+        "file: abc123/media/carbon-x.json\n"
+        'old: "id": "x"\nnew: "language": "tsx", "id": "x"\n'))])
+    media = out / "raw" / "abc123" / "media"
+    media.mkdir()
+    (media / "carbon-x.json").write_text('{"code": "1", "id": "x"}')
+    fixups = load_fixups(out)
+    assert list(fixups) == ["abc123/media/carbon-x.json"]
+    assert read_raw(media / "carbon-x.json", fixups) == '{"code": "1", "language": "tsx", "id": "x"}'
+    # a patch header path resolves the same way
+    out2 = write_out(tmp_path / "two", patches=[("m.patch", patch_text(
+        '{"id": "x"}\n', '{"id": "y"}\n', "a/abc123/media/carbon-x.json",
+        "b/abc123/media/carbon-x.json"))])
+    (out2 / "raw" / "abc123" / "media").mkdir()
+    (out2 / "raw" / "abc123" / "media" / "carbon-x.json").write_text('{"id": "x"}\n')
+    assert list(load_fixups(out2)) == ["abc123/media/carbon-x.json"]
+
+
+def test_fixup_for_a_missing_file_aborts(tmp_path):
+    out = write_out(tmp_path, patches=[("nope.sub", (
+        "file: abc123/nothing.html\nold: a\nnew: b\n"))])
+    with pytest.raises(SystemExit, match="no such raw file to patch: abc123/nothing.html"):
+        load_fixups(out)

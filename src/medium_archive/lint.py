@@ -53,8 +53,20 @@ IMAGE_RE = re.compile(r"!\[[^\]]*\]\((images/[^)]+)\)")
 MISSING_EMBED_RE = re.compile(r"\\?\[missing embed")
 
 # the link convert leaves where an iframe stood (--embeds); the href is
-# the embed's target, unescaped
+# the embed's target, unescaped. A YouTube embed stays a player instead
+# (convert.embed_iframe), which is content, not a bare link; so does a
+# player from a provider in convert.PROVIDER_EMBEDS.
 EMBED_LINK_RE = re.compile(r"\\?\[embed: [^\]]*\]\(([^)]*)\)")
+
+# the attribution line of the blockquote an archived tweet became
+# (convert.tweet_html): a quoted line ending in a dated link to the tweet
+TWEET_QUOTE_RE = re.compile(
+    r"^> .*\]\(https?://(?:www\.|mobile\.)?(?:twitter|x)\.com/[^/)]+/status/\d+\)\s*$")
+
+# a Giphy embed or a tweet's photo whose file the fetch step has not
+# archived yet: the image or clip still points at the provider (--embeds)
+REMOTE_EMBED_ASSET_RE = re.compile(
+    r'(?:!\[[^\]]*\]\(|<video src=")(https?://[^)"]*(?:giphy\.com|pbs\.twimg\.com)/[^)"]*)')
 
 FENCE_RE = re.compile(r"^`{3,}")
 
@@ -121,25 +133,58 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
     raw_root is the archive's raw/ directory, for the page's editor
     state; without it, or without a page, only the bare links are
     reported."""
+    from .images import giphy_media
+    from .sites import IFRAME_RE           # sites imports this module
+    from .urls import carbon_id, tweet_id
     problems = []
-    links = [m.group(1) for line, fenced in prose_lines(body) if not fenced
-             for m in EMBED_LINK_RE.finditer(line)]
+    links, players = [], 0
+    for line, fenced in prose_lines(body):
+        if fenced:
+            continue
+        links.extend(m.group(1) for m in EMBED_LINK_RE.finditer(line))
+        players += bool(IFRAME_RE.match(line) or TWEET_QUOTE_RE.match(line))
+        for m in REMOTE_EMBED_ASSET_RE.finditer(line):
+            problems.append(f"embed media not archived, served remotely: "
+                            f"{m.group(1)[:100]} (re-run fetch; "
+                            "`fetch --urls` takes this post's name)")
     for url in links:
-        problems.append(f"embed is a bare link, its content is not in the "
-                        f"archive: {url[:100]} (replace it by hand)")
+        if tweet_id(url):
+            problems.append(f"tweet not archived, embed is a bare link: "
+                            f"{url[:100]} (re-run fetch for its text; a "
+                            "deleted tweet stays a link)")
+        else:
+            problems.append(f"embed is a bare link, its content is not in "
+                            f"the archive: {url[:100]} (replace it by hand)")
     page = (raw_root / (front.get("medium_id") or "") / "page.html"
             if raw_root and front.get("medium_id") else None)
     if page is None or not page.is_file():
         return problems
     from .state import state_embed_targets     # sites imports this module
-    expected = state_embed_targets(page.read_text(encoding="utf-8",
-                                                  errors="replace"),
-                                   front["medium_id"])
+    # a Giphy embed converts to an image or clip, archived or not, an
+    # archived Carbon snippet to a code block, an archived tweet to a
+    # quote (or, recorded deleted, to a link saying so), and an embed
+    # from a provider that refuses framing to a titled link, so none is
+    # among the embed links a body source could have dropped
+    from .convert import provider_link
+    def archived(kind, ident):
+        return (page.parent / "media" / f"{kind}-{ident}.json").is_file()
+    def archived_carbon(url):
+        cid = carbon_id(url)
+        return cid and archived("carbon", cid)
+    def archived_tweet(url):
+        # a quote, or the link fetch's record of a deleted tweet becomes
+        tweet = tweet_id(url)
+        return tweet and archived("tweet", tweet[0])
+    expected = [t for t in state_embed_targets(
+        page.read_text(encoding="utf-8", errors="replace"), front["medium_id"])
+        if not giphy_media(t[0]) and not archived_carbon(t[0])
+        and not archived_tweet(t[0]) and not provider_link(t[0])]
     # the state's targets and the body's links name one embed in different
     # forms (a canonical page vs an embed URL), so they are compared by
-    # count: fewer links than the state has embeds means the body source
-    # dropped some -- name the state's, since those are what is missing
-    dropped = len(expected) - len(links)
+    # count: fewer links and players than the state has embeds means the
+    # body source dropped some -- name the state's, since those are what
+    # is missing
+    dropped = len(expected) - len(links) - players
     if dropped > 0:
         names = ", ".join(repr(title or url[:60]) for url, title in expected)
         problems.append(
@@ -195,7 +240,11 @@ def lint_post(post_dir: Path, seo: bool = False, embeds: bool = False,
         warnings.append("empty title")
     if not front.get("date"):
         warnings.append("empty date")
-    if len(body) < 200:
+    # a short body is the signature of a conversion that lost the body,
+    # unless the post really is that short: then the summary Medium
+    # derived from it (the description) is in it, whole
+    description = " ".join((front.get("description") or "").split())
+    if len(body) < 200 and not (description and description in " ".join(body.split())):
         warnings.append(f"body is only {len(body)} chars")
     if embeds:
         errors.extend(embed_problems(front, body, raw_root))

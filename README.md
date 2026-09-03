@@ -10,12 +10,15 @@ conversion can be tuned and re-run without hitting Medium again.
 ## Steps
 
 **`fetch`** pulls raw material from Medium into `<out>/raw/`: each post's
-page HTML, its RSS feed item, full-resolution images, and the media
-behind gist embeds (the gist's files, via medium.com/media and the
-GitHub gists API). Nothing is modified. Fetching is incremental and
-resumable, so it can be interrupted and re-run. A later run picks up
-only new posts, and backfills embed media for posts archived before it
-was collected.
+page HTML, its RSS feed item, full-resolution images, and the content
+behind its embeds that Medium's page does not carry: a gist's files
+(via medium.com/media and the GitHub gists API), a tweet's text and
+pictures (X's oEmbed and syndication endpoints), a Carbon snippet's
+code, a Giphy embed's gif or mp4. Nothing is modified. Fetching is
+incremental and resumable, so it can be interrupted and re-run. A
+later run picks up only new posts, and backfills embed content for
+posts archived before it was collected; `--urls` names posts to
+backfill by Medium id or directory name.
 
 **`import-export`** (optional) merges a Medium account export into
 `<out>/raw/`. The export is the zip from medium.com → Settings →
@@ -501,7 +504,49 @@ no longer lists, work through the steps in order:
   not). `lint` flags the placeholders until a `fetch` re-run backfills
   the media. An RSS feed body renders a gist as an iframe with no
   source at all; that converts to the same placeholder, and only a
-  fixup that puts the gist's `<script src>` back restores it. Code
+  fixup that puts the gist's `<script src>` back restores it. A
+  YouTube embed is the other exception: its URL is all a player needs,
+  so it stays an `<iframe>` (one canonical line, on the no-cookie host,
+  with the state's title for assistive tech and any `t=` start time)
+  that Hugo and Pelican render as raw HTML and the MyST exporter
+  rewrites to the `{iframe}` directive; `lint --embeds` counts it as
+  content. A Giphy embed names a media file, which `fetch` downloads
+  into `raw/<id>/images/` alongside the post's images (a re-run
+  backfills posts archived earlier, like gist media), so `convert`
+  serves it from the post itself: the gif as an image, the mp4 as a
+  looping muted `<video>` that the MyST exporter writes in its image
+  syntax. Until the file is fetched the image or clip points at Giphy,
+  which `lint --embeds` reports. A tweet's text is likewise nowhere in
+  the page, so `fetch` archives each tweet embed's oEmbed payload from
+  X's public endpoint into `raw/<id>/media/tweet-<tweet id>.json` (a
+  re-run backfills older posts; a deleted tweet is reported and stays
+  a link), and `convert` renders it as a blockquote: the text with its
+  links, then the author and a dated link to the tweet. For a tweet
+  with pictures, `fetch` also archives X's syndication payload
+  (`tweet-<id>.media.json`), which names the photos, and downloads
+  them with the post's images; the quote then carries the photos
+  (and a video's poster, linked to the tweet) in place of the
+  `pic.twitter.com` link. A tweet X no longer serves is recorded in
+  the same file (`{"deleted": true, ...}`, written when the endpoint
+  answers 404), converts to a link saying the tweet is no longer
+  available, and satisfies `lint --embeds`; delete the file to ask X
+  again, or replace it with a hand-written payload of the oEmbed shape
+  when the text is recovered elsewhere. The account export's widget markup, a
+  blockquote holding only the tweet's link, takes the same path
+  instead of converting to nothing. Embeds from a
+  few providers whose content is a player with nothing to archive (a
+  Carbon code screenshot, Vimeo, CodePen, Spotify, SoundCloud) stay
+  iframes on the provider's own embed URL,
+  at the size Medium showed them, the same one-line form as a YouTube
+  player; the list is `PROVIDER_EMBEDS` in `convert.py`. A Carbon
+  code screenshot is the one of those whose source is recoverable:
+  the embed page carries the snippet's code and language, which
+  `fetch` archives into `raw/<id>/media/carbon-<id>.json`, and
+  `convert` then writes the code block itself; the iframe is the
+  fallback until it is fetched. Everything else is still the
+  `[embed: url]` link, except an embed from a provider that refuses to
+  be framed (art19), which becomes a plain link titled by the editor
+  state and counts as content. Code
   fences carry the language Medium recorded for the block
   (`codeBlockMetadata`), and user mentions resolve to the author's
   Medium profile.
