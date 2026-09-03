@@ -171,3 +171,19 @@ def test_embed_assets_are_fetched_with_the_images_and_backfilled(tmp_path):
     # incremental: nothing to do the second time
     assert fetchmod.backfill_embed_assets(session, giphy_page(mid), mid, dest, 0) == 0
     assert session.calls == [GIPHY]
+
+
+def test_urls_file_may_name_archived_posts(tmp_path):
+    # a Medium id or a converted post's directory name (what lint prints)
+    # resolves to the archived URL, so one post can be re-fetched or
+    # backfilled without knowing its Medium URL; URLs pass through
+    index = {GOOD: {"medium_id": "111122223333"}}
+    d = tmp_path / "posts" / "2018-05-01-good-post"
+    d.mkdir(parents=True)
+    (d / "index.md").write_text('---\n{"original_url": "%s", "medium_id": '
+                                '"111122223333"}\n---\n\nBody.\n' % GOOD)
+    for ref in ("111122223333", "2018-05-01-good-post", "posts/2018-05-01-good-post/",
+                GOOD, GOOD + "?source=x"):
+        assert fetchmod.resolve_post_ref(ref, tmp_path, index).startswith(GOOD), ref
+    assert fetchmod.resolve_post_ref("2019-01-01-unknown", tmp_path, index) == "2019-01-01-unknown"
+    assert fetchmod.resolve_post_ref("deadbeef", tmp_path, index) == "deadbeef"

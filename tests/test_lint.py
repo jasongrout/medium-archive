@@ -241,5 +241,6 @@ def test_giphy_embed_is_an_asset_not_a_link(tmp_path):
                    f'<video src="{mp4}" autoplay loop muted playsinline></video>\n',
                    front=front, name="2020-01-02-remote")
     errors, _ = lint_post(d, embeds=True, raw_root=raw)
-    assert errors == [f"embed media not archived, served from Giphy: {gif} (re-run fetch)",
-                      f"embed media not archived, served from Giphy: {mp4} (re-run fetch)"]
+    tail = " (re-run fetch; `fetch --urls` takes this post's name)"
+    assert errors == [f"embed media not archived, served from Giphy: {gif}{tail}",
+                      f"embed media not archived, served from Giphy: {mp4}{tail}"]

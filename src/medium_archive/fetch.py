@@ -248,6 +248,41 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
             "image_count": len(img_map), "media_count": media_count}
 
 
+MEDIUM_ID_RE = re.compile(r"^[0-9a-f]{8,12}$")
+
+
+def resolve_post_ref(line: str, out: Path, index: dict) -> str:
+    """The archived URL a --urls line refers to, when it names an
+    archived post rather than a URL: a Medium id, or a converted post's
+    directory name as lint and stats print it (with or without a
+    posts/ prefix). Anything else is a URL and comes back as it is. A
+    name that resolves nowhere comes back unchanged too, so the
+    soft-404 it then earns says what happened."""
+    ref = line.strip().rstrip("/")
+    if "://" in ref:
+        return ref
+    if MEDIUM_ID_RE.match(ref):
+        for url, entry in index.items():
+            if entry.get("medium_id") == ref:
+                return url
+        return ref
+    name = ref.split("/")[-1]
+    md = out / "posts" / name / "index.md"
+    if md.is_file():
+        text = md.read_text(encoding="utf-8")
+        m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+        try:
+            front = json.loads(m.group(1)) if m else {}
+        except json.JSONDecodeError:
+            front = {}
+        if front.get("original_url"):
+            return front["original_url"]
+        for url, entry in index.items():
+            if entry.get("medium_id") == front.get("medium_id"):
+                return url
+    return ref
+
+
 def cmd_fetch(args):
     raw_dir = args.out / "raw"
     start = args.start or datetime.now(timezone.utc)
@@ -259,7 +294,11 @@ def cmd_fetch(args):
     feed = {}
     if args.urls:
         lines = [l.strip() for l in args.urls.read_text().splitlines()]
-        entries = [(canonical_url(l), None, "file") for l in lines if l and not l.startswith("#")]
+        # a line may name an archived post instead of a URL (its Medium
+        # id, or the posts/ directory name lint prints)
+        known = read_index(raw_dir)
+        entries = [(canonical_url(resolve_post_ref(l, args.out, known)), None, "file")
+                   for l in lines if l and not l.startswith("#")]
         try:
             feed = fetch_feed(session, args.base, raw_dir)
         except Exception:

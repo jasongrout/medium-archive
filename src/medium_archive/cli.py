@@ -145,7 +145,10 @@ def add_fetch_args(p):
                         "/sitemap/sitemap.xml and /feed must resolve under it")
     p.add_argument("--urls", type=Path, metavar="FILE",
                    help="read post URLs from FILE (one per line, '#' comments) "
-                        "instead of discovering them from sitemap + feed")
+                        "instead of discovering them from sitemap + feed; a "
+                        "line may also name an archived post by its Medium id "
+                        "or its posts/ directory name (as lint prints it), "
+                        "e.g. to backfill one post's embed media")
     p.add_argument("--no-wayback", action="store_true",
                    help="skip the Wayback Machine's index of past captures "
                         "(web.archive.org) during discovery; Medium's sitemap only "

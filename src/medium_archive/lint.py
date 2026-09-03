@@ -138,7 +138,8 @@ def embed_problems(front: dict, body: str, raw_root: Path | None) -> list:
         players += bool(IFRAME_RE.match(line))
         for m in REMOTE_EMBED_ASSET_RE.finditer(line):
             problems.append(f"embed media not archived, served from Giphy: "
-                            f"{m.group(1)[:100]} (re-run fetch)")
+                            f"{m.group(1)[:100]} (re-run fetch; "
+                            "`fetch --urls` takes this post's name)")
     for url in links:
         problems.append(f"embed is a bare link, its content is not in the "
                         f"archive: {url[:100]} (replace it by hand)")
