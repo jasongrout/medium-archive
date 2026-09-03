@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import share with context %}
-{% block title %}{{ article.title }} · {{ SITENAME }}{% endblock %}
+{% block name %}{{ article.title }}{% endblock %}
 {% block content %}
 {# title and URL, said once; the macro does the encoding. The title is
    the plain text of the Title: header, not HTML -- pelican renders only

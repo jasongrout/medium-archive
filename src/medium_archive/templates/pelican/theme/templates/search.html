@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Search · {{ SITENAME }}{% endblock %}
+{% block name %}Search{% endblock %}
+{# results are nobody's landing page: out of the index, as WordPress keeps its own #}
+{% set noindex = true %}
 {% block content %}
 <h1 class="page-title">Search</h1>
 {# Pagefind's Component UI (its recommended integration since 1.5),

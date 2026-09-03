@@ -1,0 +1,14 @@
+{{- /* The one paginator a listing page renders from -- home (the
+       posts), a section or a term (its pages, newest first) -- for the
+       list templates and for the head alike: page 2 of a listing is
+       its own address, and the canonical link, og:url and <title> have
+       to say so. Hugo keeps the first paginator a page builds, so the
+       head and the body asking with the same arguments get the same
+       one. Returns "" for a page that does not paginate. */ -}}
+{{- $pager := "" -}}
+{{- if .IsHome -}}
+{{- $pager = .Paginate (where site.RegularPages "Type" "posts") -}}
+{{- else if in (slice "section" "term") .Kind -}}
+{{- $pager = .Paginate .Pages.ByDate.Reverse -}}
+{{- end -}}
+{{- return $pager -}}

@@ -4,7 +4,7 @@
 <!-- @include shared/feed-icon.html -->
 </a>{{ end }}</h1>
 {{ .Content }}
-{{ $paginator := .Paginate .Pages.ByDate.Reverse }}
+{{ $paginator := partial "paginator.html" . }}
 <div class="card-grid">
 {{ range $paginator.Pages }}{{ partial "card.html" . }}{{ end }}
 </div>

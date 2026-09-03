@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import card with context %}
-{% block title %}{{ author }} · {{ SITENAME }}{% endblock %}
+{% block name %}{{ author }}{% endblock %}
 {% block content %}
 <h1 class="page-title">{{ author }}{% if AUTHOR_FEED_ATOM %}<a class="feed-link" href="{{ SITEURL }}/{{ AUTHOR_FEED_ATOM.format(slug=author.slug) }}" aria-label="RSS feed for {{ author }}" title="RSS feed for {{ author }}">
 <!-- @include shared/feed-icon.html -->

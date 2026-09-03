@@ -169,12 +169,33 @@ with none stored, the system scheme decides. The theme provides:
   an `@you@server` handle as readily as a bare domain.
 - Open Graph metadata on every page: `og:site_name`, `og:type`,
   `og:title`, `og:url`, `og:description`, the baked 640×360 cover as
-  `og:image` (with `twitter:card` following whether there is one),
-  `article:published_time`, the post's authors and tags, and a
-  canonical link. LinkedIn's and Facebook's share URLs carry only the
+  `og:image` (with `twitter:card` following whether there is one, and
+  `twitter:site` from `site.json`'s `"twitter"`), `article:published_time`
+  and `article:modified_time`, the post's authors (by name in the
+  `author` meta tag, by author page in `article:author`) and tags, and
+  a canonical link. LinkedIn's and Facebook's share URLs carry only the
   page address and build their whole share box from these tags, so they
   are the difference between a share link that works and one that posts
   a bare URL.
+- What search engines read beyond the share tags, as Medium's and
+  WordPress's pages carry it: each post's own `<meta name="description">`,
+  a schema.org `BlogPosting` JSON-LD block (headline, dates, author,
+  publisher with logo, cover, keywords), a robots tag allowing large
+  image previews (`max-image-preview:large`, WordPress's default), and
+  a canonical address that is the page's own -- page 2 of a listing is
+  `/page/2/`, not folded into page 1. A `sitemap.xml` (Hugo's own; the
+  Pelican plugin writes one) lists the posts with their last-modified
+  dates, and a `robots.txt` names it. The search page is kept out of
+  both, and `"noindex": true` in `site.json` keeps a whole deployment
+  out (a preview, which would otherwise be indexed as a copy of the
+  real site). The redirect map is also written as a `_redirects` file
+  at the site root, one `old new 301` rule per line, which Netlify,
+  Cloudflare Pages and their imitators answer with a real HTTP 301;
+  hosts that ignore it (GitHub Pages) serve the meta-refresh stubs.
+- The first body image of a post loads eagerly at high priority and
+  every later one lazily, as WordPress treats the first content image:
+  the first is usually on screen at load, and lazy-loading it delays
+  the largest contentful paint.
 - A `/search/` page wired to [Pagefind](https://pagefind.app). Run
   `pagefind --site public` (hugo) or `pagefind --site output` (pelican)
   after building for full-text search served as a results page with
@@ -279,6 +300,8 @@ publication rather than the tool. Every key is optional.
 | `avatar` | archive-relative image path for the header logo |
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
+| `noindex` | `true` keeps search engines off the whole deployment (a `noindex` robots tag on every page, a `robots.txt` that disallows all): for previews and staging, which would otherwise be indexed as a copy of the real site |
+| `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`) |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
 | `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`favicon`, and extra `params` for the generated config |
 

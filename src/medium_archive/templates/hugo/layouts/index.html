@@ -1,7 +1,7 @@
 {{ define "main" }}
 <h1 class="page-title">{{ site.Title }}</h1>
 <div class="intro">{{ .Content }}</div>
-{{ $paginator := .Paginate (where site.RegularPages "Type" "posts") }}
+{{ $paginator := partial "paginator.html" . }}
 <div class="card-grid">
 {{ range $paginator.Pages }}{{ partial "card.html" . }}{{ end }}
 </div>
