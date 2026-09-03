@@ -372,32 +372,28 @@ medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
 medium-archive lint --embeds --out .    # one line per embed missing content
 ```
 
-As of 2026-09-03 the run reports 20 problems:
+As of 2026-09-03, after the tweet fetch and the provider-player rule,
+the run reports 3 problems, all tweets X no longer serves:
 
-- **17 bare embed links across 9 posts**: Twitter (12),
-  carbon.now.sh code screenshots (4) and one art19
-  podcast episode. Each needs a decision per embed: an image or code
-  block placed in a fixup, a plain link with a sentence around it, or
-  leaving the link as it stands and accepting it. The tweets are the
-  bulk; a tweet's text is not in the archive, so a fixup would have to
-  quote it (Medium's export carries only the embedly wrapper).
-- **2 embeds an export body dropped** that the page's editor state still
-  carries: the tweet in `jupyter-receives-the-acm-software-system-award`
-  (already noted under `compare --state` above) and a tweet in
-  `jupyterlab-the-next-generation-of-the-jupyter-notebook`. A fixup on
-  `raw/<id>/export.html` can put the embed back.
-All three Giphy embeds are archived (`raw/<id>/images/`, named by
-Giphy id since a first fetch merged the two `giphy.mp4` basenames into
-one file; a clean refetch with the fixed tool gave the names above)
-and convert to a local image and two clips.
+- `lucy-dagostino-mcgowan`: <https://twitter.com/lucystats/status/1291022874644492288>
+- `tema-okun`: <https://twitter.com/billions_inst/status/1219477928335020032>
+  and <https://twitter.com/reshamas/status/1278081433165279232>
 
-- The gist a feed body hollowed out in
-  `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`
-  is fixed: `fixups/9a2d911cf42f-feed-gist.sub` puts the gist's
-  `<script src>` where the RSS body had an iframe with no source, and
-  convert inlines the archived file. It is a Markdown file
-  (`OTHER-THEMES.md`, a table), shown as a fenced `markdown` block the
-  way Medium's gist embed showed its source; rendering a `.md` gist
-  file as Markdown instead would be a medium-archive option.
+Eleven other tweets are archived under `raw/<id>/media/tweet-<tweet
+id>.json` (their oEmbed payloads, fetched from X's public endpoint)
+and render as quotes. For the three, a hand-written file of the same
+shape restores the quote once the text is recovered, most likely from
+a Wayback Machine capture of the tweet page (unreachable at the time
+of writing); a `"note"` key recording the source is ignored by
+convert. Until then they stay bare links and the workflow stays red.
 
-With that fixup plain `lint` is back to 0 problems.
+Everything else that was on this list is handled by conversion now:
+YouTube players, the three Giphy files, gists, and the art19 podcast
+player and four Carbon code screenshots, which stay iframes on the
+provider's own embed URL at the size Medium showed them. The Carbon
+snippets in `build-a-jupyter-widget-with-react-and-typescript` would
+read better as real code blocks; that takes someone reading the four
+screenshots and writing a fixup, and would also drop the post's last
+dependency on a third party.
+
+Plain `lint` is at 0 problems.
