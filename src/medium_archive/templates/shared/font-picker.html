@@ -3,6 +3,7 @@
 <span class="font-sample" data-set-font="sans">Helvetica</span>
 <span class="font-sample" data-set-font="open-sans">Open Sans</span>
 <span class="font-sample" data-set-font="source">Source</span>
+<span class="font-sample" data-set-font="source-sans">Source Sans</span>
 </button>
 </span>
 <script>
@@ -11,7 +12,7 @@
   var picker = document.querySelector(".font-picker");
   var button = picker.querySelector("button");
   var samples = button.querySelectorAll("[data-set-font]");
-  var order = ["sans", "open-sans", "source"];
+  var order = ["sans", "open-sans", "source", "source-sans"];
   var names = {};
   samples.forEach(function (sample) {
     names[sample.dataset.setFont] = sample.textContent;

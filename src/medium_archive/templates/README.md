@@ -42,18 +42,20 @@ These embed verbatim in both engines' pages, so they must carry no
 - `font-picker.html` is the header's body-font switch, beside the theme
   picker and built like it: one cycling button, the choice persisted
   per browser. Where the theme button draws its state as an icon, this
-  one names it ("Helvetica", "Open Sans", "Source") and sets the name in
-  the family it names, so the button says and shows what the reader is
-  on. The names are the button's own text, which the script reads back
-  for the tooltip and `aria-label`; a fixed `min-width` in `card.css`
-  keeps the three from shifting the nav as they cycle. It exists to let
-  reviewers compare candidate typography before the blog settles on
-  one: the jupyter.org Helvetica stack the site launched with, Open
-  Sans (the humanist sans nearest the logo's Myriad Pro), and Source,
-  the superfamily Medium set the publication in (Source Serif Pro
-  running text, Source Sans Pro headings and chrome, Source Code Pro
-  code). The article's reading size belongs to `.post` rather than to
-  any one choice, so the three differ in family alone. The losing
+  one names it ("Helvetica", "Open Sans", "Source", "Source Sans") and
+  sets the name in the family it names, so the button says and shows
+  what the reader is on. The names are the button's own text, which the
+  script reads back for the tooltip and `aria-label`; a fixed
+  `min-width` in `card.css` keeps the four from shifting the nav as
+  they cycle. It exists to let reviewers compare candidate typography
+  before the blog settles on one: the jupyter.org Helvetica stack the
+  site launched with, Open Sans (the humanist sans nearest the logo's
+  Myriad Pro), Source, the superfamily Medium set the publication in
+  (Source Serif Pro running text, Source Sans Pro headings and chrome,
+  Source Code Pro code), and Source Sans, that same superfamily's sans
+  face running the article text as well instead of ceding it to the
+  serif. The article's reading size belongs to `.post` rather than to
+  any one choice, so the four differ in family alone. The losing
   styles, and the picker with them, come out once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
