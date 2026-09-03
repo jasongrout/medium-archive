@@ -146,7 +146,12 @@ These embed verbatim in both engines' pages, so they must carry no
 - `dark-palette.css` is included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link
-  color and stays the same in both palettes.
+  color and stays the same in both palettes. The `--syn-*` colours
+  are the syntax-highlighting set for that palette; `card.css` names
+  the light set beside its other light values and applies both
+  through the token rules under `.post .highlight`, on the class
+  names Chroma (Hugo, with `noClasses` off in `hugo.toml.tmpl`) and
+  Pygments (Pelican's codehilite) share.
 - `card.css` is the card-grid look, written as both the hugo theme's
   and the pelican theme's stylesheet.
 
@@ -155,7 +160,10 @@ These embed verbatim in both engines' pages, so they must carry no
 The built-in theme (`hugo.TEMPLATES` maps each file into the site; the
 regular list and taxonomy pages share `list.html`), plus:
 
-- `hugo.toml.tmpl` is the generated site config.
+- `hugo.toml.tmpl` is the generated site config. Its
+  `[markup.highlight]` turns off Chroma's inline styles, whose default
+  Monokai would paint a dark block on the light page; the tokens get
+  classes instead and `card.css` colours them per palette.
 - `content/tags/_content.gotmpl` is a content adapter: it creates one
   term page per entry of `data/tags.json` (tag slug -> display name,
   written by `hugo.write_tag_names`), so the tag pages, cards, chip
