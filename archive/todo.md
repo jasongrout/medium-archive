@@ -75,7 +75,9 @@ Last full validation, all three against all 333 posts:
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and the
 `compare`, `compare --state` and `compare --ghost` results are explained
-below. No required work remains.
+below. No required work remains on the conversion itself. The posts
+whose embeds have no content in the archive are listed in section 5;
+the `Lint embeds` workflow fails until those are fixed.
 
 ## 1. Expected compare results
 
@@ -344,3 +346,46 @@ key (the publication's addresses elsewhere, for the `Organization`'s
 `sameAs`) is also unset; the values would be the GitHub organization
 and the Mastodon account, alongside the X handle already in
 `"twitter"`.
+
+## 5. Embeds without content (`lint --embeds`, the `Lint embeds` workflow)
+
+Medium posts embed videos, tweets, gists and the like as iframes.
+`convert` has no content for most of them, so an iframe becomes a
+`[embed: <url>](<url>)` link, and every generated site shows that link
+where the reader expects the video or the tweet. Gists are the
+exception (their files are archived under `raw/<id>/media/` and
+inlined as code), but a body source can lose an embed altogether. None
+of that is a conversion defect, so plain `lint` stays quiet about the
+links; `medium-archive lint --embeds` reports every one as a problem
+and exits non-zero. `.github/workflows/lint.yml` runs it on every push
+and pull request, separately from the preview build, and is expected
+to stay red until each post below is fixed by hand. To run it locally:
+
+```sh
+pip install "medium-archive @ git+https://github.com/jasongrout/medium-archive"
+medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
+medium-archive lint --embeds --out .    # one line per embed missing content
+```
+
+As of 2026-09-03 the run reports 56 problems:
+
+- **53 bare embed links across 25 posts**: YouTube (33), Twitter (12),
+  carbon.now.sh code screenshots (4), Giphy (3) and one art19 podcast
+  episode. Each needs a decision per embed: an image or code block
+  placed in a fixup, a plain link with a sentence around it, or leaving
+  the link as it stands and accepting it.
+- **2 embeds an export body dropped** that the page's editor state still
+  carries: the tweet in `jupyter-receives-the-acm-software-system-award`
+  (already noted under `compare --state` above) and a tweet in
+  `jupyterlab-the-next-generation-of-the-jupyter-notebook`. A fixup on
+  `raw/<id>/export.html` can put the embed back.
+- **1 gist hollowed out by a feed body**: the "Other themes" gist in
+  `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`.
+  The RSS body renders it as an iframe with no source, which now
+  converts to a `[missing embed]` placeholder that plain `lint` also
+  flags. The gist's files are archived; a fixup that puts the gist's
+  `<script src="https://gist.github.com/.../<id>.js">` tag into
+  `raw/9a2d911cf42f/feed_item.json` lets `convert` inline them.
+
+Because the RSS body of the 2026 survey post is the one plain `lint`
+now fails on, the "0 problems" above holds for the other 335 posts.

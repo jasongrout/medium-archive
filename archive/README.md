@@ -217,7 +217,10 @@ Medium era keep working too.
   `[missing embed: <name>]` placeholder (from the state, which has no
   URL for it) or an `[embed: <gist url>]` link (from an export or Ghost
   body, which names the gist). `lint` flags the placeholders; re-run
-  fetch to recover them.
+  fetch to recover them. `lint --embeds` flags every bare embed link
+  and every embed a body source dropped, and the `Lint embeds`
+  workflow runs it on every push and pull request; see `todo.md`,
+  section 5, for the posts it currently fails on.
 * Medium boilerplate is stripped in `convert` and still present in
   `raw/page.html`: "was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, the author header.
