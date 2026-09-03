@@ -1,7 +1,7 @@
 {% macro card(article) %}
 <article class="card">
 {% if article.cover %}
-<a class="card-cover" href="{{ SITEURL }}/{{ article.url }}"><img src="{{ SITEURL }}/{{ article.url }}{{ article.cover }}" width="640" height="360" alt="" loading="lazy"></a>
+<div class="card-cover"><img src="{{ SITEURL }}/{{ article.url }}{{ article.cover }}" width="640" height="360" alt="" loading="lazy"></div>
 {% endif %}
 <div class="card-body">
 {% if article.tags %}<p class="card-tags">{% for t in article.tags %}<a href="{{ SITEURL }}/{{ t.url }}">{{ t }}</a> {% endfor %}</p>{% endif %}

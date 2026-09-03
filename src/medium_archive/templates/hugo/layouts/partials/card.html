@@ -1,7 +1,7 @@
 <article class="card">
 {{- $cover := "" }}{{ with .Params.cover }}{{ $cover = $.Resources.Get . }}{{ end }}
 {{- with $cover }}
-<a class="card-cover" href="{{ $.RelPermalink }}">
+<div class="card-cover">
   {{- if and (eq .MediaType.MainType "image") (not (in (slice "gif" "svg") .MediaType.SubType)) -}}
   {{- /* the exporter bakes covers to exactly 640x360 (crop or
          letterbox by aspect -- see sites.make_cover_thumbnail); Fill
@@ -12,7 +12,7 @@
   {{- else -}}
   <img src="{{ .RelPermalink }}" alt="" loading="lazy">
   {{- end -}}
-</a>
+</div>
 {{- end }}
 <div class="card-body">
 {{ with .GetTerms "tags" }}<p class="card-tags">{{ range . }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a> {{ end }}</p>{{ end }}

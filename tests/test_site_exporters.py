@@ -1233,10 +1233,20 @@ def test_alt_text_falls_back_to_the_caption():
 
 def test_whole_card_is_the_post_link(archive):
     """A click anywhere on a listing card follows the post, as a reader
-    expects of a card: the title link is stretched over the card, and
-    the tag links are lifted above it so a tag still opens its page."""
-    css = (hugo.build_site(archive) / "static/css/style.css").read_text()
+    expects of a card: the card's one link to the post, the title, is
+    stretched over the card, and the tag links are lifted above it so a
+    tag still opens its page. The cover is no link of its own -- under
+    the stretched title it would be a second, unnamed tab stop to the
+    same post -- in either theme's card."""
+    hugo_site, pelican_site = hugo.build_site(archive), pelican.build_site(archive)
+    css = (hugo_site / "static/css/style.css").read_text()
     assert ".card { position: relative; }" in css
     assert ".card-title a::after { content: \"\"; position: absolute; inset: 0; }" in css
     assert ".card-tags a { position: relative; z-index: 1; }" in css
-    assert css == (pelican.build_site(archive) / "theme/static/css/style.css").read_text()
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    for card in (hugo_site / "layouts/partials/card.html",
+                 pelican_site / "theme/templates/macros.html"):
+        text = card.read_text()
+        assert '<div class="card-cover">' in text, card
+        assert 'class="card-cover" href' not in text, card
+        assert text.count('class="card-title"><a href=') == 1, card

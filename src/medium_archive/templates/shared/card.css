@@ -132,14 +132,20 @@ a:hover { text-decoration: underline; }
                margin-right: .6rem; }
 .card-title { margin: 0 0 .5rem; font-size: 1.3rem; line-height: 1.3; }
 .card-title a { color: var(--ink); }
-/* The whole card is the post's link, as a reader expects of a card: the
-   title link's ::after is stretched over the card (positioned against
-   it), so a click on the cover, the excerpt or the byline follows the
-   title. The tag links are lifted above that layer, so a tag still
-   opens its own page, and hovering anywhere on the card underlines the
-   title, the same cue as hovering the title itself. Text in a card
-   cannot be selected by drag as a result; a listing's text is a preview
-   of the post, which is a click away. */
+/* The whole card is the post's link, as a reader expects of a card.
+   The card holds one link to the post, the title: its ::after is
+   stretched over the card (positioned against it), so a click on the
+   cover, the excerpt or the byline follows the title, and the browser
+   treats the whole card as that link (middle-click, modifier-click,
+   the context menu, the status bar). A wrapper <a> could not do this:
+   the tags are links of their own, and a link may not hold a link.
+   The tag links are lifted above the stretched layer, so a tag still
+   opens its own page; hovering anywhere on the card underlines the
+   title, the same cue as hovering the title itself. The cover is not a
+   link of its own: under the stretched title it would be a second tab
+   stop to the same post, with no name (its alt is empty). Text in a
+   card cannot be selected by drag; a listing's text is a preview of
+   the post, which is a click away. */
 .card { position: relative; }
 .card-title a::after { content: ""; position: absolute; inset: 0; }
 .card-tags a { position: relative; z-index: 1; }
