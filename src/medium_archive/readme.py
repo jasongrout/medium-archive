@@ -136,7 +136,7 @@ raw/
                                 embed's target
     media/<media_id>.gist.json  the embedded gist's files, as returned by
                                 the GitHub gists API; convert inlines them
-                                as code fences
+                                as code fences (a Markdown file verbatim)
 fixups/*.sub, *.patch         optional hand-written corrections, applied to
                                 raw files in memory by convert and compare
 tags.json                     optional hand-written tag cleanup ("drop",
@@ -217,11 +217,13 @@ Medium era keep working too.
   are not: iframes appear as `[embed: <url>]` links and need manual
   replacement. Gist embeds are the exception. Their code is inlined as
   fenced blocks from `raw/<id>/media/`, where fetch archives the gist's
-  files. A gist embed whose media was never archived converts to a
-  `[missing embed: <name>]` placeholder (from the state, which has no
-  URL for it) or an `[embed: <gist url>]` link (from an export or Ghost
-  body, which names the gist). `lint` flags the placeholders; re-run
-  fetch to recover them.
+  files, and a Markdown gist file (a table, usually) is inlined
+  verbatim so it renders as prose. A gist embed whose media was never
+  archived converts to a `[missing embed: <name>]` placeholder (from
+  the state or a feed body, which have no URL for it) or an
+  `[embed: <gist url>]` link (from an export or Ghost body, which names
+  the gist). `lint` flags the placeholders; re-run fetch to recover
+  them.
 * Medium boilerplate is stripped in `convert` and still present in
   `raw/page.html`: "was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, the author header.

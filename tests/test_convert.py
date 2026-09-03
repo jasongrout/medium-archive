@@ -251,6 +251,39 @@ def test_iframe_without_a_source_becomes_a_missing_embed_placeholder():
     assert md.replace("\\[", "[") == "Before.\n\n[missing embed]\n\nAfter.\n"
 
 
+FEED_GIST = ('<p>Before.</p><iframe src="" width="0" height="0" frameborder="0" '
+             'scrolling="no"><a href="https://medium.com/media/cafe01/href">'
+             "https://medium.com/media/cafe01/href</a></iframe><p>After.</p>")
+
+
+def test_feed_iframe_inlines_the_gist_its_media_link_names():
+    # the feed's empty iframe holds a link naming the embed's media
+    # resource, which is where fetch archived the gist's files; nothing
+    # of the link survives (the sites would show it as a bare URL)
+    body = BeautifulSoup(f"<article>{FEED_GIST}</article>", "html.parser")
+    media = {"cafe01": {"value": {"iframeSrc": ""}, "gist": {"files": {
+        "a.py": {"language": "Python", "content": "x = 1"}}}}}
+    markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert markdown == "Before.\n\n```python\nx = 1\n```\n\nAfter.\n"
+
+
+def test_feed_iframe_takes_the_target_its_media_payload_names():
+    # a non-gist resource: the archived payload's own target, so the
+    # iframe converts like any sourced one
+    body = BeautifulSoup(f"<article>{FEED_GIST}</article>", "html.parser")
+    media = {"cafe01": {"value": {"iframeSrc": "https://example.com/embed"}}}
+    markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert markdown.replace("\\[", "[") == (
+        "Before.\n\n[embed: https://example.com/embed](https://example.com/embed)"
+        "\n\nAfter.\n")
+
+
+def test_feed_iframe_without_archived_media_keeps_the_placeholder():
+    body = BeautifulSoup(f"<article>{FEED_GIST}</article>", "html.parser")
+    markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media={})
+    assert markdown.replace("\\[", "[") == "Before.\n\n[missing embed]\n\nAfter.\n"
+
+
 def test_slug_of_percent_decodes():
     # Medium percent-encodes non-ASCII slugs, but its sitemap serves some
     # of the same URLs decoded; one post must get one slug either way
@@ -378,6 +411,18 @@ def test_gist_script_inlines_archived_files():
     markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
     assert "```python\nx = 1\n```" in markdown
     assert "gist.github.com" not in markdown
+
+
+def test_gist_script_inlines_a_markdown_file_verbatim():
+    # Markdown in a gist is content, not code to fence: the text goes
+    # out as written, with none of markdownify's escaping
+    body = BeautifulSoup(f"<article>{GIST_SCRIPT}</article>", "html.parser")
+    media = {"m1": {"value": {}, "gist": {
+        "id": "abcdef0123456789abcdef0123456789",
+        "files": {"t.md": {"language": "Markdown",
+                           "content": "| a_b | *c* |\n| --- | --- |\n| 1 | `x` |"}}}}}
+    markdown, _ = to_markdown(body, URL, {}, Path("/nonexistent"), media=media)
+    assert markdown == "| a_b | *c* |\n| --- | --- |\n| 1 | `x` |\n"
 
 
 def medium_page(*, og_description=None, ld_description=None,

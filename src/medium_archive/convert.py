@@ -26,8 +26,8 @@ from .images import (giphy_media, image_source, same_medium_asset,
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
                     parse_ld_json, strip_title_prefix)
-from .state import (apollo_post_state, gist_code_blocks, state_body,
-                    state_metadata, state_title)
+from .state import (apollo_post_state, gist_blocks, gist_code_blocks,
+                    state_body, state_metadata, state_title)
 from .readme import write_readme
 from .tags import load_tag_map
 from .urls import (canonical_url, carbon_id, medium_id, resolve_canonical,
@@ -94,6 +94,13 @@ class _Converter(MarkdownConverter):
             return text
         return f"\n\n<figcaption>\n\n{text.strip()}\n\n</figcaption>\n\n"
 
+    def convert_markdown(self, el, text, parent_tags):
+        # the <markdown> element gist_blocks wraps a Markdown gist file
+        # in: its text is already Markdown, so it goes out verbatim as
+        # its own block, bypassing markdownify's escaping and whitespace
+        # normalization (which `text` has been through)
+        return f"\n\n{el.get_text().strip()}\n\n"
+
     def convert_pre(self, el, text, parent_tags):
         md = super().convert_pre(el, text, parent_tags)
         if not md:
@@ -117,7 +124,8 @@ def _captioned_figure(figure) -> bool:
     """figure (or None) has a non-empty caption and, outside it,
     something to caption -- an image, an embed in any of the shapes it
     passes through to_markdown in (iframe or gist script on the way in,
-    link or inlined code on the way out) -- so its <figure>/<figcaption>
+    link, inlined code or Markdown on the way out) -- so its
+    <figure>/<figcaption>
     shell survives conversion. A caption alone does not: some captures
     never hydrate the figure's image element."""
     if figure is None:
@@ -125,8 +133,8 @@ def _captioned_figure(figure) -> bool:
     cap = figure.find("figcaption")
     return bool(cap and cap.get_text(strip=True)
                 and any(t.find_parent("figcaption") is None
-                        for t in figure.find_all(["img", "a", "iframe",
-                                                  "video", "script", "pre"])))
+                        for t in figure.find_all(["img", "a", "iframe", "video",
+                                                  "script", "pre", "markdown"])))
 
 
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com",
@@ -264,6 +272,14 @@ def _strip_tracking(url: str) -> str:
 
 GIST_SRC_RE = re.compile(
     r"https?://gist\.github\.com/(?:[^/\s]+/)?([0-9a-f]+)(?:\.js)?(?:\?.*)?$")
+
+
+# The link an RSS feed body puts inside the empty iframe it renders a
+# gist embed as: it names the embed's media resource, the id fetch
+# archives the media payload and the gist's files under (raw/media/).
+# HTML parsers keep an iframe's content as text, so this is searched
+# for in the text rather than matched against an <a>.
+MEDIA_HREF_RE = re.compile(r"https?://medium\.com/media/([0-9a-f]+)/href")
 
 
 REF_SRC_RE = re.compile(r"[?&]ref_src=[^&#]*")
@@ -533,12 +549,32 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
             continue
         files = _archived_gist_files(media or {}, m.group(1))
         if files:
-            script.replace_with(BeautifulSoup(gist_code_blocks(files),
-                                              "html.parser"))
+            script.replace_with(BeautifulSoup(gist_blocks(files), "html.parser"))
         else:
             url = m.string[:m.end(1)]           # the gist's page URL
             script.replace_with(doc.new_tag("a", href=url,
                                             string=f"embed: {url}"))
+
+    # A feed body renders a gist embed as an iframe with no source whose
+    # only content is a link to medium.com/media/<id>/href, the media
+    # resource the state names too. That id is where fetch archives the
+    # gist's files, so the embed inlines them like the state and script
+    # forms do; an archived payload that names a target instead (a
+    # non-gist embed) gives the iframe its source for the loop below.
+    for iframe in body.find_all("iframe"):
+        if iframe.get("src") or iframe.get("data-src"):
+            continue
+        m = MEDIA_HREF_RE.search(iframe.get_text())
+        entry = (media or {}).get(m.group(1)) if m else None
+        if not entry:
+            continue
+        files = (entry.get("gist") or {}).get("files") or {}
+        value = entry.get("value") or {}
+        if files:
+            iframe.replace_with(BeautifulSoup(gist_blocks(files), "html.parser"))
+        elif value.get("iframeSrc") or value.get("href"):
+            iframe["src"] = value.get("iframeSrc") or value.get("href")
+            iframe.clear()
 
     # A YouTube iframe stays an iframe: the archive has its URL, and the
     # player is the content, so it is written as one (_Converter renders

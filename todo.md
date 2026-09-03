@@ -313,7 +313,13 @@ silent data loss here):
   Without archived media the embed becomes an `[embed: <gist url>]` link
   (export and Ghost bodies name the gist) or a
   `[missing embed: <name>]` placeholder (the state does not), and `lint`
-  flags the placeholders.
+  flags the placeholders. A Markdown gist file is inlined verbatim
+  rather than fenced: it is the one way to put a table in a Medium post
+  (blog.jupyter.org's 2026 survey results), so its source is prose to
+  render, not code to show. And a feed body's gist, an empty iframe
+  around a `medium.com/media/<id>/href` link, resolves through that
+  media id to the archived files like the state and script forms, so
+  the fixup that used to put a `<script src>` back is not needed.
 - **Code fences carry languages.** The state's `codeBlockMetadata`
   records the language Medium highlighted (author-set or auto-detected;
   DISABLED stays bare). Gist files and Ghost `language-*` classes

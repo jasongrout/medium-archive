@@ -77,7 +77,8 @@ Notes:
     slug; redirects.csv collects these for every converted post.
   * Medium's "was originally published in ... on Medium" footer and stat
     tracking pixels are removed. Embedded gists inline their archived
-    files, tweets become quotes of their archived text, Carbon embeds
+    files (code fenced, Markdown verbatim), tweets become quotes of
+    their archived text, Carbon embeds
     their archived code, YouTube and other known providers' embeds stay
     players, Giphy embeds become the fetched gif or clip, other iframes
     become links.
