@@ -372,8 +372,8 @@ medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
 medium-archive lint --embeds --out .    # one line per embed missing content
 ```
 
-As of 2026-09-03, after the tweet fetch and the provider-player rule,
-the run reports 3 problems, all tweets X no longer serves:
+As of 2026-09-03 the run reports 3 problems, all tweets X no longer
+serves:
 
 - `lucy-dagostino-mcgowan`: <https://twitter.com/lucystats/status/1291022874644492288>
 - `tema-okun`: <https://twitter.com/billions_inst/status/1219477928335020032>
@@ -381,11 +381,23 @@ the run reports 3 problems, all tweets X no longer serves:
 
 Eleven other tweets are archived under `raw/<id>/media/tweet-<tweet
 id>.json` (their oEmbed payloads, fetched from X's public endpoint)
-and render as quotes. For the three, a hand-written file of the same
-shape restores the quote once the text is recovered, most likely from
-a Wayback Machine capture of the tweet page (unreachable at the time
-of writing); a `"note"` key recording the source is ignored by
-convert. Until then they stay bare links and the workflow stays red.
+and render as quotes; the nine with pictures also carry X's
+syndication payload (`tweet-<id>.media.json`) and their photos under
+`images/`, shown in the quote. For the three, medium-archive's
+`fetch` now records a 404 in the same file as `{"deleted": true, ...}`
+instead of asking every run; convert then writes a link saying the
+tweet is no longer available, and the lint passes. A re-run for the
+two posts records them:
+
+```sh
+printf '2020-08-16-lucy-dagostino-mcgowan\n2020-10-12-tema-okun\n' > /tmp/gone.txt
+medium-archive fetch https://blog.jupyter.org/ --out . --urls /tmp/gone.txt
+```
+
+Should a tweet's text turn up later (a Wayback Machine capture of the
+tweet page, say), a hand-written file of the oEmbed shape in place of
+the record restores the quote; a `"note"` key recording the source is
+ignored by convert.
 
 Everything else that was on this list is handled by conversion now:
 YouTube players, the three Giphy files, gists, and the art19 podcast
