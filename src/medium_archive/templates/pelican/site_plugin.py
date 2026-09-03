@@ -266,7 +266,7 @@ def _name_tags(article_generator):
     print(f"tag names: {len(canonical)} tags named across {articles} articles")
 
 
-def related_posts(article, articles, limit=4):
+def related_posts(article, articles, limit=3):
     # The posts most like this one, for the "Related posts" block at
     # the foot of its page: scored the way the hugo site's [related]
     # config scores them -- a shared tag counts for most, a shared

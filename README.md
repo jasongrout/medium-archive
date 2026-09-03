@@ -214,7 +214,7 @@ with none stored, the system scheme decides. The theme provides:
     Both themes declare `og:image:width`/`og:image:height`, so
     Facebook renders the large card on the first share instead of
     after a fetch of its own.
-  - Related posts under every article (up to four, by shared tags,
+  - Related posts under every article (up to three, by shared tags,
     then author, then date): the links that give a post ten years
     deep in the listings a path in from another, for readers and
     crawlers alike. Hugo's related content, configured in the

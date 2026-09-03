@@ -179,7 +179,7 @@ regular list and taxonomy pages share `list.html`), plus:
   from `data/authors.json` as `sameAs`, cover with dimensions,
   keywords) and an author page's `ProfilePage`. Built as dicts and
   jsonified so every value is escaped for a `<script>`.
-- `layouts/partials/related.html` closes a post page with up to four
+- `layouts/partials/related.html` closes a post page with up to three
   related posts (Hugo's related content, by the `[related]` indices
   the generated config sets: shared tags, then author, then date), as
   listing cards, kept out of the search index.

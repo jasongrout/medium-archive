@@ -1195,6 +1195,7 @@ def test_related_posts(archive):
     assert 'partial "related.html"' in (hugo_site / "layouts/_default/single.html").read_text()
     related = (hugo_site / "layouts/partials/related.html").read_text()
     assert '(where site.RegularPages "Type" "posts").Related' in related and 'partial "card.html"' in related
+    assert "| first 3 }}" in related     # three, the width of the home page's card rows
     pelican_site = pelican.build_site(archive)
     assert "article.related_posts" in (pelican_site / "theme/templates/article.html").read_text()
     namespace = {}
@@ -1209,8 +1210,12 @@ def test_related_posts(archive):
     c = SimpleNamespace(tags=[tag("x"), tag("y")], authors=[author("Bob")], date=day(9))
     d = SimpleNamespace(tags=[tag("z")], authors=[author("Ada")], date=day(3))
     e = SimpleNamespace(tags=[tag("z")], authors=[author("Eve")], date=day(4))
+    f = SimpleNamespace(tags=[tag("y")], authors=[author("Fay")], date=day(5))
     got = namespace["related_posts"](a, [a, b, c, d, e])
     assert got == [c, b, d]          # two tags, one tag, shared author; not e
+    # three at most, the width of the home page's card rows: d's shared
+    # author loses its place to f's shared tag
+    assert namespace["related_posts"](a, [a, b, c, d, e, f]) == [c, b, f]
     assert namespace["related_posts"](e, [a, b, c, d, e]) == [d]
     assert namespace["related_posts"](a, [a, b, c, d, e], limit=1) == [c]
 
