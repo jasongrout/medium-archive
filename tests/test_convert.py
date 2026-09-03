@@ -185,6 +185,15 @@ def test_iframe_embed_link_text_has_no_brackets():
                   "(https://www.youtube.com/embed/x)\n")
 
 
+def test_iframe_without_a_source_becomes_a_missing_embed_placeholder():
+    # a feed body renders a gist as <iframe src="" width="0" height="0">;
+    # a link with no target would read as a dangling "embed:", so it gets
+    # the placeholder the state conversion uses, which lint flags
+    md = md_of('<p>Before.</p><iframe src="" width="0" height="0"></iframe>'
+               "<p>After.</p>")
+    assert md.replace("\\[", "[") == "Before.\n\n[missing embed]\n\nAfter.\n"
+
+
 def test_slug_of_percent_decodes():
     # Medium percent-encodes non-ASCII slugs, but its sitemap serves some
     # of the same URLs decoded; one post must get one slug either way

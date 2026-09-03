@@ -47,7 +47,17 @@ and the offline test suite.
   decoded forms of one slug, and `resolve_canonical` compares decoded.
 - **`lint` subcommand.** Defect signatures (leftover Medium chrome,
   unclosed fences, missing image files, remote Medium CDN images) exit
-  non-zero, so regressions surface on every convert.
+  non-zero, so regressions surface on every convert. `lint --embeds`
+  adds the embeds whose content the archive lacks, as problems: every
+  `[embed: url]` link an iframe became (the sites render the link, not
+  the content), and every embed an export or feed body dropped that the
+  page's editor state carries (`state_embed_targets`, compared by
+  count, since the state names a canonical page where the export names
+  the embed URL). Opt-in because neither is a conversion defect; an
+  archive's CI runs it as a separate job that fails until the posts are
+  fixed by hand. An iframe with no source (how a feed body renders a
+  gist) now converts to the `[missing embed]` placeholder instead of a
+  dangling `embed:` with no link, so plain `lint` catches it too.
 - **Substitution fixups.** Raw HTML is often one enormous line, so a
   unified diff of a one-character fix embeds the whole line twice and
   cannot be reviewed. `fixups/*.sub` files hold single-line

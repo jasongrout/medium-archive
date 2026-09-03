@@ -126,3 +126,67 @@ def test_duplicate_titles_are_reported_across_posts():
                             "c": "Other", "d": ""})
     assert len(got) == 1 and "'a' and 'b'" in got[0]
     assert duplicate_titles({"a": "x", "b": "y"}) == []
+
+
+def test_embeds_mode_is_opt_in_and_flags_bare_embed_links(tmp_path):
+    """--embeds reports every embed that is still the link convert left
+    for an iframe: the sites show the link, not the content. Off by
+    default, and a link inside a code fence is literal content."""
+    body = ("x\n" * 100 +
+            "[embed: https://www.youtube.com/watch?v=a]"
+            "(https://www.youtube.com/watch?v=a)\n"
+            "```\n[embed: https://x.example/b](https://x.example/b)\n```\n")
+    d = write_post(tmp_path, body)
+    assert lint_post(d) == ([], [])
+    errors, warnings = lint_post(d, embeds=True)
+    assert not warnings
+    assert errors == ["embed is a bare link, its content is not in the "
+                      "archive: https://www.youtube.com/watch?v=a "
+                      "(replace it by hand)"]
+
+
+def test_embeds_mode_reports_embeds_the_body_source_dropped(tmp_path):
+    """With the archive's raw/ at hand, --embeds compares the body's
+    embed links against the embeds the page's editor state resolves:
+    fewer links means the export or feed body lost some. Gist embeds
+    (no target in the state) are not expected as links."""
+    from test_state import MID, make_state, para, shell_html
+
+    def embed(i, target, title):
+        p = para(i, "IFRAME", "",
+                 iframe={"mediaResource": {"__ref": f"MediaResource:m{i}"}})
+        return p, {"id": f"m{i}", "title": title, "iframeSrc": target and (
+            "https://cdn.embedly.com/widgets/media.html?url=" + target)}
+
+    paras = [embed(0, "https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Da", "A talk"),
+             embed(1, "https%3A%2F%2Ftwitter.com%2Fx%2Fstatus%2F1", "X on Twitter"),
+             embed(2, "", "tool.py")]
+    state = make_state([p for p, _ in paras])
+    for i, (_, res) in enumerate(paras):
+        state[f"MediaResource:m{i}"] = res
+    raw = tmp_path / "raw"
+    (raw / MID).mkdir(parents=True)
+    (raw / MID / "page.html").write_text(shell_html(state))
+
+    body = ("x\n" * 100 + "[embed: https://www.youtube.com/embed/a]"
+            "(https://www.youtube.com/embed/a)\n```\nprint(1)\n```\n")
+    front = {**FRONT, "medium_id": MID, "body_source": "export"}
+    d = write_post(tmp_path, body, front=front)
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert len(errors) == 2
+    assert errors[0].startswith("embed is a bare link")
+    assert errors[1] == ("body source 'export' dropped 1 embed(s) the page's "
+                         "editor state carries (state has 2: 'A talk', "
+                         "'X on Twitter'); restore them in a fixup")
+    # the state's own conversion keeps every embed: nothing dropped
+    body = body.replace("```\nprint(1)\n```\n",
+                        "[embed: https://twitter.com/x/status/1]"
+                        "(https://twitter.com/x/status/1)\n")
+    d = write_post(tmp_path, body, front={**front, "body_source": "state"},
+                   name="2020-01-02-from-state")
+    errors, _ = lint_post(d, embeds=True, raw_root=raw)
+    assert len(errors) == 2 and all(e.startswith("embed is a bare link")
+                                    for e in errors)
+    # no page (or no raw/) to compare against: only the links
+    errors, _ = lint_post(d, embeds=True, raw_root=tmp_path / "nowhere")
+    assert len(errors) == 2
