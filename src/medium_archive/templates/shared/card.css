@@ -156,6 +156,13 @@ a:hover { text-decoration: underline; }
 /* white behind transparency, like the baked card covers: these images
    were drawn for Medium's white page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
+/* An image standing on its own -- a paragraph holding nothing but the
+   image, linked or not, or a figure -- is centred, as Medium sets
+   every body image; most are narrower than the column, and an
+   inline-left image reads as a stray. An image inside running text
+   (a badge in a sentence) is not matched and stays inline. */
+.post p:has(> img:only-child), .post p:has(> a:only-child > img:only-child),
+.post figure { text-align: center; }
 /* Code names the --mono role, so the font picker's Source choice can
    put the superfamily's own mono under it. The size is em, so code
    tracks the reading size of the column it sits in rather than
