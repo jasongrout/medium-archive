@@ -1,0 +1,58 @@
+# Fail loudly on posts that are missing content. Beyond the preview
+# build, this job reconverts the archive from raw/ + fixups/ on every
+# push and pull request and runs `medium-archive lint --embeds`, which
+# exits non-zero for every embed whose content the archive does not
+# carry: a video, tweet or gist still rendered as a bare [embed: url]
+# link, an embed the post's body source dropped while the page's
+# editor state carries it, and a gist placeholder. The job stays red
+# until each such post is fixed by hand (see todo.md, "Embeds without
+# content"); that is deliberate, so the list cannot be forgotten.
+
+name: Lint embeds
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install medium-archive
+        run: pip install "medium-archive @ git+https://github.com/jasongrout/medium-archive"
+
+      - name: Rebuild posts/ from raw/
+        run: medium-archive convert --out .
+
+      - name: Lint, including embeds without content
+        run: |
+          set -o pipefail
+          medium-archive lint --embeds --out . 2>&1 | tee lint.txt
+
+      # The problem list, one line per embed, on the run's summary page
+      # and as annotations on the checks tab, whether or not the lint
+      # step passed.
+      - name: Report
+        if: always()
+        run: |
+          {
+            echo "## Posts with embeds missing content"
+            echo
+            echo '```'
+            cat lint.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -v ': warning: ' lint.txt | grep -v '^lint done' | while IFS= read -r line; do
+            echo "::error title=embed missing content::${line}"
+          done
