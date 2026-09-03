@@ -901,8 +901,9 @@ def test_animated_gifs_capped_via_gifsicle(tmp_path):
 
 def test_multiple_authors_reach_both_sites(tmp_path):
     """A post's authors list, of any length, is the byline everywhere:
-    hugo's authors taxonomy (front matter names only; the card and feed
-    read the same list), pelican's Authors: header, which it splits into
+    hugo's authors taxonomy (front matter names only; the feed reads the
+    same list, the card and post link each term's listing page),
+    pelican's Authors: header, which it splits into
     Author objects -- on commas, so a name holding one flips the
     separator to semicolons."""
     manifest = {}
@@ -924,9 +925,14 @@ def test_multiple_authors_reach_both_sites(tmp_path):
     assert "author" not in front("duet")
     assert "authors" not in front("solo")
     assert "capitalizeListTitles = false" in (site / "hugo.toml").read_text()
-    for layout in ("layouts/partials/card.html", "layouts/_default/rss.xml"):
+    text = (site / "layouts/_default/rss.xml").read_text()
+    assert ".Params.authors" in text and ".Params.author " not in text
+    # the card's byline links each author to their listing, like the
+    # post page's, so both walk the taxonomy terms rather than the names
+    for layout in ("layouts/partials/card.html", "layouts/_default/single.html"):
         text = (site / layout).read_text()
-        assert ".Params.authors" in text and ".Params.author " not in text, layout
+        assert '.GetTerms "authors"' in text and ".Params.author" not in text, layout
+        assert 'href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>' in text, layout
 
     site = pelican.build_site(tmp_path)
     head = lambda stem: (site / f"content/posts/{stem}/index.md").read_text().split("\n\n", 1)[0]
@@ -937,6 +943,10 @@ def test_multiple_authors_reach_both_sites(tmp_path):
         text = (site / f"theme/templates/{tpl}.html").read_text()
         assert "article.authors" in text and "article.author " not in text \
             and "article.author." not in text and "article.author|" not in text, tpl
+    for tpl in ("article", "macros"):
+        text = (site / f"theme/templates/{tpl}.html").read_text()
+        assert 'for a in article.authors' in text \
+            and '<a href="{{ SITEURL }}/{{ a.url }}">{{ a }}</a>' in text, tpl
 
 
 def test_first_image_loads_eagerly(archive):
