@@ -1229,3 +1229,14 @@ def test_alt_text_falls_back_to_the_caption():
     given = shell.replace("![]", "![Given]")
     assert 'alt="Given"' in hugo.figure_shortcodes(given)
     assert 'alt="Given"' in pelican.figure_blocks(given)
+
+
+def test_whole_card_is_the_post_link(archive):
+    """A click anywhere on a listing card follows the post, as a reader
+    expects of a card: the title link is stretched over the card, and
+    the tag links are lifted above it so a tag still opens its page."""
+    css = (hugo.build_site(archive) / "static/css/style.css").read_text()
+    assert ".card { position: relative; }" in css
+    assert ".card-title a::after { content: \"\"; position: absolute; inset: 0; }" in css
+    assert ".card-tags a { position: relative; z-index: 1; }" in css
+    assert css == (pelican.build_site(archive) / "theme/static/css/style.css").read_text()
