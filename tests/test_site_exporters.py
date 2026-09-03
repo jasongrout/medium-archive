@@ -508,8 +508,7 @@ def test_theme_picker_and_dark_scheme(archive):
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
                  "term-sort", "announcement",
-                 "nav-current", "image-zoom", "feed-icon", "share-icons",
-                 "share-mastodon"):
+                 "nav-current", "image-zoom", "feed-icon", "share-icons"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -626,16 +625,20 @@ def test_post_share_links(archive):
         for network in ("linkedin", "facebook", "bluesky", "mastodon", "email"):
             assert f'<use href="#share-{network}"></use>' in source, bar
         assert '<div class="post-share" data-pagefind-ignore>' in source, bar
+        # each network's own documented share URL: the page address alone
+        # for LinkedIn and Facebook, which read the rest off the Open
+        # Graph tags; a prefilled text for Bluesky and Mastodon. A toot
+        # goes to the reader's own server, which the page cannot know,
+        # so Mastodon's link is to the network's share sheet, which asks
+        # for the server; the text rides in the fragment, as its own
+        # instructions generate it, out of server logs and referrers
         for target in (f"linkedin.com/sharing/share-offsite/?url={url}",
                        f"facebook.com/sharer/sharer.php?u={url}",
                        f"bsky.app/intent/compose?text={text}",
+                       f"share.joinmastodon.org/#text={text}",
                        f"mailto:?subject={title}&amp;body={url}"):
             assert target in source, bar
-        # a toot goes to the reader's own server, which the page cannot
-        # know: the link hooks the prompt that asks for it and remembers
-        # the answer
-        assert 'class="share-link share-mastodon"' in source, bar
-        assert "data-share-text=" in source, bar
+        assert "data-share-text" not in source, bar
 
     for page, call in ((hugo_site / "layouts/_default/single.html",
                         '{{ partial "share.html" . }}'),
@@ -649,9 +652,10 @@ def test_post_share_links(archive):
         assert source.index("share-sprite") < head, page
         assert source.index("post-meta") < head < source.index("</article>"), page
         assert foot < source.index("</article>"), page
-        # the script wires every bar on the page, not just the first
-        assert 'querySelectorAll(".share-mastodon")' in source, page
-        assert source.index("</article>") < source.index("mastodon-host"), page
+        # the bar is plain links: the Mastodon prompt script is gone
+        # (the sprite's #share-mastodon symbol is still on the page)
+        assert 'querySelectorAll(".share-mastodon")' not in source, page
+        assert "mastodon-host" not in source, page
 
     # hugo escapes each value for its URL context on its own; pelican's
     # Jinja does not, so the theme spells the encoding out -- on each
