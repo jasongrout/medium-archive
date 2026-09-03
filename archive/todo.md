@@ -372,7 +372,7 @@ medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
 medium-archive lint --embeds --out .    # one line per embed missing content
 ```
 
-As of 2026-09-03 the run reports 23 problems:
+As of 2026-09-03 the run reports 20 problems:
 
 - **17 bare embed links across 9 posts**: Twitter (12),
   carbon.now.sh code screenshots (4) and one art19
@@ -386,13 +386,13 @@ As of 2026-09-03 the run reports 23 problems:
   (already noted under `compare --state` above) and a tweet in
   `jupyterlab-the-next-generation-of-the-jupyter-notebook`. A fixup on
   `raw/<id>/export.html` can put the embed back.
-- **3 Giphy files not yet fetched** (one gif in
-  `simpler-authentication-for-small-scale-jupyterhubs-...`, two mp4
-  clips in `ros-jupyter`): they convert to an image and two clips that
-  still point at media.giphy.com. A `medium-archive fetch` re-run from
-  a machine that can reach Giphy backfills them into `raw/<id>/images/`
-  and `images.json` (the development sandbox could not), after which
-  the three lines clear on their own.
+- **1 Giphy clip still to fetch.** The gif in
+  `simpler-authentication-for-small-scale-jupyterhubs-...` and the
+  first clip in `ros-jupyter` are archived. The second `ros-jupyter`
+  clip was mapped to the first one's file by a fetch that merged the
+  two `giphy.mp4` basenames (fixed in medium-archive, which now names
+  Giphy files by id); its `images.json` entry was removed so a
+  `fetch --urls` re-run for that post downloads it.
 - **1 gist hollowed out by a feed body**: the "Other themes" gist in
   `what-you-told-us-results-from-the-2026-jupyter-user-experience-...`.
   The RSS body renders it as an iframe with no source, which now
