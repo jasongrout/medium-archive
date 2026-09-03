@@ -127,11 +127,15 @@ def load_site_inputs(out: Path):
     config = {"title": "Blog archive", "description": "", "intro": ""}
     if (out / "site.json").exists():
         config.update(json.loads((out / "site.json").read_text()))
-    # Two optional keys both card themes read: "noindex" (true keeps
-    # search engines off the whole site -- a preview deployment, which
-    # would otherwise be indexed as a copy of the real one -- through a
+    # Optional keys both card themes read: "noindex" (true keeps search
+    # engines off the whole site -- a preview deployment, which would
+    # otherwise be indexed as a copy of the real one -- through a
     # robots meta tag on every page and a robots.txt that disallows
-    # all) and "twitter" (the publication's @handle, for twitter:site).
+    # all), "twitter" (the publication's @handle, for twitter:site),
+    # "profiles" (its addresses elsewhere, for the Organization's
+    # sameAs -- see site_profiles) and "share_image" (an
+    # archive-relative raster, the og:image of every page without a
+    # cover of its own).
     # Absolute links -- feed URLs, redirect stubs, the Open Graph tags
     # and the share links a reader hands to LinkedIn or Facebook -- are
     # built from base_url. Without it each exporter falls back to a
@@ -822,6 +826,65 @@ def redirects_file(rules) -> str:
     the meta-refresh stubs at the same paths. Rules from
     redirect_rules() or the rows of redirects.csv."""
     return "".join(f"{old} {new} 301\n" for old, new, *_ in rules)
+
+
+def canonical_for(post: dict) -> str | None:
+    """The address a post page's canonical link should name instead of
+    the page itself, or None. The archive is the post's home -- the
+    Medium copy is never its canonical -- except where the post itself
+    declared one on another host (Medium's "originally published at"
+    for a story imported from a gist, a Notion page, someone's own
+    blog): that is carried through, as WordPress's SEO plugins carry a
+    per-post canonical, since the page is a copy of that one and says
+    so rather than competing with it. A canonical naming the
+    publication's own host (a Ghost-era slug) is the same post and is
+    ignored; the link map already resolves it."""
+    declared = post.get("canonical_url")
+    if declared and (urlsplit(declared).netloc.lower()
+                     != urlsplit(post["original_url"]).netloc.lower()):
+        return declared
+    return None
+
+
+def author_links(manifest: dict) -> dict:
+    """Author name -> the profile address the archive knows for them
+    (the Medium profile, from the posts' bylines), for the sameAs of
+    the Person structured data on posts and author pages. The first
+    address seen for a name wins."""
+    links = {}
+    for p in manifest.values():
+        for a in p.get("authors") or []:
+            if a.get("url") and a["name"] not in links:
+                links[a["name"]] = a["url"]
+    return dict(sorted(links.items()))
+
+
+def site_profiles(config: dict) -> list:
+    """The publication's addresses elsewhere, for the Organization's
+    sameAs: site.json "profiles" (a list of URLs) plus the X/Twitter
+    profile its "twitter" handle names, deduplicated, in that order."""
+    profiles = list(config.get("profiles") or [])
+    handle = (config.get("twitter") or "").strip().lstrip("@")
+    if handle:
+        profiles.append(f"https://x.com/{handle}")
+    return list(dict.fromkeys(profiles))
+
+
+_CAPTION_LINK_RE = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
+_CAPTION_MARK_RE = re.compile(r"\*\*|__|(?<!\w)[*_](?=\S)|(?<=\S)[*_](?!\w)|`")
+
+
+def caption_text(caption: str) -> str:
+    """A caption's plain text, for an image whose alt is empty: the
+    link text of its links, no emphasis or code marks, no HTML tags,
+    whitespace collapsed. Most Medium images carry no alt while their
+    captions describe them exactly; WordPress's SEO plugins fill an
+    empty alt the same way (from the caption, else the title), and it
+    is what a screen reader, and image search, would otherwise miss."""
+    text = re.sub(r"<[^>]+>", "", caption)
+    text = _CAPTION_LINK_RE.sub(r"\1", text)
+    text = _CAPTION_MARK_RE.sub("", text)
+    return " ".join(text.split())
 
 
 def first_image(markdown: str) -> str | None:

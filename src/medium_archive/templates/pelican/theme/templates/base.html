@@ -27,14 +27,29 @@
    mail carry the title in the link itself and need none of it. Every
    URL here is absolute against SITEURL, so they are as real as
    site.json's base_url (which the exporter warns about when unset). #}
-{% set og_image = (page_url ~ article.cover) if article and article.cover else "" %}
-<link rel="canonical" href="{{ page_url }}">
+{# the share image: the post's baked cover, else SHARE_IMAGE (site.json
+   "share_image"), so a listing or a coverless post still shares with a
+   picture; its width and height (COVER_SIZE when covers are baked,
+   the file's own for the share image) are declared so Facebook renders
+   the large card on the first share, without a fetch of its own first #}
+{% set og_image = (page_url ~ article.cover) if article and article.cover else (SITEURL ~ "/" ~ SHARE_IMAGE if SHARE_IMAGE else "") %}
+{% set og_size = COVER_SIZE if article and article.cover else SHARE_IMAGE_SIZE %}
+{% set page_title = self.name() %}
+{# a post that is a copy of a page elsewhere (Canonical: header -- the
+   address the post itself declared on another host) names that page
+   as its canonical, as WordPress's per-post canonical field does;
+   og:url stays the page, since a share of this page previews this
+   page. Every other page is its own canonical: the archive is the
+   posts' home, not a copy of Medium's #}
+<link rel="canonical" href="{{ article.canonical if article and article.canonical else page_url }}">
 <meta property="og:site_name" content="{{ SITENAME }}">
 <meta property="og:type" content="{% if article %}article{% else %}website{% endif %}">
-<meta property="og:title" content="{{ self.name() }}{{ page_suffix }}">
+<meta property="og:title" content="{{ page_title }}{{ page_suffix }}">
 <meta property="og:url" content="{{ page_url }}">
 <meta property="og:description" content="{% if article %}{{ article.summary|striptags|e }}{% else %}{{ SITESUBTITLE }}{% endif %}">
 {% if og_image %}<meta property="og:image" content="{{ og_image }}">
+{% endif %}{% if og_image and og_size %}<meta property="og:image:width" content="{{ og_size[0] }}">
+<meta property="og:image:height" content="{{ og_size[1] }}">
 {% endif %}<meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}">
 {% if TWITTER %}<meta name="twitter:site" content="{{ TWITTER }}">
 {% endif %}{% if article %}{% set modified = article.modified if article.modified else article.date %}
@@ -45,28 +60,8 @@
 {% for a in article.authors %}<meta property="article:author" content="{{ SITEURL }}/{{ a.url }}">
 <meta name="author" content="{{ a|e }}">
 {% endfor %}{% for t in article.tags %}<meta property="article:tag" content="{{ t|e }}">
-{% endfor %}{# Structured data: a schema.org BlogPosting, the block Medium (as
-   SocialMediaPosting) and WordPress's SEO plugins put on every post,
-   from which search engines take the headline, dates, author and
-   publisher without parsing the page. Built as a dict and serialized
-   by tojson, which escapes every value for a <script>. #}
-{% set publisher = {"@type": "Organization", "name": SITENAME, "url": SITEURL ~ "/"} %}
-{% if AVATAR %}{% set _ = publisher.update({"logo": {"@type": "ImageObject", "url": SITEURL ~ "/" ~ AVATAR}}) %}{% endif %}
-{% set ld = {"@context": "https://schema.org", "@type": "BlogPosting",
-             "mainEntityOfPage": page_url, "url": page_url,
-             "headline": article.title,
-             "datePublished": article.date.isoformat(),
-             "dateModified": modified.isoformat(),
-             "inLanguage": DEFAULT_LANG, "isAccessibleForFree": true,
-             "publisher": publisher} %}
-{% if article.summary %}{% set _ = ld.update({"description": article.summary|striptags}) %}{% endif %}
-{% if og_image %}{% set _ = ld.update({"image": [og_image]}) %}{% endif %}
-{% set authors = [] %}
-{% for a in article.authors %}{% set _ = authors.append({"@type": "Person", "name": a.name, "url": SITEURL ~ "/" ~ a.url}) %}{% endfor %}
-{% if authors %}{% set _ = ld.update({"author": authors}) %}{% endif %}
-{% if article.tags %}{% set _ = ld.update({"keywords": article.tags|join(", ")}) %}{% endif %}
-<script type="application/ld+json">{{ ld|tojson }}</script>
-{% endif %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
+{% endfor %}{% endif %}{% include "jsonld.html" %}
+<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}" title="{{ SITENAME }}">
 {% if tag and TAG_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ TAG_FEED_ATOM.format(slug=tag.slug) }}" title="{{ SITENAME }} - {{ tag }}">
 {% elif author and AUTHOR_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ AUTHOR_FEED_ATOM.format(slug=author.slug) }}" title="{{ SITENAME }} - {{ author }}">
 {% endif %}<!-- @include shared/theme-init.html -->

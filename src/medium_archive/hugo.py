@@ -19,7 +19,14 @@ old links on any static host; the same map is written as a `_redirects`
 file for hosts that turn one into HTTP 301s. Hugo's own sitemap.xml
 (page lastmod from the post's updated date) is joined by a robots.txt
 naming it, and the theme's pages carry the metadata search engines and
-share targets read (see templates/README.md).
+share targets read (see templates/README.md): the structured data's
+author and publisher profiles come from data/authors.json (the Medium
+profile of every byline) and site.json's "profiles"/"twitter", the
+og:image of a page with no cover from its "share_image", and a post
+that declared a canonical on another host (Medium's "originally
+published at") carries it as `canonical` in its front matter; the
+Medium copy is never a page's canonical. Each post page closes with
+related posts (Hugo's related content, by shared tags).
 
 Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
 are exactly the archive's tag; the names tags are shown under
@@ -48,11 +55,12 @@ section tunes the generated config: `locale`, `avatar` and `favicon`
 import json
 import sys
 
-from .sites import (Covers, ImagePlacer, clean_site, copy_site_asset,
+from .sites import (Covers, ImagePlacer, author_links, canonical_for,
+                    caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, load_site_inputs,
                     old_paths, page_stems, redirect_rules, redirects_file,
-                    rewrite_figures, tag_names, write_redirects_csv,
-                    write_templates)
+                    rewrite_figures, site_profiles, tag_names,
+                    write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
 # templates/README.md for the rationale behind the individual files).
@@ -69,6 +77,7 @@ TEMPLATES = {
     "layouts/partials/paginator.html":
         "hugo/layouts/partials/paginator.html",
     "layouts/partials/jsonld.html": "hugo/layouts/partials/jsonld.html",
+    "layouts/partials/related.html": "hugo/layouts/partials/related.html",
     "layouts/robots.txt": "hugo/layouts/robots.txt",
     "layouts/index.html": "hugo/layouts/index.html",
     "layouts/_default/single.html": "hugo/layouts/_default/single.html",
@@ -105,6 +114,7 @@ def figure_shortcodes(markdown: str) -> str:
     def call(alt, src, link, caption):
         q = lambda v: v.replace(chr(92), "").replace(chr(34), chr(92) + chr(34))
         args = f'src="{src}"'
+        alt = alt or caption_text(caption)    # the caption describes it
         if alt:
             args += f' alt="{q(alt)}"'
         if link:
@@ -113,7 +123,8 @@ def figure_shortcodes(markdown: str) -> str:
     return rewrite_figures(markdown, call)
 
 
-def front_matter(url: str, post: dict, cover: str | None = None) -> str:
+def front_matter(url: str, post: dict, cover: str | None = None,
+                 canonical: str | None = None) -> str:
     front = {"title": post["title"]}
     if post.get("date"):
         front["date"] = post["date"]
@@ -129,6 +140,8 @@ def front_matter(url: str, post: dict, cover: str | None = None) -> str:
         front["cover"] = cover
     if post.get("first_image"):     # loaded eagerly, the rest lazily
         front["first_image"] = post["first_image"]
+    if canonical:           # the page is a copy of this one, and says so
+        front["canonical"] = canonical
     front["aliases"] = [path for path, _ in old_paths(post, url)]
     return json.dumps(front, indent=2, ensure_ascii=False) + "\n\n"
 
@@ -152,6 +165,18 @@ def _toml_params(params: dict) -> str:
         else:
             flat.append(f"{key} = {j(value)}")
     return "\n\n".join(["[params]\n" + "\n".join(flat)] + tables)
+
+
+def write_author_links(site, links: dict):
+    """data/authors.json: author name -> profile address, what the
+    theme's structured data names as each author's sameAs (on posts and
+    on the author's own page) and what a checked-in copy of the site
+    edits to add or correct one. The author taxonomy's term titles are
+    the names as written, which is the key here."""
+    (site / "data").mkdir(parents=True, exist_ok=True)
+    (site / "data" / "authors.json").write_text(
+        json.dumps(links, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8")
 
 
 def write_tag_names(site, names: dict):
@@ -191,13 +216,22 @@ def build_site(out):
     (site / "content" / "archives.md").write_text(
         json.dumps({"title": "Archives", "layout": "archives",
                     "url": "/archives/"}) + "\n", encoding="utf-8")
+    # the tag and author indexes, titled as the nav names them (with
+    # capitalizeListTitles off for the terms' sake, Hugo would title
+    # them by their lowercase path, which the breadcrumbs would repeat)
+    for plural, title in (("tags", "Tags"), ("authors", "Authors")):
+        (site / "content" / plural).mkdir(exist_ok=True)
+        (site / "content" / plural / "_index.md").write_text(
+            json.dumps({"title": title}) + "\n", encoding="utf-8")
     covers = Covers(out, manifest)
     pages = export_content(
         out, site, manifest, stems,
-        lambda url, p: front_matter(url, p, cover=covers.path(url)),
+        lambda url, p: front_matter(url, p, cover=covers.path(url),
+                                    canonical=canonical_for(p)),
         placer=ImagePlacer(out, config), transform=figure_shortcodes,
         covers=covers)
     write_tag_names(site, tag_names(manifest, out))
+    write_author_links(site, author_links(manifest))
 
     params = {"description": config.get("description", "")}
     # "avatar" (site.json top level, or hugo section): a hand-picked site
@@ -225,6 +259,17 @@ def build_site(out):
         params["noindex"] = True
     if config.get("twitter"):
         params["twitter"] = config["twitter"]
+    # "profiles" (+ the twitter handle): the publication's addresses
+    # elsewhere, the Organization's sameAs in the structured data
+    if site_profiles(config):
+        params["profiles"] = site_profiles(config)
+    # "share_image": the og:image of every page without a cover of its
+    # own (listings, posts with no usable image), under assets/ so the
+    # theme can read its dimensions
+    share = copy_site_asset(out, config.get("share_image"),
+                            site / "assets" / "img", "share")
+    if share:
+        params["share_image"] = f"img/{share}"
     params.update(hugo_config.get("params", {}))
     (site / "hugo.toml").write_text(fill_template(
         "hugo/hugo.toml.tmpl",

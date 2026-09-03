@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros.html" import share with context %}
+{% from "macros.html" import share, card with context %}
 {% block name %}{{ article.title }}{% endblock %}
 {% block content %}
 {# title and URL, said once; the macro does the encoding. The title is
@@ -19,6 +19,17 @@
 {{ article.content|safe }}
 {{ share(post_url, post_title) }}
 </article>
+{# related posts (article.related_posts, from the site plugin: by
+   shared tags, then author, then date), the listing cards; kept out
+   of the search index, since the words are the other posts' #}
+{% if article.related_posts %}
+<section class="related" data-pagefind-ignore>
+<h2 class="page-title">Related posts</h2>
+<div class="card-grid">
+{% for related in article.related_posts %}{{ card(related) }}{% endfor %}
+</div>
+</section>
+{% endif %}
 <!-- @include shared/share-mastodon.html -->
 <!-- @include shared/image-zoom.html -->
 {% endblock %}

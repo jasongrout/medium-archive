@@ -1,34 +1,80 @@
-{{- /* Structured data for a post (ctx: page, image -- the absolute
-       og:image URL or ""): a schema.org BlogPosting, the block Medium
-       (as SocialMediaPosting) and WordPress's SEO plugins put on every
-       post, from which search engines take the headline, dates,
-       author and publisher without parsing the page. Built as a dict
-       and jsonified, so every value is escaped for a <script>. */ -}}
+{{- /* Structured data for any page (ctx: page, image -- the share
+       image resource or "", url -- the page's own address): one
+       schema.org graph, the linked set WordPress's SEO plugins put on
+       every page rather than a lone node. The Organization (the
+       publisher: logo, its profiles elsewhere as sameAs) and the
+       WebSite (with the search page as its SearchAction) are on every
+       page and referenced by @id from the rest; a BreadcrumbList names
+       the page's place (home, then the tag or author index for a term
+       page, then the page); a post adds its BlogPosting, the block
+       Medium (as SocialMediaPosting) carries, with each author's
+       profile (data/authors.json) as sameAs; an author page is a
+       ProfilePage whose main entity is that Person. Built as dicts and
+       jsonified, so every value is escaped for a <script>. */ -}}
 {{- $p := .page -}}
+{{- $url := .url -}}
 {{- $stamp := "2006-01-02T15:04:05Z07:00" -}}
-{{- $publisher := dict "@type" "Organization" "name" site.Title "url" site.Home.Permalink -}}
+{{- $home := site.Home.Permalink -}}
+{{- $org_id := printf "%s#organization" $home -}}
+{{- $site_id := printf "%s#website" $home -}}
+{{- $org := dict "@type" "Organization" "@id" $org_id "name" site.Title "url" $home -}}
 {{- with site.Params.avatar -}}
-{{- $publisher = merge $publisher (dict "logo" (dict "@type" "ImageObject" "url" (. | absURL))) -}}
+{{- $org = merge $org (dict "logo" (dict "@type" "ImageObject" "url" (. | absURL))) -}}
 {{- end -}}
+{{- with site.Params.profiles -}}{{- $org = merge $org (dict "sameAs" .) -}}{{- end -}}
+{{- $web := dict "@type" "WebSite" "@id" $site_id "name" site.Title "url" $home
+      "inLanguage" site.Language.Lang "publisher" (dict "@id" $org_id)
+      "potentialAction" (dict "@type" "SearchAction"
+        "target" (dict "@type" "EntryPoint" "urlTemplate" (printf "%ssearch/?q={search_term_string}" $home))
+        "query-input" "required name=search_term_string") -}}
+{{- with site.Params.description -}}{{- $web = merge $web (dict "description" .) -}}{{- end -}}
+{{- $graph := slice $org $web -}}
+{{- /* breadcrumbs: Home, the taxonomy index above a term page, the page */ -}}
+{{- if not $p.IsHome -}}
+{{- $crumbs := slice (dict "name" "Home" "url" $home) -}}
+{{- if eq $p.Kind "term" -}}{{- with $p.Parent -}}{{- $crumbs = $crumbs | append (dict "name" .Title "url" .Permalink) -}}{{- end -}}{{- end -}}
+{{- $crumbs = $crumbs | append (dict "name" $p.Title "url" $p.Permalink) -}}
+{{- $items := slice -}}
+{{- range $i, $c := $crumbs -}}
+{{- $items = $items | append (dict "@type" "ListItem" "position" (add $i 1) "name" $c.name "item" $c.url) -}}
+{{- end -}}
+{{- $graph = $graph | append (dict "@type" "BreadcrumbList" "@id" (printf "%s#breadcrumb" $url) "itemListElement" $items) -}}
+{{- end -}}
+{{- $authors := slice -}}
+{{- range $p.GetTerms "authors" -}}
+{{- $person := dict "@type" "Person" "name" .LinkTitle "url" .Permalink -}}
+{{- with index site.Data.authors .LinkTitle -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}
+{{- $authors = $authors | append $person -}}
+{{- end -}}
+{{- if eq $p.Type "posts" -}}
 {{- $ld := dict
-  "@context" "https://schema.org"
   "@type" "BlogPosting"
-  "mainEntityOfPage" $p.Permalink
-  "url" $p.Permalink
+  "@id" (printf "%s#article" $url)
+  "isPartOf" (dict "@id" $site_id)
+  "mainEntityOfPage" $url
+  "url" $url
   "headline" $p.Title
   "datePublished" ($p.Date.Format $stamp)
   "dateModified" ($p.Lastmod.Format $stamp)
   "inLanguage" site.Language.Lang
   "isAccessibleForFree" true
-  "publisher" $publisher -}}
+  "publisher" (dict "@id" $org_id) -}}
 {{- with $p.Description -}}{{- $ld = merge $ld (dict "description" .) -}}{{- end -}}
-{{- with .image -}}{{- $ld = merge $ld (dict "image" (slice .)) -}}{{- end -}}
-{{- $authors := slice -}}
-{{- range $p.GetTerms "authors" -}}
-{{- $authors = $authors | append (dict "@type" "Person" "name" .LinkTitle "url" .Permalink) -}}
+{{- with .image -}}
+{{- $img := dict "@type" "ImageObject" "url" .Permalink -}}
+{{- if and (eq .MediaType.MainType "image") (ne .MediaType.SubType "svg") -}}
+{{- $img = merge $img (dict "width" .Width "height" .Height) -}}
+{{- end -}}
+{{- $ld = merge $ld (dict "image" (slice $img)) -}}
 {{- end -}}
 {{- with $authors -}}{{- $ld = merge $ld (dict "author" .) -}}{{- end -}}
 {{- $tags := slice -}}
 {{- range $p.GetTerms "tags" -}}{{- $tags = $tags | append .LinkTitle -}}{{- end -}}
-{{- with $tags -}}{{- $ld = merge $ld (dict "keywords" (delimit . ", ")) -}}{{- end -}}
-<script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
+{{- with $tags -}}{{- $ld = merge $ld (dict "keywords" (delimit . ", ") "articleSection" (index . 0)) -}}{{- end -}}
+{{- $graph = $graph | append $ld -}}
+{{- else if and (eq $p.Kind "term") (eq $p.Data.Plural "authors") -}}
+{{- $person := dict "@type" "Person" "name" $p.Title "url" $p.Permalink -}}
+{{- with index site.Data.authors $p.Title -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}
+{{- $graph = $graph | append (dict "@type" "ProfilePage" "@id" $url "url" $url "isPartOf" (dict "@id" $site_id) "mainEntity" $person) -}}
+{{- end -}}
+<script type="application/ld+json">{{ (dict "@context" "https://schema.org" "@graph" $graph) | jsonify | safeJS }}</script>

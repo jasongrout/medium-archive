@@ -1,0 +1,66 @@
+{# Structured data for any page: one schema.org graph, the linked set
+   WordPress's SEO plugins put on every page rather than a lone node
+   (the hugo theme's partials/jsonld.html, in Jinja). The Organization
+   (the publisher: logo, PROFILES as sameAs) and the WebSite (with the
+   search page as its SearchAction) are on every page and referenced
+   by @id from the rest; a BreadcrumbList names the page's place (home,
+   then the tag or author index for a term page, then the page); a post
+   adds its BlogPosting, the block Medium (as SocialMediaPosting)
+   carries, with each author's profile (AUTHOR_LINKS) as sameAs; an
+   author page is a ProfilePage whose main entity is that Person. Built
+   as dicts and serialized by tojson, which escapes every value for a
+   <script>. Reads base.html's page_url, page_title, is_home, og_image
+   and og_size. #}
+{% set home = SITEURL ~ "/" %}
+{% set org_id = home ~ "#organization" %}
+{% set site_id = home ~ "#website" %}
+{% set org = {"@type": "Organization", "@id": org_id, "name": SITENAME, "url": home} %}
+{% if AVATAR %}{% set _ = org.update({"logo": {"@type": "ImageObject", "url": SITEURL ~ "/" ~ AVATAR}}) %}{% endif %}
+{% if PROFILES %}{% set _ = org.update({"sameAs": PROFILES}) %}{% endif %}
+{% set web = {"@type": "WebSite", "@id": site_id, "name": SITENAME, "url": home,
+              "inLanguage": DEFAULT_LANG, "publisher": {"@id": org_id},
+              "potentialAction": {"@type": "SearchAction",
+                                  "target": {"@type": "EntryPoint", "urlTemplate": home ~ "search/?q={search_term_string}"},
+                                  "query-input": "required name=search_term_string"}} %}
+{% if SITESUBTITLE %}{% set _ = web.update({"description": SITESUBTITLE}) %}{% endif %}
+{% set graph = [org, web] %}
+{% if not is_home %}
+{% set crumbs = [{"name": "Home", "url": home}] %}
+{% if tag %}{% set _ = crumbs.append({"name": "Tags", "url": SITEURL ~ "/" ~ TAGS_URL}) %}
+{% elif author %}{% set _ = crumbs.append({"name": "Authors", "url": SITEURL ~ "/" ~ AUTHORS_URL}) %}{% endif %}
+{% set _ = crumbs.append({"name": page_title, "url": page_url}) %}
+{% set items = [] %}
+{% for c in crumbs %}{% set _ = items.append({"@type": "ListItem", "position": loop.index, "name": c.name, "item": c.url}) %}{% endfor %}
+{% set _ = graph.append({"@type": "BreadcrumbList", "@id": page_url ~ "#breadcrumb", "itemListElement": items}) %}
+{% endif %}
+{% if article %}
+{% set modified = article.modified if article.modified else article.date %}
+{% set ld = {"@type": "BlogPosting", "@id": page_url ~ "#article",
+             "isPartOf": {"@id": site_id},
+             "mainEntityOfPage": page_url, "url": page_url,
+             "headline": article.title,
+             "datePublished": article.date.isoformat(),
+             "dateModified": modified.isoformat(),
+             "inLanguage": DEFAULT_LANG, "isAccessibleForFree": true,
+             "publisher": {"@id": org_id}} %}
+{% if article.summary %}{% set _ = ld.update({"description": article.summary|striptags}) %}{% endif %}
+{% if og_image %}
+{% set image = {"@type": "ImageObject", "url": og_image} %}
+{% if og_size %}{% set _ = image.update({"width": og_size[0], "height": og_size[1]}) %}{% endif %}
+{% set _ = ld.update({"image": [image]}) %}
+{% endif %}
+{% set authors = [] %}
+{% for a in article.authors %}
+{% set person = {"@type": "Person", "name": a.name, "url": SITEURL ~ "/" ~ a.url} %}
+{% if AUTHOR_LINKS.get(a.name) %}{% set _ = person.update({"sameAs": [AUTHOR_LINKS[a.name]]}) %}{% endif %}
+{% set _ = authors.append(person) %}
+{% endfor %}
+{% if authors %}{% set _ = ld.update({"author": authors}) %}{% endif %}
+{% if article.tags %}{% set _ = ld.update({"keywords": article.tags|join(", "), "articleSection": article.tags[0]|string}) %}{% endif %}
+{% set _ = graph.append(ld) %}
+{% elif author %}
+{% set person = {"@type": "Person", "name": author.name, "url": page_url} %}
+{% if AUTHOR_LINKS.get(author.name) %}{% set _ = person.update({"sameAs": [AUTHOR_LINKS[author.name]]}) %}{% endif %}
+{% set _ = graph.append({"@type": "ProfilePage", "@id": page_url, "url": page_url, "isPartOf": {"@id": site_id}, "mainEntity": person}) %}
+{% endif %}
+<script type="application/ld+json">{{ {"@context": "https://schema.org", "@graph": graph}|tojson }}</script>

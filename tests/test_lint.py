@@ -79,3 +79,50 @@ def test_missing_embed_placeholder_is_flagged(tmp_path):
         tmp_path, "x\n" * 100 + "```\n[missing embed: tool.py]\n```\n",
         name="2020-01-03-fenced"))
     assert not errors
+
+
+def test_seo_analysis_is_opt_in(tmp_path):
+    """--seo adds the page analysis an SEO plugin runs (title and
+    description length, a missing description, images without alt
+    text, no cover image), as warnings, and only when asked for."""
+    body = ("x\n" * 100 + "![](images/bare.png)\n\n"
+            "<figure>\n\n![](images/captioned.png)\n\n<figcaption>\n\n"
+            "Captioned\n\n</figcaption>\n\n</figure>\n")
+    d = write_post(tmp_path, body, front={
+        "title": "A title that runs well past the sixty characters a result shows",
+        "date": "2020-01-01T00:00:00Z", "description": "d" * 200,
+        "images": []})
+    (d / "images").mkdir()
+    for name in ("bare.png", "captioned.png"):
+        (d / "images" / name).write_bytes(b"PNG")
+    assert lint_post(d) == ([], [])
+    errors, warnings = lint_post(d, seo=True)
+    assert not errors
+    assert [w.split(":")[0] for w in warnings] == [
+        "title is 63 chars; a search result shows about 60",
+        "description is 200 chars; a search result shows about 160",
+        "image without alt text",
+        "no image a card cover or a share preview could use (site.json \"share_image\" stands in)"]
+    assert "images/bare.png" in warnings[2]
+    # a captioned figure's image gets its alt from the caption
+    assert not any("captioned" in w for w in warnings)
+
+    d = write_post(tmp_path, "x\n" * 100 + "![](images/p.png)\n",
+                   front={"title": "Short", "date": "2020-01-01T00:00:00Z",
+                          "images": ["images/p.png"]},
+                   name="2020-01-02-short")
+    (d / "images").mkdir()
+    (d / "images" / "p.png").write_bytes(
+        b"\x89PNG\r\n\x1a\n" + b"\0" * 8 + (100).to_bytes(4, "big") * 2)
+    _, warnings = lint_post(d, seo=True)
+    assert warnings == ["no description: search results and share cards "
+                        "get the site's, or none",
+                        "image without alt text: images/p.png"]
+
+
+def test_duplicate_titles_are_reported_across_posts():
+    from medium_archive.lint import duplicate_titles
+    got = duplicate_titles({"a": "Release notes", "b": "release notes ",
+                            "c": "Other", "d": ""})
+    assert len(got) == 1 and "'a' and 'b'" in got[0]
+    assert duplicate_titles({"a": "x", "b": "y"}) == []
