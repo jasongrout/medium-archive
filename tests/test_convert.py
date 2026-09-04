@@ -34,6 +34,36 @@ def test_emphasis_on_punctuation_alone_is_dropped():
     # real emphasis is untouched
     assert md_of("<p>a <strong>word</strong> here</p>") == \
         "a **word** here\n"
+    # and a symbol is not punctuation: emphasis on one is meant, and
+    # CommonMark can carry it, so it stays emphasis
+    assert md_of("<p>the <strong>=</strong> operator</p>") == \
+        "the **=** operator\n"
+    assert md_of("<p>a <strong>\U0001f525</strong> take</p>") == \
+        "a **\U0001f525** take\n"
+    # unless the markers will not parse where it sits, which is the
+    # other half of the fix
+    assert md_of("<p>x<strong>=</strong>y</p>") == "x<strong>=</strong>y\n"
+
+
+def test_markers_inside_code_are_content():
+    """A marker in code is what the author typed, not emphasis. The
+    spans to skip are not only single-backtick ones: markdownify writes
+    ``a`b`` when the code itself holds a backtick, CommonMark closes a
+    run of N backticks with the next run of N, and a fence is the same
+    rule at block level."""
+    from medium_archive.convert import emphasis_as_html, unparsed_emphasis
+
+    for code in ["`code**.**span`", "``code**.**span``",
+                 "``x`y**.**z``", "```\nfenced**.**code\n```",
+                 "``a span**.**that\nruns past a line``"]:
+        assert list(unparsed_emphasis(code)) == [], code
+        assert emphasis_as_html(code) == code, code
+
+    # the prose on a line with code in it is still read
+    line = "task**.** and ``x`y**.**`` z"
+    assert [span for _, span in unparsed_emphasis(line)] == ["**.**"]
+    assert emphasis_as_html(line) == \
+        "task<strong>.</strong> and ``x`y**.**`` z"
 
 
 def test_emphasis_markdown_cannot_carry_goes_out_as_html():

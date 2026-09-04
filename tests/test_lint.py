@@ -33,6 +33,7 @@ def test_emphasis_commonmark_will_not_read_is_flagged(tmp_path):
     body = ("x\n" * 100 + "a *word* and **another** one\n"
             "the mask is 10.0.0.* here\n"
             "a `code**.**span` stays\n"
+            "and ``a `backtick` span**.**too`` stays\n"
             "```\nliteral**.**markers\n```\n")
     assert lint_post(write_post(tmp_path, body, name="2020-01-02-clean")) \
         == ([], [])

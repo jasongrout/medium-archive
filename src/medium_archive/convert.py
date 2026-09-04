@@ -86,32 +86,69 @@ def _flanks_right(last: str, after: str) -> bool:
 # backslash against it: an escaped asterisk is literal text, and a
 # longer run is not a span this converter writes
 EMPHASIS_RE = re.compile(r"(?<![\\*])(\*{1,2})(?![\s*])(.+?)(?<![\s\\])\1(?!\*)")
-_CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
+_BACKTICK_RUN_RE = re.compile(r"`+")
 
 
-def unparsed_emphasis(body: str):
-    """Every emphasis span in a converted body that CommonMark will not
-    read as emphasis -- the reader is shown the markers instead -- as
-    (line number, the span). Fenced blocks and code spans are not
-    prose and are skipped. Both the conversion and `lint` use it: one
-    to write HTML where Markdown will not carry the emphasis, the other
-    to fail if any is left."""
-    fence = False
-    for number, line in enumerate(body.split("\n"), 1):
-        if re.match(r"^`{3,}", line):
-            fence = not fence
+def _has_content(text: str) -> bool:
+    """Is there anything in `text` but whitespace and punctuation? A
+    symbol counts: CommonMark's flanking rules treat one as punctuation
+    (see _is_punct), which decides how a marker beside it parses, but a
+    reader sees an "=" or an emoji as much as a word."""
+    return any(not ch.isspace() and not unicodedata.category(ch).startswith("P")
+               for ch in text)
+
+
+def mask_code(text: str) -> str:
+    """`text` with everything inside code blanked out (newlines kept,
+    so lines and their offsets still line up), since a marker in code
+    is content rather than emphasis. CommonMark closes a run of N
+    backticks with the next run of exactly N, which is what markdownify
+    writes when the code itself holds a backtick (``a`b``) and what a
+    fence is at block level, and a span may run past the end of a line.
+    A run with no partner opens nothing and is left as the literal text
+    it is."""
+    runs = list(_BACKTICK_RUN_RE.finditer(text))
+    out = list(text)
+    index = 0
+    while index < len(runs):
+        opener = runs[index]
+        close = next((n for n in range(index + 1, len(runs))
+                      if runs[n].group(0) == opener.group(0)), None)
+        if close is None:
+            index += 1
             continue
-        if fence or "*" not in line:
+        for position in range(opener.start(), runs[close].end()):
+            if out[position] != "\n":
+                out[position] = "\x00"
+        index = close + 1
+    return "".join(out)
+
+
+def _unreadable_spans(body: str):
+    """(line index, start, end) of every emphasis span in a converted
+    body whose markers CommonMark will not read -- the reader is shown
+    the markers instead."""
+    lines, masked = body.split("\n"), mask_code(body).split("\n")
+    for index, (line, blanked) in enumerate(zip(lines, masked)):
+        if "*" not in blanked:
             continue
-        # a marker inside a code span is content, not emphasis
-        masked = _CODE_SPAN_RE.sub(lambda m: "\x00" * len(m.group(0)), line)
-        for match in EMPHASIS_RE.finditer(masked):
+        for match in EMPHASIS_RE.finditer(blanked):
             inner = line[match.start(2):match.end(2)]
             before = line[match.start() - 1] if match.start() else ""
             after = line[match.end()] if match.end() < len(line) else ""
             if not _flanks_left(before, inner[0]) or \
                     not _flanks_right(inner[-1], after):
-                yield number, line[match.start():match.end()]
+                yield index, match.start(), match.end()
+
+
+def unparsed_emphasis(body: str):
+    """Every emphasis span CommonMark will not read, as (line number,
+    the span). Both the conversion and `lint` use it: one to write HTML
+    where Markdown will not carry the emphasis, the other to fail if
+    any is left."""
+    lines = body.split("\n")
+    for index, start, end in _unreadable_spans(body):
+        yield index + 1, lines[index][start:end]
 
 
 def emphasis_as_html(markdown: str) -> str:
@@ -120,21 +157,17 @@ def emphasis_as_html(markdown: str) -> str:
     its way, which changes which characters are emphasized; the tag
     keeps the span exactly and every renderer these sites use reads
     inline HTML."""
-    def rewrite(line: str) -> str:
-        for span in {s for _, s in unparsed_emphasis(line)}:
-            marker = "**" if span.startswith("**") else "*"
-            tag = "strong" if marker == "**" else "em"
-            inner = span[len(marker):-len(marker)]
-            line = line.replace(span, f"<{tag}>{inner}</{tag}>")
-        return line
-
-    fence = False
-    out = []
-    for line in markdown.split("\n"):
-        if re.match(r"^`{3,}", line):
-            fence = not fence
-        out.append(line if fence else rewrite(line))
-    return "\n".join(out)
+    lines = markdown.split("\n")
+    # from the last span back, so the offsets of the ones before it
+    # still hold as each is replaced
+    for index, start, end in reversed(list(_unreadable_spans(markdown))):
+        span = lines[index][start:end]
+        marker = "**" if span.startswith("**") else "*"
+        tag = "strong" if marker == "**" else "em"
+        inner = span[len(marker):-len(marker)]
+        lines[index] = (lines[index][:start] + f"<{tag}>{inner}</{tag}>"
+                        + lines[index][end:])
+    return "\n".join(lines)
 
 
 class _Converter(MarkdownConverter):
@@ -703,8 +736,12 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     # reader ends up looking at `task**.**`, since CommonMark will not
     # open a marker between a word character and punctuation. Emphasis
     # on nothing but punctuation is emphasis on nothing, so both go.
+    # A symbol is not punctuation here, whatever the flanking rules
+    # count it as: <strong>=</strong> and <strong>🔥</strong> are
+    # something a reader sees, and emphasis on them is meant. Where the
+    # markers for one will not parse, emphasis_as_html writes the tag.
     for el in body.find_all(["strong", "em", "b", "i"]):
-        if el.parent is not None and not re.search(r"\w", el.get_text()):
+        if el.parent is not None and not _has_content(el.get_text()):
             el.replace_with(el.get_text())
 
     # The rendered page links same-publication posts relatively; those
