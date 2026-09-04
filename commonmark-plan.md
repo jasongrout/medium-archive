@@ -172,13 +172,20 @@ showing the 73 known article pages and no others.
 - Document the enabled syntax in `templates/README.md` and in the
   generated archive README, so a writer knows what is available.
 
-## Phase 4: the front matter (optional)
+## Phase 4: the front matter
 
-Three options: keep `Key: value` (no dependency, Pelican-native, no
-churn); JSON fenced by `---` (stdlib, the shape `posts/<slug>/index.md`
-and the hugo front matter already use); YAML (adds pyyaml, makes any
-packaged reader a drop-in). Only worth doing if content parity with the
-`posts/` layer is wanted for its own sake.
+**(Done.)** YAML between `---` fences, written and read with pyyaml,
+in place of Pelican's own `Key: value` headers. It is the shape
+`posts/<slug>/index.md` and the hugo site already write, and the one
+every Pelican reader that is not Pelican's own expects, so a packaged
+reader stays a `PLUGINS` line away. The exporter builds a dict and
+hands it to `yaml.safe_dump`, which quotes a title holding a colon,
+a quote or something that reads as a number the way the specification
+requires; the reader splits on the fence, hands each value to
+Pelican's own metadata processors, and joins a list back onto the
+comma Pelican splits on (tags and authors are slugs, which hold no
+comma). Front matter is metadata, so the built site is unchanged:
+all 1211 pages of the reference archive are identical across it.
 
 ## Phase 5: the emphasis markers, in `convert`
 
@@ -190,3 +197,9 @@ it. `convert` should drop emphasis whose content is only punctuation
 and reposition markers CommonMark will not open, and `lint` should
 report them so it stays fixed. This is the only change that touches the
 text of a post, and it improves the hugo site equally.
+
+The archive's own `fixups/` carry the other half of the same job, and
+one is already known: `catching-jupyter-specific-bugs-before-ci-does-…`
+writes `commands.addCommand(...)` as prose rather than in backticks,
+three times, so both engines' typographers set it as
+`commands.addCommand(…)`. Backticks in the source are the fix.

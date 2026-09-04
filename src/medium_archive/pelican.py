@@ -2,7 +2,7 @@
 the converted archive. Same reproducibility contract as the myst step
 (see sites.py); render with `pelican -l` (serve) or `pelican` (build)
 inside <out>/site-pelican/ (https://getpelican.com, `pip install
-pelican markdown-it-py mdit-py-plugins`).
+pelican markdown-it-py mdit-py-plugins pyyaml`).
 
 The site reads CommonMark rather than the python-markdown dialect
 Pelican reads by default: the generated config carries a reader built
@@ -20,7 +20,10 @@ served responsively: after each build the embedded plugin
 encodes webp variants of every still body image at the same widths as
 the hugo theme's render hook (480/736/1104, never upscaled,
 mtime-cached) and rewrites the article's img tags with srcset/sizes
-and real width/height. Metadata uses Pelican's `Key: value` header format; tags and
+and real width/height. Metadata is YAML front matter between `---`
+fences, the shape `posts/<slug>/index.md` and the hugo site already
+write (both in JSON, which is YAML) rather than Pelican's own
+`Key: value` headers, which nothing else reads; tags and
 authors are first-class in Pelican, so tag/author listing pages and
 Atom feeds (site-wide and per tag/author) come out of the box. Tags
 reach Pelican as slugs, so tag.slug and every /tags/<slug>/ URL are
@@ -75,6 +78,8 @@ Canonical: header; the Medium copy is never a page's canonical.
 import json
 import re
 import sys
+
+import yaml
 
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_links,
                     author_names, author_slug,
@@ -150,8 +155,21 @@ def figure_directives(markdown: str) -> str:
     return rewrite_figures(markdown, directive)
 
 
-def _meta(key: str, value: str) -> str:
-    return f"{key}: {' '.join(value.split())}\n"    # headers are one line
+def _one_line(value: str) -> str:
+    return " ".join(value.split())    # front matter holds no newlines
+
+
+def front_matter_yaml(fields: dict) -> str:
+    """A post's front matter: YAML between `---` fences, the form the
+    hugo site's JSON front matter and `posts/<slug>/index.md` already
+    take and every Pelican reader that is not Pelican's own expects.
+    Written by the yaml library rather than by hand: a title holding a
+    colon, a quote, a leading `-` or something that reads as a number
+    or a date is quoted the way the specification requires, which is
+    exactly what hand-written front matter gets wrong."""
+    body = yaml.safe_dump(fields, sort_keys=False, allow_unicode=True,
+                          default_flow_style=False, width=10 ** 6)
+    return f"---\n{body}---\n\n"
 
 
 def build_site(out):
@@ -163,32 +181,29 @@ def build_site(out):
     covers = Covers(out, manifest)
 
     def front_matter(url, post):
-        text = _meta("Title", post["title"] or url)
+        fields = {"title": _one_line(post["title"] or url)}
         if post.get("date"):
-            text += _meta("Date", post["date"][:16].replace("T", " "))
+            fields["date"] = post["date"][:16].replace("T", " ")
         if post.get("updated"):
-            text += _meta("Modified", post["updated"][:16].replace("T", " "))
+            fields["modified"] = post["updated"][:16].replace("T", " ")
         if post.get("authors"):
             # slugs, as the tags are, so author.slug and every
             # /authors/<slug>/ URL are exactly what the hugo site
             # serves rather than whatever each engine would make of a
             # byline (see sites.author_slug); the site plugin names the
             # Author objects from AUTHOR_DISPLAY once they are collected.
-            # A slug holds no comma, so Pelican's comma split is
-            # unambiguous and the semicolon form it also accepts, which
-            # a name like "Project Jupyter, Inc." used to need, is not.
-            text += _meta("Authors", ", ".join(
-                author_slug(a["name"]) for a in post["authors"]))
+            fields["authors"] = [author_slug(a["name"])
+                                 for a in post["authors"]]
         if post.get("tags"):
-            text += _meta("Tags", ", ".join(post["tags"]))
-        text += _meta("Slug", stems[url])
+            fields["tags"] = list(post["tags"])
+        fields["slug"] = stems[url]
         if covers.path(url):
-            text += _meta("Cover", covers.path(url))
+            fields["cover"] = covers.path(url)
         if post.get("description"):
-            text += _meta("Summary", post["description"])
+            fields["summary"] = _one_line(post["description"])
         if canonical_for(post):       # a copy of that page, and says so
-            text += _meta("Canonical", canonical_for(post))
-        return text + "\n"
+            fields["canonical"] = canonical_for(post)
+        return front_matter_yaml(fields)
 
     pages = export_content(out, site, manifest, stems, front_matter,
                            escape=attach_images,

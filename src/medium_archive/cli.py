@@ -292,7 +292,7 @@ def main():
                            "Hugo emits for aliases). Render with `pelican -l` "
                            "inside <out>/site-pelican/ "
                            "(https://getpelican.com; `pip install pelican "
-                           "markdown-it-py mdit-py-plugins pillow`)")
+                           "markdown-it-py mdit-py-plugins pyyaml pillow`)")
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
                         "offline; differences print as a unified patch on stdout "

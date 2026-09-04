@@ -3,6 +3,8 @@
 import json
 import re
 import sys
+
+import yaml
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 
@@ -128,6 +130,14 @@ def test_hugo_page_keeps_caption_in_its_figure(archive):
     assert (site / "layouts/partials/post-image.html").exists()
 
 
+def pelican_front(site, stem):
+    """A pelican page's front matter, parsed: YAML between `---`
+    fences, the counterpart of json.loads() on a hugo page's."""
+    text = (site / f"content/posts/{stem}/index.md").read_text()
+    _, front, _ = text.split("---\n", 2)
+    return yaml.safe_load(front)
+
+
 def config_parser(site):
     """The markdown-it parser the generated config reads posts with.
     The config is executable Python, and its reader is built where a
@@ -176,6 +186,32 @@ def test_the_figure_directive_escapes_what_it_renders(archive):
     assert 'alt="R&amp;D, 5 &lt; 6"' in html
     assert ("<figcaption>A <code>code</code> span, R&amp;D and 5 &lt; 6."
             "</figcaption>") in html
+
+
+def test_the_front_matter_is_yaml_the_reader_reads_back(archive):
+    """Front matter is YAML between `---` fences, as `posts/` and the
+    hugo site write it, rather than pelican's own `Key: value` headers
+    that only pelican reads. It is written by the yaml library, so a
+    title holding a colon or a quote is quoted as the specification
+    requires, and the reader splits on the fence rather than on the
+    first blank line."""
+    site = pelican.build_site(archive)
+    namespace, _ = config_parser(site)
+    text = (site / "content/posts/second-post/index.md").read_text()
+    front, body = namespace["_split_front_matter"](text)
+    assert yaml.safe_load(front)["title"] == "Second Post"
+    assert not body.lstrip().startswith("title:")
+
+    # what hand-written front matter gets wrong, and yaml does not
+    tricky = {"title": 'Voil\u00e0: "quoted", 5 - 3', "tags": ["a", "b"],
+              "date": "2021-03-01 10:00", "slug": "x"}
+    parsed = yaml.safe_load(
+        pelican.front_matter_yaml(tricky).split("---\n")[1])
+    assert parsed == tricky
+
+    # a horizontal rule in the body is not a front-matter fence
+    front, body = namespace["_split_front_matter"]("Text.\n\n---\n\nMore.\n")
+    assert front == "" and body.startswith("Text.")
 
 
 def test_the_typographer_sets_prose_the_way_hugo_does(archive):
@@ -418,9 +454,8 @@ def test_tag_display_names_reach_both_sites(archive):
     assert not (hugo_site / "content/tags/example").exists()
 
     pelican_site = pelican.build_site(archive)
-    head = (pelican_site / "content/posts/second-post/index.md") \
-        .read_text().split("\n\n", 1)[0]
-    assert "Tags: example" in head                # the tag is still a slug
+    # the tag is still a slug
+    assert pelican_front(pelican_site, "second-post")["tags"] == ["example"]
     config = (pelican_site / "pelicanconf.py").read_text()
     assert '"example": "Example Tag"' in config
     assert "_name_tags" in config          # names the Tag objects, so the
@@ -542,12 +577,12 @@ def test_pelican_site(archive):
     (archive / "site.json").write_text(json.dumps(cfg))
     site = pelican.build_site(archive)
     text = (site / "content/posts/second-post/index.md").read_text()
-    head = text.split("\n\n", 1)[0]
-    assert "Title: Second Post" in head
-    assert "Date: 2021-03-01 10:00" in head
-    assert "Authors: ada-lovelace" in head
-    assert "Tags: example" in head and "Slug: second-post" in head
-    assert "Cover: images/" in head          # summary-card cover
+    front = pelican_front(site, "second-post")
+    assert front["title"] == "Second Post"
+    assert front["date"] == "2021-03-01 10:00"
+    assert front["authors"] == ["ada-lovelace"]
+    assert front["tags"] == ["example"] and front["slug"] == "second-post"
+    assert front["cover"].startswith("images/")   # summary-card cover
     # colocated images become {attach} links -- but not inside fences
     assert "]({attach}images/001-pic.png)" in text
     assert "![fenced](images/lit.png)" in text
@@ -1139,12 +1174,14 @@ def test_multiple_authors_reach_both_sites(tmp_path):
         assert 'href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>' in text, layout
 
     site = pelican.build_site(tmp_path)
-    head = lambda stem: (site / f"content/posts/{stem}/index.md").read_text().split("\n\n", 1)[0]
-    assert "Authors: ada-lovelace, yuvipanda\n" in head("duet")
-    # a slug holds no comma, so the comma split is unambiguous even for
-    # a byline like "Project Jupyter, Inc." that once forced semicolons
-    assert "Authors: project-jupyter-inc, min-rk\n" in head("trio")
-    assert "Author" not in head("solo")
+    assert pelican_front(site, "duet")["authors"] == ["ada-lovelace",
+                                                      "yuvipanda"]
+    # a slug holds no comma, so the reader's comma split is unambiguous
+    # even for a byline like "Project Jupyter, Inc." that once forced
+    # pelican's semicolon separator
+    assert pelican_front(site, "trio")["authors"] == ["project-jupyter-inc",
+                                                      "min-rk"]
+    assert "authors" not in pelican_front(site, "solo")
     for tpl in ("article", "macros", "base"):
         text = (site / f"theme/templates/{tpl}.html").read_text()
         assert "article.authors" in text and "article.author " not in text \
@@ -1309,9 +1346,9 @@ def test_external_canonical_reaches_the_head(archive):
     baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
     assert '<link rel="canonical" href="{{ or .Params.canonical $url }}">' in baseof
     pelican_site = pelican.build_site(archive)
-    page = (pelican_site / "content/posts/second-post/index.md").read_text()
-    assert "Canonical: https://gist.github.com/ada/1\n" in page
-    assert "Canonical:" not in (pelican_site / "content/posts/first-post/index.md").read_text()
+    assert pelican_front(pelican_site, "second-post")["canonical"] == \
+        "https://gist.github.com/ada/1"
+    assert "canonical" not in pelican_front(pelican_site, "first-post")
     base = (pelican_site / "theme/templates/base.html").read_text()
     assert 'href="{{ article.canonical if article and article.canonical else page_url }}"' in base
     # neither head knows the Medium address: a post without a declared
@@ -1576,9 +1613,8 @@ def test_author_slugs_are_clean_and_shared_by_both_sites(tmp_path):
     assert "hugo.Data.authornames" in adapter and '"kind" "term"' in adapter
 
     pelican_site = pelican.build_site(tmp_path)
-    heads = [(pelican_site / f"content/posts/post-{i}/index.md").read_text()
-             for i in range(len(hard))]
-    assert [h.split("Authors: ", 1)[1].split("\n", 1)[0] for h in heads] == slugs
+    assert [pelican_front(pelican_site, f"post-{i}")["authors"][0]
+            for i in range(len(hard))] == slugs
     config = (pelican_site / "pelicanconf.py").read_text()
     namespace = {}
     exec(compile(config, "pelicanconf.py", "exec"), namespace)

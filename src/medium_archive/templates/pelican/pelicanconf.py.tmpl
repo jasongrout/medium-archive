@@ -120,6 +120,8 @@ import re as _re
 import shlex as _shlex
 import unicodedata as _unicodedata
 
+import yaml as _yaml
+
 from markdown_it import MarkdownIt as _MarkdownIt
 from markdown_it.rules_core.replacements import RARE_RE as _RARE_RE
 from markdown_it.rules_core.replacements import (
@@ -188,6 +190,20 @@ def _body_image(src, alt="", link=None):
     img = (f'<img alt="{_attr(alt)}" src="{src}" loading="lazy"'
            f' {BODY_IMAGE_ATTR}="">')
     return f'<a href="{_attr(link)}">{img}</a>' if link else img
+
+
+_FRONT_MATTER_RE = _re.compile(r"\A---\r?\n(.*?)^(?:---|\.\.\.)\r?\n",
+                               _re.MULTILINE | _re.DOTALL)
+
+
+def _split_front_matter(text):
+    """(YAML front matter, body). A file with no `---` fence is all
+    body, which is what a page written by hand without front matter
+    is; pelican then reports the missing title itself."""
+    match = _FRONT_MATTER_RE.match(text)
+    if not match:
+        return "", text
+    return match.group(1), text[match.end():]
 
 
 def _replacements(state):
@@ -297,11 +313,14 @@ def _reader_class():
     from pelican.utils import pelican_open
 
     class _CommonMarkReader(BaseReader):
-        """Every .md file in content/, read as CommonMark. The header
-        is pelican's own `Key: value` block, one line per key as the
-        exporter writes it, ended by the first blank line;
-        FORMATTED_FIELDS (the Summary) is rendered as Markdown, as
-        pelican's own reader does."""
+        """Every .md file in content/, read as CommonMark, with YAML
+        front matter between `---` fences: the form the hugo site and
+        `posts/<slug>/index.md` already use, and the one every Pelican
+        reader that is not Pelican's own expects. Pelican's own
+        metadata processors do the rest, so a list (tags, authors)
+        becomes Tag and Author objects and a date is parsed as pelican
+        parses every date; FORMATTED_FIELDS (the Summary) is rendered
+        as Markdown, as pelican's own reader does."""
         enabled = True
         file_extensions = ["md", "markdown", "mkd", "mdown"]
 
@@ -311,13 +330,18 @@ def _reader_class():
 
         def read(self, source_path):
             with pelican_open(source_path) as text:
-                header, _, body = text.partition("\n\n")
+                front, body = _split_front_matter(text)
             metadata = {}
-            for line in header.splitlines():
-                name, sep, value = line.partition(":")
-                if not sep:
+            for name, value in (_yaml.safe_load(front) or {}).items():
+                if value is None:
                     continue
-                name, value = name.strip().lower(), value.strip()
+                name = name.lower()
+                if isinstance(value, (list, tuple)):
+                    # tags and authors reach the site as slugs, which
+                    # hold no comma, so pelican's own comma split reads
+                    # the list back exactly
+                    value = ", ".join(str(item) for item in value)
+                value = str(value)
                 if name in self.settings["FORMATTED_FIELDS"]:
                     value = self._md.render(value)
                 metadata[name] = self.process_metadata(name, value)
