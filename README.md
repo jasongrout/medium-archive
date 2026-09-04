@@ -72,7 +72,9 @@ The hugo and pelican sites are the preferred targets and carry the full
 feature set, and both read a post the same way: hugo through Goldmark,
 pelican through a CommonMark reader (markdown-it-py) the generated
 config carries in place of pelican's own python-markdown one, which
-follows no specification. The myst site is a simpler alternate. See
+follows no specification. Both write each page's metadata as YAML front
+matter between `---` fences, so a field is read and hand-edited the
+same way in either site. The myst site is a simpler alternate. See
 [Generated sites](#generated-sites).
 
 **`lint`** scans the converted posts for conversion-defect signatures:
@@ -268,7 +270,10 @@ with none stored, the system scheme decides. The theme provides:
   after building for full-text search served as a results page with
   highlighted, in-context excerpts and per-section sub-results.
 
-Render with `hugo server` or `pelican -l`.
+Render with `hugo server` or `pelican -l`. The hugo theme tracks
+current Hugo -- the layout structure Hugo looks pages up in today,
+and `hugo.Data` for its data files -- so it wants Hugo extended
+0.156 or newer.
 
 ### Images
 

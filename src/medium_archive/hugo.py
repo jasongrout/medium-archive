@@ -11,9 +11,13 @@ exporter ships with every site (see figure_shortcodes), so the
 rendered page carries the same markup Medium served -- a <figure>
 holding the img (with the responsive srcset ladder body images get)
 and its <figcaption>, no paragraph wrappers, caption styled by CSS --
-and the caption stays programmatically associated with its picture. Front matter is JSON (Hugo reads it natively): tags and
-authors feed Hugo's taxonomies, which give the tag/author listing pages
-and per-term RSS feeds, and every old inbound path (Medium slug+id,
+and the caption stays programmatically associated with its picture.
+Front matter is YAML between `---` fences (see
+sites.front_matter_yaml) -- the form Hugo's own documentation and
+themes are written in, and the one the pelican site writes, so a field
+is read and hand-edited the same way in either site. Tags and authors
+feed Hugo's taxonomies, which give the tag/author listing pages and
+per-term RSS feeds, and every old inbound path (Medium slug+id,
 /p/<id>, Ghost-era) becomes an alias, so Hugo emits redirect stubs for
 old links on any static host; the same map is written as a `_redirects`
 file for hosts that turn one into HTTP 301s. Hugo's own sitemap.xml
@@ -58,9 +62,10 @@ import sys
 from .sites import (Covers, ImagePlacer, author_links, author_names,
                     author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
-                    export_content, fill_template, load_site_inputs,
-                    old_paths, page_stems, quote_arg, redirect_rules,
-                    redirects_file, rewrite_figures, site_profiles, tag_names,
+                    export_content, fill_template, front_matter_yaml,
+                    load_site_inputs, old_paths, page_stems, quote_arg,
+                    redirect_rules, redirects_file, rewrite_figures,
+                    site_profiles, tag_names,
                     write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
@@ -72,28 +77,30 @@ from .sites import (Covers, ImagePlacer, author_links, author_names,
 # calls resolve to that shortcode, which takes the caption as inner
 # content.
 TEMPLATES = {
-    "layouts/_default/baseof.html": "hugo/layouts/_default/baseof.html",
-    "layouts/partials/card.html": "hugo/layouts/partials/card.html",
-    "layouts/partials/share.html": "hugo/layouts/partials/share.html",
-    "layouts/partials/paginator.html":
-        "hugo/layouts/partials/paginator.html",
-    "layouts/partials/jsonld.html": "hugo/layouts/partials/jsonld.html",
-    "layouts/partials/related.html": "hugo/layouts/partials/related.html",
+    "layouts/baseof.html": "hugo/layouts/baseof.html",
+    "layouts/_partials/card.html": "hugo/layouts/_partials/card.html",
+    "layouts/_partials/share.html": "hugo/layouts/_partials/share.html",
+    "layouts/_partials/paginator.html":
+        "hugo/layouts/_partials/paginator.html",
+    "layouts/_partials/jsonld.html": "hugo/layouts/_partials/jsonld.html",
+    "layouts/_partials/related.html": "hugo/layouts/_partials/related.html",
     "layouts/robots.txt": "hugo/layouts/robots.txt",
-    "layouts/index.html": "hugo/layouts/index.html",
-    "layouts/_default/single.html": "hugo/layouts/_default/single.html",
-    "layouts/_default/list.html": "hugo/layouts/_default/list.html",
-    "layouts/_default/taxonomy.html": "hugo/layouts/_default/list.html",
-    "layouts/_default/terms.html": "hugo/layouts/_default/terms.html",
-    "layouts/_default/archives.html": "hugo/layouts/_default/archives.html",
-    "layouts/_default/search.html": "hugo/layouts/_default/search.html",
+    "layouts/home.html": "hugo/layouts/home.html",
+    "layouts/page.html": "hugo/layouts/page.html",
+    # one listing layout for the post section and for a tag's or an
+    # author's page; the terms index has its own
+    "layouts/section.html": "hugo/layouts/section.html",
+    "layouts/term.html": "hugo/layouts/section.html",
+    "layouts/taxonomy.html": "hugo/layouts/taxonomy.html",
+    "layouts/archives.html": "hugo/layouts/archives.html",
+    "layouts/search.html": "hugo/layouts/search.html",
     "layouts/alias.html": "hugo/layouts/alias.html",
-    "layouts/_default/_markup/render-image.html":
-        "hugo/layouts/_default/_markup/render-image.html",
-    "layouts/_default/rss.xml": "hugo/layouts/_default/rss.xml",
-    "layouts/shortcodes/figure.html": "hugo/layouts/shortcodes/figure.html",
-    "layouts/partials/post-image.html":
-        "hugo/layouts/partials/post-image.html",
+    "layouts/_markup/render-image.html":
+        "hugo/layouts/_markup/render-image.html",
+    "layouts/rss.xml": "hugo/layouts/rss.xml",
+    "layouts/_shortcodes/figure.html": "hugo/layouts/_shortcodes/figure.html",
+    "layouts/_partials/post-image.html":
+        "hugo/layouts/_partials/post-image.html",
     "static/css/style.css": "shared/card.css",
     # the term pages, from data/tags.json and data/authornames.json
     # (see write_tag_names and write_author_names)
@@ -151,7 +158,7 @@ def front_matter(url: str, post: dict, cover: str | None = None,
     if canonical:           # the page is a copy of this one, and says so
         front["canonical"] = canonical
     front["aliases"] = [path for path, _ in old_paths(post, url)]
-    return json.dumps(front, indent=2, ensure_ascii=False) + "\n\n"
+    return front_matter_yaml(front)
 
 
 def _toml_params(params: dict) -> str:
@@ -224,26 +231,26 @@ def build_site(out):
 
     (site / "content").mkdir(parents=True)
     (site / "content" / "_index.md").write_text(
-        json.dumps({"title": config["title"]}) + "\n\n"
+        front_matter_yaml({"title": config["title"]})
         + (config.get("intro", "") + "\n" if config.get("intro") else ""),
         encoding="utf-8")
     # the theme's Pagefind search page and year-grouped archives timeline;
     # search results are nobody's landing page, so the search page is
     # kept out of the index and the sitemap, as WordPress keeps its own
     (site / "content" / "search.md").write_text(
-        json.dumps({"title": "Search", "layout": "search",
-                    "url": "/search/", "noindex": True,
-                    "sitemap": {"disable": True}}) + "\n", encoding="utf-8")
+        front_matter_yaml({"title": "Search", "layout": "search",
+                           "url": "/search/", "noindex": True,
+                           "sitemap": {"disable": True}}), encoding="utf-8")
     (site / "content" / "archives.md").write_text(
-        json.dumps({"title": "Archives", "layout": "archives",
-                    "url": "/archives/"}) + "\n", encoding="utf-8")
+        front_matter_yaml({"title": "Archives", "layout": "archives",
+                           "url": "/archives/"}), encoding="utf-8")
     # the tag and author indexes, titled as the nav names them (with
     # capitalizeListTitles off for the terms' sake, Hugo would title
     # them by their lowercase path, which the breadcrumbs would repeat)
     for plural, title in (("tags", "Tags"), ("authors", "Authors")):
         (site / "content" / plural).mkdir(exist_ok=True)
         (site / "content" / plural / "_index.md").write_text(
-            json.dumps({"title": title}) + "\n", encoding="utf-8")
+            front_matter_yaml({"title": title}), encoding="utf-8")
     covers = Covers(out, manifest)
     pages = export_content(
         out, site, manifest, stems,
@@ -260,8 +267,9 @@ def build_site(out):
     # dropping the page is also what makes the two sites agree. The
     # posts themselves are untouched; only the section's own page goes.
     (site / "content" / "posts" / "_index.md").write_text(
-        json.dumps({"title": "Posts",
-                    "_build": {"render": "never", "list": "never"}}) + "\n",
+        front_matter_yaml({"title": "Posts",
+                           "build": {"render": "never",
+                                     "list": "never"}}),
         encoding="utf-8")
     write_tag_names(site, tag_names(manifest, out))
     write_author_names(site, author_names(manifest))

@@ -297,8 +297,9 @@ Medium era keep working too.
 
 ## Building the sites
 
-Tools: Hugo extended (0.128 or newer, for the generated config's
-`[pagination]` table; validated with 0.140 and 0.158),
+Tools: Hugo extended (0.156 or newer: the theme is written in the
+layout structure Hugo looks pages up in today, and reads its data
+files through `hugo.Data`; validated with 0.165),
 `pip install pelican markdown-it-py mdit-py-plugins pyyaml pillow`,
 `npm install -g mystmd pagefind`,
 and optionally gifsicle (without it, animated-gif display copies keep

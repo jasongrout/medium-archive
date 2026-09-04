@@ -43,7 +43,7 @@
 {{- $authors := slice -}}
 {{- range $p.GetTerms "authors" -}}
 {{- $person := dict "@type" "Person" "name" .LinkTitle "url" .Permalink -}}
-{{- with index site.Data.authors .LinkTitle -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}
+{{- with index hugo.Data.authors .LinkTitle -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}
 {{- $authors = $authors | append $person -}}
 {{- end -}}
 {{- if eq $p.Type "posts" -}}
@@ -74,7 +74,7 @@
 {{- $graph = $graph | append $ld -}}
 {{- else if and (eq $p.Kind "term") (eq $p.Data.Plural "authors") -}}
 {{- $person := dict "@type" "Person" "name" $p.Title "url" $p.Permalink -}}
-{{- with index site.Data.authors $p.Title -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}
+{{- with index hugo.Data.authors $p.Title -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}
 {{- $graph = $graph | append (dict "@type" "ProfilePage" "@id" $url "url" $url "isPartOf" (dict "@id" $site_id) "mainEntity" $person) -}}
 {{- end -}}
 <script type="application/ld+json">{{ (dict "@context" "https://schema.org" "@graph" $graph) | jsonify | safeJS }}</script>

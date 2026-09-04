@@ -112,7 +112,7 @@ These embed verbatim in both engines' pages, so they must carry no
   grid) plus an envelope drawn to match. A post renders the bar twice,
   under the byline and at the foot, so the marks are defined once and
   referenced ten times. The bar itself stays with each engine, since
-  only the engine knows a post's URL: hugo's `partials/share.html` and
+  only the engine knows a post's URL: hugo's `_partials/share.html` and
   the pelican theme's `share()` macro in `macros.html`, each called
   twice. Each link is the network's own documented share URL: LinkedIn
   and Facebook take the page address alone and read the rest off its
@@ -179,8 +179,12 @@ These embed verbatim in both engines' pages, so they must carry no
 
 ## hugo/
 
-The built-in theme (`hugo.TEMPLATES` maps each file into the site; the
-regular list and taxonomy pages share `list.html`), plus:
+The built-in theme, in the layout structure current Hugo looks pages
+up in -- `baseof.html`, `home.html`, `page.html`, `section.html`,
+`taxonomy.html` and the underscored `_partials/`, `_shortcodes/` and
+`_markup/` (`hugo.TEMPLATES` maps each file into the site; the post
+section and a term's page share `section.html`, written to the site as
+`term.html` too), plus:
 
 - `hugo.toml.tmpl` is the generated site config. Its
   `[markup.highlight]` turns off Chroma's inline styles, whose default
@@ -198,37 +202,37 @@ regular list and taxonomy pages share `list.html`), plus:
   left as the term puts its accents and punctuation into the path, and
   the pelican site folds the same name to ASCII, so without it the two
   engines serve one author at two different addresses.
-- `layouts/_default/rss.xml` gives full-content feeds, like the
+- `layouts/rss.xml` gives full-content feeds, like the
   publication's original Medium feed: summary in `<description>`,
   complete body in `<content:encoded>`, capped by `services.rss.limit`.
   Feed readers resolve relative URLs unreliably, so root-relative
   src/href become absolute against baseURL, and the responsive
   srcset/sizes attributes, meaningless in a feed, are stripped. Written
   for site and per-term feeds alike.
-- `layouts/partials/post-image.html` renders one body image:
+- `layouts/_partials/post-image.html` renders one body image:
   responsive, lazily-loaded variants (webp encodes of the still
   originals; gif/svg/webp sources pass through untouched). The render
   hook and the figure shortcode share it, so captioned and bare images
   carry the same markup. The post's first image (front matter
   `first_image`, from the exporter) is fetched eagerly at high priority
   instead of lazily, as WordPress treats the first content image.
-- `layouts/partials/paginator.html` is the one paginator a listing
+- `layouts/_partials/paginator.html` is the one paginator a listing
   page (home, a section, a term) renders from, for the list templates
   and for the head alike: page 2 of a listing is its own address, and
   `baseof.html` names it in the canonical link, `og:url` and `<title>`
   rather than page one, which search engines would fold every page
   into. Hugo keeps the first paginator a page builds, so head and body
   asking with the same arguments get the same one.
-- `layouts/partials/jsonld.html` is every page's structured data: one
+- `layouts/_partials/jsonld.html` is every page's structured data: one
   schema.org graph, as WordPress's SEO plugins emit it -- the
   `Organization` (publisher: logo, `site.Params.profiles` as `sameAs`)
   and the `WebSite` (the search page as its `SearchAction`) on every
   page, referenced by `@id` from a `BreadcrumbList` placing the page,
   a post's `BlogPosting` (headline, dates, authors with their profile
-  from `data/authors.json` as `sameAs`, cover with dimensions,
+  from `data/authors.json` (read through `hugo.Data`) as `sameAs`, cover with dimensions,
   keywords) and an author page's `ProfilePage`. Built as dicts and
   jsonified so every value is escaped for a `<script>`.
-- `layouts/partials/related.html` closes a post page with up to three
+- `layouts/_partials/related.html` closes a post page with up to three
   related posts (Hugo's related content, by the `[related]` indices
   the generated config sets: shared tags, then author, then date), as
   listing cards, kept out of the search index.
@@ -236,9 +240,9 @@ regular list and taxonomy pages share `list.html`), plus:
   everything when site.json sets `"noindex"` (the same switch puts a
   `noindex` robots tag on every page, as a page's own front matter
   does for the search page).
-- `layouts/_default/_markup/render-image.html` handles body images from
+- `layouts/_markup/render-image.html` handles body images from
   Markdown image syntax, delegated to the partial.
-- `layouts/shortcodes/figure.html` renders a captioned (and possibly
+- `layouts/_shortcodes/figure.html` renders a captioned (and possibly
   linked) body image as the `<figure>`/`<figcaption>` Medium served:
   the image through the same partial, the caption rendered inline with
   no `<p>` wrapper, styling left to CSS. The exporter rewrites
@@ -263,8 +267,8 @@ regular list and taxonomy pages share `list.html`), plus:
   The reader is registered through a plugin whose `register()` builds
   the class, so the config can be read (and tested) without Pelican
   installed. It reads YAML front matter between `---` fences, the shape
-  `posts/<slug>/index.md` and the hugo site already write, rather than
-  Pelican's own `Key: value` headers that nothing else reads; Pelican's
+  the hugo site writes too (see `sites.front_matter_yaml`), rather
+  than Pelican's own `Key: value` headers that nothing else reads; Pelican's
   metadata processors then turn the lists into `Tag` and `Author`
   objects and parse the dates. Beyond CommonMark it enables what the hugo site's Goldmark
   enables -- tables, strikethrough, footnotes, definition lists and the
