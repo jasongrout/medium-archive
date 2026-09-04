@@ -1333,3 +1333,19 @@ def test_alt_text_falls_back_to_the_caption():
     given = shell.replace("![]", "![Given]")
     assert 'alt="Given"' in hugo.figure_shortcodes(given)
     assert 'alt="Given"' in pelican.figure_blocks(given)
+
+
+def test_hugo_does_not_publish_the_posts_section_page(archive):
+    """content/posts/ is a Hugo section, so Hugo would publish a list
+    page and a feed for it unasked: /posts/ is the home listing over
+    again, pagination and all, canonical to itself and in the sitemap
+    while nothing links to it. Pelican has no sections -- posts/<slug>/
+    is only a URL pattern there -- so dropping the page is also what
+    keeps the two sites' address spaces the same. The posts themselves
+    stay exactly where they were."""
+    site = hugo.build_site(archive)
+    section = json.loads((site / "content/posts/_index.md").read_text())
+    assert section["_build"] == {"render": "never", "list": "never"}
+    # the posts are untouched: the section's own page is all that goes
+    assert (site / "content/posts/second-post/index.md").exists()
+    assert (site / "content/posts/first-post/index.md").exists()
