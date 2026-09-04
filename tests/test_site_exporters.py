@@ -220,8 +220,9 @@ def test_the_config_reads_commonmark(archive):
     # intra-site pass still finds them on the rendered page
     assert 'src="{attach}images/a.png"' in md.render("![x]({attach}images/a.png)")
     assert 'href="{attach}notes.pdf"' in md.render("[x]({attach}notes.pdf)")
-    # tables, footnotes and definition lists are on
+    # tables, strikethrough, footnotes and definition lists are on
     assert "<table>" in md.render("| a | b |\n|---|---|\n| 1 | 2 |\n")
+    assert "<s>gone</s>" in md.render("~~gone~~\n")
     assert "footnote" in md.render("A[^1]\n\n[^1]: note\n")
     assert "<dl>" in md.render("term\n: meaning\n")
     # and the specification is followed where python-markdown guessed:

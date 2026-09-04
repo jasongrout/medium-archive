@@ -218,7 +218,11 @@ def _figure(md):
 def _make_md():
     # xhtmlOut off: the site plugin reads the <img> tags this writes
     # with a regex, and an XHTML-style void tag is not what it expects.
-    md = _MarkdownIt("commonmark", {"xhtmlOut": False}).enable("table")
+    # Tables and strikethrough are the two GitHub-flavoured rules a
+    # writer expects to work, and both are built in here; hugo's
+    # goldmark has them on for the same reason.
+    md = _MarkdownIt("commonmark", {"xhtmlOut": False})
+    md.enable(["table", "strikethrough"])
     md.use(_footnote).use(_deflist).use(_figure)
     # heading ids give search results per-section anchors
     md.use(_anchors, max_level=6, slug_func=_slug)
