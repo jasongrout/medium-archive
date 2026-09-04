@@ -187,8 +187,8 @@ def add_fetch_args(p):
 def add_convert_args(p):
     p.add_argument("--prefer-page", action="store_true",
                    help="always convert the rendered page body; by default the "
-                        "account export, the RSS <content:encoded> body, or the "
-                        "page's embedded editor state (in that order) is "
+                        "account export, the page's embedded editor state, or "
+                        "the RSS <content:encoded> body (in that order) is "
                         "preferred -- all three are cleaner sources than the "
                         "rendered HTML")
     p.add_argument("--prefer-ghost", action="store_true",

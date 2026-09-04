@@ -118,6 +118,36 @@ def test_paragraph_types_render():
                   "> A quote.\n")
 
 
+def test_soft_line_break_survives_as_a_hard_break():
+    # the editor stores a shift-enter break as a newline inside the
+    # paragraph's text; as HTML whitespace it would join the two lines
+    md = md_of_state(make_state([
+        para(0, "P", "First line.\nSecond line."),
+        para(1, "ULI", "item one\nstill item one"),
+        para(2, "BQ", "Quoted.\nStill quoted."),
+    ]))
+    assert md == ("First line.  \nSecond line.\n\n"
+                  "- item one  \n  still item one\n\n"
+                  "> Quoted.  \n> Still quoted.\n")
+
+
+def test_soft_break_takes_the_spaces_around_it():
+    # a line that ends in a space would otherwise carry it into the
+    # break's own two spaces, and one that starts with spaces would
+    # arrive indented
+    md = md_of_state(make_state([para(0, "P", "Time  \n   Session")]))
+    assert md == "Time  \nSession\n"
+
+
+def test_soft_break_inside_a_markup_span():
+    # the markup offsets are the text's own, so a span covering the
+    # break still wraps both lines
+    p = para(0, "P", "bold one\nbold two")
+    p["markups"] = [{"type": "STRONG", "start": 0, "end": 17}]
+    md = md_of_state(make_state([p]))
+    assert md == "**bold one  \nbold two**\n"
+
+
 def test_markups_apply_on_utf16_offsets():
     # "🎉🎉 bold" -- the emoji take two UTF-16 units each, so the STRONG
     # markup for "bold" starts at unit 5, character 3
@@ -225,6 +255,54 @@ def test_convert_post_recovers_shell_from_state(tmp_path):
     assert front["date"] == "2019-12-29T12:11:11Z"
     out = tmp_path / "posts" / "2019-12-29-my-post" / "index.md"
     assert "Recovered body text." in out.read_text()
+
+
+def test_ghost_migration_pairs_collapse_in_a_state_body(tmp_path):
+    # Medium's Ghost importer turned each wrapped source line into a
+    # <br><br> pair, which the state carries as a blank line inside the
+    # paragraph text; on a post with a Ghost origin a pair is a line
+    # wrap, so it collapses to a space, while a single break stays one
+    raw = tmp_path / MID
+    raw.mkdir()
+    (raw / "page.html").write_text(shell_html(make_state([
+        para(0, "P", "A wrapped\n\nsource line."),
+        para(1, "P", "A real\nsoft break."),
+    ])))
+    (raw / "ghost.json").write_text(json.dumps(
+        {"original_url": "http://blog.example.com/2015/03/04/my-post"}))
+    convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    md = (tmp_path / "posts" / "2019-12-29-my-post" / "index.md").read_text()
+    assert "A wrapped source line." in md
+    assert "A real  \nsoft break." in md
+
+
+def test_state_outranks_the_feed_body(tmp_path):
+    # Medium's RSS HTML carries no <code>, demotes the authored heading
+    # levels and drops the section dividers, all of which the state
+    # keeps, so a post with both converts from the state
+    raw = tmp_path / MID
+    raw.mkdir()
+    p = para(0, "P", "Install mytool first.")
+    p["markups"] = [{"type": "CODE", "start": 8, "end": 14}]
+    (raw / "page.html").write_text(shell_html(make_state(
+        [para(0, "H3", "Getting started"), p])))
+    (raw / "feed_item.json").write_text(json.dumps(
+        {"content_html": "<h4>Getting started</h4>"
+                         "<p>Install mytool first.</p>"}))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["body_source"] == "state"
+    md = (tmp_path / "posts" / "2019-12-29-my-post" / "index.md").read_text()
+    assert "## Getting started" in md and "`mytool`" in md
+
+
+def test_feed_body_still_converts_a_capture_without_state(tmp_path):
+    raw = tmp_path / MID
+    raw.mkdir()
+    (raw / "feed_item.json").write_text(json.dumps(
+        {"title": "My Post", "date": "2019-12-29T12:11:11Z",
+         "content_html": "<p>From the feed.</p>"}))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["body_source"] == "feed"
 
 
 def test_state_subtitle_repeating_the_title_loses_it(tmp_path):

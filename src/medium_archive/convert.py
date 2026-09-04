@@ -909,11 +909,11 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
-    elif have_feed:
-        body, body_source = feed_body(feed_item["content_html"]), "feed"
     elif state is not None:            # the page's embedded editor state
         body = state_body(state, raw.name, info["title"], media)
         body_source = "state"
+    elif have_feed:                    # a capture with no usable state
+        body, body_source = feed_body(feed_item["content_html"]), "feed"
     else:                              # a page without embedded state
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
 
@@ -1025,8 +1025,15 @@ def cmd_convert(args):
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     if manifest:
         write_redirects(manifest, args.out)
-    if not (args.out / "README.md").exists():
-        write_readme(args.out, args.base or archive_base(args.out) or "(unknown publication)")
+    # The archive README describes the layout convert itself writes, so
+    # it is rewritten on every run rather than only when missing: an
+    # archive kept in version control would otherwise carry a README
+    # describing an older tool. It is generated, not hand-written --
+    # corrections belong in readme.py. An archive whose publication
+    # cannot be named yet keeps whatever README it has.
+    base = args.base or archive_base(args.out)
+    if base or not (args.out / "README.md").exists():
+        write_readme(args.out, base or "(unknown publication)")
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
     # A tags.json entry that changed no post is stale config -- fail
     # loudly, like a fixup that no longer applies. Only a complete run
