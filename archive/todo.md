@@ -72,6 +72,16 @@ Last full validation, all three against all 333 posts:
   warnings are cosmetic empty-image-alt ones; Medium images rarely
   carry alt text.
 
+**The Markdown renderer.** `compare.md` records the comparison behind
+choosing Pelican; `commonmark.md` records what it costs to render its
+posts with a CommonMark parser (markdown-it-py) instead of
+python-markdown, which follows no spec. The measured answer: a 74-line
+reader in the config the exporter already generates reproduces the
+current site exactly, the packaged plugins do not without work, and the
+Pelican exporter has to render figure captions to HTML the way the Hugo
+one already does. Four work items are listed at the end of that file;
+all of them are medium-archive changes, nothing in this repo.
+
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and the
 `compare`, `compare --state` and `compare --ghost` results are explained
@@ -101,6 +111,27 @@ the `Lint embeds` workflow fails should any come back.
   identical in the Ghost capture and the Medium sources, so it was
   published that way in 2015 and the archive is faithful. Fixups could
   hand-correct the worst of it if desired.
+
+- **The feed body drops every inline code span** (measured 2026-09, not
+  acted on). Medium's RSS HTML carries no `<code>`, and `convert`
+  prefers the feed body over the page's editor state, so six of the
+  eleven feed-sourced posts here -- the 2026 ones, which have no
+  account export -- lost all of theirs: announcing-jupyter-builder 43,
+  the eslint-plugin post 39, jupyterlite-0-8 26, the 2026 survey
+  results 10, jupyterlab-4-6 6, jupytergis-0-16 3. The feed also
+  demotes the authored heading levels (`##` arrives as `###`).
+
+  The fix is a `convert` change rather than fixups: preferring the
+  editor state over the feed (`export > state > feed > page` instead of
+  `export > feed > state > page`). Tried here and measured: all 336
+  posts convert, `lint` stays at 0, the backtick counts on those six go
+  18->94, 36->120, 0->52, 0->12, 6->26 and 24->30, the headings come
+  back, and the other five feed-sourced posts change by a few
+  characters. It also settles the typographer nit in `commonmark.md`:
+  the eslint post's `commands.addCommand(...)` is inside a code span in
+  the state, so no renderer touches it. The change was left undone
+  pending a decision, since it re-converts every feed-sourced post and
+  changes a documented source order.
 
 ## 3. Tag cleanup (tags.json)
 
