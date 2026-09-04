@@ -46,12 +46,26 @@ The first Hugo export took 12 min, but that is the one-time
 223 MB) which both exporters then hard-link from. Against a warm cache
 the two exporter steps are within 0.1 s of each other.
 
-The HTML count differs for two benign reasons. Hugo emits 167
-`page/1/` redirect stubs (a reader who edits a URL to `/tags/binder/page/1/`
-lands on the term page; Pelican 404s there) and a `/posts/` section page
-with its own feed. Neither engine is missing a page the other has: the
-336 post URLs are identical, and every listing, index, feed, sitemap,
-`robots.txt` and `_redirects` file is present in both.
+Neither engine is missing a page the other has: the 336 post URLs are
+identical, and every listing, index, feed, sitemap, `robots.txt` and
+`_redirects` file is present in both. The HTML count differs for two
+unrelated reasons, one benign and one not.
+
+The benign one is in Hugo's favour: it emits 167 `page/1/` redirect
+stubs, so a reader who edits a URL to `/tags/binder/page/1/` lands on
+the term page, where Pelican 404s.
+
+The other was a defect. `content/posts/` is a Hugo *section*, and Hugo
+publishes a list page and an RSS feed for a section on its own, so
+`/posts/` was the home listing over again -- the same 24 cards, the same
+first card, the same 14 pagination pages -- canonical to itself,
+`index, follow`, and in the sitemap, while nothing on the site linked to
+it. Its heading and `<title>` read a bare lowercase "posts", and its
+feed carried the same 20 items as the site feed. Pelican has no
+sections (`posts/{slug}/` is only a URL pattern there), so it never had
+the page. Fixed in
+[medium-archive#58](https://github.com/jasongrout/medium-archive/pull/58),
+which also brings Hugo's sitemap from 506 URLs to Pelican's 505.
 
 Rendered in headless Chromium at 1280x900, in light and dark, every
 probed metric matched:
@@ -74,12 +88,14 @@ card theme promises.
 
 ## Defects found, two per engine
 
-All four are small; they are recorded here because they were found by
-the comparison, not because they favour either choice. All four are
+These four are small; they are recorded here because they were found
+by the comparison, not because they favour either choice. They are
 fixed in `medium-archive`: the three below in
 [#56](https://github.com/jasongrout/medium-archive/pull/56), and the
 author URLs, which change an address and so were kept separate, in
 [#57](https://github.com/jasongrout/medium-archive/pull/57). The
+duplicate `/posts/` listing described above is a fifth, in
+[#58](https://github.com/jasongrout/medium-archive/pull/58). The
 measurements above are from the builds as they stood when the
 comparison ran, before those fixes.
 
