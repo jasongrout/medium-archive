@@ -22,6 +22,12 @@ make of a name like "C++"; the names tags are shown under (tags.json's
 plugin names the Tag objects once the tags are collected -- Pelican
 renders a tag from the object everywhere, the per-tag feed title
 included, and that one it builds in Python out of reach of a template.
+Authors take the same route, and need it more: a byline is a person's
+name, so left as the term it would reach each generator raw -- hugo
+keeping its accents and punctuation in the path, Pelican folding them
+away -- and one author would sit at two addresses. Both exporters write
+sites.author_slug's slug instead, AUTHOR_DISPLAY carries the names, and
+the site plugin puts them on the Author objects the same way.
 
 The exporter writes its own theme, from the package's templates/pelican/
 and templates/shared/ files -- the card-grid blog shared with
@@ -63,6 +69,7 @@ import re
 import sys
 
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_links,
+                    author_names, author_slug,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
                     image_size, load_site_inputs, page_stems,
@@ -158,11 +165,16 @@ def build_site(out):
         if post.get("updated"):
             text += _meta("Modified", post["updated"][:16].replace("T", " "))
         if post.get("authors"):
-            # Pelican splits the list on semicolons when it has any,
-            # else on commas: pick the separator no name contains
-            names = [a["name"] for a in post["authors"]]
-            sep = "; " if any("," in n for n in names) else ", "
-            text += _meta("Authors", sep.join(names))
+            # slugs, as the tags are, so author.slug and every
+            # /authors/<slug>/ URL are exactly what the hugo site
+            # serves rather than whatever each engine would make of a
+            # byline (see sites.author_slug); the site plugin names the
+            # Author objects from AUTHOR_DISPLAY once they are collected.
+            # A slug holds no comma, so Pelican's comma split is
+            # unambiguous and the semicolon form it also accepts, which
+            # a name like "Project Jupyter, Inc." used to need, is not.
+            text += _meta("Authors", ", ".join(
+                author_slug(a["name"]) for a in post["authors"]))
         if post.get("tags"):
             text += _meta("Tags", ", ".join(post["tags"]))
         text += _meta("Slug", stems[url])
@@ -213,6 +225,8 @@ def build_site(out):
         cover_size=setting(list(COVER_SIZE) if covers.pillow else None),
         author_links=json.dumps(author_links(manifest), ensure_ascii=False,
                                 indent=4),
+        author_display=json.dumps(author_names(manifest), ensure_ascii=False,
+                                  indent=4),
         tag_display=json.dumps(dict(sorted(tag_names(manifest, out).items())),
                                ensure_ascii=False, indent=4),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")

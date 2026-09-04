@@ -26,6 +26,7 @@ import struct
 import subprocess
 import tempfile
 import sys
+import unicodedata
 from importlib import resources
 from pathlib import Path
 from string import Template
@@ -850,6 +851,51 @@ def canonical_for(post: dict) -> str | None:
                      != urlsplit(post["original_url"]).netloc.lower()):
         return declared
     return None
+
+
+# Latin letters that carry no combining form, so NFKD leaves them whole
+# and an ASCII fold would drop them ("Michal" losing its l entirely).
+_FOLD = str.maketrans({
+    "\u0141": "L", "\u0142": "l", "\u00d8": "O", "\u00f8": "o",
+    "\u00c6": "AE", "\u00e6": "ae", "\u0152": "OE", "\u0153": "oe",
+    "\u00df": "ss", "\u0110": "D", "\u0111": "d", "\u0126": "H",
+    "\u0127": "h", "\u0131": "i", "\u014a": "N", "\u014b": "n",
+    "\u00de": "Th", "\u00fe": "th", "\u00d0": "D", "\u00f0": "d",
+})
+
+
+def author_slug(name: str) -> str:
+    """An author's name as the slug both sites key them by. Bylines are
+    people's names, not slugs, so left as terms they would reach each
+    generator raw: hugo keeps a name's accents and punctuation in the
+    path it builds (`/authors/matt-mccormick-@thewtex@fosstodon.org/`),
+    while pelican folds it to ASCII, so the two sites would serve one
+    author under two addresses. Slugging here is what the tags do
+    already, for the same reason -- the slug is the identity, and the
+    name is what a page shows.
+
+    The rules are pelican's own slugify, reproduced so its author URLs
+    do not move: fold to ASCII, drop everything that is not a word
+    character, space or hyphen, then collapse runs to single hyphens.
+    """
+    text = unicodedata.normalize("NFKC", name).translate(_FOLD)
+    text = "".join(c for c in unicodedata.normalize("NFKD", text)
+                   if not unicodedata.combining(c))
+    text = text.encode("ascii", "ignore").decode("ascii")
+    text = re.sub(r"[^\w\s-]", "", text)
+    return re.sub(r"[-\s]+", "-", text.strip()).lower()
+
+
+def author_names(manifest: dict) -> dict:
+    """Author slug -> the name a site shows them under, the authors'
+    counterpart of tag_names. The first spelling seen for a slug wins."""
+    names = {}
+    for p in manifest.values():
+        for a in p.get("authors") or []:
+            slug = author_slug(a["name"])
+            if slug and slug not in names:
+                names[slug] = a["name"]
+    return dict(sorted(names.items()))
 
 
 def author_links(manifest: dict) -> dict:
