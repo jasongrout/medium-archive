@@ -2,6 +2,7 @@
 title removal."""
 
 import json
+import os
 import re
 from pathlib import Path
 
@@ -530,6 +531,20 @@ def test_convert_documents_posts_and_sites_outside_the_archive_readme(tmp_path):
     assert "myst start" not in archive and "pip install pelican" not in archive
     # the fields are documented once, and reach both files that need them
     assert "| `body_source`" in archive and "| `body_source`" in posts
+
+
+def test_convert_leaves_unchanged_readmes_untouched(tmp_path):
+    # a rewrite with the bytes the file already holds is churn of its
+    # own: git looks at the mtime before the content, and so does every
+    # build and sync downstream of a committed README
+    args, cmd_convert = convert_archive(tmp_path)
+    names = ("README.md", "posts/README.md", "SITES.md")
+    for name in names:
+        os.utime(tmp_path / name, (0, 0))
+
+    cmd_convert(args)
+    for name in names:
+        assert (tmp_path / name).stat().st_mtime_ns == 0, name
 
 
 def test_convert_readmes_carry_no_generation_date(tmp_path):

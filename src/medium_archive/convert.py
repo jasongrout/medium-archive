@@ -1026,15 +1026,13 @@ def cmd_convert(args):
     if manifest:
         write_redirects(manifest, args.out)
     # The READMEs describe the layout convert itself writes, so they are
-    # rewritten on every run rather than only when missing: an archive
-    # kept in version control would otherwise carry a README describing
-    # an older tool. They are generated, not hand-written -- corrections
-    # belong in readme.py. An archive whose publication cannot be named
-    # yet keeps whatever archive README it has; the other two name no
-    # publication and are written either way.
-    base = args.base or archive_base(args.out)
-    if base or not (args.out / "README.md").exists():
-        write_readme(args.out, base or "(unknown publication)")
+    # brought up to date on every run rather than only when missing: an
+    # archive kept in version control would otherwise carry a README
+    # describing an older tool. They are generated, not hand-written --
+    # corrections belong in readme.py. A run with nothing new to say
+    # leaves them, and their mtimes, untouched (see write_if_changed).
+    write_readme(args.out, args.base or archive_base(args.out)
+                 or "(unknown publication)")
     write_posts_readme(args.out)
     write_sites_readme(args.out)
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)

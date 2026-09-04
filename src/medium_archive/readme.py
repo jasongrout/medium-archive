@@ -444,32 +444,41 @@ myst:
 """
 
 
+def write_if_changed(path: Path, text: str):
+    """Write the file, unless it already holds exactly this text. These
+    documents are rewritten by every run and a run usually has nothing
+    new to say, so rewriting the same bytes would touch the mtime of a
+    committed file for nothing -- and every tool that reads mtimes, from
+    a build to an rsync, would believe the file had changed."""
+    data = text.encode("utf-8")
+    if path.exists() and path.read_bytes() == data:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+
+
 def write_readme(out: Path, base: str):
     """The archive README: the committed layer, and nothing else."""
-    out.mkdir(parents=True, exist_ok=True)
     # The commands are written to run from the archive root, not with
-    # the --out path of whichever run wrote this file: convert rewrites
-    # the README every time, and a path that moved with the caller's
-    # working directory would churn the archive's diff on every run. The
-    # generation date is left out for the same reason -- it changed the
-    # file on every run without saying anything a re-run had changed.
-    (out / "README.md").write_text(README_TEMPLATE.format(
+    # the --out path of whichever run wrote this file: a path that moved
+    # with the caller's working directory would churn the archive's diff
+    # from one run to the next. The generation date is left out for the
+    # same reason -- it changed the file on every run without saying
+    # anything a re-run had changed.
+    write_if_changed(out / "README.md", README_TEMPLATE.format(
         base=base.rstrip("/"),
         fields=FIELDS_TABLE,
-    ), encoding="utf-8")
+    ))
 
 
 def write_posts_readme(out: Path):
     """The README of the converted posts, inside the tree it describes."""
-    posts = out / "posts"
-    posts.mkdir(parents=True, exist_ok=True)
-    (posts / "README.md").write_text(
-        POSTS_README_TEMPLATE.format(fields=FIELDS_TABLE), encoding="utf-8")
+    write_if_changed(out / "posts" / "README.md",
+                     POSTS_README_TEMPLATE.format(fields=FIELDS_TABLE))
 
 
 def write_sites_readme(out: Path):
     """The README of the generated sites. One file for the three of
     them: they share their inputs, their page URLs and their theme, and
     a reader choosing between them wants them side by side."""
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "SITES.md").write_text(SITES_README, encoding="utf-8")
+    write_if_changed(out / "SITES.md", SITES_README)
