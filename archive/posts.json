@@ -22,7 +22,7 @@
     "images": [
       "images/001-1_1jHlCkiGYDfmAd0mWDhf1A.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-07-29-positron-server-available-for-academic-use-via-jupyterhub"
   },
   "https://blog.jupyter.org/jupyterlite-0-8-is-released-0c89c4200f79": {
@@ -56,7 +56,7 @@
       "images/006-0_WKrNZ-b6NXSbf5UG.png",
       "images/007-0_AJW_fYChAaoUhRbD.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-07-10-jupyterlite-0-8-is-released"
   },
   "https://blog.jupyter.org/navigating-the-post-workshop-fog-a-path-to-myst-6aaaaa6bf81f": {
@@ -86,7 +86,7 @@
       "images/001-1_rxDzW-V0Ey6pg-hkg2bPag.jpeg",
       "images/002-1_aWttEDS_jHdMWa1ZwvimPg.jpeg"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-07-09-navigating-the-post-workshop-fog-a-path-to-myst"
   },
   "https://blog.jupyter.org/2026-jupyter-community-call-for-funding-proposals-f938928a1b8e": {
@@ -162,7 +162,7 @@
       "images/021-1_cxBr835uxAtjpO9Tlqg7bw.png",
       "images/022-1_hWEaY7HfHBjzbajj9OIKtQ.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-07-02-jupyterlab-4-6-and-notebook-7-6-are-out"
   },
   "https://blog.jupyter.org/congratulations-distinguished-contributors-1998f468b29e": {
@@ -192,7 +192,7 @@
       "images/004-1_C7R23KzWzt6vhNUyRFeOgA.jpeg",
       "images/005-1_PfvfmCFMF7KRqzqrWrAPZQ.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-06-24-congratulations-distinguished-contributors"
   },
   "https://blog.jupyter.org/announcing-jupyter-builder-a-standalone-build-system-for-jupyterlab-extensions-c3d4cc06fa95": {
@@ -219,7 +219,7 @@
     "images": [
       "images/001-1_3UBtK-sh01N6OXIbGFNrpQ.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-06-19-announcing-jupyter-builder-a-standalone-build-system-for-jupyterlab-extensions"
   },
   "https://blog.jupyter.org/jupyter-user-survey-252ac60945ae": {
@@ -272,7 +272,7 @@
     "images": [
       "images/001-1_FO2axICPqqSETF34ZMoaBw.jpeg"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-06-15-becoming-the-new-jupyterhub-and-jupyter-book-community-manager"
   },
   "https://blog.jupyter.org/catching-jupyter-specific-bugs-before-ci-does-announcing-jupyter-eslint-plugin-fc65ae414630": {
@@ -298,7 +298,7 @@
     "images": [
       "images/001-1_CXmGuOa5O6Z60l4KZSEo3g.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-06-11-catching-jupyter-specific-bugs-before-ci-does-announcing-jupyter-eslint-plugin"
   },
   "https://blog.jupyter.org/a-users-journey-with-plugin-playground-from-first-idea-to-installable-jupyterlab-extension-697021dd6fb9": {
@@ -9810,7 +9810,7 @@
       "images/006-1_GsxLjpQu33wvCx8KZxBUWA.png",
       "images/007-1_SU9Ll713eVozkjVQNQNmMA.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-08-24-jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more"
   },
   "https://blog.jupyter.org/what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhancement-survey-9a2d911cf42f": {
@@ -9843,7 +9843,7 @@
       "images/006-1_EqKzmO74B8Rk9uteMOxlWA.png",
       "images/007-1_OuWj_WKQ2Oxl7rO6bV8NLA.png"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-08-25-what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan"
   },
   "https://blog.jupyter.org/a-robotics-workbench-for-jupytercad-6eb498a22178": {
@@ -9874,7 +9874,34 @@
       "images/003-1_hG86LjJfW9V_AVmjbAd_Pw.gif",
       "images/004-0_Zir-X_cL1PYlmmnW.svg"
     ],
-    "body_source": "feed",
+    "body_source": "state",
     "dir": "posts/2026-09-02-a-robotics-workbench-for-jupytercad"
+  },
+  "https://blog.jupyter.org/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c": {
+    "title": "Mark Your Calendars: Jupyter Day 2026 is Coming to San Jose!",
+    "authors": [
+      {
+        "name": "Jupyter Foundation",
+        "url": "https://medium.com/@jupyterfoundation"
+      }
+    ],
+    "date": "2026-09-04T10:01:04Z",
+    "updated": "2026-09-04T10:01:04Z",
+    "original_url": "https://blog.jupyter.org/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c",
+    "original_path": "/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c",
+    "medium_id": "bbaad863421c",
+    "slug": "mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "Join us on October 19 for a full day of talks, posters, and community discussion on the future of interactive computing. Submit a talk by…",
+    "tags": [
+      "events"
+    ],
+    "images": [
+      "images/001-1_6labwo1Ihj7MNXTJdqSg4A.jpeg",
+      "images/002-1_eA27lps_Wenzgjp-euT5ag.png"
+    ],
+    "body_source": "state",
+    "dir": "posts/2026-09-04-mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose"
   }
 }
