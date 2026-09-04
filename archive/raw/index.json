@@ -3590,5 +3590,15 @@
     "fetched_at": "2026-09-02T19:05:11+00:00",
     "images": 8,
     "in_feed": true
+  },
+  "https://blog.jupyter.org/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c": {
+    "medium_id": "bbaad863421c",
+    "title": "Mark Your Calendars: Jupyter Day 2026 is Coming to San Jose!",
+    "published": "2026-09-04T10:01:04Z",
+    "sitemap_date": "2026-09-04T10:01:04+00:00",
+    "found_via": "feed",
+    "fetched_at": "2026-09-04T13:53:44+00:00",
+    "images": 4,
+    "in_feed": true
   }
 }
