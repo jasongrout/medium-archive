@@ -74,8 +74,14 @@ card theme promises.
 
 ## Defects found, two per engine
 
-All four are small and fixable; they are recorded here because they were
-found by the comparison, not because they favour either choice.
+All four are small; they are recorded here because they were found by
+the comparison, not because they favour either choice. All four are
+fixed in `medium-archive`: the three below in
+[#56](https://github.com/jasongrout/medium-archive/pull/56), and the
+author URLs, which change an address and so were kept separate, in
+[#57](https://github.com/jasongrout/medium-archive/pull/57). The
+measurements above are from the builds as they stood when the
+comparison ran, before those fixes.
 
 ### Hugo
 
@@ -88,8 +94,11 @@ found by the comparison, not because they favour either choice.
    in a URL path. Pelican transliterates to clean ASCII by default:
    `frederic-collonval`, `jurgen-hermann`, `michal-krassowski`,
    `cam-gerlach`, `joe-lucas`, `matt-mccormick-thewtexfosstodonorg`.
-   Fixable with `removePathAccents = true` plus slug hygiene in
-   `hugo.toml.tmpl`.
+   `removePathAccents = true` alone is not enough: it folds the accents
+   but leaves the dots, the `@`, the trailing hyphen and `ł`. The fix
+   was to address authors by slug in both exporters, as tags already
+   are, which also makes the two engines agree by construction rather
+   than by coincidence.
 2. **Cards ignore the curated description.** `partials/card.html` renders
    `.Summary`, Hugo's auto-summary of the body, rather than the
    `description` front matter that `convert` writes. All 336 posts have a
