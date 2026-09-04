@@ -598,18 +598,25 @@ no longer lists, work through the steps in order:
   HTML, and as data in its embedded editor state
   (`window.__APOLLO_STATE__`), the ordered paragraph list with markup
   spans, image ids, code blocks, plus title, timestamps, author and
-  tags. `convert` prefers the state (`body_source: state`) over the
-  rendered HTML. It has no chrome to strip and keeps what the renderer
-  destroys: the full text span of a link containing a code fragment,
-  bold on code, and iframe embeds that an un-hydrated capture drops
-  entirely. It also survives when Medium serves the bare application
-  shell (no server-rendered article, page title just "Medium"), which is
-  how shell-only captures convert at all. A shell's images were never
-  fetched, though, so its body keeps remote URLs until re-fetched.
-  `compare --state` verifies the state conversion against account
-  exports, as plain `compare` does for the page conversion. The rendered
-  page remains the fallback and is available with
+  tags. `convert` prefers the state (`body_source: state`) over both the
+  rendered HTML and the RSS body. It has no chrome to strip and keeps
+  what the renderer destroys: the full text span of a link containing a
+  code fragment, bold on code, and iframe embeds that an un-hydrated
+  capture drops entirely. It also survives when Medium serves the bare
+  application shell (no server-rendered article, page title just
+  "Medium"), which is how shell-only captures convert at all. A shell's
+  images were never fetched, though, so its body keeps remote URLs until
+  re-fetched. `compare --state` verifies the state conversion against
+  account exports, as plain `compare` does for the page conversion. The
+  rendered page remains the fallback and is available with
   `convert --prefer-page`.
+* Medium's RSS body (`body_source: feed`) is a third source, and a lossy
+  one: its HTML carries no `<code>`, so every inline code span goes,
+  it demotes the authored heading levels (`##` is served as `###`), and
+  it drops the section dividers. It ranks below the state for that
+  reason -- it converts a post whose capture has no usable state -- and
+  it is the one body Medium truncates, on a member-only post, which
+  `convert` warns about.
 * Medium rate-limits and may serve a bot wall. A 429 is not retried:
   fetch reports it, with the server's `Retry-After` hint when sent, and
   moves on. Raise `--delay` and re-run to resume.
