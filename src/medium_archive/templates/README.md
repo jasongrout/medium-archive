@@ -263,8 +263,8 @@ regular list and taxonomy pages share `list.html`), plus:
   The reader is registered through a plugin whose `register()` builds
   the class, so the config can be read (and tested) without Pelican
   installed. It reads YAML front matter between `---` fences, the shape
-  `posts/<slug>/index.md` and the hugo site already write, rather than
-  Pelican's own `Key: value` headers that nothing else reads; Pelican's
+  the hugo site writes too (see `sites.front_matter_yaml`), rather
+  than Pelican's own `Key: value` headers that nothing else reads; Pelican's
   metadata processors then turn the lists into `Tag` and `Author`
   objects and parse the dates. Beyond CommonMark it enables what the hugo site's Goldmark
   enables -- tables, strikethrough, footnotes, definition lists and the

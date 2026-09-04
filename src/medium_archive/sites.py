@@ -32,6 +32,8 @@ from pathlib import Path
 from string import Template
 from urllib.parse import unquote, urlsplit
 
+import yaml
+
 from .lint import split_post
 from .tags import display_name, load_tag_display
 from .urls import medium_id
@@ -985,6 +987,24 @@ def clean_site(site: Path, keep=()):
         for child in site.iterdir():
             if child.name not in keep:
                 shutil.rmtree(child) if child.is_dir() else child.unlink()
+
+
+def front_matter_yaml(fields: dict) -> str:
+    """A page's front matter: YAML between `---` fences, what both
+    site generators read natively and what nearly every other one
+    reads too -- the form a hand-edited checked-in site expects, and
+    the form the two exporters share so a field means the same thing
+    in either site.
+
+    Written by the yaml library rather than by hand: a title holding a
+    colon, a quote, a leading `-` or something that reads as a number
+    or a date is quoted the way the specification requires, which is
+    exactly what hand-written front matter gets wrong. Keys keep the
+    order they were built in (sort_keys off), so a page's front matter
+    reads title-first rather than alphabetically."""
+    body = yaml.safe_dump(fields, sort_keys=False, allow_unicode=True,
+                          default_flow_style=False, width=10 ** 6)
+    return f"---\n{body}---\n\n"
 
 
 def read_post_body(src: Path):

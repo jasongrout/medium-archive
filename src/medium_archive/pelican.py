@@ -21,11 +21,11 @@ encodes webp variants of every still body image at the same widths as
 the hugo theme's render hook (480/736/1104, never upscaled,
 mtime-cached) and rewrites the article's img tags with srcset/sizes
 and real width/height. Metadata is YAML front matter between `---`
-fences, the shape `posts/<slug>/index.md` and the hugo site already
-write (both in JSON, which is YAML) rather than Pelican's own
-`Key: value` headers, which nothing else reads; tags and
-authors are first-class in Pelican, so tag/author listing pages and
-Atom feeds (site-wide and per tag/author) come out of the box. Tags
+fences, the shape the hugo site writes too (see
+sites.front_matter_yaml) rather than Pelican's own `Key: value`
+headers, which nothing else reads; tags and authors are first-class in
+Pelican, so tag/author listing pages and Atom feeds (site-wide and per
+tag/author) come out of the box. Tags
 reach Pelican as slugs, so tag.slug and every /tags/<slug>/ URL are
 exactly the archive's tag rather than whatever Pelican's slugify would
 make of a name like "C++"; the names tags are shown under (tags.json's
@@ -79,15 +79,14 @@ import json
 import re
 import sys
 
-import yaml
-
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_links,
                     author_names, author_slug,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
-                    image_size, load_site_inputs, page_stems,
-                    quote_arg, rewrite_figures, site_profiles, tag_names,
-                    template_text, write_redirects_csv, write_templates)
+                    front_matter_yaml, image_size, load_site_inputs,
+                    page_stems, quote_arg, rewrite_figures, site_profiles,
+                    tag_names, template_text, write_redirects_csv,
+                    write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
 # templates/README.md). The stylesheet is the card look shared with the
@@ -157,19 +156,6 @@ def figure_directives(markdown: str) -> str:
 
 def _one_line(value: str) -> str:
     return " ".join(value.split())    # front matter holds no newlines
-
-
-def front_matter_yaml(fields: dict) -> str:
-    """A post's front matter: YAML between `---` fences, the form the
-    hugo site's JSON front matter and `posts/<slug>/index.md` already
-    take and every Pelican reader that is not Pelican's own expects.
-    Written by the yaml library rather than by hand: a title holding a
-    colon, a quote, a leading `-` or something that reads as a number
-    or a date is quoted the way the specification requires, which is
-    exactly what hand-written front matter gets wrong."""
-    body = yaml.safe_dump(fields, sort_keys=False, allow_unicode=True,
-                          default_flow_style=False, width=10 ** 6)
-    return f"---\n{body}---\n\n"
 
 
 def build_site(out):
