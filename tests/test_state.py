@@ -276,6 +276,35 @@ def test_ghost_migration_pairs_collapse_in_a_state_body(tmp_path):
     assert "A real  \nsoft break." in md
 
 
+def test_state_outranks_the_feed_body(tmp_path):
+    # Medium's RSS HTML carries no <code>, demotes the authored heading
+    # levels and drops the section dividers, all of which the state
+    # keeps, so a post with both converts from the state
+    raw = tmp_path / MID
+    raw.mkdir()
+    p = para(0, "P", "Install mytool first.")
+    p["markups"] = [{"type": "CODE", "start": 8, "end": 14}]
+    (raw / "page.html").write_text(shell_html(make_state(
+        [para(0, "H3", "Getting started"), p])))
+    (raw / "feed_item.json").write_text(json.dumps(
+        {"content_html": "<h4>Getting started</h4>"
+                         "<p>Install mytool first.</p>"}))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["body_source"] == "state"
+    md = (tmp_path / "posts" / "2019-12-29-my-post" / "index.md").read_text()
+    assert "## Getting started" in md and "`mytool`" in md
+
+
+def test_feed_body_still_converts_a_capture_without_state(tmp_path):
+    raw = tmp_path / MID
+    raw.mkdir()
+    (raw / "feed_item.json").write_text(json.dumps(
+        {"title": "My Post", "date": "2019-12-29T12:11:11Z",
+         "content_html": "<p>From the feed.</p>"}))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["body_source"] == "feed"
+
+
 def test_state_subtitle_repeating_the_title_loses_it(tmp_path):
     # the stored preview subtitle is built from the body, so on a post
     # that opens with its title the subtitle repeats it; the description

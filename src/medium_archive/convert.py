@@ -909,11 +909,11 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
     elif exp:
         body, body_source = export_body(exp["soup"]), "export"
-    elif have_feed:
-        body, body_source = feed_body(feed_item["content_html"]), "feed"
     elif state is not None:            # the page's embedded editor state
         body = state_body(state, raw.name, info["title"], media)
         body_source = "state"
+    elif have_feed:                    # a capture with no usable state
+        body, body_source = feed_body(feed_item["content_html"]), "feed"
     else:                              # a page without embedded state
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
 
