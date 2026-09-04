@@ -157,11 +157,16 @@ showing the 73 known article pages and no others.
 
 ## Phase 3: the extension set (each its own commit)
 
-- Typographer on, for Hugo parity: curly quotes and ellipses on ~21
-  posts of the reference archive. Re-run the hugo/pelican comparison
-  afterwards; it should remove a row from `compare.md`.
-- Strikethrough and task lists on: no effect on existing posts, and
-  what a writer expects to work.
+- **(Done.)** Strikethrough on, beside the tables that were already
+  enabled: no post in the reference archive uses `~~`, and all 1211
+  pages of its site are identical across the change. Task lists were
+  considered and left off.
+- **(Done.)** Typographer on, for Hugo parity: 55 article pages and 7
+  listing pages of the reference archive change, all of it curly
+  quotes and apostrophes, twelve ellipses and one en dash. markdown-it
+  also substitutes `(c)`, `(tm)` and `(r)`, which Goldmark does not and
+  which turned `501(c)(3)` into `501©(3)` on seven pages, so the
+  reader calls the replacements rule without that half.
 - Linkify off: it would rewrite bare URLs in 2015-era posts. Attributes
   (`{.class}`) only if a use appears.
 - Document the enabled syntax in `templates/README.md` and in the

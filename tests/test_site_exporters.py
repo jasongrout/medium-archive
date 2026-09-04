@@ -178,6 +178,28 @@ def test_the_figure_directive_escapes_what_it_renders(archive):
             "</figcaption>") in html
 
 
+def test_the_typographer_sets_prose_the_way_hugo_does(archive):
+    """Goldmark's typographer is on in the hugo site, so the pelican
+    reader runs markdown-it's: without it the two sites set the same
+    prose differently. The symbol substitutions are the one part left
+    off -- markdown-it has them and goldmark does not, and "501(c)(3)"
+    is a nonprofit, not a copyright sign."""
+    _, md = config_parser(pelican.build_site(archive))
+    assert md.renderInline('He said "no", it\'s fine') == \
+        "He said \u201cno\u201d, it\u2019s fine"
+    assert md.renderInline("wait...") == "wait\u2026"
+    assert md.renderInline("a -- b and c---d") == \
+        "a \u2013 b and c\u2014d"
+    # a flag is not a dash, and code is not prose
+    assert md.renderInline("pip install --upgrade x") == \
+        "pip install --upgrade x"
+    assert md.renderInline("`\"quoted\"`") == "<code>&quot;quoted&quot;</code>"
+    # the (c)/(tm)/(r) substitutions markdown-it would make and
+    # goldmark does not; "+-" stays part of the rule that is called
+    assert md.renderInline("a 501(c)(3) nonprofit (tm) (r)") == \
+        "a 501(c)(3) nonprofit (tm) (r)"
+
+
 def test_the_reader_registers_through_a_receiver_that_outlives_it(archive):
     """pelican holds a signal's receivers weakly, so a receiver defined
     inside register() is collected on the way out and the reader never

@@ -262,7 +262,12 @@ regular list and taxonomy pages share `list.html`), plus:
   caption with this same parser so it is not raw HTML in the content.
   The reader is registered through a plugin whose `register()` builds
   the class, so the config can be read (and tested) without Pelican
-  installed. The config also carries `TAG_DISPLAY` and
+  installed. Beyond CommonMark it enables what the hugo site's Goldmark
+  enables -- tables, strikethrough, footnotes, definition lists and the
+  typographer (curly quotes, the ellipsis, en and em dashes) -- so the
+  two sites read and set a post the same way. markdown-it's
+  `(c)`/`(tm)`/`(r)` substitutions are the exception, left off because
+  Goldmark has no equivalent and this publication writes `501(c)(3)`. The config also carries `TAG_DISPLAY` and
   `AUTHOR_DISPLAY`, the slug-to-name maps for tags and authors (both
   reach Pelican as slugs so their URLs are exact; see `tags.py` and
   `sites.author_slug`), and renders `INTRO`, site.json's landing-page

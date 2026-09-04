@@ -121,6 +121,9 @@ import shlex as _shlex
 import unicodedata as _unicodedata
 
 from markdown_it import MarkdownIt as _MarkdownIt
+from markdown_it.rules_core.replacements import RARE_RE as _RARE_RE
+from markdown_it.rules_core.replacements import (
+    replace_rare as _replace_rare)
 from mdit_py_plugins.anchors import anchors_plugin as _anchors
 from mdit_py_plugins.container import container_plugin as _container
 from mdit_py_plugins.deflist import deflist_plugin as _deflist
@@ -187,6 +190,24 @@ def _body_image(src, alt="", link=None):
     return f'<a href="{_attr(link)}">{img}</a>' if link else img
 
 
+def _replacements(state):
+    """markdown-it's typographic replacements, less the (c)/(tm)/(r)
+    symbols: "501(c)(3)" is the legal form of a nonprofit, not a
+    copyright sign, and it appears in this publication. Goldmark's
+    typographer, which the hugo site runs, substitutes no symbols
+    either, so dropping them is also what keeps the two sites setting
+    the same prose. The rest of the rule -- the ellipsis, the en and em
+    dashes, runs of ?! or commas, and "+-" -> "±" -- is markdown-it's
+    own, called here rather than reimplemented so that it stays in step
+    with the library."""
+    if not state.md.options.typographer:
+        return
+    for token in state.tokens:
+        if token.type == "inline" and token.children:
+            if _RARE_RE.search(token.content):
+                _replace_rare(token.children)
+
+
 def _figure(md):
     """The `::: figure src="..." alt="..." link="..."` directive the
     pelican exporter writes for each captioned image, rendered as the
@@ -221,8 +242,19 @@ def _make_md():
     # Tables and strikethrough are the two GitHub-flavoured rules a
     # writer expects to work, and both are built in here; hugo's
     # goldmark has them on for the same reason.
-    md = _MarkdownIt("commonmark", {"xhtmlOut": False})
-    md.enable(["table", "strikethrough"])
+    #
+    # The typographer is on for the same parity: goldmark's is on in
+    # the hugo site, so without it the two sites set the same prose
+    # differently -- straight quotes and three dots here, curly quotes
+    # and an ellipsis there. It is two rules on top of the option:
+    # smartquotes turns quotes and apostrophes into their typographic
+    # forms, replacements does the ellipsis and the dashes (`--` and
+    # `---` between words or spaced, never against a flag like
+    # `--upgrade`). Code spans and fenced blocks are untouched by both,
+    # being neither text nor prose.
+    md = _MarkdownIt("commonmark", {"xhtmlOut": False, "typographer": True})
+    md.enable(["table", "strikethrough", "smartquotes", "replacements"])
+    md.core.ruler.at("replacements", _replacements)
     md.use(_footnote).use(_deflist).use(_figure)
     # heading ids give search results per-section anchors
     md.use(_anchors, max_level=6, slug_func=_slug)
