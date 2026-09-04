@@ -378,10 +378,10 @@ which turns bare URLs into links and would change 2015-era posts.
    here changed, lint is at 0, and no page carries a stray marker.
 
    The one post that looked like a fixup turned out to be something
-   else. `catching-jupyter-specific-bugs-before-ci-does-…` reads
+   else. `catching-jupyter-specific-bugs-before-ci-does-…` read
    `commands.addCommand(…)` not because the author wrote it as prose
-   but because Medium's RSS body, which `convert` prefers here, drops
-   every `<code>` span the page keeps -- 39 of them in that post, 127
-   across six posts. See `todo.md`, section 2: the fix is a source-order
-   change in `convert`, measured but not made, and it removes the need
-   for a fixup.
+   but because Medium's RSS body, which `convert` preferred here,
+   drops every `<code>` span the page keeps -- 39 of them in that post,
+   127 across six posts. `convert` now prefers the page's editor state
+   over the feed body, so those spans are back and no typographer
+   reaches them; see `todo.md`, section 2. No fixup was needed.

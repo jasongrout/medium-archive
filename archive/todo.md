@@ -112,26 +112,40 @@ the `Lint embeds` workflow fails should any come back.
   published that way in 2015 and the archive is faithful. Fixups could
   hand-correct the worst of it if desired.
 
-- **The feed body drops every inline code span** (measured 2026-09, not
-  acted on). Medium's RSS HTML carries no `<code>`, and `convert`
-  prefers the feed body over the page's editor state, so six of the
+- **The feed body dropped every inline code span** (measured and fixed
+  2026-09). Medium's RSS HTML carries no `<code>`, and `convert`
+  preferred the feed body over the page's editor state, so six of the
   eleven feed-sourced posts here -- the 2026 ones, which have no
   account export -- lost all of theirs: announcing-jupyter-builder 43,
   the eslint-plugin post 39, jupyterlite-0-8 26, the 2026 survey
   results 10, jupyterlab-4-6 6, jupytergis-0-16 3. The feed also
-  demotes the authored heading levels (`##` arrives as `###`).
+  demoted the authored heading levels (`##` arrived as `###`) and
+  dropped the section dividers.
 
-  The fix is a `convert` change rather than fixups: preferring the
-  editor state over the feed (`export > state > feed > page` instead of
-  `export > feed > state > page`). Tried here and measured: all 336
-  posts convert, `lint` stays at 0, the backtick counts on those six go
-  18->94, 36->120, 0->52, 0->12, 6->26 and 24->30, the headings come
-  back, and the other five feed-sourced posts change by a few
-  characters. It also settles the typographer nit in `commonmark.md`:
-  the eslint post's `commands.addCommand(...)` is inside a code span in
-  the state, so no renderer touches it. The change was left undone
-  pending a decision, since it re-converts every feed-sourced post and
-  changes a documented source order.
+  Fixed in `convert` rather than with fixups: the body source order is
+  now `export` > `state` > `feed` > `page`. What settled it was
+  converting the eleven three ways and reading the rendered page as the
+  third witness -- the state matches it on every block-structure count
+  (74 `##`, 16 `###`, 128 code spans, 12 dividers, same fences, images,
+  figures, list items and embeds), while the feed matches neither
+  (0 `##`, 74 `###`, 3 code spans, no dividers). Where state and page
+  differ the state has more: 28 links against 18 on the eslint post,
+  and 3214 words against 2841 on the survey post, whose page capture is
+  un-hydrated. The feed is also the one body Medium truncates, on a
+  member-only post.
+
+  All 336 posts convert, `lint` stays at 0, and `body_source` is the
+  only front-matter field that changed anywhere in the archive -- image
+  sets and slugs are identical, so no post changed address. The
+  eslint post's `commands.addCommand(...)` is inside a code span now,
+  so no renderer touches it and the fixup `commonmark.md` wanted is
+  unnecessary.
+
+  One thing the feed did better came with it: Medium stores a
+  shift-enter break as a newline inside the paragraph text, which the
+  state conversion dropped. That was fixed first (48 posts here were
+  missing about 97 breaks the rendered page keeps), so the source swap
+  itself changed nothing but headings and code spans.
 
 ## 3. Tag cleanup (tags.json)
 

@@ -236,19 +236,23 @@ Medium era keep working too.
 * Medium boilerplate is stripped in `convert` and still present in
   `raw/page.html`: "was originally published in ... on Medium", stat
   tracking pixels, clap/share UI, the author header.
-* Body source preference is `export` > `feed` > `state` > `page`,
+* Body source preference is `export` > `state` > `feed` > `page`,
   overridden with `convert --prefer-page`. Export bodies are the Medium
   editor's own HTML and convert most faithfully. `state` is the same
   content as the editor stores it, read from the page's embedded state,
   and keeps what the rendered HTML destroys: the full text span of a
   link containing a code fragment, and iframe embeds an un-hydrated
-  capture drops. `page` is the rendered HTML, used only when the capture
-  has no embedded state. The export contributes the exact first-publish
-  timestamp and the untruncated subtitle. Tags, the updated date and
-  the publication canonical URL still come from the page, so fetching
-  remains worthwhile even when an account export is available.
-  `compare --state` verifies the state conversion against the export the
-  way plain `compare` verifies the page conversion.
+  capture drops. `feed` is the RSS `<content:encoded>` body, which
+  carries no `<code>` at all, demotes the authored heading levels (`##`
+  arrives as `###`) and drops the section dividers, so it is used only
+  for a capture whose page has no usable state; it is also the one body
+  Medium truncates, on a member-only post. `page` is the rendered HTML,
+  used when there is no other source. The export contributes the exact
+  first-publish timestamp and the untruncated subtitle. Tags, the
+  updated date and the publication canonical URL still come from the
+  page, so fetching remains worthwhile even when an account export is
+  available. `compare --state` verifies the state conversion against the
+  export the way plain `compare` verifies the page conversion.
 * Posts flagged in `raw/missing.json` are gone from Medium, deleted or
   unpublished. Each entry's `wayback_url` points at its web.archive.org
   captures for manual recovery. An entry with `same_slug_archived` was
