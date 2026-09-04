@@ -242,9 +242,13 @@ regular list and taxonomy pages share `list.html`), plus:
 ## pelican/
 
 - `pelicanconf.py.tmpl` is the generated config, including the
-  `_LazyImages` Markdown extension (body images load lazily) and
+  `_BodyImages` Markdown extension (body images load lazily, and are
+  marked as bodies' for the site plugin's post-build pass) and
   `TAG_DISPLAY`, the tag-slug-to-name map (tags reach Pelican as slugs
-  so their URLs are exact; see `tags.py`).
+  so their URLs are exact; see `tags.py`). It also renders `INTRO`,
+  site.json's landing-page blurb, from Markdown: `index.html` emits it
+  into the same `.intro` block the hugo landing page uses, and Jinja
+  has no Markdown filter to do it in the theme.
 - `site_plugin.py` is appended verbatim after the filled config. It
   gives Pelican the redirect stubs Hugo renders for aliases (and the
   `_redirects` file both exporters write), the responsive body images
