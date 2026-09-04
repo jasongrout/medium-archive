@@ -17,7 +17,10 @@ under Pelican for this archive.
 **Summary.** Plugins exist; `pelican-markdown-it-reader` is the closest
 maintained one, and installing it renders all 336 posts, but as it
 stands it costs this site heading ids, syntax-highlighting colours,
-figure captions and half its responsive images. A reader written into
+figure captions and half its responsive images. The fuller
+`minchin.pelican.readers.commonmark` builds nothing at all until the
+front matter is YAML, and then invents 103 tag pages out of `#123`
+issue references until told not to. A reader written into
 the config the exporter already generates -- 74 lines of Python, no
 plugin -- reproduces the current site exactly: every listing, tag,
 author, feed and archive page identical, and 73 of 336 article pages
@@ -110,6 +113,80 @@ python-markdown, and the plugin exposes no equivalent hooks.
   reads that mark to encode webp variants and stamp dimensions.
   Unmarked, only the images inside figure shells (which carry the
   attribute literally) keep the treatment.
+
+## Adopting minchin's reader, measured
+
+`minchin.pelican.readers.commonmark` is the most complete of the
+packaged readers (1143 lines across the package, against 223 for
+`pelican-markdown-it-reader`), so it was run against this site rather
+than judged from its README. It can be configured into parity, and the
+configuration is the argument against it.
+
+As installed and listed in `PLUGINS`, with the site as the exporter
+writes it today: **0 of 336 articles build.** The reader wants YAML
+front matter; against Pelican's `Key: value` headers it finds no
+metadata and Pelican skips every file ("could not find information
+about 'title'"). With the headers rewritten as YAML, all 336 build in
+21 s, and then:
+
+| | as configured today | with minchin, defaults | after configuring it |
+|---|---|---|---|
+| articles built | 336 | 336 (YAML front matter first; 0 without) | 336 |
+| tag pages (plus the index) | 58 | **161** | 58 |
+| posts with heading ids | 248 | 0 | 248 |
+| body images with `width`/`height` | 2009 | 1538 | 2009 |
+| posts with the theme's highlight class | 112 | 112 | 112 |
+| build warnings | 6 | 120 | 120 |
+
+The tag row is the one to look at. The reader harvests Obsidian-style
+inline `#tag` tokens out of the body, so every `#3288` issue reference
+and `#Masks4All` hashtag in a post became a tag with its own page --
+57 real tags became 160 -- and those tokens are stripped from the text
+that reaches the reader. Turning it off means setting
+`COMMONMARK_INLINE_TAG_SYMBOLS` to a character no post uses; setting it
+to the empty string throws inside the reader and takes all 336 articles
+down again.
+
+The 114 remaining warnings, one per internal `/posts/<slug>/` link in
+the archive, come from the reader's own link rewriting: it prefixes
+relative links with `{filename}` or `{static}` by extension and warns
+about anything else, and root-relative site links are anything else. It
+leaves them alone, correctly, but the build is never clean again --
+which matters for a repo whose CI is green on "0 problems".
+
+The figure captions are missing from the table because no reader fixes
+them: 189 pages leak `markdown="span"` under minchin exactly as they do
+under the other two, since that is CommonMark, not the plugin. It is
+the exporter's to fix, whichever reader is chosen.
+
+Parity on the rest is reachable. Its fence rule emits `codehilite
+highlight`, so the theme's stylesheet matches; heading ids and the
+body-image marking go in through `COMMONMARK["extensions"]`, though not
+as render rules -- the reader installs its own `image`, `link_open` and
+`fence` rules *after* the extensions, so anything of ours in those
+slots is overwritten and the marking has to be done as a core rule that
+sets token attributes instead. Beyond that the package brings
+opinions this site does not want (first `<h1>` promoted to the title
+and removed from the body, a duplicate-`<h1>` pass), a BeautifulSoup
+parse and re-serialisation of every article, a monkey-patch of
+`Readers.check_file`, a dependency on the author's plugin autoloader,
+and a fresh `MarkdownIt` built per file.
+
+`pelican-markdown-it-reader` is the opposite trade: 223 readable lines,
+no opinions beyond CommonMark, but its `_build_md` takes no
+configuration at all, so heading ids, the theme's highlight class and
+the body-image marking cannot be reached from outside it.
+
+**Recommendation: write the reader.** The generated `pelicanconf.py` is
+already the place where this site's Markdown layer is configured, the
+reader is 74 lines against 1143, and it reproduces today's site exactly
+with no settings to discover and no behavior to switch off. The real
+dependency either way is markdown-it-py, which is doing the parsing in
+all three options; what a package adds on top of it here is another
+project's idea of what a blog post is. Should that change -- if the
+exporter ever wants MyST, or wiki links, or inline tags -- adopting a
+reader then is a `PLUGINS` line, and the YAML front matter recommended
+below is the only part of the archive that would have to move first.
 
 ## Writing one instead
 
