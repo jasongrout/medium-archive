@@ -9876,5 +9876,32 @@
     ],
     "body_source": "state",
     "dir": "posts/2026-09-02-a-robotics-workbench-for-jupytercad"
+  },
+  "https://blog.jupyter.org/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c": {
+    "title": "Mark Your Calendars: Jupyter Day 2026 is Coming to San Jose!",
+    "authors": [
+      {
+        "name": "Jupyter Foundation",
+        "url": "https://medium.com/@jupyterfoundation"
+      }
+    ],
+    "date": "2026-09-04T10:01:04Z",
+    "updated": "2026-09-04T10:01:04Z",
+    "original_url": "https://blog.jupyter.org/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c",
+    "original_path": "/mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose-bbaad863421c",
+    "medium_id": "bbaad863421c",
+    "slug": "mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "Join us on October 19 for a full day of talks, posters, and community discussion on the future of interactive computing. Submit a talk by…",
+    "tags": [
+      "events"
+    ],
+    "images": [
+      "images/001-1_6labwo1Ihj7MNXTJdqSg4A.jpeg",
+      "images/002-1_eA27lps_Wenzgjp-euT5ag.png"
+    ],
+    "body_source": "state",
+    "dir": "posts/2026-09-04-mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose"
   }
 }
