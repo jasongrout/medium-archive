@@ -390,6 +390,13 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
                                 generator-native front matter, config, and
                                 the shared card-grid theme; each carries
                                 its own redirects.csv
+  data/tags.json,               the names tags and authors are shown under
+  data/authornames.json,        and the profile address of each byline:
+  data/authors.json             the same three files in both sites, read
+                                by Hugo through hugo.Data and by the
+                                pelican config beside them. Written from
+                                the archive, and editable by hand in a
+                                site kept under version control
 ```
 
 ## Conventions and caveats
@@ -405,6 +412,11 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
 * Each site's `redirects.csv` is the generator's own: it maps the old
   inbound paths of the archive's `redirects.csv` to the page URLs that
   generator actually serves.
+* The `data/*.json` files in `site-hugo/` and `site-pelican/` are
+  derived from the archive like everything else in those directories,
+  so an exporter run overwrites them. A tag or author name belongs in
+  the archive's `tags.json` or in the post's byline; editing the data
+  file directly is for a site kept as a checked-in project of its own.
 
 ## Building the sites
 

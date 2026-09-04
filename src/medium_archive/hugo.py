@@ -40,6 +40,11 @@ term pages with those titles -- which is how every place Hugo renders a
 term (cards, the tag page and its <title>, the chip index, the per-tag
 feed) picks a name up at once, and how a checked-in copy of the site
 renames a tag by editing one file rather than a directory per tag.
+Author names (data/authornames.json) and the byline profiles the
+structured data reads (data/authors.json) are the same arrangement.
+The pelican exporter writes all three files, with the same names and
+contents, and its generated config reads them the way Hugo reads these
+(see sites.write_data_files).
 
 Hugo has no default theme. The exporter writes a small self-contained
 one (layouts/ + css, from the package's templates/hugo/ and
@@ -59,13 +64,12 @@ section tunes the generated config: `locale`, `avatar` and `favicon`
 import json
 import sys
 
-from .sites import (Covers, ImagePlacer, author_links, author_names,
-                    author_slug, canonical_for,
+from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, front_matter_yaml,
                     load_site_inputs, old_paths, page_stems, quote_arg,
                     redirect_rules, redirects_file, rewrite_figures,
-                    site_profiles, tag_names,
+                    site_profiles, write_data_files,
                     write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
@@ -103,7 +107,7 @@ TEMPLATES = {
         "hugo/layouts/_partials/post-image.html",
     "static/css/style.css": "shared/card.css",
     # the term pages, from data/tags.json and data/authornames.json
-    # (see write_tag_names and write_author_names)
+    # (see sites.write_data_files)
     "content/tags/_content.gotmpl": "hugo/content/tags/_content.gotmpl",
     "content/authors/_content.gotmpl":
         "hugo/content/authors/_content.gotmpl",
@@ -182,46 +186,6 @@ def _toml_params(params: dict) -> str:
     return "\n\n".join(["[params]\n" + "\n".join(flat)] + tables)
 
 
-def write_author_links(site, links: dict):
-    """data/authors.json: author name -> profile address, what the
-    theme's structured data names as each author's sameAs (on posts and
-    on the author's own page) and what a checked-in copy of the site
-    edits to add or correct one. The author taxonomy's term titles are
-    the names as written, which is the key here."""
-    (site / "data").mkdir(parents=True, exist_ok=True)
-    (site / "data" / "authors.json").write_text(
-        json.dumps(links, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8")
-
-
-def write_author_names(site, names: dict):
-    """data/authornames.json: author slug -> the name they are shown
-    under, the one file the site's author content adapter
-    (content/authors/_content.gotmpl) builds the term pages from. Front
-    matter keeps the slug, so the term and its /authors/<slug>/ URL
-    match the pelican site's, and only the title Hugo renders carries
-    the name's capitals, accents and punctuation."""
-    (site / "data").mkdir(parents=True, exist_ok=True)
-    (site / "data" / "authornames.json").write_text(
-        json.dumps(dict(sorted(names.items())), indent=2, ensure_ascii=False)
-        + "\n", encoding="utf-8")
-
-
-def write_tag_names(site, names: dict):
-    """data/tags.json: tag slug -> the name the tag is shown under, the
-    one file the site's content adapter (content/tags/_content.gotmpl,
-    in TEMPLATES) builds the term pages from. Front matter keeps the
-    slug, so the term and its /tags/<tag>/ URL are unchanged and it is
-    only the title Hugo renders that gains its spaces and capitals --
-    which means every place a term's title reaches (cards, the tag page
-    heading and <title>, the chip index, per-tag RSS) is covered at
-    once, in a real theme as much as in the built-in one."""
-    (site / "data").mkdir(parents=True, exist_ok=True)
-    (site / "data" / "tags.json").write_text(
-        json.dumps(dict(sorted(names.items())), indent=2, ensure_ascii=False)
-        + "\n", encoding="utf-8")
-
-
 def build_site(out):
     manifest, config = load_site_inputs(out)
     stems = page_stems(manifest)
@@ -271,9 +235,13 @@ def build_site(out):
                            "build": {"render": "never",
                                      "list": "never"}}),
         encoding="utf-8")
-    write_tag_names(site, tag_names(manifest, out))
-    write_author_names(site, author_names(manifest))
-    write_author_links(site, author_links(manifest))
+    # data/tags.json, data/authornames.json and data/authors.json: the
+    # slug-to-name maps the term content adapters build the tag and
+    # author pages from, and the byline profiles the structured data
+    # names as each author's sameAs. Hugo reads them through hugo.Data;
+    # the pelican site is given the same three files (see
+    # sites.write_data_files).
+    write_data_files(site, manifest, out)
 
     params = {"description": config.get("description", "")}
     # "avatar" (site.json top level, or hugo section): a hand-picked site

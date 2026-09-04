@@ -432,8 +432,9 @@ Tags:
   title, so cards, the tag page and its `<title>`, the chip index and
   the per-tag RSS feed all pick it up while front matter keeps the slug,
   and a checked-in site renames a tag in one file.
-  Pelican gets a `TAG_DISPLAY` map in `pelicanconf.py`, which the site
-  plugin sets on the `Tag` objects once the tags are collected. Tags
+  Pelican gets the same `data/tags.json`, which its generated config
+  reads from beside itself into a `TAG_DISPLAY` map and the site plugin
+  sets on the `Tag` objects once the tags are collected. Tags
   still reach Pelican as slugs, so `tag.slug` is exact rather than
   whatever its slugify makes of a name like "C++". Naming the objects
   rather than filtering in the theme is what reaches the per-tag feed's

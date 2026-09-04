@@ -192,16 +192,16 @@ section and a term's page share `section.html`, written to the site as
   classes instead and `card.css` colours them per palette.
 - `content/tags/_content.gotmpl` is a content adapter: it creates one
   term page per entry of `data/tags.json` (tag slug -> display name,
-  written by `hugo.write_tag_names`), so the tag pages, cards, chip
+  written by `sites.write_data_files`), so the tag pages, cards, chip
   index and per-tag feeds all show a tag's name while its URL stays
   the slug -- and a checked-in copy of the site renames a tag by
   editing that one data file.
 - `content/authors/_content.gotmpl` is the same adapter for authors,
-  over `data/authornames.json` (author slug -> name, from
-  `hugo.write_author_names`). Bylines need it more than tags do: a name
-  left as the term puts its accents and punctuation into the path, and
-  the pelican site folds the same name to ASCII, so without it the two
-  engines serve one author at two different addresses.
+  over `data/authornames.json` (author slug -> name, from the same
+  writer). Bylines need it more than tags do: a name left as the term
+  puts its accents and punctuation into the path, and the pelican site
+  folds the same name to ASCII, so without it the two engines serve one
+  author at two different addresses.
 - `layouts/rss.xml` gives full-content feeds, like the
   publication's original Medium feed: summary in `<description>`,
   complete body in `<content:encoded>`, capped by `services.rss.limit`.
@@ -275,13 +275,22 @@ section and a term's page share `section.html`, written to the site as
   typographer (curly quotes, the ellipsis, en and em dashes) -- so the
   two sites read and set a post the same way. markdown-it's
   `(c)`/`(tm)`/`(r)` substitutions are the exception, left off because
-  Goldmark has no equivalent and this publication writes `501(c)(3)`. The config also carries `TAG_DISPLAY` and
-  `AUTHOR_DISPLAY`, the slug-to-name maps for tags and authors (both
-  reach Pelican as slugs so their URLs are exact; see `tags.py` and
-  `sites.author_slug`), and renders `INTRO`, site.json's landing-page
-  blurb, through the reader's own parser: `index.html` emits it into
-  the same `.intro` block the hugo landing page uses, and Jinja has no
-  Markdown filter to do it in the theme.
+  Goldmark has no equivalent and this publication writes `501(c)(3)`.
+  The config also reads the site's data files from beside itself:
+  `TAG_DISPLAY` and `AUTHOR_DISPLAY` from `data/tags.json` and
+  `data/authornames.json`, the slug-to-name maps for tags and authors
+  (both reach Pelican as slugs so their URLs are exact; see `tags.py`
+  and `sites.author_slug`), and `AUTHOR_LINKS` from
+  `data/authors.json`. They are the same three files the hugo
+  site reads through `hugo.Data` -- `sites.write_data_files` writes
+  them for both -- and they are kept out of the config because a name
+  or a profile is what a checked-in copy of a site corrects by hand
+  while this file is generated; a missing one leaves the terms showing
+  as their slugs rather than failing the build. The config also renders
+  `INTRO`, site.json's landing-page blurb, through the reader's own
+  parser: `index.html` emits it into the same `.intro` block the hugo
+  landing page uses, and Jinja has no Markdown filter to do it in the
+  theme.
 - `site_plugin.py` is appended verbatim after the filled config. It
   gives Pelican the redirect stubs Hugo renders for aliases (and the
   `_redirects` file both exporters write), the responsive body images
@@ -291,8 +300,9 @@ section and a term's page share `section.html`, written to the site as
   same way: shared tags, then author, then date; `article.html` reads
   `article.related_posts`), and the
   names tags and authors are shown under (from `TAG_DISPLAY` and
-  `AUTHOR_DISPLAY`, set on the `Tag` and `Author` objects so the theme
-  and the per-term feeds both pick them up; both reach Pelican as
+  `AUTHOR_DISPLAY`, the config's reading of `data/tags.json` and
+  `data/authornames.json`, set on the `Tag` and `Author` objects so the
+  theme and the per-term feeds both pick them up; both reach Pelican as
   slugs, so their URLs match the hugo site's exactly). It refers to
   names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
   `AUTHOR_DISPLAY`, `NOINDEX`, and the reader's plugin class in its
@@ -302,7 +312,8 @@ section and a term's page share `section.html`, written to the site as
 - `theme/templates/jsonld.html` is the hugo partial of the same name
   in Jinja, included by `base.html` after the page's address, name
   and share image are set; author profiles come from `AUTHOR_LINKS`
-  and the publisher's from `PROFILES`, both in the config.
+  (the config's reading of `data/authors.json`) and the publisher's
+  from `PROFILES`, which site.json fills in directly.
 - `theme/templates/` is the Jinja theme. `author.html` is `tag.html`
   with the `tag` variable swapped for `author`; keep them in step. Each
   template names its page in a `name` block; `base.html` composes the
