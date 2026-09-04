@@ -114,7 +114,9 @@ def figure_shortcodes(markdown: str) -> str:
     def call(alt, src, link, caption):
         q = lambda v: v.replace(chr(92), "").replace(chr(34), chr(92) + chr(34))
         args = f'src="{src}"'
-        alt = alt or caption_text(caption)    # the caption describes it
+        # plain text, like the pelican exporter's: an alt is prose for a
+        # screen reader, and the two sites should read it out the same
+        alt = caption_text(alt or caption)    # the caption describes it
         if alt:
             args += f' alt="{q(alt)}"'
         if link:

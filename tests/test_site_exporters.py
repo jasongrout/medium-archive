@@ -1349,3 +1349,31 @@ def test_hugo_does_not_publish_the_posts_section_page(archive):
     # the posts are untouched: the section's own page is all that goes
     assert (site / "content/posts/second-post/index.md").exists()
     assert (site / "content/posts/first-post/index.md").exists()
+
+
+def test_figure_alt_text_cannot_end_its_own_tag():
+    """An alt is prose, and prose holds characters that end an HTML tag
+    for anything reading it with a regex. Two ways in, both seen in the
+    archive: a literal ">" ("File -> Hub Control Panel"), and a Markdown
+    code span, which python-markdown expands into a real <code> tag
+    *inside the attribute*, because the figure shell is a markdown="span"
+    block and its inline patterns still run there. Either one ends the
+    tag early for pelican's own intra-site link pass, which then leaves
+    the {attach} in src unresolved and the image broken on the page.
+    So the exporters escape the one and strip the other, and the two
+    engines carry the same plain-text alt."""
+    arrow = ("<figure>\n\n![File -> Hub Control Panel](images/a.png)\n\n"
+             "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>")
+    block = pelican.figure_blocks(arrow)
+    assert 'alt="File -&gt; Hub Control Panel"' in block
+    assert ">" not in re.search(r'alt="([^"]*)"', block).group(1)
+
+    code = ("<figure>\n\n![a `p5.js` kernel](images/a.png)\n\n"
+            "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>")
+    assert 'alt="a p5.js kernel"' in pelican.figure_blocks(code)
+    assert 'alt="a p5.js kernel"' in hugo.figure_shortcodes(code)
+
+    # and the markdown pass really does leave that attribute alone now
+    import markdown as md_mod
+    html = md_mod.markdown(pelican.figure_blocks(code), extensions=["extra"])
+    assert "<code>" not in re.search(r'alt="([^"]*)"', html).group(1)
