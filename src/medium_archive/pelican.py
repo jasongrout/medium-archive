@@ -137,9 +137,19 @@ def figure_blocks(markdown: str) -> str:
     The image reference already carries the {attach} prefix: escape
     runs first."""
     def block(alt, src, link, caption):
+        # ">" as much as "<": an alt reading "File -> Hub Control Panel"
+        # otherwise ends the tag early for anything reading it with a
+        # regex -- pelican's own intra-site link pass among them, which
+        # then leaves the {attach} in src unresolved and the image
+        # broken on the page
         esc = lambda v: (v.replace("&", "&amp;").replace('"', "&quot;")
-                         .replace("<", "&lt;"))
-        alt = alt or caption_text(caption)    # the caption describes it
+                         .replace("<", "&lt;").replace(">", "&gt;"))
+        # plain text, never Markdown: this goes inside an attribute of a
+        # markdown="span" block, where python-markdown still runs its
+        # inline patterns, and a `code span` in an alt would become a
+        # real <code> tag inside the attribute -- the same early end,
+        # arrived at from the other direction
+        alt = caption_text(alt or caption)    # the caption describes it
         img = (f'<img alt="{esc(alt)}" src="{src}" loading="lazy"'
                f' {BODY_IMAGE_ATTR}="">')
         if link:
