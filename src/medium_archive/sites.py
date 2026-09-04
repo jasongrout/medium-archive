@@ -942,10 +942,19 @@ def caption_text(caption: str) -> str:
 def quote_arg(value: str) -> str:
     """A value for a double-quoted argument on an exporter's own
     directive or shortcode line (hugo's figure shortcode, the pelican
-    figure directive): backslashes dropped, since nothing in an alt or
-    a link needs one and both hugo's shortcode parser and the reader's
-    shlex.split would read them as escapes, and inner quotes escaped so
-    they do not end the argument."""
+    figure directive): inner quotes escaped so they do not end the
+    argument, and backslashes dropped.
+
+    Dropping rather than escaping them is hugo's doing. Its shortcode
+    lexer gives a backslash meaning only before a quote; but a value
+    that carries one escaped quote then goes through
+    ignoreEscapesAndEmit, which strips every backslash in it ("We don't
+    send the backslash back to the client"). So `\\\\` would reach hugo as
+    two literal backslashes in one value and as none in another, while
+    shlex.split gives the pelican reader one either way -- and the two
+    sites are meant to carry the same alt text, which a test holds them
+    to. Dropping is lossy and identical; no alt or link in a real
+    archive has held a backslash yet."""
     return value.replace("\\", "").replace('"', '\\"')
 
 
