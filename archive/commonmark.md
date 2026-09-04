@@ -354,9 +354,16 @@ which turns bare URLs into links and would change 2015-era posts.
    The measured result is the one this file predicts: 336 posts, six
    warnings, every non-article page identical, 73 article pages
    differing. See `commonmark-plan.md` in that repository.
-2. Decide the extension set (typographer yes, to match Hugo; linkify
-   probably not) and the front-matter format (YAML, to match everything
-   else).
+2. **(Partly done 2026-09.)** The extension set: strikethrough is on
+   beside the tables, footnotes and definition lists (no post here uses
+   `~~`, and every page is identical across the change), and the
+   typographer is on for Hugo parity -- 55 article pages and 7 listing
+   pages of this archive gain curly quotes, apostrophes, twelve
+   ellipses and one en dash. markdown-it's `(c)`/`(tm)`/`(r)`
+   substitutions are left off: Goldmark has none, and they turned this
+   publication's `501(c)(3)` into `501©(3)` on seven pages. Task lists
+   were considered and skipped, linkify stays off. Still open: the
+   front-matter format (YAML, to match everything else).
 3. Separately, in `convert`, stop emitting emphasis that wraps only
    punctuation, and lint for markers CommonMark will not open. That is
    the only change that touches the posts' text, and it improves the
