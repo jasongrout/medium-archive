@@ -1,0 +1,11 @@
+{{- /* One term page per entry in data/authornames.json (author slug ->
+       the name they are shown under), the authors' counterpart of
+       content/tags/_content.gotmpl. Front matter carries the slug, so
+       /authors/<slug>/ is the same address the pelican site serves;
+       the title is what every place Hugo renders the term picks up --
+       cards, bylines, the author page and its <title>, the chip index,
+       the per-author feed. Left as names, the terms would put a
+       byline's accents and punctuation straight into the path. */ -}}
+{{ range $slug, $name := hugo.Data.authornames }}
+{{ $.AddPage (dict "kind" "term" "path" $slug "title" $name) }}
+{{ end }}
