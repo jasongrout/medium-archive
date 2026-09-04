@@ -1025,8 +1025,15 @@ def cmd_convert(args):
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     if manifest:
         write_redirects(manifest, args.out)
-    if not (args.out / "README.md").exists():
-        write_readme(args.out, args.base or archive_base(args.out) or "(unknown publication)")
+    # The archive README describes the layout convert itself writes, so
+    # it is rewritten on every run rather than only when missing: an
+    # archive kept in version control would otherwise carry a README
+    # describing an older tool. It is generated, not hand-written --
+    # corrections belong in readme.py. An archive whose publication
+    # cannot be named yet keeps whatever README it has.
+    base = args.base or archive_base(args.out)
+    if base or not (args.out / "README.md").exists():
+        write_readme(args.out, base or "(unknown publication)")
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
     # A tags.json entry that changed no post is stale config -- fail
     # loudly, like a fixup that no longer applies. Only a complete run

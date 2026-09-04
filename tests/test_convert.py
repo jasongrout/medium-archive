@@ -485,6 +485,28 @@ def test_gist_script_inlines_a_markdown_file_verbatim():
     assert markdown == "| a_b | *c* |\n| --- | --- |\n| 1 | `x` |\n"
 
 
+def test_convert_rewrites_the_archive_readme(tmp_path):
+    # the README documents the layout convert writes, so a stale one is
+    # a wrong one; it is generated output, like posts.json
+    from types import SimpleNamespace
+
+    from medium_archive.convert import cmd_convert
+    raw = tmp_path / "raw" / "0123456789ab"
+    raw.mkdir(parents=True)
+    (raw / "page.html").write_text(medium_page())
+    (tmp_path / "raw" / "index.json").write_text(json.dumps(
+        {URL: {"medium_id": "0123456789ab"}}))
+    args = SimpleNamespace(out=tmp_path, prefer_page=False, prefer_ghost=False,
+                           only=None, clean=False, base=None)
+    cmd_convert(args)
+    readme = tmp_path / "README.md"
+    assert "# Medium archive of https://blog.example.com" in readme.read_text()
+
+    readme.write_text("stale\n")
+    cmd_convert(args)
+    assert "# Medium archive of https://blog.example.com" in readme.read_text()
+
+
 def medium_page(*, og_description=None, ld_description=None,
                 meta_description=None, title="Widgets for everyone") -> str:
     """A Medium post page carrying the summary tags a test cares about."""
