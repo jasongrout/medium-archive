@@ -621,6 +621,13 @@ Feeds and sharing:
   orange text fixes only the colour-alone question (1.4.1), not text
   contrast (1.4.3).
 
+- Replace the Pelican exporter's renderer with markdown-it-py, so the
+  site renders CommonMark rather than python-markdown's approximation
+  of it, and figures become a directive the reader renders instead of
+  raw HTML that needs `md_in_html`. `commonmark-plan.md` holds the
+  plan, the decisions and their measurements; the reference archive's
+  `commonmark.md` holds the page-by-page numbers behind them.
+
 Archive-specific follow-ups (posts whose images still need fetching,
 hand-correction candidates) live in each archive's own notes, alongside
 its `fixups/`.
