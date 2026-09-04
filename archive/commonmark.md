@@ -91,6 +91,10 @@ whole build.
 | posts with responsive `srcset` images | 60 | 36 |
 | body images with `width`/`height` | 2009 | 1538 |
 
+The `srcset` row is a comparison, not an absolute: both builds ran on
+an export made without Pillow, which leaves fewer images in a format
+the variant ladder covers. With Pillow at export, the same site has 81.
+
 Each has the same cause: the generated `pelicanconf.py` reaches into
 python-markdown, and the plugin exposes no equivalent hooks.
 
@@ -240,8 +244,8 @@ one-line `Key: value` header. 74 non-comment lines in total.
 
 With it in place, every metric in the table above returns to its
 python-markdown value: 248 posts with heading ids, 112 with `.highlight`
-code, 2009 body images with dimensions, 60 with `srcset`, no leaked
-attributes, no unrendered captions. Build time is unchanged (21.9 s vs
+code, 2009 body images with dimensions, 81 with `srcset` (see the note
+under the table above), no leaked attributes, no unrendered captions. Build time is unchanged (21.9 s vs
 22.6 s for 336 posts), and the build's warnings are the same six
 cosmetic empty-alt ones. Of 1211 pages, the 875 listing, tag, author,
 archive, search and feed pages are identical; 73 of the 336 article
@@ -342,15 +346,18 @@ which turns bare URLs into links and would change 2015-era posts.
 
 ## Recommended order
 
-1. In medium-archive, render figure captions to HTML in the Pelican
-   exporter and stop emitting `markdown="span"` / `markdown="1"`.
-2. Add the reader to the generated `pelicanconf.py`, drop the
-   `_BodyImages` extension and the `MARKDOWN` setting, and depend on
-   `markdown-it-py` + `mdit-py-plugins` instead of `markdown`.
-3. Decide the extension set (typographer yes, to match Hugo; linkify
+1. **(Done 2026-09.)** In medium-archive, captioned images became a
+   `::: figure` directive the reader renders -- the counterpart of the
+   hugo exporter's figure shortcode -- rather than raw HTML needing
+   `md_in_html`, and the generated `pelicanconf.py` carries the reader
+   in place of the `_BodyImages` extension and the `MARKDOWN` setting.
+   The measured result is the one this file predicts: 336 posts, six
+   warnings, every non-article page identical, 73 article pages
+   differing. See `commonmark-plan.md` in that repository.
+2. Decide the extension set (typographer yes, to match Hugo; linkify
    probably not) and the front-matter format (YAML, to match everything
    else).
-4. Separately, in `convert`, stop emitting emphasis that wraps only
+3. Separately, in `convert`, stop emitting emphasis that wraps only
    punctuation, and lint for markers CommonMark will not open. That is
    the only change that touches the posts' text, and it improves the
    Hugo site too.
