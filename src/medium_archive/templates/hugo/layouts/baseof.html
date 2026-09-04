@@ -6,7 +6,7 @@
 {{/* A paginated listing is many pages, each its own address: the
      canonical link, og:url and <title> below name the page actually
      being rendered, not page one for all of them, which search
-     engines would otherwise fold into one (see partials/paginator.html) */}}
+     engines would otherwise fold into one (see _partials/paginator.html) */}}
 {{ $pager := partial "paginator.html" . }}
 {{ $url := .Permalink }}
 {{ $name := cond .IsHome site.Title .Title }}

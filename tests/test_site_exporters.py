@@ -80,18 +80,18 @@ def test_hugo_site(archive):
     # the tab icon lands at the site root, under its canonical name
     assert 'favicon = "favicon.svg"' in config
     assert (site / "static/favicon.svg").read_bytes() == b"SVG"
-    assert 'rel="icon"' in (site / "layouts/_default/baseof.html").read_text()
+    assert 'rel="icon"' in (site / "layouts/baseof.html").read_text()
     # full-content feed, capped: announce new posts, don't ship the archive
     assert "[services.rss]\nlimit = 20" in config
-    rss = (site / "layouts/_default/rss.xml").read_text()
+    rss = (site / "layouts/rss.xml").read_text()
     assert "content:encoded" in rss and "srcset" in rss
     # a literal <?xml gets HTML-escaped by Hugo's template engine,
     # producing an invalid feed; it must go through safeHTML
     assert 'printf "<?xml' in rss and "safeHTML" in rss
     assert not rss.lstrip("{}-% \n").startswith("<?xml")
-    assert (site / "layouts/_default/single.html").exists()
+    assert (site / "layouts/page.html").exists()
     # a year-grouped archives timeline, like the pelican theme's
-    assert (site / "layouts/_default/archives.html").exists()
+    assert (site / "layouts/archives.html").exists()
     assert page_front(site / "content/archives.md")["layout"] == "archives"
     assert "Welcome." in (site / "content/_index.md").read_text()
     assert (site / "redirects.csv").read_text().count("/posts/first-post/") == 3
@@ -149,8 +149,8 @@ def test_hugo_page_keeps_caption_in_its_figure(archive):
             "{{< /figure >}}") in page
     # the shortcode the figure calls resolve to, and the image partial
     # it shares with the render hook
-    assert (site / "layouts/shortcodes/figure.html").exists()
-    assert (site / "layouts/partials/post-image.html").exists()
+    assert (site / "layouts/_shortcodes/figure.html").exists()
+    assert (site / "layouts/_partials/post-image.html").exists()
 
 
 def page_front(path):
@@ -354,7 +354,7 @@ def test_hugo_site_config_and_front_matter(archive, capsys):
     # an asset site.json names but the archive lacks is skipped, noted
     assert "favicon" not in config
     assert "favicon not found, skipped" in capsys.readouterr().err
-    assert (site / "layouts/_default/baseof.html").exists()
+    assert (site / "layouts/baseof.html").exists()
     assert (site / "content/search.md").exists()
     assert (site / "content/archives.md").exists()
     front = post_front(site, "second-post")
@@ -504,10 +504,10 @@ def test_feed_links_carry_the_rss_mark(archive):
     author's page are the shared RSS mark, pointing at that term's own
     feed."""
     hugo_site = hugo.build_site(archive)
-    nav = (hugo_site / "layouts/_default/baseof.html").read_text()
+    nav = (hugo_site / "layouts/baseof.html").read_text()
     assert '<a class="feed-link" href="{{ "index.xml" | relURL }}"' in nav
     assert 'aria-label="RSS"' in nav and "feed-icon" in nav
-    term = (hugo_site / "layouts/_default/list.html").read_text()
+    term = (hugo_site / "layouts/section.html").read_text()
     assert '.OutputFormats.Get "rss"' in term    # only where a feed exists
     assert 'aria-label="RSS feed for {{ $.Title }}"' in term
 
@@ -650,7 +650,7 @@ def test_theme_picker_and_dark_scheme(archive):
     assert ':root:not([data-theme="light"])' in css
     assert ".theme-picker" in css
     assert (pelican_site / "theme/static/css/style.css").read_text() == css
-    for base in (hugo_site / "layouts/_default/baseof.html",
+    for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):
         text = base.read_text()
         for choice in ("light", "system", "dark"):
@@ -703,7 +703,7 @@ def test_announcement_banner(archive):
     pelican_site = pelican.build_site(archive)
     assert f'announcement = "{banner_url}"' in (hugo_site / "hugo.toml").read_text()
     assert f'ANNOUNCEMENT = "{banner_url}"' in (pelican_site / "pelicanconf.py").read_text()
-    for base in (hugo_site / "layouts/_default/baseof.html",
+    for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):
         text = base.read_text()
         # the banner div sits above the header, emitted only when an
@@ -730,7 +730,7 @@ def test_nav_current_highlight(archive):
     # aria-current, which the stylesheet paints in the accent
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    for base in (hugo_site / "layouts/_default/baseof.html",
+    for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):
         text = base.read_text()
         assert 'setAttribute("aria-current", "page")' in text, base
@@ -744,7 +744,7 @@ def test_term_sort_control(archive):
     # placed above the chip list it reorders
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    for page in (hugo_site / "layouts/_default/terms.html",
+    for page in (hugo_site / "layouts/taxonomy.html",
                  pelican_site / "theme/templates/tags.html",
                  pelican_site / "theme/templates/authors.html"):
         text = page.read_text()
@@ -760,7 +760,7 @@ def test_image_zoom(archive):
     # post pages carry the click-to-zoom modal, on both engines
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    for page in (hugo_site / "layouts/_default/single.html",
+    for page in (hugo_site / "layouts/page.html",
                  pelican_site / "theme/templates/article.html"):
         text = page.read_text()
         assert '<dialog class="zoom-dialog"' in text, page
@@ -788,7 +788,7 @@ def test_code_copy(archive):
     # post pages carry the code-block copy button, on both engines
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    for page in (hugo_site / "layouts/_default/single.html",
+    for page in (hugo_site / "layouts/page.html",
                  pelican_site / "theme/templates/article.html"):
         text = page.read_text()
         assert '<template class="code-copy-template">' in text, page
@@ -867,7 +867,7 @@ def test_post_share_links(archive):
     pelican_site = pelican.build_site(archive)
     # each engine names the same three values, so the bars keep one shape
     for bar, url, title, text in (
-            (hugo_site / "layouts/partials/share.html", "{{ .Permalink }}",
+            (hugo_site / "layouts/_partials/share.html", "{{ .Permalink }}",
              "{{ .Title }}", "{{ $text }}"),
             (pelican_site / "theme/templates/macros.html", "{{ enc_url }}",
              "{{ enc_title }}", "{{ enc_text }}")):
@@ -890,7 +890,7 @@ def test_post_share_links(archive):
             assert target in source, bar
         assert "data-share-text" not in source, bar
 
-    for page, call in ((hugo_site / "layouts/_default/single.html",
+    for page, call in ((hugo_site / "layouts/page.html",
                         '{{ partial "share.html" . }}'),
                        (pelican_site / "theme/templates/article.html",
                         "{{ share(post_url, post_title) }}")):
@@ -938,7 +938,7 @@ def test_share_targets_get_the_open_graph_tags_they_render_from(archive):
     tags, so the share links are worth no more than these."""
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    for head in (hugo_site / "layouts/_default/baseof.html",
+    for head in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):
         source = head.read_text()
         for prop in ("og:site_name", "og:type", "og:title", "og:url",
@@ -1189,11 +1189,11 @@ def test_multiple_authors_reach_both_sites(tmp_path):
     assert "author" not in front("duet")
     assert "authors" not in front("solo")
     assert "capitalizeListTitles = false" in (site / "hugo.toml").read_text()
-    text = (site / "layouts/_default/rss.xml").read_text()
+    text = (site / "layouts/rss.xml").read_text()
     assert ".Params.authors" in text and ".Params.author " not in text
     # the card's byline links each author to their listing, like the
     # post page's, so both walk the taxonomy terms rather than the names
-    for layout in ("layouts/partials/card.html", "layouts/_default/single.html"):
+    for layout in ("layouts/_partials/card.html", "layouts/page.html"):
         text = (site / layout).read_text()
         assert '.GetTerms "authors"' in text and ".Params.author" not in text, layout
         assert 'href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>' in text, layout
@@ -1231,7 +1231,7 @@ def test_first_image_loads_eagerly(archive):
     assert front["first_image"] == "images/001-pic.png"
     first = post_front(hugo_site, "first-post")
     assert "first_image" not in first
-    partial = (hugo_site / "layouts/partials/post-image.html").read_text()
+    partial = (hugo_site / "layouts/_partials/post-image.html").read_text()
     assert ".page.Params.first_image" in partial
     assert 'fetchpriority="high"' in partial and 'loading="lazy"' in partial
     pelican_site = pelican.build_site(archive)
@@ -1257,7 +1257,7 @@ def test_crawl_files(archive):
     assert "/2015/06/01/first-post /posts/first-post/ 301" in redirects
     assert "/p/bbb222bbb222 /posts/second-post/ 301" in redirects
     assert all(line.endswith(" 301") for line in redirects)
-    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    baseof = (hugo_site / "layouts/baseof.html").read_text()
     assert 'name="robots"' in baseof and "max-image-preview:large" in baseof
     assert "site.Params.noindex" in baseof and ".Params.noindex" in baseof
 
@@ -1296,7 +1296,7 @@ def test_page_metadata_search_engines_read(archive):
     included, which both engines would otherwise call page one."""
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    heads = {"hugo": (hugo_site / "layouts/_default/baseof.html").read_text(),
+    heads = {"hugo": (hugo_site / "layouts/baseof.html").read_text(),
              "pelican": (pelican_site / "theme/templates/base.html").read_text()}
     for engine, head in heads.items():
         for prop in ("article:modified_time", "article:author"):
@@ -1305,7 +1305,7 @@ def test_page_metadata_search_engines_read(archive):
         assert 'name="twitter:site"' in head, engine
     # structured data: one block, a BlogPosting, with the fields that
     # matter, and every value escaped for a <script>
-    ld = (hugo_site / "layouts/partials/jsonld.html").read_text()
+    ld = (hugo_site / "layouts/_partials/jsonld.html").read_text()
     assert 'type="application/ld+json"' in ld
     pelican_ld = (pelican_site / "theme/templates/jsonld.html").read_text()
     assert 'type="application/ld+json"' in pelican_ld
@@ -1328,7 +1328,7 @@ def test_page_metadata_search_engines_read(archive):
     # output file in pelican
     assert 'partial "paginator.html"' in heads["hugo"]
     assert '<link rel="canonical" href="{{ or .Params.canonical $url }}">' in heads["hugo"]
-    for layout in ("index.html", "_default/list.html"):
+    for layout in ("home.html", "section.html"):
         assert 'partial "paginator.html"' in (hugo_site / "layouts" / layout).read_text()
     assert "output_file" in heads["pelican"]
     assert ('<link rel="canonical" href="{{ article.canonical if article '
@@ -1337,7 +1337,7 @@ def test_page_metadata_search_engines_read(archive):
 
 def _graph_source(engine_site, engine):
     if engine == "hugo":
-        return (engine_site / "layouts/partials/jsonld.html").read_text()
+        return (engine_site / "layouts/_partials/jsonld.html").read_text()
     return (engine_site / "theme/templates/jsonld.html").read_text()
 
 
@@ -1364,7 +1364,7 @@ def test_external_canonical_reaches_the_head(archive):
     assert second["canonical"] == "https://gist.github.com/ada/1"
     first = post_front(hugo_site, "first-post")
     assert "canonical" not in first
-    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    baseof = (hugo_site / "layouts/baseof.html").read_text()
     assert '<link rel="canonical" href="{{ or .Params.canonical $url }}">' in baseof
     pelican_site = pelican.build_site(archive)
     assert post_front(pelican_site, "second-post")["canonical"] == \
@@ -1391,7 +1391,7 @@ def test_share_image_stands_in_for_a_missing_cover(archive):
     hugo_site = hugo.build_site(archive)
     assert 'share_image = "img/share.png"' in (hugo_site / "hugo.toml").read_text()
     assert (hugo_site / "assets/img/share.png").is_file()   # readable dims
-    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    baseof = (hugo_site / "layouts/baseof.html").read_text()
     assert 'with site.Params.share_image }}{{ with resources.Get .' in baseof
     for prop in ("og:image:width", "og:image:height"):
         assert f'property="{prop}"' in baseof, prop
@@ -1437,7 +1437,7 @@ def test_structured_data_graph(archive):
     config = (hugo_site / "hugo.toml").read_text()
     assert 'profiles = ["https://github.com/example", "https://x.com/example"]' in config
     # the graph on every page, not only posts
-    baseof = (hugo_site / "layouts/_default/baseof.html").read_text()
+    baseof = (hugo_site / "layouts/baseof.html").read_text()
     assert '{{ end }}{{ partial "jsonld.html"' in baseof
     # the tag and author indexes are titled as the nav names them, which
     # the breadcrumbs repeat
@@ -1456,7 +1456,7 @@ def test_structured_data_graph(archive):
                     "ListItem", "BlogPosting", "ProfilePage", "sameAs",
                     "isPartOf", "ImageObject", "articleSection"):
             assert key in src, (engine, key)
-    assert "site.Data.authors" in _graph_source(hugo_site, "hugo")
+    assert "hugo.Data.authors" in _graph_source(hugo_site, "hugo")
     assert "AUTHOR_LINKS" in _graph_source(pelican_site, "pelican")
 
 
@@ -1467,8 +1467,8 @@ def test_related_posts(archive):
     hugo_site = hugo.build_site(archive)
     config = (hugo_site / "hugo.toml").read_text()
     assert "[related]" in config and 'name = "tags"' in config
-    assert 'partial "related.html"' in (hugo_site / "layouts/_default/single.html").read_text()
-    related = (hugo_site / "layouts/partials/related.html").read_text()
+    assert 'partial "related.html"' in (hugo_site / "layouts/page.html").read_text()
+    related = (hugo_site / "layouts/_partials/related.html").read_text()
     assert '(where site.RegularPages "Type" "posts").Related' in related and 'partial "card.html"' in related
     assert "| first 3 }}" in related     # three, the width of the home page's card rows
     pelican_site = pelican.build_site(archive)
@@ -1543,7 +1543,7 @@ def test_hugo_cards_show_the_curated_description(archive):
     the body, so leaving it first would show a post's opening sentence
     on the card while the other engine showed the subtitle."""
     card = (hugo.build_site(archive)
-            / "layouts/partials/card.html").read_text()
+            / "layouts/_partials/card.html").read_text()
     assert "or .Description .Summary" in card
 
 
@@ -1662,7 +1662,7 @@ def test_hugo_does_not_publish_the_posts_section_page(archive):
     stay exactly where they were."""
     site = hugo.build_site(archive)
     section = page_front(site / "content/posts/_index.md")
-    assert section["_build"] == {"render": "never", "list": "never"}
+    assert section["build"] == {"render": "never", "list": "never"}
     # the posts are untouched: the section's own page is all that goes
     assert (site / "content/posts/second-post/index.md").exists()
     assert (site / "content/posts/first-post/index.md").exists()

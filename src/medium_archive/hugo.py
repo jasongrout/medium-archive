@@ -77,28 +77,30 @@ from .sites import (Covers, ImagePlacer, author_links, author_names,
 # calls resolve to that shortcode, which takes the caption as inner
 # content.
 TEMPLATES = {
-    "layouts/_default/baseof.html": "hugo/layouts/_default/baseof.html",
-    "layouts/partials/card.html": "hugo/layouts/partials/card.html",
-    "layouts/partials/share.html": "hugo/layouts/partials/share.html",
-    "layouts/partials/paginator.html":
-        "hugo/layouts/partials/paginator.html",
-    "layouts/partials/jsonld.html": "hugo/layouts/partials/jsonld.html",
-    "layouts/partials/related.html": "hugo/layouts/partials/related.html",
+    "layouts/baseof.html": "hugo/layouts/baseof.html",
+    "layouts/_partials/card.html": "hugo/layouts/_partials/card.html",
+    "layouts/_partials/share.html": "hugo/layouts/_partials/share.html",
+    "layouts/_partials/paginator.html":
+        "hugo/layouts/_partials/paginator.html",
+    "layouts/_partials/jsonld.html": "hugo/layouts/_partials/jsonld.html",
+    "layouts/_partials/related.html": "hugo/layouts/_partials/related.html",
     "layouts/robots.txt": "hugo/layouts/robots.txt",
-    "layouts/index.html": "hugo/layouts/index.html",
-    "layouts/_default/single.html": "hugo/layouts/_default/single.html",
-    "layouts/_default/list.html": "hugo/layouts/_default/list.html",
-    "layouts/_default/taxonomy.html": "hugo/layouts/_default/list.html",
-    "layouts/_default/terms.html": "hugo/layouts/_default/terms.html",
-    "layouts/_default/archives.html": "hugo/layouts/_default/archives.html",
-    "layouts/_default/search.html": "hugo/layouts/_default/search.html",
+    "layouts/home.html": "hugo/layouts/home.html",
+    "layouts/page.html": "hugo/layouts/page.html",
+    # one listing layout for the post section and for a tag's or an
+    # author's page; the terms index has its own
+    "layouts/section.html": "hugo/layouts/section.html",
+    "layouts/term.html": "hugo/layouts/section.html",
+    "layouts/taxonomy.html": "hugo/layouts/taxonomy.html",
+    "layouts/archives.html": "hugo/layouts/archives.html",
+    "layouts/search.html": "hugo/layouts/search.html",
     "layouts/alias.html": "hugo/layouts/alias.html",
-    "layouts/_default/_markup/render-image.html":
-        "hugo/layouts/_default/_markup/render-image.html",
-    "layouts/_default/rss.xml": "hugo/layouts/_default/rss.xml",
-    "layouts/shortcodes/figure.html": "hugo/layouts/shortcodes/figure.html",
-    "layouts/partials/post-image.html":
-        "hugo/layouts/partials/post-image.html",
+    "layouts/_markup/render-image.html":
+        "hugo/layouts/_markup/render-image.html",
+    "layouts/rss.xml": "hugo/layouts/rss.xml",
+    "layouts/_shortcodes/figure.html": "hugo/layouts/_shortcodes/figure.html",
+    "layouts/_partials/post-image.html":
+        "hugo/layouts/_partials/post-image.html",
     "static/css/style.css": "shared/card.css",
     # the term pages, from data/tags.json and data/authornames.json
     # (see write_tag_names and write_author_names)
@@ -266,8 +268,8 @@ def build_site(out):
     # posts themselves are untouched; only the section's own page goes.
     (site / "content" / "posts" / "_index.md").write_text(
         front_matter_yaml({"title": "Posts",
-                           "_build": {"render": "never",
-                                      "list": "never"}}),
+                           "build": {"render": "never",
+                                     "list": "never"}}),
         encoding="utf-8")
     write_tag_names(site, tag_names(manifest, out))
     write_author_names(site, author_names(manifest))

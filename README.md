@@ -270,7 +270,10 @@ with none stored, the system scheme decides. The theme provides:
   after building for full-text search served as a results page with
   highlighted, in-context excerpts and per-section sub-results.
 
-Render with `hugo server` or `pelican -l`.
+Render with `hugo server` or `pelican -l`. The hugo theme tracks
+current Hugo -- the layout structure Hugo looks pages up in today,
+and `hugo.Data` for its data files -- so it wants Hugo extended
+0.156 or newer.
 
 ### Images
 
