@@ -69,13 +69,17 @@ the same page URLs, rewrite links between posts of the publication to
 those pages, read the same `site.json`, and write a `redirects.csv`
 into the site, so the generators can be compared on identical content.
 The hugo and pelican sites are the preferred targets and carry the full
-feature set. The myst site is a simpler alternate. See
+feature set, and both read a post the same way: hugo through Goldmark,
+pelican through a CommonMark reader (markdown-it-py) the generated
+config carries in place of pelican's own python-markdown one, which
+follows no specification. The myst site is a simpler alternate. See
 [Generated sites](#generated-sites).
 
 **`lint`** scans the converted posts for conversion-defect signatures:
 leftover Medium chrome, unclosed code fences, images referenced but
-missing on disk, remote Medium CDN images, embeds whose media was never
-archived. It exits non-zero when a defect is found, so regressions
+missing on disk, remote Medium CDN images, emphasis markers CommonMark
+will not read (the reader would be shown the asterisks), embeds whose
+media was never archived. It exits non-zero when a defect is found, so regressions
 surface on every convert instead of waiting for a reader. `lint
 --embeds` also fails on every embed whose content the archive does not
 carry: one still rendered as the bare `[embed: url]` link an iframe

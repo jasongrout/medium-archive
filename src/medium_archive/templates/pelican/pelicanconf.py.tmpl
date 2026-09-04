@@ -60,10 +60,10 @@ FAVICON = $favicon
 ANNOUNCEMENT = $announcement
 # site.json's "intro": the landing-page blurb. It is Markdown, like
 # the hugo site's content/_index.md, and is rendered here because
-# Jinja has no Markdown filter of its own; index.html emits it.
-import markdown as _markdown
+# Jinja has no Markdown filter of its own; index.html emits it. The
+# rendering waits for the reader's parser, at the end of this file, so
+# that the blurb is read exactly as a post is.
 _INTRO_MD = $intro
-INTRO = _markdown.markdown(_INTRO_MD) if _INTRO_MD else None
 # keep search engines off this deployment (a preview): a noindex robots
 # tag on every page, and a robots.txt that disallows all
 NOINDEX = $noindex
@@ -103,47 +103,272 @@ TAG_FEED_ATOM = "feeds/tag-{slug}.atom.xml"
 AUTHOR_FEED_ATOM = "feeds/author-{slug}.atom.xml"
 AUTHOR_FEED_RSS = None
 
-from markdown.extensions import Extension as _Extension
-from markdown.treeprocessors import Treeprocessor as _Treeprocessor
+# ------------------------------------------------------------------ reader
+# Pelican reads Markdown with python-markdown, which follows no
+# specification. This site reads CommonMark instead, through
+# markdown-it-py (`pip install markdown-it-py mdit-py-plugins`), so a
+# post means what the specification says it means -- the same parser
+# family mystmd and Jupyter Book use, and the same reading of a post
+# the hugo site's Goldmark gives.
+#
+# The reader below replaces pelican's own, and is where everything this
+# site needs from the Markdown layer hangs: heading ids for search
+# anchors, the theme's Pygments class, pelican's {attach} placeholders,
+# the body-image marking the plugin's post-build pass reads, and the
+# figure directive the exporter writes for a captioned image.
+import re as _re
+import shlex as _shlex
+import unicodedata as _unicodedata
+
+import yaml as _yaml
+
+from markdown_it import MarkdownIt as _MarkdownIt
+from markdown_it.rules_core.replacements import RARE_RE as _RARE_RE
+from markdown_it.rules_core.replacements import (
+    replace_rare as _replace_rare)
+from mdit_py_plugins.anchors import anchors_plugin as _anchors
+from mdit_py_plugins.container import container_plugin as _container
+from mdit_py_plugins.deflist import deflist_plugin as _deflist
+from mdit_py_plugins.footnote import footnote_plugin as _footnote
+from pygments import highlight as _highlight
+from pygments.formatters.html import HtmlFormatter as _HtmlFormatter
+from pygments.lexers import get_lexer_by_name as _lexer_by_name
+from pygments.lexers import guess_lexer as _guess_lexer
+from pygments.lexers.special import TextLexer as _TextLexer
+from pygments.util import ClassNotFound as _ClassNotFound
+
+# pelican's own link placeholders, which it resolves on the rendered
+# page. markdown-it percent-encodes a link target, so a {attach} that
+# went through the parser has to be given its braces back before
+# pelican's intra-site pass looks for it.
+_PLACEHOLDERS = ("attach", "static", "filename", "tag", "author",
+                 "category", "index")
 
 
-class _BodyImages(_Extension):
-    # Runs on the article's own Markdown tree, which is what makes it
-    # the counterpart of the hugo theme's image render hook: every img
-    # here is a body image, and an img the theme renders (a listing or
-    # related-post card) is not in this tree at all and cannot be
-    # reached from it. Two things follow from that.
+def _keep_placeholders(url):
+    for name in _PLACEHOLDERS:
+        url = url.replace("%7B" + name + "%7D", "{" + name + "}")
+    return url
+
+
+def _slug(text):
+    """A heading id, as python-markdown's toc extension made them: an
+    ascii fold, then everything but word characters, spaces and hyphens
+    dropped, lowercased, runs joined with one hyphen. Kept identical so
+    that the ids search results anchor to do not move."""
+    text = _unicodedata.normalize("NFKD", text)
+    text = text.encode("ascii", "ignore").decode("ascii")
+    text = _re.sub(r"[^\w\s-]", "", text).strip().lower()
+    return _re.sub(r"[-\s]+", "-", text)
+
+
+def _attr(value):
+    """A value inside a double-quoted HTML attribute. ">" as much as
+    "<": an alt reading "File -> Hub Control Panel" otherwise ends the
+    tag early for anything reading it with a regex -- pelican's own
+    intra-site link pass among them, which then leaves the {attach} in
+    src unresolved and the image broken on the page."""
+    return (value.replace("&", "&amp;").replace('"', "&quot;")
+            .replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def _body_image(src, alt="", link=None):
+    """An <img> for the article's own body: lazily loaded, so a reader
+    doesn't fetch every below-the-fold full-resolution image up front,
+    and marked as a body image for the site plugin's post-build pass.
+    That pass runs late, on the finished HTML, because it needs output
+    paths to encode variants beside and because pelican leaves {attach}
+    unresolved until then (and does not resolve it inside a srcset at
+    all). By then a body image and one the theme rendered look alike,
+    so the distinction is recorded here, where only a body image can
+    be -- an <img> the theme renders (a listing or related-post card)
+    never passes through this reader. The pass strips the mark as it
+    rewrites, so it never reaches a reader. BODY_IMAGE_ATTR is the
+    plugin's own constant, from the section appended below this one.
+    The first image on a page is promoted back to eager there too, by
+    the literal loading="lazy" written here."""
+    img = (f'<img alt="{_attr(alt)}" src="{src}" loading="lazy"'
+           f' {BODY_IMAGE_ATTR}="">')
+    return f'<a href="{_attr(link)}">{img}</a>' if link else img
+
+
+_FRONT_MATTER_RE = _re.compile(r"\A---\r?\n(.*?)^(?:---|\.\.\.)\r?\n",
+                               _re.MULTILINE | _re.DOTALL)
+
+
+def _split_front_matter(text):
+    """(YAML front matter, body). A file with no `---` fence is all
+    body, which is what a page written by hand without front matter
+    is; pelican then reports the missing title itself."""
+    match = _FRONT_MATTER_RE.match(text)
+    if not match:
+        return "", text
+    return match.group(1), text[match.end():]
+
+
+def _replacements(state):
+    """markdown-it's typographic replacements, less the (c)/(tm)/(r)
+    symbols: "501(c)(3)" is the legal form of a nonprofit, not a
+    copyright sign, and it appears in this publication. Goldmark's
+    typographer, which the hugo site runs, substitutes no symbols
+    either, so dropping them is also what keeps the two sites setting
+    the same prose. The rest of the rule -- the ellipsis, the en and em
+    dashes, runs of ?! or commas, and "+-" -> "±" -- is markdown-it's
+    own, called here rather than reimplemented so that it stays in step
+    with the library."""
+    if not state.md.options.typographer:
+        return
+    for token in state.tokens:
+        if token.type == "inline" and token.children:
+            if _RARE_RE.search(token.content):
+                _replace_rare(token.children)
+
+
+def _figure(md):
+    """The `::: figure src="..." alt="..." link="..."` directive the
+    pelican exporter writes for each captioned image, rendered as the
+    <figure>/<figcaption> Medium served. This is the counterpart of the
+    hugo exporter's figure shortcode: the caption is the directive's
+    body, so it can hold Markdown an attribute could not, and it is
+    rendered here, by this parser, with whatever extensions this config
+    enables. Its paragraph wrapper is dropped, which keeps the caption
+    inline the way hugo's RenderString does, and keeps img and caption
+    out of <p> tags."""
+    def render(self, tokens, idx, options, env):
+        token = tokens[idx]
+        if token.nesting == -1:
+            return "</figcaption>\n</figure>\n"
+        args = dict(a.split("=", 1)
+                    for a in _shlex.split(token.info)[1:] if "=" in a)
+        for inner in tokens[idx + 1:]:
+            if inner.type == "container_figure_close":
+                break
+            if inner.type in ("paragraph_open", "paragraph_close"):
+                inner.hidden = True
+        img = _body_image(args.get("src", ""), args.get("alt", ""),
+                          args.get("link"))
+        return f"<figure>\n{img}\n<figcaption>"
+
+    md.use(_container, "figure", render=render)
+
+
+def _make_md():
+    # xhtmlOut off: the site plugin reads the <img> tags this writes
+    # with a regex, and an XHTML-style void tag is not what it expects.
+    # Tables and strikethrough are the two GitHub-flavoured rules a
+    # writer expects to work, and both are built in here; hugo's
+    # goldmark has them on for the same reason.
     #
-    # Each image loads lazily, so a reader doesn't fetch every
-    # below-the-fold full-resolution image up front; the site plugin
-    # promotes the first one on a page back to eager afterwards.
-    #
-    # Each is also marked as a body image. The plugin's post-build pass
-    # has to run late, on the finished HTML, because it needs output
-    # paths to encode variants beside and because pelican leaves
-    # {attach} unresolved until then (and does not resolve it inside a
-    # srcset at all). By then a body image and a card look alike, so
-    # this is where the distinction is recorded rather than guessed
-    # from the path -- a card points into some other post's images/
-    # directory, which no path rule separates reliably. The plugin
-    # strips the marker as it rewrites, so it never reaches a reader.
-    def extendMarkdown(self, md):
-        class _Body(_Treeprocessor):
-            def run(self, root):
-                for img in root.iter("img"):
-                    img.set("loading", "lazy")
-                    img.set("data-body-image", "")
-        md.treeprocessors.register(_Body(md), "body-images", 5)
+    # The typographer is on for the same parity: goldmark's is on in
+    # the hugo site, so without it the two sites set the same prose
+    # differently -- straight quotes and three dots here, curly quotes
+    # and an ellipsis there. It is two rules on top of the option:
+    # smartquotes turns quotes and apostrophes into their typographic
+    # forms, replacements does the ellipsis and the dashes (`--` and
+    # `---` between words or spaced, never against a flag like
+    # `--upgrade`). Code spans and fenced blocks are untouched by both,
+    # being neither text nor prose.
+    md = _MarkdownIt("commonmark", {"xhtmlOut": False, "typographer": True})
+    md.enable(["table", "strikethrough", "smartquotes", "replacements"])
+    md.core.ruler.at("replacements", _replacements)
+    md.use(_footnote).use(_deflist).use(_figure)
+    # heading ids give search results per-section anchors
+    md.use(_anchors, max_level=6, slug_func=_slug)
+
+    def fence(self, tokens, idx, options, env):
+        token = tokens[idx]
+        try:
+            lexer = (_lexer_by_name(token.info.split()[0]) if token.info
+                     else _guess_lexer(token.content))
+        except (_ClassNotFound, IndexError):
+            lexer = _TextLexer()
+        # the class the shared card theme styles, and the one hugo's
+        # chroma emits, so one palette serves both sites
+        return _highlight(token.content, lexer,
+                          _HtmlFormatter(cssclass="highlight", wrapcode=True))
+
+    def image(self, tokens, idx, options, env):
+        token = tokens[idx]
+        token.attrSet("src", _keep_placeholders(token.attrGet("src") or ""))
+        token.attrSet("loading", "lazy")
+        token.attrSet(BODY_IMAGE_ATTR, "")
+        return self.image(tokens, idx, options, env)
+
+    def link_open(self, tokens, idx, options, env):
+        token = tokens[idx]
+        token.attrSet("href", _keep_placeholders(token.attrGet("href") or ""))
+        return self.renderToken(tokens, idx, options, env)
+
+    md.add_render_rule("fence", fence)
+    md.add_render_rule("image", image)
+    md.add_render_rule("link_open", link_open)
+    return md
 
 
-MARKDOWN = {
-    "extension_configs": {
-        "markdown.extensions.codehilite": {"css_class": "highlight"},
-        "markdown.extensions.extra": {},
-        "markdown.extensions.meta": {},
-        # heading ids give search results per-section anchors
-        "markdown.extensions.toc": {},
-    },
-    "extensions": [_BodyImages()],
-    "output_format": "html5",
-}
+def _reader_class():
+    """The reader, built on first use. Deferring it is what lets this
+    config be read (and tested) with markdown-it-py and pygments alone,
+    without pelican installed."""
+    from pelican.readers import BaseReader
+    from pelican.utils import pelican_open
+
+    class _CommonMarkReader(BaseReader):
+        """Every .md file in content/, read as CommonMark, with YAML
+        front matter between `---` fences: the form the hugo site and
+        `posts/<slug>/index.md` already use, and the one every Pelican
+        reader that is not Pelican's own expects. Pelican's own
+        metadata processors do the rest, so a list (tags, authors)
+        becomes Tag and Author objects and a date is parsed as pelican
+        parses every date; FORMATTED_FIELDS (the Summary) is rendered
+        as Markdown, as pelican's own reader does."""
+        enabled = True
+        file_extensions = ["md", "markdown", "mkd", "mdown"]
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._md = _make_md()
+
+        def read(self, source_path):
+            with pelican_open(source_path) as text:
+                front, body = _split_front_matter(text)
+            metadata = {}
+            for name, value in (_yaml.safe_load(front) or {}).items():
+                if value is None:
+                    continue
+                name = name.lower()
+                if isinstance(value, (list, tuple)):
+                    # tags and authors reach the site as slugs, which
+                    # hold no comma, so pelican's own comma split reads
+                    # the list back exactly
+                    value = ", ".join(str(item) for item in value)
+                value = str(value)
+                if name in self.settings["FORMATTED_FIELDS"]:
+                    value = self._md.render(value)
+                metadata[name] = self.process_metadata(name, value)
+            return self._md.render(body), metadata
+
+    return _CommonMarkReader
+
+
+def _use_reader(readers):
+    """Every Markdown extension pelican knows, read by the reader above
+    instead of pelican's python-markdown one. Module level, and it has
+    to be: pelican's signals hold their receivers weakly, so a function
+    defined inside register() is collected on the way out and the
+    reader silently never registers -- leaving the build to
+    python-markdown, which renders the figure directives as text."""
+    reader = _reader_class()
+    for ext in reader.file_extensions:
+        readers.reader_classes[ext] = reader
+
+
+class _CommonMarkPlugin:
+    @staticmethod
+    def register():
+        from pelican import signals
+
+        signals.readers_init.connect(_use_reader)
+
+
+# the landing-page blurb, read as CommonMark like everything else here
+INTRO = _make_md().render(_INTRO_MD) if _INTRO_MD else None

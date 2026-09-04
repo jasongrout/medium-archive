@@ -290,7 +290,8 @@ a:hover { text-decoration-line: underline; }
              font-size: .9em; }
 .post pre code { font-size: inherit; background: none; }
 /* Token colours for highlighted blocks, on the class names Pygments
-   (Pelican's codehilite) and Chroma (Hugo, with noClasses off) share:
+   (Pelican, through its reader's fence rule) and Chroma (Hugo, with
+   noClasses off) share:
    keywords, strings, comments, numbers, the names of functions and
    classes, and builtins. The block keeps the theme's background and
    ink, so a block reads as part of the page in either scheme, where

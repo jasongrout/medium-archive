@@ -9,6 +9,7 @@ import json
 import re
 import shutil
 import sys
+import unicodedata
 from pathlib import Path
 from html import escape
 from urllib.parse import (parse_qsl, urlencode, urljoin, urlparse, urlsplit,
@@ -48,6 +49,127 @@ def feed_item_authors(feed_item: dict) -> list:
     return []
 
 
+# CommonMark decides from the characters on either side of a marker
+# whether it can open or close an emphasis span: a `**` between a word
+# character and punctuation opens nothing, and the reader is shown the
+# asterisks. Medium's editor produces exactly that, wrapping a stray
+# period or a closing quote in <strong>, so the fix belongs here rather
+# than in any one site's renderer -- hugo's goldmark and the pelican
+# site's markdown-it read the same rules, and python-markdown, which
+# guessed instead, is what used to paper over it.
+_UNICODE_PUNCT = ("P", "S")          # what the specification counts
+
+
+def _is_punct(ch: str) -> bool:
+    return bool(ch) and unicodedata.category(ch)[0] in _UNICODE_PUNCT
+
+
+def _is_space(ch: str) -> bool:
+    return ch == "" or ch.isspace()
+
+
+def _flanks_left(before: str, first: str) -> bool:
+    """Can a marker with `before` behind it and `first` after it open?"""
+    if _is_space(first):
+        return False
+    return not _is_punct(first) or _is_space(before) or _is_punct(before)
+
+
+def _flanks_right(last: str, after: str) -> bool:
+    """Can a marker with `last` behind it and `after` after it close?"""
+    if _is_space(last):
+        return False
+    return not _is_punct(last) or _is_space(after) or _is_punct(after)
+
+
+# a `*text*` or `**text**` span markdownify emits, with no marker or
+# backslash against it: an escaped asterisk is literal text, and a
+# longer run is not a span this converter writes
+EMPHASIS_RE = re.compile(r"(?<![\\*])(\*{1,2})(?![\s*])(.+?)(?<![\s\\])\1(?!\*)")
+_BACKTICK_RUN_RE = re.compile(r"`+")
+
+
+def _has_content(text: str) -> bool:
+    """Is there anything in `text` but whitespace and punctuation? A
+    symbol counts: CommonMark's flanking rules treat one as punctuation
+    (see _is_punct), which decides how a marker beside it parses, but a
+    reader sees an "=" or an emoji as much as a word."""
+    return any(not ch.isspace() and not unicodedata.category(ch).startswith("P")
+               for ch in text)
+
+
+def mask_code(text: str) -> str:
+    """`text` with everything inside code blanked out (newlines kept,
+    so lines and their offsets still line up), since a marker in code
+    is content rather than emphasis. CommonMark closes a run of N
+    backticks with the next run of exactly N, which is what markdownify
+    writes when the code itself holds a backtick (``a`b``) and what a
+    fence is at block level, and a span may run past the end of a line.
+    A run with no partner opens nothing and is left as the literal text
+    it is."""
+    runs = list(_BACKTICK_RUN_RE.finditer(text))
+    out = list(text)
+    index = 0
+    while index < len(runs):
+        opener = runs[index]
+        close = next((n for n in range(index + 1, len(runs))
+                      if runs[n].group(0) == opener.group(0)), None)
+        if close is None:
+            index += 1
+            continue
+        for position in range(opener.start(), runs[close].end()):
+            if out[position] != "\n":
+                out[position] = "\x00"
+        index = close + 1
+    return "".join(out)
+
+
+def _unreadable_spans(body: str):
+    """(line index, start, end) of every emphasis span in a converted
+    body whose markers CommonMark will not read -- the reader is shown
+    the markers instead."""
+    lines, masked = body.split("\n"), mask_code(body).split("\n")
+    for index, (line, blanked) in enumerate(zip(lines, masked)):
+        if "*" not in blanked:
+            continue
+        for match in EMPHASIS_RE.finditer(blanked):
+            inner = line[match.start(2):match.end(2)]
+            before = line[match.start() - 1] if match.start() else ""
+            after = line[match.end()] if match.end() < len(line) else ""
+            if not _flanks_left(before, inner[0]) or \
+                    not _flanks_right(inner[-1], after):
+                yield index, match.start(), match.end()
+
+
+def unparsed_emphasis(body: str):
+    """Every emphasis span CommonMark will not read, as (line number,
+    the span). Both the conversion and `lint` use it: one to write HTML
+    where Markdown will not carry the emphasis, the other to fail if
+    any is left."""
+    lines = body.split("\n")
+    for index, start, end in _unreadable_spans(body):
+        yield index + 1, lines[index][start:end]
+
+
+def emphasis_as_html(markdown: str) -> str:
+    """Emphasis CommonMark will not read, written as the HTML tag it
+    means. The alternative is moving the marker past the punctuation in
+    its way, which changes which characters are emphasized; the tag
+    keeps the span exactly and every renderer these sites use reads
+    inline HTML."""
+    lines = markdown.split("\n")
+    # from the last span back, so the offsets of the ones before it
+    # still hold as each is replaced
+    for index, start, end in reversed(list(_unreadable_spans(markdown))):
+        span = lines[index][start:end]
+        marker = "**" if span.startswith("**") else "*"
+        tag = "strong" if marker == "**" else "em"
+        inner = span[len(marker):-len(marker)]
+        lines[index] = (lines[index][:start] + f"<{tag}>{inner}</{tag}>"
+                        + lines[index][end:])
+    return "\n".join(lines)
+
+
 class _Converter(MarkdownConverter):
     """markdownify, with two code-fence tweaks and figure preservation.
 
@@ -68,7 +190,8 @@ class _Converter(MarkdownConverter):
     its own HTML block and still render the image and caption Markdown
     between them; the site exporters rewrite the shell to their native
     figure form, which is regular enough to match exactly (see
-    hugo.figure_shortcodes, pelican.figure_blocks, myst.myst_figures)."""
+    hugo.figure_shortcodes, pelican.figure_directives,
+    myst.myst_figures)."""
 
     def convert_figure(self, el, text, parent_tags):
         if not _captioned_figure(el):
@@ -606,10 +729,19 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         else:
             iframe.replace_with(doc.new_tag("p", string="[missing embed]"))
 
-    # Medium's editor emits things like <strong> </strong> between runs;
-    # markdownify drops whitespace-only emphasis, losing the space.
+    # Medium's editor emits things like <strong> </strong> between runs,
+    # and <strong>.</strong> or <em>,</em> where a run ends on its
+    # punctuation. markdownify drops the whitespace-only ones, losing
+    # the space; the punctuation-only ones it keeps, and they are how a
+    # reader ends up looking at `task**.**`, since CommonMark will not
+    # open a marker between a word character and punctuation. Emphasis
+    # on nothing but punctuation is emphasis on nothing, so both go.
+    # A symbol is not punctuation here, whatever the flanking rules
+    # count it as: <strong>=</strong> and <strong>🔥</strong> are
+    # something a reader sees, and emphasis on them is meant. Where the
+    # markers for one will not parse, emphasis_as_html writes the tag.
     for el in body.find_all(["strong", "em", "b", "i"]):
-        if el.parent is not None and not el.get_text().strip():
+        if el.parent is not None and not _has_content(el.get_text()):
             el.replace_with(el.get_text())
 
     # The rendered page links same-publication posts relatively; those
@@ -626,6 +758,10 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered
     # page serves plain spaces. Normalize so output is stable across sources.
     markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
+    # what is left of the emphasis Medium wrote against punctuation:
+    # spans whose markers CommonMark will not read, written as the tag
+    # they mean (see emphasis_as_html)
+    markdown = emphasis_as_html(markdown)
     # markdownify renders the grid-separating <br>s as whitespace-only
     # "hard break" lines; those are just blank lines to Markdown, so
     # normalize them away -- except in code fences, where whitespace is

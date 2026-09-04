@@ -32,6 +32,10 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote
 
+# the CommonMark emphasis rules live with the conversion that has to
+# satisfy them; this is the only thing lint borrows from it
+from .convert import unparsed_emphasis
+
 # Nav/UI text and link markers that only occur in Medium page chrome,
 # never in an article body.
 CHROME_RE = re.compile(
@@ -225,6 +229,12 @@ def lint_post(post_dir: Path, seo: bool = False, embeds: bool = False,
                                     f"{m.group(1)[:80]}")
                 else:
                     errors.append(f"remote Medium CDN image: {m.group(1)[:80]}")
+
+    for number, span in unparsed_emphasis(body):
+        errors.append(
+            f"emphasis CommonMark will not read, line {number}: {span[:60]!r} "
+            "(the reader is shown the markers; convert writes these as "
+            "<em>/<strong>, so re-run it)")
 
     if sum(1 for line in body.split("\n") if FENCE_RE.match(line)) % 2:
         errors.append("odd number of code-fence lines (unclosed fence)")

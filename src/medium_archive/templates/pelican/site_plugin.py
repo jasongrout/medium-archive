@@ -106,7 +106,7 @@ SIZES_ATTR = "(max-width: 800px) 100vw, 736px"
 # with no src in it, leaving the image unprocessed and its marker on.
 IMG_TAG = r"""<img\b(?:[^>"']|"[^"]*"|'[^']*')*>"""
 IMG_TAG_RE = None   # compiled on first use
-# Which images this pass may touch: the ones the Markdown extension
+# Which images this pass may touch: the ones the config's reader
 # marked, and only those. The marker is how a body image is told from
 # one the theme rendered, since by this point -- the finished HTML --
 # the two are indistinguishable markup. A path rule cannot stand in for
@@ -120,14 +120,14 @@ VARIANT_SUFFIXES = (".jpg", ".jpeg")
 
 
 def _prioritize_first_images(pelican_obj):
-    # Every body image loads lazily (the _BodyImages extension). The
-    # first one on a post page is the one most likely on screen at
-    # load, so it is fetched eagerly and first instead, as WordPress
-    # treats the first content image: lazy-loading the largest visible
-    # image delays the page's largest contentful paint. Body images
-    # alone qualify -- the header avatar and the related-post cards are
-    # not marked, so they cannot be picked; with none, the page is left
-    # as it is.
+    # Every body image loads lazily (the config's reader marks them as
+    # it renders). The first one on a post page is the one most likely
+    # on screen at load, so it is fetched eagerly and first instead, as
+    # WordPress treats the first content image: lazy-loading the
+    # largest visible image delays the page's largest contentful paint.
+    # Body images alone qualify -- the header avatar and the
+    # related-post cards are not marked, so they cannot be picked; with
+    # none, the page is left as it is.
     import glob
     import os
     import re
@@ -367,4 +367,7 @@ class _SitePlugins:
         signals.finalized.connect(_write_crawl_files)
 
 
-PLUGINS = [_SitePlugins]
+# _CommonMarkPlugin comes from the generated config's own section,
+# above this one: it puts the CommonMark reader in front of pelican's
+# python-markdown one.
+PLUGINS = [_CommonMarkPlugin, _SitePlugins]

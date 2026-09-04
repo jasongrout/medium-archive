@@ -293,7 +293,8 @@ Medium era keep working too.
 
 Tools: Hugo extended (0.128 or newer, for the generated config's
 `[pagination]` table; validated with 0.140 and 0.158),
-`pip install pelican markdown pillow`, `npm install -g mystmd pagefind`,
+`pip install pelican markdown-it-py mdit-py-plugins pyyaml pillow`,
+`npm install -g mystmd pagefind`,
 and optionally gifsicle (without it, animated-gif display copies keep
 their full size).
 

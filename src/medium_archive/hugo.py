@@ -59,8 +59,8 @@ from .sites import (Covers, ImagePlacer, author_links, author_names,
                     author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, load_site_inputs,
-                    old_paths, page_stems, redirect_rules, redirects_file,
-                    rewrite_figures, site_profiles, tag_names,
+                    old_paths, page_stems, quote_arg, redirect_rules,
+                    redirects_file, rewrite_figures, site_profiles, tag_names,
                     write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
@@ -116,7 +116,7 @@ def figure_shortcodes(markdown: str) -> str:
     generated config for it, and for the old bodies that carry HTML
     fragments of their own."""
     def call(alt, src, link, caption):
-        q = lambda v: v.replace(chr(92), "").replace(chr(34), chr(92) + chr(34))
+        q = quote_arg                        # shared with the pelican exporter
         args = f'src="{src}"'
         # plain text, like the pelican exporter's: an alt is prose for a
         # screen reader, and the two sites should read it out the same

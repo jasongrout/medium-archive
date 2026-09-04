@@ -939,6 +939,25 @@ def caption_text(caption: str) -> str:
     return " ".join(text.split())
 
 
+def quote_arg(value: str) -> str:
+    """A value for a double-quoted argument on an exporter's own
+    directive or shortcode line (hugo's figure shortcode, the pelican
+    figure directive): inner quotes escaped so they do not end the
+    argument, and backslashes dropped.
+
+    Dropping rather than escaping them is hugo's doing. Its shortcode
+    lexer gives a backslash meaning only before a quote; but a value
+    that carries one escaped quote then goes through
+    ignoreEscapesAndEmit, which strips every backslash in it ("We don't
+    send the backslash back to the client"). So `\\\\` would reach hugo as
+    two literal backslashes in one value and as none in another, while
+    shlex.split gives the pelican reader one either way -- and the two
+    sites are meant to carry the same alt text, which a test holds them
+    to. Dropping is lossy and identical; no alt or link in a real
+    archive has held a backslash yet."""
+    return value.replace("\\", "").replace('"', '\\"')
+
+
 def first_image(markdown: str) -> str | None:
     """The images/<name> reference of the first body image, or None. The
     first image of a post is usually in the first screen, so the site
@@ -1007,8 +1026,8 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
     pelican): one content/posts/<stem>/index.md per post -- front matter
     from front_matter(url, post), body with in-publication links rewritten
     to /posts/<stem>/ and then through transform() when given (a
-    generator-specific whole-body rewrite, like pelican's figure
-    markdown="1" opt-in) -- plus the post's images beside it (through
+    generator-specific whole-body rewrite, like each exporter's own
+    figure form) -- plus the post's images beside it (through
     placer, when given -- see ImagePlacer) and its baked card cover
     (covers, when given -- see Covers). Returns the page count."""
     links = LinkMap(manifest, stems)
