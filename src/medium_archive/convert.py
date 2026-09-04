@@ -29,7 +29,7 @@ from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     parse_ld_json, strip_title_prefix)
 from .state import (apollo_post_state, gist_blocks, gist_code_blocks,
                     state_body, state_metadata, state_title)
-from .readme import write_readme
+from .readme import write_posts_readme, write_readme, write_sites_readme
 from .tags import load_tag_map
 from .urls import (canonical_url, carbon_id, medium_id, resolve_canonical,
                    slug_of, tweet_id)
@@ -1025,15 +1025,16 @@ def cmd_convert(args):
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     if manifest:
         write_redirects(manifest, args.out)
-    # The archive README describes the layout convert itself writes, so
-    # it is rewritten on every run rather than only when missing: an
+    # The READMEs describe the layout convert itself writes, so they are
+    # brought up to date on every run rather than only when missing: an
     # archive kept in version control would otherwise carry a README
-    # describing an older tool. It is generated, not hand-written --
-    # corrections belong in readme.py. An archive whose publication
-    # cannot be named yet keeps whatever README it has.
-    base = args.base or archive_base(args.out)
-    if base or not (args.out / "README.md").exists():
-        write_readme(args.out, base or "(unknown publication)")
+    # describing an older tool. They are generated, not hand-written --
+    # corrections belong in readme.py. A run with nothing new to say
+    # leaves them, and their mtimes, untouched (see write_if_changed).
+    write_readme(args.out, args.base or archive_base(args.out)
+                 or "(unknown publication)")
+    write_posts_readme(args.out)
+    write_sites_readme(args.out)
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
     # A tags.json entry that changed no post is stale config -- fail
     # loudly, like a fixup that no longer applies. Only a complete run
