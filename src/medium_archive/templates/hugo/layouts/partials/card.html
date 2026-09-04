@@ -17,7 +17,10 @@
 <div class="card-body">
 {{ with .GetTerms "tags" }}<p class="card-tags">{{ range . }}<a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a> {{ end }}</p>{{ end }}
 <h2 class="card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-<p class="card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
+{{/* the curated description convert writes, as the pelican card
+     renders it; .Summary (Hugo's auto-summary of the body) is the
+     fallback for a post that has none */}}
+<p class="card-excerpt">{{ or .Description .Summary | plainify | truncate 150 }}</p>
 <p class="card-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>{{ with .GetTerms "authors" }} · {{ range $i, $a := . }}{{ if $i }}, {{ end }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}</p>
 </div>
 </article>

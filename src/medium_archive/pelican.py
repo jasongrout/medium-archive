@@ -98,6 +98,18 @@ TEMPLATES = {
 
 IMAGE_RE = re.compile(r"\]\((images/[^)\s]+)\)")
 
+# What marks an <img> as a post's own body image, for the site plugin's
+# post-build pass; it strips the attribute again as it rewrites. Most
+# images reach the page through the Markdown tree, where the generated
+# config's _BodyImages extension sets this. A captioned one does not:
+# the figure shell below writes the tag itself, as literal HTML the
+# tree never sees, so it has to set the same mark here. Both are the
+# article's own content, which is the whole point -- an <img> the theme
+# renders (a listing or related-post card) is neither, and so is never
+# marked. Keep in step with BODY_IMAGE_ATTR in
+# templates/pelican/site_plugin.py; a test holds the two together.
+BODY_IMAGE_ATTR = "data-body-image"
+
 
 def attach_images(line: str) -> str:
     """Colocated image references become {attach} links, so Pelican
@@ -110,9 +122,12 @@ FIGURE_TAG_RE = re.compile(r"^<(figure|figcaption)>$", re.M)
 
 def figure_blocks(markdown: str) -> str:
     """Convert's figure shells in the form python-markdown renders the
-    way Medium served them: one HTML block, the img a literal tag (the
-    site plugin's post-build pass gives any body <img> its srcset and
-    dimensions), the caption opted in to inline processing -- both
+    way Medium served them: one HTML block, the img a literal tag
+    (marked as a body image, since the tag is written here rather than
+    rendered from the Markdown tree the config's extension marks; the
+    site plugin's post-build pass reads that mark to give the img its
+    srcset and dimensions, and strips it), the caption opted in to
+    inline processing -- both
     markdown="span", which python-markdown's md_in_html (part of the
     `extra` extension the generated config enables) needs to render the
     caption's Markdown at all, and which keeps img and caption out of
@@ -125,7 +140,8 @@ def figure_blocks(markdown: str) -> str:
         esc = lambda v: (v.replace("&", "&amp;").replace('"', "&quot;")
                          .replace("<", "&lt;"))
         alt = alt or caption_text(caption)    # the caption describes it
-        img = f'<img alt="{esc(alt)}" src="{src}" loading="lazy">'
+        img = (f'<img alt="{esc(alt)}" src="{src}" loading="lazy"'
+               f' {BODY_IMAGE_ATTR}="">')
         if link:
             img = f'<a href="{esc(link)}">{img}</a>'
         return ('<figure markdown="span">\n'
@@ -207,6 +223,8 @@ def build_site(out):
         # themes' html announcement option), or literal HTML
         announcement=(json.dumps(config["announcement"], ensure_ascii=False)
                       if config.get("announcement") else "None"),
+        # the landing-page blurb, Markdown; the config renders it
+        intro=setting(config.get("intro")),
         noindex="True" if config.get("noindex") else "False",
         twitter=setting(config.get("twitter")),
         profiles=json.dumps(site_profiles(config)),
