@@ -144,7 +144,7 @@ These embed verbatim in both engines' pages, so they must carry no
   block, spliced into the post templates beside `image-zoom.html`,
   since only article pages have code blocks. Every `<pre>` in the
   article is one, whatever the engine wrapped it in (a fenced block
-  from convert, a Goldmark or codehilite highlight div, an inlined
+  from convert, a Goldmark or Pygments highlight div, an inlined
   gist or Carbon snippet inside a figure): the script wraps each in a
   `.code-block` div, the positioning box `card.css` pins the button
   to, so a wide block scrolls under the button rather than carrying it
@@ -172,7 +172,8 @@ These embed verbatim in both engines' pages, so they must carry no
   applies both
   through the token rules under `.post .highlight`, on the class
   names Chroma (Hugo, with `noClasses` off in `hugo.toml.tmpl`) and
-  Pygments (Pelican's codehilite) share.
+  Pygments (Pelican, through the fence rule in the generated config's
+  reader, which names the same `highlight` class) share.
 - `card.css` is the card-grid look, written as both the hugo theme's
   and the pelican theme's stylesheet.
 
@@ -247,15 +248,27 @@ regular list and taxonomy pages share `list.html`), plus:
 
 ## pelican/
 
-- `pelicanconf.py.tmpl` is the generated config, including the
-  `_BodyImages` Markdown extension (body images load lazily, and are
-  marked as bodies' for the site plugin's post-build pass) and
-  `TAG_DISPLAY` and `AUTHOR_DISPLAY`, the slug-to-name maps for tags
-  and authors (both reach Pelican as slugs so their URLs are exact;
-  see `tags.py` and `sites.author_slug`). It also renders `INTRO`,
-  site.json's landing-page blurb, from Markdown: `index.html` emits it
-  into the same `.intro` block the hugo landing page uses, and Jinja
-  has no Markdown filter to do it in the theme.
+- `pelicanconf.py.tmpl` is the generated config. Most of it is the
+  CommonMark reader that replaces Pelican's python-markdown one
+  (`pip install markdown-it-py mdit-py-plugins`), which is where
+  everything this site needs from the Markdown layer hangs: heading
+  ids for search anchors, Pygments on the `highlight` class the shared
+  stylesheet styles, Pelican's `{attach}` placeholders (markdown-it
+  percent-encodes a link target, so the braces are put back before
+  Pelican's intra-site pass looks for them), the marking that tells
+  the site plugin's post-build pass which images are a body's, and the
+  `::: figure` directive the exporter writes for a captioned image --
+  the counterpart of the hugo theme's figure shortcode, rendering the
+  caption with this same parser so it is not raw HTML in the content.
+  The reader is registered through a plugin whose `register()` builds
+  the class, so the config can be read (and tested) without Pelican
+  installed. The config also carries `TAG_DISPLAY` and
+  `AUTHOR_DISPLAY`, the slug-to-name maps for tags and authors (both
+  reach Pelican as slugs so their URLs are exact; see `tags.py` and
+  `sites.author_slug`), and renders `INTRO`, site.json's landing-page
+  blurb, through the reader's own parser: `index.html` emits it into
+  the same `.intro` block the hugo landing page uses, and Jinja has no
+  Markdown filter to do it in the theme.
 - `site_plugin.py` is appended verbatim after the filled config. It
   gives Pelican the redirect stubs Hugo renders for aliases (and the
   `_redirects` file both exporters write), the responsive body images
@@ -269,7 +282,10 @@ regular list and taxonomy pages share `list.html`), plus:
   and the per-term feeds both pick them up; both reach Pelican as
   slugs, so their URLs match the hugo site's exactly). It refers to
   names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
-  `AUTHOR_DISPLAY`, `NOINDEX`), so it is not importable on its own.
+  `AUTHOR_DISPLAY`, `NOINDEX`, and the reader's plugin class in its
+  `PLUGINS` line), so it is not importable on its own; the config in
+  turn takes `BODY_IMAGE_ATTR` from it, the one definition of the
+  marker both halves use.
 - `theme/templates/jsonld.html` is the hugo partial of the same name
   in Jinja, included by `base.html` after the page's address, name
   and share image are set; author profiles come from `AUTHOR_LINKS`

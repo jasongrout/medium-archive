@@ -2,13 +2,21 @@
 the converted archive. Same reproducibility contract as the myst step
 (see sites.py); render with `pelican -l` (serve) or `pelican` (build)
 inside <out>/site-pelican/ (https://getpelican.com, `pip install
-pelican markdown`).
+pelican markdown-it-py mdit-py-plugins`).
+
+The site reads CommonMark rather than the python-markdown dialect
+Pelican reads by default: the generated config carries a reader built
+on markdown-it-py, which replaces Pelican's own (see the config
+template). That is where everything this site needs from the Markdown
+layer hangs -- heading ids, Pygments on the class the shared theme
+styles, Pelican's {attach} placeholders, the body-image marking, and
+the figure directive below.
 
 Each post becomes content/posts/<stem>/index.md with its images beside
 it; image references are rewritten to Pelican's `{attach}` form so the
 files publish next to the article at /posts/<stem>/. Body images load
-lazily (a small Markdown extension embedded in the generated config)
-and are served responsively: after each build the embedded plugin
+lazily (the reader marks every image in an article's body) and are
+served responsively: after each build the embedded plugin
 encodes webp variants of every still body image at the same widths as
 the hugo theme's render hook (480/736/1104, never upscaled,
 mtime-cached) and rewrites the article's img tags with srcset/sizes
@@ -73,7 +81,7 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_links,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
                     image_size, load_site_inputs, page_stems,
-                    rewrite_figures, site_profiles, tag_names,
+                    quote_arg, rewrite_figures, site_profiles, tag_names,
                     template_text, write_redirects_csv, write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
@@ -98,18 +106,6 @@ TEMPLATES = {
 
 IMAGE_RE = re.compile(r"\]\((images/[^)\s]+)\)")
 
-# What marks an <img> as a post's own body image, for the site plugin's
-# post-build pass; it strips the attribute again as it rewrites. Most
-# images reach the page through the Markdown tree, where the generated
-# config's _BodyImages extension sets this. A captioned one does not:
-# the figure shell below writes the tag itself, as literal HTML the
-# tree never sees, so it has to set the same mark here. Both are the
-# article's own content, which is the whole point -- an <img> the theme
-# renders (a listing or related-post card) is neither, and so is never
-# marked. Keep in step with BODY_IMAGE_ATTR in
-# templates/pelican/site_plugin.py; a test holds the two together.
-BODY_IMAGE_ATTR = "data-body-image"
-
 
 def attach_images(line: str) -> str:
     """Colocated image references become {attach} links, so Pelican
@@ -117,49 +113,41 @@ def attach_images(line: str) -> str:
     return IMAGE_RE.sub(r"]({attach}\1)", line)
 
 
-FIGURE_TAG_RE = re.compile(r"^<(figure|figcaption)>$", re.M)
+def figure_directives(markdown: str) -> str:
+    """Convert's figure shells as calls to the figure directive the
+    generated config's reader renders, the caption as the directive's
+    body -- the counterpart of the hugo exporter's figure shortcode,
+    and for the same reasons. An attribute could not carry the
+    caption's Markdown (links, emphasis), and rendering the shell as
+    raw HTML instead, as this exporter did while pelican rendered with
+    python-markdown, needs that library's md_in_html extension to
+    render the caption at all: CommonMark says the contents of an HTML
+    block are raw. Rendering through the directive also keeps the img
+    and the caption out of <p> wrappers, marks the img as a body image
+    for the site plugin's post-build pass, and renders the caption with
+    the site's own parser, so it picks up whatever extensions the
+    config enables.
 
+    A shell around anything else (the link an embed became, an inlined
+    gist) stays raw HTML, which the reader passes through: its lines
+    are blank-line separated, which ends the HTML block and leaves the
+    Markdown between them to be parsed as Markdown.
 
-def figure_blocks(markdown: str) -> str:
-    """Convert's figure shells in the form python-markdown renders the
-    way Medium served them: one HTML block, the img a literal tag
-    (marked as a body image, since the tag is written here rather than
-    rendered from the Markdown tree the config's extension marks; the
-    site plugin's post-build pass reads that mark to give the img its
-    srcset and dimensions, and strips it), the caption opted in to
-    inline processing -- both
-    markdown="span", which python-markdown's md_in_html (part of the
-    `extra` extension the generated config enables) needs to render the
-    caption's Markdown at all, and which keeps img and caption out of
-    <p> wrappers. A shell around anything but a single image (the link
-    an embed became) keeps its blank-line-separated lines instead,
-    opted in with markdown="1" so the Markdown between them renders.
     The image reference already carries the {attach} prefix: escape
-    runs first."""
-    def block(alt, src, link, caption):
-        # ">" as much as "<": an alt reading "File -> Hub Control Panel"
-        # otherwise ends the tag early for anything reading it with a
-        # regex -- pelican's own intra-site link pass among them, which
-        # then leaves the {attach} in src unresolved and the image
-        # broken on the page
-        esc = lambda v: (v.replace("&", "&amp;").replace('"', "&quot;")
-                         .replace("<", "&lt;").replace(">", "&gt;"))
-        # plain text, never Markdown: this goes inside an attribute of a
-        # markdown="span" block, where python-markdown still runs its
-        # inline patterns, and a `code span` in an alt would become a
-        # real <code> tag inside the attribute -- the same early end,
-        # arrived at from the other direction
+    runs first. It is left exactly as it is here -- the reader writes
+    it into an attribute, which no parser touches, so pelican's
+    intra-site link pass resolves it on the rendered page."""
+    def directive(alt, src, link, caption):
+        args = f'src="{src}"'
+        # plain text, like the hugo exporter's: an alt is prose for a
+        # screen reader, and the two sites should read it out the same
         alt = caption_text(alt or caption)    # the caption describes it
-        img = (f'<img alt="{esc(alt)}" src="{src}" loading="lazy"'
-               f' {BODY_IMAGE_ATTR}="">')
+        if alt:
+            args += f' alt="{quote_arg(alt)}"'
         if link:
-            img = f'<a href="{esc(link)}">{img}</a>'
-        return ('<figure markdown="span">\n'
-                f"{img}\n"
-                f'<figcaption markdown="span">{caption}</figcaption>\n'
-                "</figure>")
-    markdown = rewrite_figures(markdown, block)
-    return FIGURE_TAG_RE.sub(r'<\1 markdown="1">', markdown)
+            args += f' link="{quote_arg(link)}"'
+        return f"::: figure {args}\n{caption}\n:::"
+    return rewrite_figures(markdown, directive)
 
 
 def _meta(key: str, value: str) -> str:
@@ -205,7 +193,7 @@ def build_site(out):
     pages = export_content(out, site, manifest, stems, front_matter,
                            escape=attach_images,
                            placer=ImagePlacer(out, config),
-                           transform=figure_blocks, covers=covers)
+                           transform=figure_directives, covers=covers)
 
     # the header logo and the tab icon, shipped through the theme's
     # static dir

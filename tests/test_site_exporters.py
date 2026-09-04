@@ -2,8 +2,9 @@
 
 import json
 import re
+import sys
 from pathlib import Path
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
@@ -127,24 +128,107 @@ def test_hugo_page_keeps_caption_in_its_figure(archive):
     assert (site / "layouts/partials/post-image.html").exists()
 
 
-def test_pelican_page_renders_the_figure_shell_as_one_block(archive):
+def config_parser(site):
+    """The markdown-it parser the generated config reads posts with.
+    The config is executable Python, and its reader is built where a
+    pelican build would build it, so this is the same parser the site
+    renders with -- without needing pelican itself installed."""
+    namespace = {}
+    exec(compile((site / "pelicanconf.py").read_text(), "pelicanconf.py",
+                 "exec"), namespace)
+    return namespace, namespace["_make_md"]()
+
+
+def test_pelican_page_writes_the_figure_directive(archive):
+    """The shell becomes the figure directive the generated config's
+    reader renders -- the counterpart of the hugo exporter's figure
+    shortcode. The caption is the directive's body, so it can hold
+    Markdown an attribute could not, and the reader renders it with the
+    site's own parser: CommonMark says the contents of an HTML block
+    are raw, so a raw <figure> in the content would show the caption's
+    Markdown to the reader."""
     site = pelican.build_site(captioned_archive(archive))
     page = (site / "content/posts/captioned-post/index.md").read_text()
-    assert ('<figure markdown="span">\n'
-            '<img alt="Alt text" src="{attach}images/001-fig.gif" '
-            'loading="lazy" data-body-image="">\n'
-            '<figcaption markdown="span">The caption, with a '
-            "[link](https://example.com).</figcaption>\n"
-            "</figure>") in page
-    # python-markdown's md_in_html (span mode) renders the caption's
-    # Markdown inline: no <p> wrappers around the img or the caption,
-    # matching the markup Medium serves
-    import markdown as md_mod
-    body = page.split("\n\n", 1)[1]
-    html = md_mod.markdown(body, extensions=["extra"])
+    assert ('::: figure src="{attach}images/001-fig.gif" alt="Alt text"\n'
+            "The caption, with a [link](https://example.com).\n"
+            ":::") in page
+
+    _, md = config_parser(site)
+    html = md.render(page.split("\n\n", 1)[1])
+    # no <p> wrappers around the img or the caption, matching the
+    # markup Medium serves and the hugo shortcode renders
     assert "<p><img" not in html and "<figcaption><p>" not in html
     assert ('<figcaption>The caption, with a '
             '<a href="https://example.com">link</a>.</figcaption>') in html
+    # the image is the article's own body image, and keeps the {attach}
+    # pelican resolves on the rendered page
+    assert ('<img alt="Alt text" src="{attach}images/001-fig.gif" '
+            'loading="lazy" data-body-image="">') in html
+
+
+def test_the_figure_directive_escapes_what_it_renders(archive):
+    """The caption is Markdown, rendered by the site's parser; what it
+    renders into an HTML attribute or a text node has to be escaped
+    there, not left to the exporter."""
+    _, md = config_parser(pelican.build_site(archive))
+    html = md.render('::: figure src="images/a.png" alt="R&D, 5 < 6"\n'
+                     "A `code` span, R&D and 5 < 6.\n:::\n")
+    assert 'alt="R&amp;D, 5 &lt; 6"' in html
+    assert ("<figcaption>A <code>code</code> span, R&amp;D and 5 &lt; 6."
+            "</figcaption>") in html
+
+
+def test_the_reader_registers_through_a_receiver_that_outlives_it(archive):
+    """pelican holds a signal's receivers weakly, so a receiver defined
+    inside register() is collected on the way out and the reader never
+    registers at all -- a build that silently falls back to
+    python-markdown and renders every figure directive as text. The
+    receiver has to be reachable after register() returns, which means
+    the config's own module namespace holds it."""
+    namespace, _ = config_parser(pelican.build_site(archive))
+    connected = []
+    stub = ModuleType("pelican")
+    stub.signals = SimpleNamespace(
+        readers_init=SimpleNamespace(connect=connected.append))
+    saved = sys.modules.get("pelican")
+    sys.modules["pelican"] = stub
+    try:
+        namespace["_CommonMarkPlugin"].register()
+    finally:
+        if saved is None:
+            del sys.modules["pelican"]
+        else:
+            sys.modules["pelican"] = saved
+    receiver, = connected
+    assert any(receiver is value for value in namespace.values())
+
+
+def test_the_config_reads_commonmark(archive):
+    """The reader is a CommonMark parser (markdown-it-py), with the
+    pieces this site needs hung off it. python-markdown, which pelican
+    reads with by default, follows no specification and differs on all
+    of these."""
+    _, md = config_parser(pelican.build_site(archive))
+
+    # heading ids, as the search page's per-section anchors
+    assert '<h2 id="voila-and-friends">' in md.render("## Voilà and friends\n")
+    # code blocks on the class the shared stylesheet styles, which is
+    # also the one hugo's chroma emits
+    assert '<div class="highlight">' in md.render("```python\nx = 1\n```\n")
+    assert '<div class="highlight">' in md.render("```\nplain\n```\n")
+    # pelican's placeholders survive the parser's URL encoding, so its
+    # intra-site pass still finds them on the rendered page
+    assert 'src="{attach}images/a.png"' in md.render("![x]({attach}images/a.png)")
+    assert 'href="{attach}notes.pdf"' in md.render("[x]({attach}notes.pdf)")
+    # tables, footnotes and definition lists are on
+    assert "<table>" in md.render("| a | b |\n|---|---|\n| 1 | 2 |\n")
+    assert "footnote" in md.render("A[^1]\n\n[^1]: note\n")
+    assert "<dl>" in md.render("term\n: meaning\n")
+    # and the specification is followed where python-markdown guessed:
+    # a bare <word> is text, not a dropped tag, and a list that starts
+    # at 3 says so
+    assert "&lt;my_package&gt;" in md.render("recipes/<my_package>\n")
+    assert '<ol start="3">' in md.render("3. third\n4. fourth\n")
 
 
 def test_link_wrapped_figures_keep_their_link():
@@ -153,23 +237,20 @@ def test_link_wrapped_figures_keep_their_link():
     assert hugo.figure_shortcodes(shell) == (
         '{{< figure src="images/a.png" alt="Alt" '
         'link="https://demo.example" >}}Cap.{{< /figure >}}')
-    assert pelican.figure_blocks(shell) == (
-        '<figure markdown="span">\n'
-        '<a href="https://demo.example">'
-        '<img alt="Alt" src="images/a.png" loading="lazy" '
-        'data-body-image=""></a>\n'
-        '<figcaption markdown="span">Cap.</figcaption>\n</figure>')
+    assert pelican.figure_directives(shell) == (
+        '::: figure src="images/a.png" alt="Alt" '
+        'link="https://demo.example"\nCap.\n:::')
 
 
 def test_non_image_figure_shells_stay_raw_html():
     shell = ("<figure>\n\n[embed: https://u](https://u)\n\n<figcaption>\n\n"
              "Cap.\n\n</figcaption>\n\n</figure>")
-    # hugo leaves them to Goldmark's unsafe renderer as they are;
-    # pelican opts the tag lines into markdown so the content renders
+    # neither exporter touches them: hugo leaves them to Goldmark's
+    # unsafe renderer, and the pelican reader passes an HTML block
+    # through the same way. Their lines are blank-line separated, which
+    # ends the HTML block, so the Markdown between them still renders.
     assert hugo.figure_shortcodes(shell) == shell
-    assert pelican.figure_blocks(shell) == shell.replace(
-        "<figure>", '<figure markdown="1">').replace(
-        "<figcaption>", '<figcaption markdown="1">')
+    assert pelican.figure_directives(shell) == shell
 
 
 def test_hugo_site_config_and_front_matter(archive, capsys):
@@ -453,7 +534,9 @@ def test_pelican_site(archive):
     assert "FEED_MAX_ITEMS = 20" in config
     assert 'THEME = "theme"' in config
     assert '"search.html": "search/index.html"' in config
-    assert "_BodyImages" in config           # body images load lazily
+    # the CommonMark reader replaces pelican's python-markdown one, and
+    # takes its settings with it
+    assert "_CommonMarkReader" in config and "MARKDOWN = {" not in config
     assert 'AVATAR = "theme/img/avatar.png"' in config
     assert (site / "theme/static/img/avatar.png").read_bytes() == b"IMG"
     assert 'FAVICON = "theme/favicon.svg"' in config
@@ -466,7 +549,7 @@ def test_pelican_site(archive):
     assert (site / "redirects.csv").exists()
     # the embedded plugin turns redirects.csv into redirect stubs and
     # rewrites body images into responsive webp variants
-    assert "PLUGINS = [_SitePlugins]" in config
+    assert "PLUGINS = [_CommonMarkPlugin, _SitePlugins]" in config
     assert "signals.finalized" in config and "redirects.csv" in config
     assert "_optimize_article_images" in config
     assert "VARIANT_WIDTHS = (480, 736, 1104)" in config
@@ -1340,10 +1423,10 @@ def test_alt_text_falls_back_to_the_caption():
     shell = ("<figure>\n\n![](images/1.png)\n\n<figcaption>\n\nA [chart](https://x.y) of *it*"
              "\n\n</figcaption>\n\n</figure>")
     assert 'alt="A chart of it"' in hugo.figure_shortcodes(shell)
-    assert 'alt="A chart of it"' in pelican.figure_blocks(shell)
+    assert 'alt="A chart of it"' in pelican.figure_directives(shell)
     given = shell.replace("![]", "![Given]")
     assert 'alt="Given"' in hugo.figure_shortcodes(given)
-    assert 'alt="Given"' in pelican.figure_blocks(given)
+    assert 'alt="Given"' in pelican.figure_directives(given)
 
 
 def test_intro_reaches_both_landing_pages(archive):
@@ -1390,48 +1473,41 @@ def test_body_images_are_marked_where_only_a_body_image_can_be(archive):
     and no path rule separates them -- a related-post card points into
     another post's own images/ directory, exactly where that post's
     body images live. So the distinction is recorded upstream, in the
-    Markdown extension, which is the counterpart of the hugo theme's
-    render hook: every img in an article's tree is a body image, and a
-    card is not in that tree to be reached. The pass keys off the mark
-    and strips it, so no reader sees it."""
-    namespace = {}
-    exec(compile((pelican.build_site(archive) / "pelicanconf.py").read_text(),
-                 "pelicanconf.py", "exec"), namespace)
+    reader, which is the counterpart of the hugo theme's render hook:
+    every image the reader renders is in an article's body, and a card
+    the theme renders never passes through it. The pass keys off the
+    mark and strips it, so no reader sees it."""
+    site = pelican.build_site(archive)
+    namespace, md = config_parser(site)
     assert namespace["BODY_IMAGE_ATTR"] == "data-body-image"
     # the path rule this replaced must not creep back: it is what took
     # a card's cover.jpg for a body image
     assert "ARTICLE_IMG" not in namespace and "VARIANT_IMG" not in namespace
 
-    # the extension really marks what the Markdown tree holds
-    import markdown as md_mod
-    html = md_mod.markdown("Text.\n\n![pic](images/001-pic.png)\n",
-                           **namespace["MARKDOWN"])
+    # one definition of the marker in the generated file, which the
+    # reader half takes from the plugin half appended after it
+    config = (site / "pelicanconf.py").read_text()
+    assert config.count("BODY_IMAGE_ATTR = ") == 1
+
+    # the reader really marks what an article's body holds, both the
+    # images written as Markdown and the one a figure directive names
+    html = md.render("Text.\n\n![pic](images/001-pic.png)\n")
     assert 'data-body-image=""' in html and 'loading="lazy"' in html
+    figure = md.render('::: figure src="images/a.png" alt="A"\nCap.\n:::\n')
+    assert 'data-body-image=""' in figure and 'loading="lazy"' in figure
 
     # and the pass takes the mark off whichever way it returns a tag
-    plugin = (pelican.build_site(archive) / "pelicanconf.py").read_text()
     # exactly one way out keeps the tag as it stands -- the one for a
     # tag with no mark, which is the theme's; every other return is of
     # the marker-stripped `bare`
-    assert "bare = marker_re.sub(" in plugin
-    assert plugin.count("return tag") == 1
-
-    # the exporter marks the figure shells' literal tags, so its name
-    # for the attribute and the plugin's have to be the one string
-    assert pelican.BODY_IMAGE_ATTR == namespace["BODY_IMAGE_ATTR"]
-
-    # a captioned image is written as a literal tag, not rendered from
-    # the tree, so it carries the mark from the exporter instead
-    figure = pelican.figure_blocks(
-        "<figure>\n\n![Alt](images/a.png)\n\n<figcaption>\n\nCap.\n\n"
-        "</figcaption>\n\n</figure>")
-    assert f'{pelican.BODY_IMAGE_ATTR}=""' in figure
+    assert "bare = marker_re.sub(" in config
+    assert config.count("return tag") == 1
 
     # an alt holding a ">" (a caption naming a <code> span) must not cut
     # the tag short: that would leave the image unprocessed, its mark on
     tag_re = re.compile(namespace["IMG_TAG"])
     tricky = ('<img alt="a <code>x</code> span" src="/posts/p/images/1.jpg"'
-              f' loading="lazy" {pelican.BODY_IMAGE_ATTR}="">')
+              ' loading="lazy" data-body-image="">')
     assert tag_re.search(tricky).group(0) == tricky
 
 
@@ -1513,29 +1589,41 @@ def test_hugo_does_not_publish_the_posts_section_page(archive):
     assert (site / "content/posts/first-post/index.md").exists()
 
 
-def test_figure_alt_text_cannot_end_its_own_tag():
+def test_figure_alt_text_cannot_end_its_own_tag(archive):
     """An alt is prose, and prose holds characters that end an HTML tag
-    for anything reading it with a regex. Two ways in, both seen in the
-    archive: a literal ">" ("File -> Hub Control Panel"), and a Markdown
-    code span, which python-markdown expands into a real <code> tag
-    *inside the attribute*, because the figure shell is a markdown="span"
-    block and its inline patterns still run there. Either one ends the
-    tag early for pelican's own intra-site link pass, which then leaves
-    the {attach} in src unresolved and the image broken on the page.
-    So the exporters escape the one and strip the other, and the two
-    engines carry the same plain-text alt."""
+    for anything reading it with a regex: a literal ">" ("File -> Hub
+    Control Panel"), seen in the archive, ends the img tag early for
+    pelican's own intra-site link pass, which then leaves the {attach}
+    in src unresolved and the image broken on the page. A Markdown code
+    span in an alt is the same problem arrived at from the other
+    direction, so both exporters carry the caption's plain text.
+
+    The alt now crosses two boundaries, and each escapes for its own:
+    the exporter quotes it for the directive's argument line (the same
+    quoting the hugo shortcode call uses, undone by the reader's
+    shlex), and the reader escapes it for the attribute it writes."""
     arrow = ("<figure>\n\n![File -> Hub Control Panel](images/a.png)\n\n"
              "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>")
-    block = pelican.figure_blocks(arrow)
-    assert 'alt="File -&gt; Hub Control Panel"' in block
-    assert ">" not in re.search(r'alt="([^"]*)"', block).group(1)
+    directive = pelican.figure_directives(arrow)
+    assert 'alt="File -> Hub Control Panel"' in directive
 
     code = ("<figure>\n\n![a `p5.js` kernel](images/a.png)\n\n"
             "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>")
-    assert 'alt="a p5.js kernel"' in pelican.figure_blocks(code)
+    assert 'alt="a p5.js kernel"' in pelican.figure_directives(code)
     assert 'alt="a p5.js kernel"' in hugo.figure_shortcodes(code)
 
-    # and the markdown pass really does leave that attribute alone now
-    import markdown as md_mod
-    html = md_mod.markdown(pelican.figure_blocks(code), extensions=["extra"])
-    assert "<code>" not in re.search(r'alt="([^"]*)"', html).group(1)
+    # a quote in an alt would end the argument, so it is escaped for the
+    # directive line and comes back whole from the reader's parse
+    quoted = ("<figure>\n\n![the \"run\" button](images/a.png)\n\n"
+              "<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>")
+    assert r'alt="the \"run\" button"' in pelican.figure_directives(quoted)
+
+    namespace, md = config_parser(pelican.build_site(archive))
+    tag_re = re.compile(namespace["IMG_TAG"])
+    for shell in (arrow, quoted):
+        html = md.render(pelican.figure_directives(shell))
+        alt = re.search(r'alt="([^"]*)"', html).group(1)
+        assert ">" not in alt and "<" not in alt
+        img = tag_re.search(html)
+        # the tag the post-build pass will read is the whole tag
+        assert img.group(0).endswith('data-body-image="">')

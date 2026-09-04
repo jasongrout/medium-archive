@@ -68,7 +68,8 @@ class _Converter(MarkdownConverter):
     its own HTML block and still render the image and caption Markdown
     between them; the site exporters rewrite the shell to their native
     figure form, which is regular enough to match exactly (see
-    hugo.figure_shortcodes, pelican.figure_blocks, myst.myst_figures)."""
+    hugo.figure_shortcodes, pelican.figure_directives,
+    myst.myst_figures)."""
 
     def convert_figure(self, el, text, parent_tags):
         if not _captioned_figure(el):

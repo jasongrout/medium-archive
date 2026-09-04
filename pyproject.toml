@@ -19,7 +19,11 @@ covers = ["pillow"]
 medium-archive = "medium_archive.cli:main"
 
 [dependency-groups]
-dev = ["pytest", "pillow", "markdown"]
+# markdown-it-py, mdit-py-plugins and pygments are what the
+# generated pelican config reads Markdown with; the tests read that
+# config the way a pelican build does
+dev = ["pytest", "pillow", "markdown-it-py", "mdit-py-plugins",
+       "pygments"]
 
 [build-system]
 requires = ["hatchling"]
