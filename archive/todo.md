@@ -72,6 +72,16 @@ Last full validation, all three against all 333 posts:
   warnings are cosmetic empty-image-alt ones; Medium images rarely
   carry alt text.
 
+**The Markdown renderer.** `compare.md` records the comparison behind
+choosing Pelican; `commonmark.md` records what it costs to render its
+posts with a CommonMark parser (markdown-it-py) instead of
+python-markdown, which follows no spec. The measured answer: a 74-line
+reader in the config the exporter already generates reproduces the
+current site exactly, the packaged plugins do not without work, and the
+Pelican exporter has to render figure captions to HTML the way the Hugo
+one already does. Four work items are listed at the end of that file;
+all of them are medium-archive changes, nothing in this repo.
+
 Status after the 2026-08-23 sessions: all 333 posts convert
 (`medium-archive convert --clean`), `lint` reports 0 problems, and the
 `compare`, `compare --state` and `compare --ghost` results are explained
