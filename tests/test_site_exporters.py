@@ -1431,3 +1431,19 @@ def test_body_images_are_marked_where_only_a_body_image_can_be(archive):
     tricky = ('<img alt="a <code>x</code> span" src="/posts/p/images/1.jpg"'
               f' loading="lazy" {pelican.BODY_IMAGE_ATTR}="">')
     assert tag_re.search(tricky).group(0) == tricky
+
+
+def test_hugo_does_not_publish_the_posts_section_page(archive):
+    """content/posts/ is a Hugo section, so Hugo would publish a list
+    page and a feed for it unasked: /posts/ is the home listing over
+    again, pagination and all, canonical to itself and in the sitemap
+    while nothing links to it. Pelican has no sections -- posts/<slug>/
+    is only a URL pattern there -- so dropping the page is also what
+    keeps the two sites' address spaces the same. The posts themselves
+    stay exactly where they were."""
+    site = hugo.build_site(archive)
+    section = json.loads((site / "content/posts/_index.md").read_text())
+    assert section["_build"] == {"render": "never", "list": "never"}
+    # the posts are untouched: the section's own page is all that goes
+    assert (site / "content/posts/second-post/index.md").exists()
+    assert (site / "content/posts/first-post/index.md").exists()
