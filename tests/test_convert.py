@@ -2,6 +2,7 @@
 title removal."""
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -485,9 +486,9 @@ def test_gist_script_inlines_a_markdown_file_verbatim():
     assert markdown == "| a_b | *c* |\n| --- | --- |\n| 1 | `x` |\n"
 
 
-def test_convert_rewrites_the_archive_readme(tmp_path):
-    # the README documents the layout convert writes, so a stale one is
-    # a wrong one; it is generated output, like posts.json
+def convert_archive(tmp_path):
+    """A one-post archive, converted. Returns the convert args, so a
+    test can run it again."""
     from types import SimpleNamespace
 
     from medium_archive.convert import cmd_convert
@@ -499,12 +500,45 @@ def test_convert_rewrites_the_archive_readme(tmp_path):
     args = SimpleNamespace(out=tmp_path, prefer_page=False, prefer_ghost=False,
                            only=None, clean=False, base=None)
     cmd_convert(args)
+    return args, cmd_convert
+
+
+def test_convert_rewrites_the_archive_readme(tmp_path):
+    # the README documents the layout convert writes, so a stale one is
+    # a wrong one; it is generated output, like posts.json
+    args, cmd_convert = convert_archive(tmp_path)
     readme = tmp_path / "README.md"
     assert "# Medium archive of https://blog.example.com" in readme.read_text()
 
     readme.write_text("stale\n")
     cmd_convert(args)
     assert "# Medium archive of https://blog.example.com" in readme.read_text()
+
+
+def test_convert_documents_posts_and_sites_outside_the_archive_readme(tmp_path):
+    # the archive README is the one file an archive commits, so what
+    # only describes the ignored trees lives with those trees instead:
+    # a conversion or theme change must not churn the committed file
+    convert_archive(tmp_path)
+    archive = (tmp_path / "README.md").read_text()
+    posts = (tmp_path / "posts" / "README.md").read_text()
+    sites = (tmp_path / "SITES.md").read_text()
+
+    assert "## Front matter" in posts and "body source preference" in posts.lower()
+    assert "## Front matter" not in archive
+    assert "hugo" in sites and "myst start" in sites
+    assert "myst start" not in archive and "pip install pelican" not in archive
+    # the fields are documented once, and reach both files that need them
+    assert "| `body_source`" in archive and "| `body_source`" in posts
+
+
+def test_convert_readmes_carry_no_generation_date(tmp_path):
+    # a date rewritten on every run is churn in a committed file, and
+    # says nothing the git history does not
+    convert_archive(tmp_path)
+    for name in ("README.md", "posts/README.md", "SITES.md"):
+        text = (tmp_path / name).read_text()
+        assert not re.search(r"\d{4}-\d{2}-\d{2}", text), name
 
 
 def medium_page(*, og_description=None, ld_description=None,

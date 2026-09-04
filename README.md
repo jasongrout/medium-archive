@@ -98,8 +98,7 @@ tag with its post count, the worklist for curating `tags.json`.
 
 `raw/` is the source of truth and the only part that cannot be
 regenerated once the Medium site is gone. Everything else is derived
-from it. A `README.md` written into the archive documents the full
-layout, the front matter fields, and the caveats.
+from it.
 
 If the archive lives in version control, commit the small derived files
 `posts.json` and `redirects.csv` anyway. Their diffs show what a
@@ -107,9 +106,25 @@ If the archive lives in version control, commit the small derived files
 trees (`posts/` and the site directories) are better gitignored and
 regenerated.
 
-The archive's own README describes the archive. What the generated
-sites contain is documented here, so that a theme change does not
-oblige every archive downstream to regenerate its README.
+Three generated READMEs document the archive, one per layer, so that
+each sits with the files it describes:
+
+- `README.md` in the archive root covers the committed layer -- `raw/`,
+  the hand-written files, `posts.json` and `redirects.csv` -- and the
+  fields of `posts.json`.
+- `posts/README.md` covers the converted posts: their layout, their
+  front matter, and the conversion caveats.
+- `SITES.md` covers the generated sites: their layout, their caveats,
+  and how to build them.
+
+The split is what keeps an archive's one committed README still: a
+change to how a post converts or to what a site exporter writes rewrites
+only a file that archive ignores. An archive that later commits `posts/`
+or a site directory commits that layer's README with it.
+
+The archive's own READMEs describe the archive. What the generated sites
+contain is documented here, so that a theme change does not oblige every
+archive downstream to regenerate its READMEs.
 
 ## Tag cleanup (`tags.json`)
 
@@ -650,7 +665,8 @@ src/medium_archive/
   dates.py       date parsing and the --start/--end window check
   urls.py        Medium URL and post-identifier helpers
   tags.py        hand-curated tag cleanup (<out>/tags.json), applied by convert
-  readme.py      the README.md written into each archive
+  readme.py      the READMEs written into each archive: README.md,
+                 posts/README.md and SITES.md
 tests/           offline tests (canned HTTP responses, no network);
                  run with `uv run pytest`
 ```
