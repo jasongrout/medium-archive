@@ -55,7 +55,8 @@ section tunes the generated config: `locale`, `avatar` and `favicon`
 import json
 import sys
 
-from .sites import (Covers, ImagePlacer, author_links, canonical_for,
+from .sites import (Covers, ImagePlacer, author_links, author_names,
+                    author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, load_site_inputs,
                     old_paths, page_stems, redirect_rules, redirects_file,
@@ -94,8 +95,11 @@ TEMPLATES = {
     "layouts/partials/post-image.html":
         "hugo/layouts/partials/post-image.html",
     "static/css/style.css": "shared/card.css",
-    # the term pages, from data/tags.json (see write_tag_names)
+    # the term pages, from data/tags.json and data/authornames.json
+    # (see write_tag_names and write_author_names)
     "content/tags/_content.gotmpl": "hugo/content/tags/_content.gotmpl",
+    "content/authors/_content.gotmpl":
+        "hugo/content/authors/_content.gotmpl",
 }
 
 
@@ -135,7 +139,9 @@ def front_matter(url: str, post: dict, cover: str | None = None,
     if post.get("tags"):
         front["tags"] = post["tags"]
     if post.get("authors"):                      # the author taxonomy
-        front["authors"] = [a["name"] for a in post["authors"]]
+        # slugs, as the tags are: a byline left as the term would put
+        # its accents and punctuation in the URL (see sites.author_slug)
+        front["authors"] = [author_slug(a["name"]) for a in post["authors"]]
     if cover:               # bundle resource: the card cover and og:image
         front["cover"] = cover
     if post.get("first_image"):     # loaded eagerly, the rest lazily
@@ -177,6 +183,19 @@ def write_author_links(site, links: dict):
     (site / "data" / "authors.json").write_text(
         json.dumps(links, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8")
+
+
+def write_author_names(site, names: dict):
+    """data/authornames.json: author slug -> the name they are shown
+    under, the one file the site's author content adapter
+    (content/authors/_content.gotmpl) builds the term pages from. Front
+    matter keeps the slug, so the term and its /authors/<slug>/ URL
+    match the pelican site's, and only the title Hugo renders carries
+    the name's capitals, accents and punctuation."""
+    (site / "data").mkdir(parents=True, exist_ok=True)
+    (site / "data" / "authornames.json").write_text(
+        json.dumps(dict(sorted(names.items())), indent=2, ensure_ascii=False)
+        + "\n", encoding="utf-8")
 
 
 def write_tag_names(site, names: dict):
@@ -243,6 +262,7 @@ def build_site(out):
                     "_build": {"render": "never", "list": "never"}}) + "\n",
         encoding="utf-8")
     write_tag_names(site, tag_names(manifest, out))
+    write_author_names(site, author_names(manifest))
     write_author_links(site, author_links(manifest))
 
     params = {"description": config.get("description", "")}
