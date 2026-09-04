@@ -67,7 +67,7 @@ jobs:
         run: >
           pip install
           "medium-archive[covers] @ git+https://github.com/jasongrout/medium-archive"
-          pelican markdown
+          pelican markdown mdit_py_plugins
 
       - name: Install Hugo (extended), MyST, Pagefind and gifsicle
         run: |
