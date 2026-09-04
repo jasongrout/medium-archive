@@ -372,8 +372,16 @@ which turns bare URLs into links and would change 2015-era posts.
    the only change that touches the posts' text, and it improves the
    Hugo site too.
 
-   `fixups/` carries the other half of that job, and one entry is
-   already known: `catching-jupyter-specific-bugs-before-ci-does-…`
-   writes `commands.addCommand(...)` as prose rather than in
-   backticks, three times, so both engines' typographers set it as
-   `commands.addCommand(…)`. Backticks in the source are the fix.
+   **(Done 2026-09.)** `convert` unwraps emphasis whose text holds no
+   word character and writes what is left as `<em>`/`<strong>` where
+   the markers will not parse; `lint` reports any that remain. 46 posts
+   here changed, lint is at 0, and no page carries a stray marker.
+
+   The one post that looked like a fixup turned out to be something
+   else. `catching-jupyter-specific-bugs-before-ci-does-…` reads
+   `commands.addCommand(…)` not because the author wrote it as prose
+   but because Medium's RSS body, which `convert` prefers here, drops
+   every `<code>` span the page keeps -- 39 of them in that post, 127
+   across six posts. See `todo.md`, section 2: the fix is a source-order
+   change in `convert`, measured but not made, and it removes the need
+   for a fixup.
