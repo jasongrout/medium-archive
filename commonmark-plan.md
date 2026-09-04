@@ -189,14 +189,27 @@ all 1211 pages of the reference archive are identical across it.
 
 ## Phase 5: the emphasis markers, in `convert`
 
-CommonMark will not open emphasis on a `**` between a word character
-and punctuation, so Medium's editor wrapping a stray period or quote in
-`<strong>` shows the marker to the reader: 18 posts under the new
-renderer, and 15 under hugo today. The renderer is not the place to fix
-it. `convert` should drop emphasis whose content is only punctuation
-and reposition markers CommonMark will not open, and `lint` should
-report them so it stays fixed. This is the only change that touches the
-text of a post, and it improves the hugo site equally.
+**(Done.)** CommonMark will not open emphasis on a `**` between a word
+character and punctuation, so Medium's editor wrapping a stray period
+or quote in `<strong>` showed the marker to the reader: 18 posts under
+the new renderer, and 15 under hugo. The renderer was not the place to
+fix it, and the fix improves the hugo site equally.
+
+Two changes, in the order the conversion runs them. In the soup,
+emphasis whose text holds no word character is unwrapped -- emphasis on
+nothing but punctuation is emphasis on nothing, and it is where most of
+these came from (`<strong>.</strong>` at the end of a run). In the
+Markdown that comes out, any span whose markers still will not parse is
+written as the `<em>`/`<strong>` it means: moving a marker past the
+punctuation in its way would change which characters are emphasized,
+while the tag says the span exactly and every renderer these sites use
+reads inline HTML.
+
+`lint` reports what is left, so a post that acquires one fails the
+build rather than reaching a reader. On the reference archive: 46 posts
+changed, `lint` is at 0 problems, and no rendered page carries a stray
+marker (the four `**` left in the site are a URL glob and R operators,
+all inside code).
 
 The archive's own `fixups/` carry the other half of the same job, and
 one is already known: `catching-jupyter-specific-bugs-before-ci-does-…`

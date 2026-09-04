@@ -21,6 +21,36 @@ def md_of(html: str) -> str:
     return markdown
 
 
+def test_emphasis_on_punctuation_alone_is_dropped():
+    """Medium's editor ends a bold run on its punctuation, writing
+    <strong>.</strong>. CommonMark will not open a marker between a
+    word character and punctuation, so the reader is shown `task**.**`;
+    and emphasis on nothing but punctuation means nothing anyway. The
+    same pass already dropped the whitespace-only ones, which cost a
+    space when markdownify swallowed them."""
+    assert md_of("<p>for next task<strong>.</strong> And so on</p>") == \
+        "for next task. And so on\n"
+    assert md_of("<p>a<strong> </strong>b</p>") == "a b\n"
+    # real emphasis is untouched
+    assert md_of("<p>a <strong>word</strong> here</p>") == \
+        "a **word** here\n"
+
+
+def test_emphasis_markdown_cannot_carry_goes_out_as_html():
+    """A run whose text ends on punctuation and butts against the next
+    word -- <em>"...life,"</em>said -- has no Markdown form: the
+    closing marker sits between punctuation and a word character, where
+    CommonMark will not close a span, and moving the marker would
+    change which characters are emphasized. The tag says it exactly,
+    and every renderer these sites use reads inline HTML."""
+    md = md_of('<p>outlets. <em>\u201cIt took over my life,\u201d</em>said '
+               "Jeremy in April</p>")
+    assert "<em>\u201cIt took over my life,\u201d</em>said" in md
+    assert "*" not in md
+    # and what Markdown can carry stays Markdown
+    assert md_of("<p>a <em>word</em> here</p>") == "a *word* here\n"
+
+
 def test_plain_pre_keeps_three_backtick_fence():
     assert md_of("<pre>a = 1</pre>") == "```\na = 1\n```\n"
 

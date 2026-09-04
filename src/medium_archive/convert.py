@@ -9,6 +9,7 @@ import json
 import re
 import shutil
 import sys
+import unicodedata
 from pathlib import Path
 from html import escape
 from urllib.parse import (parse_qsl, urlencode, urljoin, urlparse, urlsplit,
@@ -46,6 +47,94 @@ def feed_item_authors(feed_item: dict) -> list:
     if feed_item.get("author"):
         return [{"name": feed_item["author"], "url": None}]
     return []
+
+
+# CommonMark decides from the characters on either side of a marker
+# whether it can open or close an emphasis span: a `**` between a word
+# character and punctuation opens nothing, and the reader is shown the
+# asterisks. Medium's editor produces exactly that, wrapping a stray
+# period or a closing quote in <strong>, so the fix belongs here rather
+# than in any one site's renderer -- hugo's goldmark and the pelican
+# site's markdown-it read the same rules, and python-markdown, which
+# guessed instead, is what used to paper over it.
+_UNICODE_PUNCT = ("P", "S")          # what the specification counts
+
+
+def _is_punct(ch: str) -> bool:
+    return bool(ch) and unicodedata.category(ch)[0] in _UNICODE_PUNCT
+
+
+def _is_space(ch: str) -> bool:
+    return ch == "" or ch.isspace()
+
+
+def _flanks_left(before: str, first: str) -> bool:
+    """Can a marker with `before` behind it and `first` after it open?"""
+    if _is_space(first):
+        return False
+    return not _is_punct(first) or _is_space(before) or _is_punct(before)
+
+
+def _flanks_right(last: str, after: str) -> bool:
+    """Can a marker with `last` behind it and `after` after it close?"""
+    if _is_space(last):
+        return False
+    return not _is_punct(last) or _is_space(after) or _is_punct(after)
+
+
+# a `*text*` or `**text**` span markdownify emits, with no marker or
+# backslash against it: an escaped asterisk is literal text, and a
+# longer run is not a span this converter writes
+EMPHASIS_RE = re.compile(r"(?<![\\*])(\*{1,2})(?![\s*])(.+?)(?<![\s\\])\1(?!\*)")
+_CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
+
+
+def unparsed_emphasis(body: str):
+    """Every emphasis span in a converted body that CommonMark will not
+    read as emphasis -- the reader is shown the markers instead -- as
+    (line number, the span). Fenced blocks and code spans are not
+    prose and are skipped. Both the conversion and `lint` use it: one
+    to write HTML where Markdown will not carry the emphasis, the other
+    to fail if any is left."""
+    fence = False
+    for number, line in enumerate(body.split("\n"), 1):
+        if re.match(r"^`{3,}", line):
+            fence = not fence
+            continue
+        if fence or "*" not in line:
+            continue
+        # a marker inside a code span is content, not emphasis
+        masked = _CODE_SPAN_RE.sub(lambda m: "\x00" * len(m.group(0)), line)
+        for match in EMPHASIS_RE.finditer(masked):
+            inner = line[match.start(2):match.end(2)]
+            before = line[match.start() - 1] if match.start() else ""
+            after = line[match.end()] if match.end() < len(line) else ""
+            if not _flanks_left(before, inner[0]) or \
+                    not _flanks_right(inner[-1], after):
+                yield number, line[match.start():match.end()]
+
+
+def emphasis_as_html(markdown: str) -> str:
+    """Emphasis CommonMark will not read, written as the HTML tag it
+    means. The alternative is moving the marker past the punctuation in
+    its way, which changes which characters are emphasized; the tag
+    keeps the span exactly and every renderer these sites use reads
+    inline HTML."""
+    def rewrite(line: str) -> str:
+        for span in {s for _, s in unparsed_emphasis(line)}:
+            marker = "**" if span.startswith("**") else "*"
+            tag = "strong" if marker == "**" else "em"
+            inner = span[len(marker):-len(marker)]
+            line = line.replace(span, f"<{tag}>{inner}</{tag}>")
+        return line
+
+    fence = False
+    out = []
+    for line in markdown.split("\n"):
+        if re.match(r"^`{3,}", line):
+            fence = not fence
+        out.append(line if fence else rewrite(line))
+    return "\n".join(out)
 
 
 class _Converter(MarkdownConverter):
@@ -607,10 +696,15 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
         else:
             iframe.replace_with(doc.new_tag("p", string="[missing embed]"))
 
-    # Medium's editor emits things like <strong> </strong> between runs;
-    # markdownify drops whitespace-only emphasis, losing the space.
+    # Medium's editor emits things like <strong> </strong> between runs,
+    # and <strong>.</strong> or <em>,</em> where a run ends on its
+    # punctuation. markdownify drops the whitespace-only ones, losing
+    # the space; the punctuation-only ones it keeps, and they are how a
+    # reader ends up looking at `task**.**`, since CommonMark will not
+    # open a marker between a word character and punctuation. Emphasis
+    # on nothing but punctuation is emphasis on nothing, so both go.
     for el in body.find_all(["strong", "em", "b", "i"]):
-        if el.parent is not None and not el.get_text().strip():
+        if el.parent is not None and not re.search(r"\w", el.get_text()):
             el.replace_with(el.get_text())
 
     # The rendered page links same-publication posts relatively; those
@@ -627,6 +721,10 @@ def to_markdown(body, base_url: str, img_map: dict, raw: Path,
     # Export bodies keep the editor's non-breaking/hair spaces; the rendered
     # page serves plain spaces. Normalize so output is stable across sources.
     markdown = markdown.replace("\u00a0", " ").replace("\u200a", " ")
+    # what is left of the emphasis Medium wrote against punctuation:
+    # spans whose markers CommonMark will not read, written as the tag
+    # they mean (see emphasis_as_html)
+    markdown = emphasis_as_html(markdown)
     # markdownify renders the grid-separating <br>s as whitespace-only
     # "hard break" lines; those are just blank lines to Markdown, so
     # normalize them away -- except in code fences, where whitespace is

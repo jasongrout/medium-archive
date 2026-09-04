@@ -21,6 +21,23 @@ def test_clean_post_passes(tmp_path):
     assert lint_post(d) == ([], [])
 
 
+def test_emphasis_commonmark_will_not_read_is_flagged(tmp_path):
+    """The markers a reader would be shown. convert writes these as
+    <em>/<strong>, so any left in a converted post means the post
+    predates that or a fixup put it back."""
+    d = write_post(tmp_path, "x\n" * 100 + "for next task**.** And so on\n")
+    errors, _ = lint_post(d)
+    assert any("emphasis CommonMark will not read" in e for e in errors)
+
+    # what CommonMark does read, and what is not prose, are left alone
+    body = ("x\n" * 100 + "a *word* and **another** one\n"
+            "the mask is 10.0.0.* here\n"
+            "a `code**.**span` stays\n"
+            "```\nliteral**.**markers\n```\n")
+    assert lint_post(write_post(tmp_path, body, name="2020-01-02-clean")) \
+        == ([], [])
+
+
 def test_medium_chrome_is_flagged(tmp_path):
     d = write_post(tmp_path, "x\n" * 100 +
                    "[Sign in](https://medium.com/m/signin?operation=login&x=1)\n")

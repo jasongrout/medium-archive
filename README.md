@@ -77,8 +77,9 @@ follows no specification. The myst site is a simpler alternate. See
 
 **`lint`** scans the converted posts for conversion-defect signatures:
 leftover Medium chrome, unclosed code fences, images referenced but
-missing on disk, remote Medium CDN images, embeds whose media was never
-archived. It exits non-zero when a defect is found, so regressions
+missing on disk, remote Medium CDN images, emphasis markers CommonMark
+will not read (the reader would be shown the asterisks), embeds whose
+media was never archived. It exits non-zero when a defect is found, so regressions
 surface on every convert instead of waiting for a reader. `lint
 --embeds` also fails on every embed whose content the archive does not
 carry: one still rendered as the bare `[embed: url]` link an iframe
