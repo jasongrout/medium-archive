@@ -362,9 +362,18 @@ which turns bare URLs into links and would change 2015-era posts.
    ellipses and one en dash. markdown-it's `(c)`/`(tm)`/`(r)`
    substitutions are left off: Goldmark has none, and they turned this
    publication's `501(c)(3)` into `501©(3)` on seven pages. Task lists
-   were considered and skipped, linkify stays off. Still open: the
-   front-matter format (YAML, to match everything else).
+   were considered and skipped, linkify stays off. The front matter is
+   YAML between `---` fences now, as `posts/` and the hugo site
+   already write, so a packaged reader stays a `PLUGINS` line away;
+   metadata only, and every page of this archive is identical across
+   that change.
 3. Separately, in `convert`, stop emitting emphasis that wraps only
    punctuation, and lint for markers CommonMark will not open. That is
    the only change that touches the posts' text, and it improves the
    Hugo site too.
+
+   `fixups/` carries the other half of that job, and one entry is
+   already known: `catching-jupyter-specific-bugs-before-ci-does-…`
+   writes `commands.addCommand(...)` as prose rather than in
+   backticks, three times, so both engines' typographers set it as
+   `commands.addCommand(…)`. Backticks in the source are the fix.
