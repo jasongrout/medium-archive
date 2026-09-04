@@ -628,6 +628,22 @@ Feeds and sharing:
   plan, the decisions and their measurements; the reference archive's
   `commonmark.md` holds the page-by-page numbers behind them.
 
+- Decide whether the page's embedded editor state should be preferred
+  over the RSS feed body (`export > state > feed > page` in
+  `convert_post`, rather than today's `export > feed > state > page`).
+  Medium's feed HTML carries no `<code>`, so a post converted from it
+  loses every inline code span the page keeps, and its authored heading
+  levels with them (`##` arrives as `###`). On the reference archive
+  that is six of eleven feed-sourced posts -- all the 2026 ones, which
+  have no account export -- and 127 code spans. The change was tried
+  there and measured: all 336 posts convert, `lint` stays at 0, the
+  backtick counts on those six go 18->94, 36->120, 0->52, 0->12, 6->26
+  and 24->30, and the other five feed-sourced posts change by a few
+  characters. Left undone because it re-converts every feed-sourced
+  post and reverses a documented preference; the state was put behind
+  the feed when it was added, and whether the feed's cleaner block
+  structure was the reason is worth confirming before swapping them.
+
 Archive-specific follow-ups (posts whose images still need fetching,
 hand-correction candidates) live in each archive's own notes, alongside
 its `fixups/`.
