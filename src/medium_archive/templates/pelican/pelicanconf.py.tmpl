@@ -89,6 +89,11 @@ AUTHOR_LINKS = $author_links
 # plugin below names each Tag object from this map once the tags are
 # collected, which is what the theme and the feeds then render.
 TAG_DISPLAY = $tag_display
+# author slug -> the name they are shown under. Bylines reach Pelican as
+# slugs for the same reason tags do, so author.slug and every
+# /authors/<slug>/ URL match the hugo site's exactly; the site plugin
+# names each Author object from this map once they are collected.
+AUTHOR_DISPLAY = $author_display
 
 FEED_ALL_ATOM = "feeds/all.atom.xml"
 FEED_MAX_ITEMS = 20             # a feed announces new posts; the site

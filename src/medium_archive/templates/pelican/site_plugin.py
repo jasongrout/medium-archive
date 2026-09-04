@@ -284,6 +284,46 @@ def _name_tags(article_generator):
     print(f"tag names: {len(canonical)} tags named across {articles} articles")
 
 
+def _name_authors(article_generator):
+    # The authors' counterpart of _name_tags, and for the same reason: a
+    # byline reaches Pelican as the archive's slug, so author.slug --
+    # what /authors/<slug>/, the per-author feed's filename and the
+    # object's own hash are built from -- matches the hugo site exactly,
+    # and only the name a reader sees is left to set. Pelican renders an
+    # author from the Author object everywhere, the per-author feed's
+    # title included, which it builds in Python out of reach of any
+    # template; so the objects themselves are named here.
+    #
+    # generator.authors is a list of (author, articles) pairs, and each
+    # article carries its own Author objects, so as with tags every
+    # article's list is pointed at the one named object per slug.
+    canonical = {}
+
+    def name(author):
+        got = canonical.get(author.slug)
+        if got is None:
+            shown = AUTHOR_DISPLAY.get(author.slug)
+            if shown and shown != author.name:
+                author.slug = author.slug   # pin it: setting a name
+                author.name = shown         # otherwise re-slugifies
+            canonical[author.slug] = got = author
+        return got
+
+    for author, _articles in article_generator.authors:
+        name(author)
+    articles = 0
+    for group in ("articles", "translations", "hidden_articles",
+                  "hidden_translations", "drafts", "drafts_translations"):
+        for article in getattr(article_generator, group, ()):
+            if getattr(article, "authors", None):
+                article.authors = [name(a) for a in article.authors]
+                articles += 1
+            if getattr(article, "author", None):
+                article.author = name(article.author)
+    print(f"author names: {len(canonical)} authors named across "
+          f"{articles} articles")
+
+
 def related_posts(article, articles, limit=3):
     # The posts most like this one, for the "Related posts" block at
     # the foot of its page: scored the way the hugo site's [related]
@@ -318,6 +358,7 @@ class _SitePlugins:
     def register():
         from pelican import signals
         signals.article_generator_finalized.connect(_name_tags)
+        signals.article_generator_finalized.connect(_name_authors)
         signals.article_generator_finalized.connect(_relate_articles)
         signals.article_generator_finalized.connect(_collect_sitemap)
         signals.finalized.connect(_prioritize_first_images)

@@ -63,7 +63,7 @@ def test_hugo_site(archive):
     page = site / "content/posts/second-post/index.md"
     front = json.loads(page.read_text().split("\n\n", 1)[0])
     assert front["title"] == "Second Post"
-    assert front["tags"] == ["example"] and front["authors"] == ["Ada Lovelace"]
+    assert front["tags"] == ["example"] and front["authors"] == ["ada-lovelace"]
     assert front["aliases"] == ["/second-post-bbb222bbb222", "/p/bbb222bbb222"]
     assert (page.parent / "images/001-pic.png").read_bytes() == b"PNG"
     # the Ghost-era path becomes an alias too
@@ -197,7 +197,7 @@ def test_hugo_site_config_and_front_matter(archive, capsys):
     assert "images" not in front
     assert (site / "content/posts/second-post/images/cover.jpg"
             ).read_bytes() == b"PNG"
-    assert front["authors"] == ["Ada Lovelace"]
+    assert front["authors"] == ["ada-lovelace"]
     assert "author" not in front                # the taxonomy is the byline
 
 
@@ -441,7 +441,7 @@ def test_pelican_site(archive):
     head = text.split("\n\n", 1)[0]
     assert "Title: Second Post" in head
     assert "Date: 2021-03-01 10:00" in head
-    assert "Authors: Ada Lovelace" in head
+    assert "Authors: ada-lovelace" in head
     assert "Tags: example" in head and "Slug: second-post" in head
     assert "Cover: images/" in head          # summary-card cover
     # colocated images become {attach} links -- but not inside fences
@@ -999,7 +999,7 @@ def test_animated_gifs_capped_via_gifsicle(tmp_path):
 
 def test_multiple_authors_reach_both_sites(tmp_path):
     """A post's authors list, of any length, is the byline everywhere:
-    hugo's authors taxonomy (front matter names only; the feed reads the
+    hugo's authors taxonomy (front matter slugs only; the feed reads the
     same list, the card and post link each term's listing page),
     pelican's Authors: header, which it splits into
     Author objects -- on commas, so a name holding one flips the
@@ -1019,7 +1019,7 @@ def test_multiple_authors_reach_both_sites(tmp_path):
     site = hugo.build_site(tmp_path)
     front = lambda stem: json.loads(
         (site / f"content/posts/{stem}/index.md").read_text().split("\n\n", 1)[0])
-    assert front("duet")["authors"] == ["Ada Lovelace", "yuvipanda"]
+    assert front("duet")["authors"] == ["ada-lovelace", "yuvipanda"]
     assert "author" not in front("duet")
     assert "authors" not in front("solo")
     assert "capitalizeListTitles = false" in (site / "hugo.toml").read_text()
@@ -1034,8 +1034,10 @@ def test_multiple_authors_reach_both_sites(tmp_path):
 
     site = pelican.build_site(tmp_path)
     head = lambda stem: (site / f"content/posts/{stem}/index.md").read_text().split("\n\n", 1)[0]
-    assert "Authors: Ada Lovelace, yuvipanda\n" in head("duet")
-    assert "Authors: Project Jupyter, Inc.; Min RK\n" in head("trio")
+    assert "Authors: ada-lovelace, yuvipanda\n" in head("duet")
+    # a slug holds no comma, so the comma split is unambiguous even for
+    # a byline like "Project Jupyter, Inc." that once forced semicolons
+    assert "Authors: project-jupyter-inc, min-rk\n" in head("trio")
     assert "Author" not in head("solo")
     for tpl in ("article", "macros", "base"):
         text = (site / f"theme/templates/{tpl}.html").read_text()
@@ -1431,6 +1433,68 @@ def test_body_images_are_marked_where_only_a_body_image_can_be(archive):
     tricky = ('<img alt="a <code>x</code> span" src="/posts/p/images/1.jpg"'
               f' loading="lazy" {pelican.BODY_IMAGE_ATTR}="">')
     assert tag_re.search(tricky).group(0) == tricky
+
+
+def test_author_slugs_are_clean_and_shared_by_both_sites(tmp_path):
+    """A byline is a person's name, not a slug, so left as the term it
+    would reach each generator raw: hugo puts a name's accents and
+    punctuation straight into the path it builds, while pelican folds
+    the same name to ASCII, and one author ends up at two addresses.
+    Both exporters therefore write the slug, as they already do for
+    tags, and each carries the name separately for rendering."""
+    hard = [("Frédéric Collonval", "frederic-collonval"),
+            ("Michał Krassowski", "michal-krassowski"),
+            ("C.A.M. Gerlach", "cam-gerlach"),
+            ("Matt McCormick @thewtex@fosstodon.org",
+             "matt-mccormick-thewtexfosstodonorg"),
+            ("Joe Lucas ", "joe-lucas")]
+    for name, slug in hard:
+        assert sites.author_slug(name) == slug, name
+        assert re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug), slug
+
+    manifest = {}
+    for i, (name, _slug) in enumerate(hard):
+        make_post(tmp_path, manifest, f"post-{i}", f"abc123abc12{i}",
+                  f"2020-01-0{i + 1}T00:00:00Z", "Hi.\n",
+                  authors=[{"name": name, "url": None}])
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (tmp_path / "site.json").write_text(json.dumps({"title": "T"}))
+    slugs = [slug for _name, slug in hard]
+
+    # the map both sites are named from: slug -> the name it shows
+    assert sites.author_names(manifest) == {s: n for n, s in hard}
+
+    hugo_site = hugo.build_site(tmp_path)
+    front = lambda stem: json.loads(
+        (hugo_site / f"content/posts/{stem}/index.md").read_text()
+        .split("\n\n", 1)[0])
+    assert [front(f"post-{i}")["authors"][0] for i in range(len(hard))] == slugs
+    # the term pages come from that map, so the path stays the slug
+    # while the title carries the name
+    names = json.loads((hugo_site / "data/authornames.json").read_text())
+    assert names == {s: n for n, s in hard}
+    adapter = (hugo_site / "content/authors/_content.gotmpl").read_text()
+    assert "hugo.Data.authornames" in adapter and '"kind" "term"' in adapter
+
+    pelican_site = pelican.build_site(tmp_path)
+    heads = [(pelican_site / f"content/posts/post-{i}/index.md").read_text()
+             for i in range(len(hard))]
+    assert [h.split("Authors: ", 1)[1].split("\n", 1)[0] for h in heads] == slugs
+    config = (pelican_site / "pelicanconf.py").read_text()
+    namespace = {}
+    exec(compile(config, "pelicanconf.py", "exec"), namespace)
+    assert namespace["AUTHOR_DISPLAY"] == {s: n for n, s in hard}
+
+    # the plugin names the Author objects, as it does the tags: one
+    # object per slug, the slug untouched, the name the one shown
+    articles = [SimpleNamespace(authors=[_FakeTag(s)]) for s in slugs]
+    generator = SimpleNamespace(
+        authors=[(a.authors[0], [a]) for a in articles], articles=articles,
+        translations=[], hidden_articles=[], hidden_translations=[],
+        drafts=[], drafts_translations=[])
+    namespace["_name_authors"](generator)
+    assert [str(a.authors[0]) for a in articles] == [n for n, _s in hard]
+    assert [a.authors[0].slug for a in articles] == slugs
 
 
 def test_hugo_does_not_publish_the_posts_section_page(archive):

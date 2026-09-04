@@ -191,6 +191,12 @@ regular list and taxonomy pages share `list.html`), plus:
   index and per-tag feeds all show a tag's name while its URL stays
   the slug -- and a checked-in copy of the site renames a tag by
   editing that one data file.
+- `content/authors/_content.gotmpl` is the same adapter for authors,
+  over `data/authornames.json` (author slug -> name, from
+  `hugo.write_author_names`). Bylines need it more than tags do: a name
+  left as the term puts its accents and punctuation into the path, and
+  the pelican site folds the same name to ASCII, so without it the two
+  engines serve one author at two different addresses.
 - `layouts/_default/rss.xml` gives full-content feeds, like the
   publication's original Medium feed: summary in `<description>`,
   complete body in `<content:encoded>`, capped by `services.rss.limit`.
@@ -244,8 +250,9 @@ regular list and taxonomy pages share `list.html`), plus:
 - `pelicanconf.py.tmpl` is the generated config, including the
   `_BodyImages` Markdown extension (body images load lazily, and are
   marked as bodies' for the site plugin's post-build pass) and
-  `TAG_DISPLAY`, the tag-slug-to-name map (tags reach Pelican as slugs
-  so their URLs are exact; see `tags.py`). It also renders `INTRO`,
+  `TAG_DISPLAY` and `AUTHOR_DISPLAY`, the slug-to-name maps for tags
+  and authors (both reach Pelican as slugs so their URLs are exact;
+  see `tags.py` and `sites.author_slug`). It also renders `INTRO`,
   site.json's landing-page blurb, from Markdown: `index.html` emits it
   into the same `.intro` block the hugo landing page uses, and Jinja
   has no Markdown filter to do it in the theme.
@@ -257,10 +264,12 @@ regular list and taxonomy pages share `list.html`), plus:
   related posts Hugo's related content gives each post (scored the
   same way: shared tags, then author, then date; `article.html` reads
   `article.related_posts`), and the
-  names tags are shown under (from `TAG_DISPLAY`, set on the `Tag`
-  objects so the theme and the per-tag feeds both pick them up). It
-  refers to names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
-  `NOINDEX`), so it is not importable on its own.
+  names tags and authors are shown under (from `TAG_DISPLAY` and
+  `AUTHOR_DISPLAY`, set on the `Tag` and `Author` objects so the theme
+  and the per-term feeds both pick them up; both reach Pelican as
+  slugs, so their URLs match the hugo site's exactly). It refers to
+  names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
+  `AUTHOR_DISPLAY`, `NOINDEX`), so it is not importable on its own.
 - `theme/templates/jsonld.html` is the hugo partial of the same name
   in Jinja, included by `base.html` after the page's address, name
   and share image are set; author profiles come from `AUTHOR_LINKS`

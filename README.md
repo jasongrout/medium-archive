@@ -147,7 +147,10 @@ with none stored, the system scheme decides. The theme provides:
 - A paginated home of cover-image cards. Each card shows the post's
   first still image of sane size (chosen by header-sniffing
   dimensions), tag links, excerpt and byline, with each
-  author linked to their listing.
+  author linked to their listing. Tags and authors are both addressed
+  by slug, so `/tags/<tag>/` and `/authors/<author>/` are the same on
+  either engine and a byline's accents and punctuation stay out of the
+  URL while the page still shows the name in full.
 - Article pages, tag and author card listings, and chip indexes
   sortable by name or by post count.
 - An optional header logo and browser-tab icon: `site.json`'s
