@@ -19,7 +19,7 @@ covers = ["pillow"]
 medium-archive = "medium_archive.cli:main"
 
 [dependency-groups]
-dev = ["pytest", "pillow"]
+dev = ["pytest", "pillow", "markdown"]
 
 [build-system]
 requires = ["hatchling"]

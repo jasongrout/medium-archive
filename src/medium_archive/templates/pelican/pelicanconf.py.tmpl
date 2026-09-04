@@ -58,6 +58,12 @@ CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = $avatar
 FAVICON = $favicon
 ANNOUNCEMENT = $announcement
+# site.json's "intro": the landing-page blurb. It is Markdown, like
+# the hugo site's content/_index.md, and is rendered here because
+# Jinja has no Markdown filter of its own; index.html emits it.
+import markdown as _markdown
+_INTRO_MD = $intro
+INTRO = _markdown.markdown(_INTRO_MD) if _INTRO_MD else None
 # keep search engines off this deployment (a preview): a noindex robots
 # tag on every page, and a robots.txt that disallows all
 NOINDEX = $noindex
@@ -101,15 +107,33 @@ from markdown.extensions import Extension as _Extension
 from markdown.treeprocessors import Treeprocessor as _Treeprocessor
 
 
-class _LazyImages(_Extension):
-    # body images load lazily, so a reader doesn't fetch every
-    # below-the-fold full-resolution image up front
+class _BodyImages(_Extension):
+    # Runs on the article's own Markdown tree, which is what makes it
+    # the counterpart of the hugo theme's image render hook: every img
+    # here is a body image, and an img the theme renders (a listing or
+    # related-post card) is not in this tree at all and cannot be
+    # reached from it. Two things follow from that.
+    #
+    # Each image loads lazily, so a reader doesn't fetch every
+    # below-the-fold full-resolution image up front; the site plugin
+    # promotes the first one on a page back to eager afterwards.
+    #
+    # Each is also marked as a body image. The plugin's post-build pass
+    # has to run late, on the finished HTML, because it needs output
+    # paths to encode variants beside and because pelican leaves
+    # {attach} unresolved until then (and does not resolve it inside a
+    # srcset at all). By then a body image and a card look alike, so
+    # this is where the distinction is recorded rather than guessed
+    # from the path -- a card points into some other post's images/
+    # directory, which no path rule separates reliably. The plugin
+    # strips the marker as it rewrites, so it never reaches a reader.
     def extendMarkdown(self, md):
-        class _Lazy(_Treeprocessor):
+        class _Body(_Treeprocessor):
             def run(self, root):
                 for img in root.iter("img"):
                     img.set("loading", "lazy")
-        md.treeprocessors.register(_Lazy(md), "lazy-images", 5)
+                    img.set("data-body-image", "")
+        md.treeprocessors.register(_Body(md), "body-images", 5)
 
 
 MARKDOWN = {
@@ -120,6 +144,6 @@ MARKDOWN = {
         # heading ids give search results per-section anchors
         "markdown.extensions.toc": {},
     },
-    "extensions": [_LazyImages()],
+    "extensions": [_BodyImages()],
     "output_format": "html5",
 }

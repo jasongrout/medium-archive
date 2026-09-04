@@ -98,35 +98,47 @@ def _write_crawl_files(pelican_obj):
 # Responsive body images, like the hugo exporter's render hook: webp
 # variants at these widths (never upscaled), advertised via srcset with
 # this sizes hint, plus real width/height so the layout cannot shift.
-# Photographs only -- png and webp here are line art the placer kept
-# whole (see ImagePlacer), whose 9 px text does not survive a 736 px
-# variant, and an animated gif would lose its frames.
 VARIANT_WIDTHS = (480, 736, 1104)
 SIZES_ATTR = "(max-width: 800px) 100vw, 736px"
+# An <img> tag, spanning its attribute values rather than stopping at
+# the first ">": an alt text can hold one (a caption naming a <code>
+# span, say), and a pattern that stopped there would match a fragment
+# with no src in it, leaving the image unprocessed and its marker on.
+IMG_TAG = r"""<img\b(?:[^>"']|"[^"]*"|'[^']*')*>"""
 IMG_TAG_RE = None   # compiled on first use
-ARTICLE_IMG = r"/?posts/[^/]+/images/[^/]+\.(?:png|jpe?g|gif|webp)"
-VARIANT_IMG = r"/?posts/[^/]+/images/[^/]+\.jpe?g"
+# Which images this pass may touch: the ones the Markdown extension
+# marked, and only those. The marker is how a body image is told from
+# one the theme rendered, since by this point -- the finished HTML --
+# the two are indistinguishable markup. A path rule cannot stand in for
+# it: a related-post card points into another post's own images/
+# directory, exactly where that post's body images live.
+BODY_IMAGE_ATTR = "data-body-image"
+# Photographs get the variant ladder. png and webp here are line art
+# the placer kept whole (see ImagePlacer), whose 9 px text does not
+# survive a 736 px variant, and an animated gif would lose its frames.
+VARIANT_SUFFIXES = (".jpg", ".jpeg")
 
 
 def _prioritize_first_images(pelican_obj):
-    # Every body image loads lazily (the _LazyImages extension). The
+    # Every body image loads lazily (the _BodyImages extension). The
     # first one on a post page is the one most likely on screen at
     # load, so it is fetched eagerly and first instead, as WordPress
     # treats the first content image: lazy-loading the largest visible
     # image delays the page's largest contentful paint. Body images
-    # alone qualify (the header avatar is not one); with none, the
-    # page is left as it is.
+    # alone qualify -- the header avatar and the related-post cards are
+    # not marked, so they cannot be picked; with none, the page is left
+    # as it is.
     import glob
     import os
     import re
-    img_re = re.compile(r'<img\b[^>]*\bsrc="(?:%s)?(%s)"[^>]*>'
-                        % (re.escape(SITEURL), ARTICLE_IMG), re.I)
+    img_re = re.compile(IMG_TAG, re.I)
     pages = 0
     for page in glob.glob(os.path.join(pelican_obj.output_path,
                                        "posts", "*", "index.html")):
         with open(page, encoding="utf-8") as fh:
             html = fh.read()
-        m = img_re.search(html)
+        m = next((m for m in img_re.finditer(html)
+                  if BODY_IMAGE_ATTR in m.group(0)), None)
         if not m or ' loading="lazy"' not in m.group(0):
             continue
         first = m.group(0).replace(' loading="lazy"', ' fetchpriority="high"', 1)
@@ -137,12 +149,14 @@ def _prioritize_first_images(pelican_obj):
 
 
 def _optimize_article_images(pelican_obj):
-    # Rewrite each article's body images (the constrained pattern this
-    # exporter itself emits; anything else passes through): every one
-    # gets real width/height and a link to the file itself, and
-    # photographs additionally get lazily loaded responsive variants.
-    # Variants are cached by mtime, so only new or changed images are
-    # re-encoded on later builds.
+    # Rewrite each article's body images -- the ones the Markdown
+    # extension marked, and nothing else: every one gets real
+    # width/height, and photographs additionally get lazily loaded
+    # responsive variants. Variants are cached by mtime, so only new or
+    # changed images are re-encoded on later builds.
+    #
+    # The marker comes off here, on every marked tag, whether or not
+    # this pass had anything to add to it, so it never reaches a reader.
     try:
         from PIL import Image
     except ImportError:
@@ -152,21 +166,25 @@ def _optimize_article_images(pelican_obj):
     import glob
     import os
     import re
-    tag_re = re.compile(r"<img\b[^>]*>")
+    tag_re = re.compile(IMG_TAG)
     attr_re = re.compile(r'([-\w]+)="([^"]*)"')
-    path_re = re.compile(ARTICLE_IMG + "$", re.I)
-    variant_re = re.compile(VARIANT_IMG + "$", re.I)
+    marker_re = re.compile(r'\s*\b%s\b(?:="[^"]*")?' % BODY_IMAGE_ATTR, re.I)
     stats = {"variants": 0, "pages": 0}
 
     here = os.path.dirname(os.path.abspath(__file__))
 
     def rewrite(match):
         tag = match.group(0)
+        if not marker_re.search(tag):    # the theme's, not a body's
+            return tag
+        bare = marker_re.sub("", tag, count=1)
         attrs = dict(attr_re.findall(tag))
         src = attrs.get("src", "")
         path = src[len(SITEURL):] if SITEURL and src.startswith(SITEURL) else src
-        if "srcset" in attrs or not path_re.fullmatch(path):
-            return tag
+        # an image the archive never localized (a remote CDN URL that
+        # lint reports) has no file here to measure or re-encode
+        if "srcset" in attrs or "://" in path:
+            return bare
         parts = path.lstrip("/").split("/")
         local = os.path.join(pelican_obj.output_path, *parts)
         # encode from (and cache against) the content-side original:
@@ -176,7 +194,7 @@ def _optimize_article_images(pelican_obj):
         if not os.path.exists(source):
             source = local
         try:
-            wants_variants = bool(variant_re.fullmatch(path))
+            wants_variants = path.lower().endswith(VARIANT_SUFFIXES)
             with Image.open(source) as im:
                 width, height = im.size
                 srcset = []
@@ -200,16 +218,16 @@ def _optimize_article_images(pelican_obj):
                     srcset.append("%s-%d.webp %dw"
                                   % (os.path.splitext(src)[0], vw, vw))
         except OSError:
-            return tag
+            return bare
         extra = ""
         if "width" not in attrs and "height" not in attrs:
             extra += ' width="%d" height="%d"' % (width, height)
         if srcset:
             extra += ' srcset="%s" sizes="%s"' % (", ".join(srcset), SIZES_ATTR)
         if not extra:
-            return tag
-        end = "/>" if tag.endswith("/>") else ">"
-        return tag[:-len(end)] + extra + end
+            return bare
+        end = "/>" if bare.endswith("/>") else ">"
+        return bare[:-len(end)] + extra + end
 
     for page in glob.glob(os.path.join(pelican_obj.output_path,
                                        "posts", "*", "index.html")):

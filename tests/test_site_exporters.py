@@ -132,7 +132,7 @@ def test_pelican_page_renders_the_figure_shell_as_one_block(archive):
     page = (site / "content/posts/captioned-post/index.md").read_text()
     assert ('<figure markdown="span">\n'
             '<img alt="Alt text" src="{attach}images/001-fig.gif" '
-            'loading="lazy">\n'
+            'loading="lazy" data-body-image="">\n'
             '<figcaption markdown="span">The caption, with a '
             "[link](https://example.com).</figcaption>\n"
             "</figure>") in page
@@ -156,7 +156,8 @@ def test_link_wrapped_figures_keep_their_link():
     assert pelican.figure_blocks(shell) == (
         '<figure markdown="span">\n'
         '<a href="https://demo.example">'
-        '<img alt="Alt" src="images/a.png" loading="lazy"></a>\n'
+        '<img alt="Alt" src="images/a.png" loading="lazy" '
+        'data-body-image=""></a>\n'
         '<figcaption markdown="span">Cap.</figcaption>\n</figure>')
 
 
@@ -452,7 +453,7 @@ def test_pelican_site(archive):
     assert "FEED_MAX_ITEMS = 20" in config
     assert 'THEME = "theme"' in config
     assert '"search.html": "search/index.html"' in config
-    assert "_LazyImages" in config           # body images load lazily
+    assert "_BodyImages" in config           # body images load lazily
     assert 'AVATAR = "theme/img/avatar.png"' in config
     assert (site / "theme/static/img/avatar.png").read_bytes() == b"IMG"
     assert 'FAVICON = "theme/favicon.svg"' in config
@@ -825,11 +826,19 @@ def test_pelican_escapes_by_default(archive):
     for key in ('"trim_blocks": True', '"lstrip_blocks": True',
                 '"extensions": []'):
         assert key in config, key
-    # article.content is the one genuinely-HTML value in the theme
+    # the genuinely-HTML values in the theme, and the only ones: the
+    # rendered body, and the landing-page intro the config renders from
+    # site.json's Markdown. The intro is hand-written and versioned with
+    # the archive, unlike a title or a tag name, which come from whoever
+    # wrote the post -- that is what makes it safe to mark safe.
     templates = site / "theme/templates"
     safe = [(f.name, line.strip()) for f in sorted(templates.glob("*.html"))
             for line in f.read_text().splitlines() if "|safe" in line]
-    assert safe == [("article.html", "{{ article.content|safe }}")], safe
+    assert safe == [
+        ("article.html", "{{ article.content|safe }}"),
+        ("index.html",
+         '{% if INTRO %}<div class="intro">{{ INTRO|safe }}</div>{% endif %}'),
+    ], safe
 
 
 def test_missing_base_url_is_not_silent(tmp_path, capsys):
@@ -1335,6 +1344,95 @@ def test_alt_text_falls_back_to_the_caption():
     given = shell.replace("![]", "![Given]")
     assert 'alt="Given"' in hugo.figure_shortcodes(given)
     assert 'alt="Given"' in pelican.figure_blocks(given)
+
+
+def test_intro_reaches_both_landing_pages(archive):
+    """site.json's "intro" is the landing-page blurb, and belongs on
+    both preferred targets. Hugo renders it from content/_index.md; the
+    pelican config renders the same Markdown (jinja has no Markdown
+    filter of its own) and index.html emits it into the same .intro
+    block the shared stylesheet already styles."""
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert "Welcome." in (hugo_site / "content" / "_index.md").read_text()
+    assert '_INTRO_MD = "Welcome."' in (
+        pelican_site / "pelicanconf.py").read_text()
+    index = (pelican_site / "theme/templates/index.html").read_text()
+    assert 'class="intro"' in index and "INTRO" in index
+
+
+def test_intro_absent_leaves_a_valid_config(archive):
+    """No intro must leave the config valid Python, the way the avatar
+    and announcement keys do -- json.dumps(None) would emit a
+    NameError-raising `null`."""
+    cfg = json.loads((archive / "site.json").read_text())
+    del cfg["intro"]
+    (archive / "site.json").write_text(json.dumps(cfg))
+    config = (pelican.build_site(archive) / "pelicanconf.py").read_text()
+    assert "_INTRO_MD = None" in config
+
+
+def test_hugo_cards_show_the_curated_description(archive):
+    """A card's excerpt is the description convert writes, which is what
+    the pelican card renders. Hugo's .Summary is its own auto-summary of
+    the body, so leaving it first would show a post's opening sentence
+    on the card while the other engine showed the subtitle."""
+    card = (hugo.build_site(archive)
+            / "layouts/partials/card.html").read_text()
+    assert "or .Description .Summary" in card
+
+
+def test_body_images_are_marked_where_only_a_body_image_can_be(archive):
+    """The post-build pass has to run on the finished HTML: it needs
+    output paths to encode variants beside, and pelican leaves {attach}
+    unresolved until then (and never resolves it inside a srcset). By
+    then a body image and one the theme rendered are the same markup,
+    and no path rule separates them -- a related-post card points into
+    another post's own images/ directory, exactly where that post's
+    body images live. So the distinction is recorded upstream, in the
+    Markdown extension, which is the counterpart of the hugo theme's
+    render hook: every img in an article's tree is a body image, and a
+    card is not in that tree to be reached. The pass keys off the mark
+    and strips it, so no reader sees it."""
+    namespace = {}
+    exec(compile((pelican.build_site(archive) / "pelicanconf.py").read_text(),
+                 "pelicanconf.py", "exec"), namespace)
+    assert namespace["BODY_IMAGE_ATTR"] == "data-body-image"
+    # the path rule this replaced must not creep back: it is what took
+    # a card's cover.jpg for a body image
+    assert "ARTICLE_IMG" not in namespace and "VARIANT_IMG" not in namespace
+
+    # the extension really marks what the Markdown tree holds
+    import markdown as md_mod
+    html = md_mod.markdown("Text.\n\n![pic](images/001-pic.png)\n",
+                           **namespace["MARKDOWN"])
+    assert 'data-body-image=""' in html and 'loading="lazy"' in html
+
+    # and the pass takes the mark off whichever way it returns a tag
+    plugin = (pelican.build_site(archive) / "pelicanconf.py").read_text()
+    # exactly one way out keeps the tag as it stands -- the one for a
+    # tag with no mark, which is the theme's; every other return is of
+    # the marker-stripped `bare`
+    assert "bare = marker_re.sub(" in plugin
+    assert plugin.count("return tag") == 1
+
+    # the exporter marks the figure shells' literal tags, so its name
+    # for the attribute and the plugin's have to be the one string
+    assert pelican.BODY_IMAGE_ATTR == namespace["BODY_IMAGE_ATTR"]
+
+    # a captioned image is written as a literal tag, not rendered from
+    # the tree, so it carries the mark from the exporter instead
+    figure = pelican.figure_blocks(
+        "<figure>\n\n![Alt](images/a.png)\n\n<figcaption>\n\nCap.\n\n"
+        "</figcaption>\n\n</figure>")
+    assert f'{pelican.BODY_IMAGE_ATTR}=""' in figure
+
+    # an alt holding a ">" (a caption naming a <code> span) must not cut
+    # the tag short: that would leave the image unprocessed, its mark on
+    tag_re = re.compile(namespace["IMG_TAG"])
+    tricky = ('<img alt="a <code>x</code> span" src="/posts/p/images/1.jpg"'
+              f' loading="lazy" {pelican.BODY_IMAGE_ATTR}="">')
+    assert tag_re.search(tricky).group(0) == tricky
 
 
 def test_author_slugs_are_clean_and_shared_by_both_sites(tmp_path):
