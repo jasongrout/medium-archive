@@ -30,6 +30,10 @@ IMG_BASE = "https://miro.medium.com/v2/"
 # forced by an overlapping markup never severs an <a>.
 MARKUP_TAGS = ("CODE", "EM", "STRONG", "A")
 
+# A soft line break inside a paragraph's text, with the whitespace that
+# sits either side of it (see _text_html).
+SOFT_BREAK_RE = re.compile(r"[ \t]*\n[ \t]*")
+
 # The renderer promotes the editor's section/sub-section headings one
 # level (the h1 is the title); match it so both body sources agree.
 HEADINGS = {"H2": "h2", "H3": "h2", "H4": "h3"}
@@ -176,6 +180,15 @@ def _markup_href(state, mu) -> str | None:
     return f"https://medium.com/@{username}" if username else None
 
 
+def _text_html(text: str) -> str:
+    """Escaped paragraph text with Medium's soft line breaks as <br>.
+    The editor stores a shift-enter break as a literal newline inside
+    the paragraph's text; left alone it is HTML whitespace, so the two
+    lines run together. The spaces around it go with the break, so a
+    line never ends in stray whitespace or starts indented."""
+    return SOFT_BREAK_RE.sub("<br>", escape(text))
+
+
 def _rich_text(text: str, markups: list, state: dict | None = None) -> str:
     """Paragraph text with its markups applied, as escaped HTML."""
     markups = [mu for mu in markups or [] if mu.get("type") in MARKUP_TAGS]
@@ -189,7 +202,7 @@ def _rich_text(text: str, markups: list, state: dict | None = None) -> str:
         resolved.append(mu)
     markups = resolved
     if not markups:
-        return escape(text)
+        return _text_html(text)
     to_char = _unit_to_char(text)
     spans = [(MARKUP_TAGS.index(mu["type"]), to_char(mu["start"]),
               to_char(mu["end"]), mu) for mu in markups]
@@ -197,7 +210,7 @@ def _rich_text(text: str, markups: list, state: dict | None = None) -> str:
                      *(e for _, _, e, _ in spans)})
     out = []
     for a, b in zip(bounds, bounds[1:]):
-        seg = escape(text[a:b])
+        seg = _text_html(text[a:b])
         for prio, s, e, mu in sorted(spans):    # low priority wraps first
             if s <= a and b <= e:
                 if mu["type"] == "A":
