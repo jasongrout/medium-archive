@@ -230,6 +230,18 @@ def build_site(out):
                                     canonical=canonical_for(p)),
         placer=ImagePlacer(out, config), transform=figure_shortcodes,
         covers=covers)
+    # Hugo makes content/posts/ a section and publishes a list page and
+    # a feed for it unasked: /posts/ is the home listing again, its 14
+    # pagination pages included, canonical to itself and in the sitemap
+    # while nothing links to it -- two indexable addresses for one
+    # listing, the second headed by a bare lowercase "posts". Pelican
+    # has no sections (posts/<slug>/ is only a URL pattern there), so
+    # dropping the page is also what makes the two sites agree. The
+    # posts themselves are untouched; only the section's own page goes.
+    (site / "content" / "posts" / "_index.md").write_text(
+        json.dumps({"title": "Posts",
+                    "_build": {"render": "never", "list": "never"}}) + "\n",
+        encoding="utf-8")
     write_tag_names(site, tag_names(manifest, out))
     write_author_links(site, author_links(manifest))
 
