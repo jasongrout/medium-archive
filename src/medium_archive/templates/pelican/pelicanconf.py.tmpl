@@ -79,21 +79,49 @@ PROFILES = $profiles
 SHARE_IMAGE = $share_image
 SHARE_IMAGE_SIZE = $share_image_size
 COVER_SIZE = $cover_size
+
+# ------------------------------------------------------------- data files
+# The maps this site renders names from live beside this file as
+# data/*.json rather than in it, the same three files the hugo site
+# reads through hugo.Data: this config is generated and carries a
+# warning against editing it, while a name or a profile is exactly what
+# a checked-in copy of a site corrects by hand. They are read here, at
+# config time, so the rest of this file and the site plugin below see
+# ordinary Python dicts.
+import json as _json
+import os as _os
+
+_DATA_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)),
+                          "data")
+
+
+def _data(name):
+    """One data file, as a dict. Missing is empty: without it every tag
+    and author simply shows as its slug, which is a site worth building."""
+    try:
+        with open(_os.path.join(_DATA_DIR, name), encoding="utf-8") as fh:
+            return _json.load(fh)
+    except FileNotFoundError:
+        return {}
+
+
 # author name -> profile address (the Medium profile of every byline):
 # the Person's sameAs in a post's structured data, and the author
-# page's. Edit to add or correct one.
-AUTHOR_LINKS = $author_links
+# page's. Edit data/authors.json to add or correct one.
+AUTHOR_LINKS = _data("authors.json")
 # tag slug -> the name the tag is shown under. Tags reach Pelican as
 # slugs, so tag.slug and every /tags/<slug>/ URL are exact rather than
 # whatever Pelican's slugify would make of a name like "C++"; the site
 # plugin below names each Tag object from this map once the tags are
-# collected, which is what the theme and the feeds then render.
-TAG_DISPLAY = $tag_display
+# collected, which is what the theme and the feeds then render. Rename
+# a tag by editing data/tags.json.
+TAG_DISPLAY = _data("tags.json")
 # author slug -> the name they are shown under. Bylines reach Pelican as
 # slugs for the same reason tags do, so author.slug and every
 # /authors/<slug>/ URL match the hugo site's exactly; the site plugin
 # names each Author object from this map once they are collected.
-AUTHOR_DISPLAY = $author_display
+# Rename an author by editing data/authornames.json.
+AUTHOR_DISPLAY = _data("authornames.json")
 
 FEED_ALL_ATOM = "feeds/all.atom.xml"
 FEED_MAX_ITEMS = 20             # a feed announces new posts; the site

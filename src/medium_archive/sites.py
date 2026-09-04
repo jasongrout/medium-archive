@@ -913,6 +913,43 @@ def author_links(manifest: dict) -> dict:
     return dict(sorted(links.items()))
 
 
+def site_data(manifest: dict, out: Path) -> dict:
+    """File name -> the map it holds, for the data files both the hugo
+    and the pelican site are built with. They hold what a site is
+    rendered from that is neither the posts nor the hand-written
+    site.json: the names tags and authors are shown under, and the
+    profile address of each byline. Derived from the archive here and
+    written beside the site's config rather than baked into it, so a
+    checked-in copy of a site can correct a name or add a profile by
+    editing one small file -- and so a rename reaches every place the
+    engine renders that term at once (cards, the term page and its
+    title, the chip index, the per-term feed), which a directory per
+    term could not.
+
+    Tags and authors reach both engines as slugs, so a term and its
+    /tags/<slug>/ or /authors/<slug>/ URL are exactly the archive's
+    rather than whatever each engine's slugify would make of "C++" or
+    of an accented byline (see tags.py and author_slug); these maps
+    carry the spaces, capitals, accents and punctuation that only the
+    rendered name needs. The author profiles are keyed by that rendered
+    name, which is what a byline reads as in the structured data."""
+    return {"tags.json": tag_names(manifest, out),
+            "authornames.json": author_names(manifest),
+            "authors.json": author_links(manifest)}
+
+
+def write_data_files(site: Path, manifest: dict, out: Path) -> dict:
+    """Write site_data's maps as <site>/data/*.json, sorted so a diff
+    between two builds shows only what the archive changed."""
+    data = site_data(manifest, out)
+    (site / "data").mkdir(parents=True, exist_ok=True)
+    for name, mapping in data.items():
+        (site / "data" / name).write_text(
+            json.dumps(dict(sorted(mapping.items())), indent=2,
+                       ensure_ascii=False) + "\n", encoding="utf-8")
+    return data
+
+
 def site_profiles(config: dict) -> list:
     """The publication's addresses elsewhere, for the Organization's
     sameAs: site.json "profiles" (a list of URLs) plus the X/Twitter

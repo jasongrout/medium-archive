@@ -249,9 +249,9 @@ with none stored, the system scheme decides. The theme provides:
     `WebSite` (with the search page as its `SearchAction`), a
     `BreadcrumbList` placing the page (home, the tag or author index,
     the page), the post's `BlogPosting` with each author's Medium
-    profile as `sameAs` (from the bylines, through `data/authors.json`
-    in the hugo site and `AUTHOR_LINKS` in the pelican config), and
-    each author page as a `ProfilePage` of that `Person`.
+    profile as `sameAs` (from the bylines, through each site's
+    `data/authors.json`), and each author page as a `ProfilePage` of
+    that `Person`.
   - Per-post canonicals. Every page is its own canonical: the archive
     is the posts' home, and the Medium copy is never named as one. The
     exception is a post that declared a canonical on another host
@@ -280,6 +280,17 @@ with none stored, the system scheme decides. The theme provides:
   every later one lazily, as WordPress treats the first content image:
   the first is usually on screen at load, and lazy-loading it delays
   the largest contentful paint.
+- Three hand-editable data files, `data/tags.json`,
+  `data/authornames.json` and `data/authors.json`, written the same in
+  both sites: the name each tag and each author is shown under, and the
+  profile address of each byline. Tags and authors reach both engines
+  as slugs so their URLs are exact, and these files are where the
+  spaces, capitals, accents and punctuation of the rendered name live.
+  Hugo reads them through `hugo.Data`, the pelican config reads them
+  beside itself, so a checked-in site renames a tag or corrects a
+  profile by editing one small file -- and the new name reaches every
+  place the engine renders that term (cards, the term page and its
+  title, the chip index, the per-term feed) at once.
 - A `/search/` page wired to [Pagefind](https://pagefind.app). Run
   `pagefind --site public` (hugo) or `pagefind --site output` (pelican)
   after building for full-text search served as a results page with

@@ -166,14 +166,24 @@ def post_front(site, stem):
     return page_front(site / f"content/posts/{stem}/index.md")
 
 
+def config_namespace(site):
+    """The generated config, executed as pelican executes it: from its
+    own path, so the `data/*.json` files it reads beside itself are
+    found. It is executable Python and needs neither pelican nor the
+    site's own build, so its settings, its reader and the site plugin's
+    functions can all be exercised from here."""
+    path = site / "pelicanconf.py"
+    namespace = {"__file__": str(path)}
+    exec(compile(path.read_text(), "pelicanconf.py", "exec"), namespace)
+    return namespace
+
+
 def config_parser(site):
     """The markdown-it parser the generated config reads posts with.
-    The config is executable Python, and its reader is built where a
-    pelican build would build it, so this is the same parser the site
-    renders with -- without needing pelican itself installed."""
-    namespace = {}
-    exec(compile((site / "pelicanconf.py").read_text(), "pelicanconf.py",
-                 "exec"), namespace)
+    The config's reader is built where a pelican build would build it,
+    so this is the same parser the site renders with -- without needing
+    pelican itself installed."""
+    namespace = config_namespace(site)
     return namespace, namespace["_make_md"]()
 
 
@@ -482,10 +492,55 @@ def test_tag_display_names_reach_both_sites(archive):
     pelican_site = pelican.build_site(archive)
     # the tag is still a slug
     assert post_front(pelican_site, "second-post")["tags"] == ["example"]
+    # the same data file, hand-editable beside the generated config,
+    # which reads it into TAG_DISPLAY at build time
+    assert json.loads((pelican_site / "data/tags.json").read_text()) \
+        == {"example": "Example Tag"}
     config = (pelican_site / "pelicanconf.py").read_text()
-    assert '"example": "Example Tag"' in config
+    assert 'TAG_DISPLAY = _data("tags.json")' in config
+    assert config_namespace(pelican_site)["TAG_DISPLAY"] \
+        == {"example": "Example Tag"}
     assert "_name_tags" in config          # names the Tag objects, so the
     assert "article_generator_finalized" in config   # feeds get it too
+
+
+def test_both_sites_write_the_same_hand_editable_data_files(archive):
+    """The maps that are neither a post nor site.json -- tag names,
+    author names, byline profiles -- are data files beside each site's
+    config, the same three files with the same contents in both sites.
+    Hugo reads them through hugo.Data; the pelican config reads them at
+    config time, so editing one by hand renames a tag or corrects a
+    profile in the built site without re-running the exporter."""
+    (archive / "tags.json").write_text(json.dumps(
+        {"display": {"example": "Example Tag"}}))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for name in ("tags.json", "authornames.json", "authors.json"):
+        got = (pelican_site / "data" / name).read_bytes()
+        assert got == (hugo_site / "data" / name).read_bytes(), name
+        assert got.endswith(b"\n")           # a diffable, editable file
+    assert json.loads((pelican_site / "data/tags.json").read_text()) \
+        == {"example": "Example Tag"}
+    assert json.loads((pelican_site / "data/authornames.json").read_text()) \
+        == {"ada-lovelace": "Ada Lovelace"}
+    assert json.loads((pelican_site / "data/authors.json").read_text()) \
+        == {"Ada Lovelace": "https://medium.com/@ada"}
+    # nothing of the three is baked into the generated config
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert "Example Tag" not in config and "medium.com/@ada" not in config
+
+    # a hand edit reaches the config's settings, with no rebuild
+    (pelican_site / "data/tags.json").write_text(
+        json.dumps({"example": "Renamed By Hand"}))
+    assert config_namespace(pelican_site)["TAG_DISPLAY"] \
+        == {"example": "Renamed By Hand"}
+    # and a deleted file leaves a site that still builds, tags and
+    # authors showing as their slugs
+    for name in ("tags.json", "authornames.json", "authors.json"):
+        (pelican_site / "data" / name).unlink()
+    namespace = config_namespace(pelican_site)
+    assert namespace["TAG_DISPLAY"] == namespace["AUTHOR_DISPLAY"] == {}
+    assert namespace["AUTHOR_LINKS"] == {}
 
 
 def test_tags_display_as_slugs_with_spaces_by_default(archive):
@@ -576,9 +631,7 @@ def test_every_article_gets_the_named_tag_object(archive):
     (archive / "tags.json").write_text(json.dumps(
         {"display": {"example": "Example Tag"}}))
     site = pelican.build_site(archive)
-    namespace = {}
-    exec(compile((site / "pelicanconf.py").read_text(), "pelicanconf.py",
-                 "exec"), namespace)
+    namespace = config_namespace(site)
 
     # three articles, each with its own object for the one tag
     articles = [SimpleNamespace(tags=[_FakeTag("example")]) for _ in range(3)]
@@ -1447,7 +1500,12 @@ def test_structured_data_graph(archive):
     pelican_site = pelican.build_site(archive)
     config = (pelican_site / "pelicanconf.py").read_text()
     assert 'PROFILES = ["https://github.com/example", "https://x.com/example"]' in config
-    assert '"Ada Lovelace": "https://medium.com/@ada"' in config
+    # the byline profiles are the same data file in both sites, read
+    # into the pelican config as AUTHOR_LINKS
+    assert json.loads((pelican_site / "data/authors.json").read_text()) \
+        == {"Ada Lovelace": "https://medium.com/@ada"}
+    assert config_namespace(pelican_site)["AUTHOR_LINKS"] \
+        == {"Ada Lovelace": "https://medium.com/@ada"}
     assert '{% include "jsonld.html" %}' in (pelican_site / "theme/templates/base.html").read_text()
     for engine, site in (("hugo", hugo_site), ("pelican", pelican_site)):
         src = _graph_source(site, engine)
@@ -1473,9 +1531,7 @@ def test_related_posts(archive):
     assert "| first 3 }}" in related     # three, the width of the home page's card rows
     pelican_site = pelican.build_site(archive)
     assert "article.related_posts" in (pelican_site / "theme/templates/article.html").read_text()
-    namespace = {}
-    exec(compile((pelican_site / "pelicanconf.py").read_text(), "pelicanconf.py",
-                 "exec"), namespace)
+    namespace = config_namespace(pelican_site)
     from datetime import datetime
     day = lambda n: datetime(2020, 1, n)
     tag = lambda s: SimpleNamespace(slug=s)
@@ -1635,9 +1691,11 @@ def test_author_slugs_are_clean_and_shared_by_both_sites(tmp_path):
     pelican_site = pelican.build_site(tmp_path)
     assert [post_front(pelican_site, f"post-{i}")["authors"][0]
             for i in range(len(hard))] == slugs
-    config = (pelican_site / "pelicanconf.py").read_text()
-    namespace = {}
-    exec(compile(config, "pelicanconf.py", "exec"), namespace)
+    # the same map, as the same data file the hugo site got, read back
+    # by the config
+    assert json.loads((pelican_site / "data/authornames.json").read_text()) \
+        == {s: n for n, s in hard}
+    namespace = config_namespace(pelican_site)
     assert namespace["AUTHOR_DISPLAY"] == {s: n for n, s in hard}
 
     # the plugin names the Author objects, as it does the tags: one

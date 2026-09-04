@@ -29,16 +29,23 @@ tag/author) come out of the box. Tags
 reach Pelican as slugs, so tag.slug and every /tags/<slug>/ URL are
 exactly the archive's tag rather than whatever Pelican's slugify would
 make of a name like "C++"; the names tags are shown under (tags.json's
-`display`) go into pelicanconf.py as TAG_DISPLAY, from which the site
-plugin names the Tag objects once the tags are collected -- Pelican
-renders a tag from the object everywhere, the per-tag feed title
-included, and that one it builds in Python out of reach of a template.
-Authors take the same route, and need it more: a byline is a person's
-name, so left as the term it would reach each generator raw -- hugo
-keeping its accents and punctuation in the path, Pelican folding them
-away -- and one author would sit at two addresses. Both exporters write
-sites.author_slug's slug instead, AUTHOR_DISPLAY carries the names, and
-the site plugin puts them on the Author objects the same way.
+`display`) arrive instead as one data file beside the config,
+data/tags.json, which pelicanconf.py reads into TAG_DISPLAY and the
+site plugin names the Tag objects from once the tags are collected --
+Pelican renders a tag from the object everywhere, the per-tag feed
+title included, and that one it builds in Python out of reach of a
+template. Authors take the same route, and need it more: a byline is a
+person's name, so left as the term it would reach each generator raw --
+hugo keeping its accents and punctuation in the path, Pelican folding
+them away -- and one author would sit at two addresses. Both exporters
+write sites.author_slug's slug instead, data/authornames.json carries
+the names, and the site plugin puts them on the Author objects the same
+way. The byline profiles the structured data reads are the third such
+file, data/authors.json. All three are what the hugo site is built from
+too, with the same names and contents (see sites.write_data_files):
+they are generated, but a name or a profile is exactly what a
+checked-in copy of a site corrects by hand, and the config that reads
+them is not.
 
 The exporter writes its own theme, from the package's templates/pelican/
 and templates/shared/ files -- the card-grid blog shared with
@@ -68,8 +75,8 @@ updated date) and a robots.txt naming it, and the related posts each
 post page closes with (by shared tags, then author, then date); the
 theme's pages carry the metadata search engines and share targets read
 (see templates/README.md): the structured data's author and publisher
-profiles come from AUTHOR_LINKS (the Medium profile of every byline)
-and site.json's "profiles"/"twitter", the og:image of a page with no
+profiles come from AUTHOR_LINKS (data/authors.json: the Medium profile
+of every byline) and site.json's "profiles"/"twitter", the og:image of a page with no
 cover from its "share_image", and a post that declared a canonical on
 another host (Medium's "originally published at") carries it as a
 Canonical: header; the Medium copy is never a page's canonical.
@@ -79,13 +86,12 @@ import json
 import re
 import sys
 
-from .sites import (COVER_SIZE, Covers, ImagePlacer, author_links,
-                    author_names, author_slug,
+from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
                     front_matter_yaml, image_size, load_site_inputs,
                     page_stems, quote_arg, rewrite_figures, site_profiles,
-                    tag_names, template_text, write_redirects_csv,
+                    template_text, write_data_files, write_redirects_csv,
                     write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
@@ -230,14 +236,17 @@ def build_site(out):
         share_image=setting(share and f"theme/img/{share}"),
         share_image_size=setting(share_size and list(share_size)),
         cover_size=setting(list(COVER_SIZE) if covers.pillow else None),
-        author_links=json.dumps(author_links(manifest), ensure_ascii=False,
-                                indent=4),
-        author_display=json.dumps(author_names(manifest), ensure_ascii=False,
-                                  indent=4),
-        tag_display=json.dumps(dict(sorted(tag_names(manifest, out).items())),
-                               ensure_ascii=False, indent=4),
     ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")
 
+    # data/tags.json, data/authornames.json and data/authors.json: the
+    # slug-to-name maps the site plugin names the Tag and Author objects
+    # from, and the byline profiles the structured data names as each
+    # author's sameAs. The config reads all three at build time, so a
+    # name or a profile is corrected by editing one small file instead
+    # of a generated config; they are the same three files, with the
+    # same contents, the hugo site reads through hugo.Data (see
+    # sites.write_data_files).
+    write_data_files(site, manifest, out)
     write_templates(site, TEMPLATES)
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"pelican done: {pages}/{len(manifest)} pages -> {site}",
