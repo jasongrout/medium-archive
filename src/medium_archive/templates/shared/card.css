@@ -65,8 +65,15 @@
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
         --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
                        Arial, sans-serif;
-        --source-serif: "Source Serif Pro", Georgia, Cambria,
-                        "Times New Roman", Times, serif;
+        /* Source Serif 4 is the extension and replacement of Source
+           Serif Pro: the same text design, plus an optical-size axis
+           the browser drives itself (font-optical-sizing is auto by
+           default), so the article's 1.25rem running text is set in
+           the drawing meant for reading sizes rather than one scaled
+           from a single master. Pro sits behind it for a reader who
+           has the older family installed locally but not the new one. */
+        --source-serif: "Source Serif 4", "Source Serif Pro", Georgia,
+                        Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
                        Menlo, Consolas, monospace;
         --atkinson: "Atkinson Hyperlegible", "Helvetica Neue", Helvetica,
@@ -126,8 +133,8 @@ a:hover { text-decoration-line: underline; }
    at ~7:1 on the dark cards. Both tune the rule, where the default
    leaves it to the browser: a 1px rule dropped clear of the baseline,
    so text-decoration-skip-ink cuts small nicks around the descenders
-   rather than long gaps. (Source Serif Pro's own underline sits at
-   -0.05em, where its descenders at -0.249em break the line into
+   rather than long gaps. (Source Serif 4's own underline sits at
+   -0.05em, where its descenders at -0.25em break the line into
    pieces and a thin rule reads thinner still.) */
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea; }
 :root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe; }
