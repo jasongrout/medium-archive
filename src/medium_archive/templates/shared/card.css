@@ -631,8 +631,10 @@ ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
    accent. The form is HubSpot's, rendered into .newsletter-form inside
    an iframe of its own, which no stylesheet here can reach: its look is
    read off these same tokens and passed to the embed as a string
-   (shared/newsletter.html), which is also where the band is unhidden,
-   once there is a form to show. */
+   (shared/newsletter.html), laid out the way jupyter.org reads down --
+   heading, the fields on one row, the consent copy under them, the
+   button below that -- and that snippet is also where the band is
+   unhidden, once there is a form to show. */
 .newsletter { background: var(--card); border-top: 1px solid var(--line);
               margin-top: 3rem; padding: 2.5rem 0; }
 .newsletter[hidden] { display: none; }

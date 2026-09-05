@@ -201,7 +201,11 @@ These embed verbatim in both engines' pages, so they must carry no
   and handed to the embed as the CSS string it styles that iframe
   with; the button takes the accent with the text-shadow the
   announcement banner uses, the accent being too light a ground for
-  plain white text. Those values are baked in at render time, so the
+  plain white text. That string also carries the layout, jupyter.org's
+  own in the order it reads down: the fields on one row, the consent
+  copy on its own beneath them, the button below that. The last two
+  take a full-width flex basis rather than being left to wrap there by
+  arithmetic, so the order holds whatever fields the form is given. Those values are baked in at render time, so the
   form is drawn again whenever the theme or font picker changes them,
   and when the system scheme changes with no choice pinned. The band's
   markup is emitted hidden and shown here, once the embed has loaded:

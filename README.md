@@ -194,8 +194,9 @@ with none stored, the system scheme decides. The theme provides:
   clears it.
 - An optional newsletter signup band at the foot of every page, from
   `site.json`'s `"newsletter"`: a heading and a HubSpot form, the
-  section jupyter.org closes its own pages with, drawn in the site's
-  own type and colours. The form renders inside HubSpot's iframe, so
+  section jupyter.org closes its own pages with, laid out the way that
+  page reads down -- heading, the fields on one row, the consent copy,
+  the button -- and drawn in the site's own type and colours. The form renders inside HubSpot's iframe, so
   the site's ink, accent and body face are passed to the embed and
   re-passed whenever the reader changes the theme or the font; the band
   stays hidden unless the embed loads, so a blocked script leaves no

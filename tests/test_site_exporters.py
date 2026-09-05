@@ -824,6 +824,11 @@ def test_newsletter_band(archive):
         # its look is passed to the embed -- with this site's accent on
         # the button, not the colour jupyter.org hard-codes
         assert "--accent" in text and ".hs-button" in text, base
+        # and jupyter.org's layout: the fields on one row, then the
+        # consent copy, then the button, each of the last two on a
+        # full-width basis so the order holds at any field count
+        assert '".hs-richtext { flex: 1 0 100%;' in text, base
+        assert '".hs-submit { flex: 1 0 100%; }"' in text, base
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".newsletter " in css and ".newsletter h2" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()

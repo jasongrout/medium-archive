@@ -13,6 +13,11 @@
   // face, the button the accent (white on it at the text-shadow the
   // announcement banner uses, since the accent is a 2.8:1 ground), and
   // the consent copy the muted gray the rest of the chrome is set in.
+  // The layout is jupyter.org's, in the order that page reads down:
+  // the fields on one row, the consent copy on its own beneath them,
+  // and the button below that. The last two are given a full-width
+  // basis rather than left to wrap there by arithmetic, so the order
+  // holds however many fields the form is later given.
   function formCss() {
     var ink = token("--ink", "#1c1c1c");
     var muted = token("--muted", "#525252");
@@ -21,9 +26,9 @@
     var face = getComputedStyle(document.body).fontFamily;
     return [
       "body { font-family: " + face + "; }",
-      ".hs-form { display: flex; flex-wrap: wrap; gap: 1rem;" +
+      ".hs-form { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem;" +
         " align-items: flex-end; font-size: 1rem; }",
-      ".hs-form-field { flex: 1 1 15rem; position: relative;" +
+      ".hs-form-field { flex: 1 1 11rem; position: relative;" +
         " padding-bottom: 1.4em; }",
       ".hs-form-field label { color: " + muted + " !important;" +
         " font-size: 0.85em; }",
@@ -38,10 +43,10 @@
         " border-bottom-width: 2px !important; }",
       ".hs-input.error { border-bottom-style: dashed !important; }",
       "select.hs-input { appearance: auto; color: " + ink + " !important; }",
-      ".hs-richtext { flex: 1 1 20rem; color: " + muted + ";" +
-        " font-size: 0.85em; line-height: 1.5; }",
+      ".hs-richtext { flex: 1 0 100%; margin: 0; color: " + muted + ";" +
+        " font-size: 0.85em; line-height: 1.5; max-width: 60ch; }",
       ".hs-richtext a { color: inherit; }",
-      ".hs-submit { flex: 0 0 auto; }",
+      ".hs-submit { flex: 1 0 100%; }",
       ".hs-button { background: " + accent + " !important; color: #fff !important;" +
         " text-shadow: 0 0 4px #000 !important; border: none !important;" +
         " font: inherit !important; font-weight: 600 !important;" +
