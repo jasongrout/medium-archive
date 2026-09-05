@@ -63,15 +63,20 @@
         --system-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
                        monospace;
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
-                       Arial, sans-serif;
-        /* Source Serif 4 is the extension and replacement of Source
-           Serif Pro: the same text design, plus an optical-size axis
-           the browser drives itself (font-optical-sizing is auto by
-           default), so the article's 1.25rem running text is set in
-           the drawing meant for reading sizes rather than one scaled
-           from a single master. Pro sits behind it for a reader who
-           has the older family installed locally but not the new one. */
+        /* Source Sans 3 and Source Serif 4 are the current generation
+           of Adobe's superfamily: the same text designs, redrawn as
+           variable faces, extending and replacing Source Sans Pro and
+           Source Serif Pro. Each keeps its Pro predecessor behind it
+           in the stack for a reader who has the older family installed
+           locally but not the new one. The mono is not renamed -- Source
+           Code Pro is itself the current face. */
+        --source-sans: "Source Sans 3", "Source Sans Pro",
+                       "Helvetica Neue", Helvetica, Arial, sans-serif;
+        /* Source Serif 4 carries an optical-size axis besides, one the
+           browser drives itself (font-optical-sizing is auto by
+           default), so the article's 1.25rem running text is set in the
+           drawing meant for reading sizes rather than one scaled from a
+           single master. */
         --source-serif: "Source Serif 4", "Source Serif Pro", Georgia,
                         Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,

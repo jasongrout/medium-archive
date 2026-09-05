@@ -724,7 +724,7 @@ def test_theme_picker_and_dark_scheme(archive):
         for family in ("Atkinson+Hyperlegible", "Atkinson+Hyperlegible+Mono",
                        "IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
                        "Inter", "Nunito+Sans", "Source+Serif+4",
-                       "Source+Sans+Pro", "Source+Code+Pro"):
+                       "Source+Sans+3", "Source+Code+Pro"):
             assert f"family={family}" in text, (base, family)
         # the stored choices apply before the stylesheet loads, so a
         # page cannot flash the wrong scheme or font
