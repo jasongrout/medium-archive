@@ -66,6 +66,7 @@
 {% elif author and AUTHOR_FEED_ATOM %}<link rel="alternate" type="application/atom+xml" href="{{ SITEURL }}/{{ AUTHOR_FEED_ATOM.format(slug=author.slug) }}" title="{{ SITENAME }} - {{ author }}">
 {% endif %}<!-- @include shared/theme-init.html -->
 <!-- @include shared/font-init.html -->
+<!-- @include shared/link-init.html -->
 {% if FAVICON %}<link rel="icon" href="{{ SITEURL }}/{{ FAVICON }}">
 {% endif %}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,6 +95,7 @@
 {% block content %}{% endblock %}
 </main>
 <footer class="wrap site-footer">{{ SITESUBTITLE }}</footer>
+<!-- @include shared/link-picker.html -->
 <!-- @include shared/font-picker.html -->
 </body>
 </html>

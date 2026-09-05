@@ -4,6 +4,9 @@
   --bg: #131313; --card: #1e1e1e; --line: #333333; --code-bg: #2a2a2a;
   --mark: #7a4114; --error-bg: #2a1a1a; --error-line: #5c2828;
   --error-ink: #f87171; --error-soft: #ef4444;
+  /* the dark half of each link choice; the accent needs no darkening
+     here, where it measures 5.9:1 on the cards */
+  --link: var(--link-d); --link-rule: var(--link-rule-d);
   --syn-keyword: #ff7b72; --syn-string: #a5d6ff; --syn-comment: #8b949e;
   --syn-number: #79c0ff; --syn-name: #d2a8ff; --syn-builtin: #ffa657;
   color-scheme: dark;

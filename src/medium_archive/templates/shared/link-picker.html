@@ -1,0 +1,41 @@
+<span class="link-picker" hidden>
+<select aria-label="Link color">
+<option value="orange">Orange rule</option>
+<option value="orange-dark">Orange rule, darker</option>
+<option value="petrol">Petrol</option>
+<option value="blue">Blue</option>
+<option value="link-blue">Link blue</option>
+<option value="petrol-aaa">Petrol, AAA</option>
+</select>
+<svg class="picker-arrow" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>
+<script>
+(function () {
+  var root = document.documentElement;
+  var picker = document.querySelector(".link-picker");
+  var select = picker.querySelector("select");
+  var options = select.options;
+  function apply(choice) {
+    select.value = choice;
+    if (choice === "orange") root.removeAttribute("data-link");
+    else root.setAttribute("data-link", choice);
+    try {
+      if (choice === "orange") localStorage.removeItem("link");
+      else localStorage.setItem("link", choice);
+    } catch (e) {}
+  }
+  select.addEventListener("change", function () {
+    apply(select.value);
+  });
+  var stored = root.getAttribute("data-link");
+  var known = false;
+  for (var i = 0; i < options.length; i++) {
+    if (options[i].value === stored) known = true;
+  }
+  apply(known ? stored : "orange");
+  picker.hidden = false;
+})();
+</script>

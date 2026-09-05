@@ -8,6 +8,15 @@
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
         --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
         --error-soft: #b91c1c;
+        /* The link colour the picker offers (see link-picker.html).
+           Every choice states a light value and a dark one; the palette
+           in force picks between them, so a choice itself carries no
+           scheme rules. currentColor on --link leaves the word the ink
+           it inherits, which is the default here: the rule alone marks
+           the link, in the accent. */
+        --link-l: currentColor; --link-rule-l: var(--accent);
+        --link-d: currentColor; --link-rule-d: var(--accent);
+        --link: var(--link-l); --link-rule: var(--link-rule-l);
         /* syntax colours for highlighted code: Primer's prettylights
            light set (see the token rules) */
         --syn-keyword: #cf222e; --syn-string: #0a3069; --syn-comment: #6e7781;
@@ -90,18 +99,52 @@
 body { margin: 0; background: var(--bg); color: var(--ink);
        font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
-/* Links provide a splash of the accent color on the page */
-a { color: inherit; text-decoration-line: underline;
-    text-decoration-color: var(--accent);
+/* Links provide a splash of colour on the page: the accent under the
+   word by default, or, under a picker choice that colours links, the
+   word and its rule together. The offset drops the rule clear of the
+   baseline so text-decoration-skip-ink cuts small nicks around the
+   descenders rather than long gaps -- Source Serif Pro's own underline
+   sits at -0.05em, where its descenders (-0.249em) break the line into
+   pieces and a thin rule reads thinner still. */
+a { color: var(--link); text-decoration-line: underline;
+    text-decoration-color: var(--link-rule);
     text-decoration-thickness: 1px;
+    text-underline-offset: .15em;
  }
 /* Links that are components rather than words -- the site title and
    nav, card covers and titles, tag pills, chips, page numbers, the
-   archive list -- carry no rule at rest; hovering shows the same rule. */
+   archive list -- carry no rule at rest; hovering shows the same rule.
+   They keep the ink they inherit under every link choice too: a card
+   title or a nav item is a piece of the page, not a link among words. */
 .site-title, .site-header nav a, .card-cover, .card-title a,
 .tag, .share-link, .chip, ul.pagination .page-link,
-.archives a { text-decoration-line: none; }
+.archives a { text-decoration-line: none; color: currentColor; }
 a:hover { text-decoration-line: underline; }
+/* The link choices. The accent is 2.83:1 on the white card and 2.58:1
+   on the page, under the 3:1 a non-text indicator wants, which is what
+   makes the default rule read faint rather than thin; "orange-dark"
+   fixes that in colour alone, at 4.03:1. The rest move the signal into
+   the word and let the rule follow it in currentColor: blues drawn at
+   the accent's complement in OKLCH (its hue is 48deg, so 228deg) and
+   two steps round towards a conventional link blue, each at 5.5:1 on
+   the card -- 3.1:1 against the body ink, which is what makes them
+   read as links rather than as dark text. "petrol-aaa" is the same
+   complement taken to the 7:1 the body grays hold, where it gains page
+   contrast but loses most of its separation from the ink (2.4:1). The
+   dark values sit at ~7:1 on the dark cards. */
+:root[data-link="orange-dark"] { --link-rule-l: #cf5d18; }
+:root[data-link="petrol"] { --link-l: #017194; --link-d: #09b6ea;
+                            --link-rule-l: currentColor;
+                            --link-rule-d: currentColor; }
+:root[data-link="blue"] { --link-l: #026fa4; --link-d: #23b2ff;
+                          --link-rule-l: currentColor;
+                          --link-rule-d: currentColor; }
+:root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe;
+                               --link-rule-l: currentColor;
+                               --link-rule-d: currentColor; }
+:root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
+                                --link-rule-l: currentColor;
+                                --link-rule-d: currentColor; }
 
 /* jupyter.org's .global-banner styling, so a shared announcement file
    looks the same here as there: white on the accent with a soft
@@ -165,9 +208,12 @@ a:hover { text-decoration-line: underline; }
    rather than beside the theme button, and hidden until its script
    runs, like the theme button, since without JS a choice could not
    apply anyway. */
-.font-picker { position: fixed; right: 1.25rem; bottom: 1.25rem;
-               z-index: 40; }
-.font-picker[hidden] { display: none; }
+.font-picker, .link-picker { position: fixed; right: 1.25rem; z-index: 40; }
+.font-picker { bottom: 1.25rem; }
+/* the link picker rides directly above the font one: the same box, one
+   select height and a gap higher, so the two read as one stack */
+.link-picker { bottom: 3.85rem; color: var(--muted); }
+.font-picker[hidden], .link-picker[hidden] { display: none; }
 /* The select names the choice it is on and sets that name in the
    family it names, so it both says and shows what you are reading: a
    dropdown, not the theme button's cycling pill, since nine choices
@@ -183,21 +229,30 @@ a:hover { text-decoration-line: underline; }
    does not clear on a <select>. The shadow matches the card and post
    panels, so the picker reads as floating over the page rather than
    as part of it. */
-.font-picker select { display: block; width: 12rem; height: 2.1rem;
+.font-picker select, .link-picker select {
+                      display: block; width: 12rem; height: 2.1rem;
                       padding: 0 1.9rem 0 .9rem; border: 1px solid var(--line);
                       border-radius: 999px; background: var(--card);
                       color: var(--muted); font-size: .8rem; cursor: pointer;
                       box-shadow: 0 1px 3px rgba(0,0,0,.09),
                                   0 4px 14px rgba(0,0,0,.05);
                       appearance: none; -webkit-appearance: none; }
-.font-picker select:hover, .font-picker select:focus-visible { color: var(--accent); }
-.font-picker-arrow { position: absolute; right: 1rem; top: 50%;
-                     transform: translateY(-50%); width: .85rem; height: .85rem;
-                     fill: none; stroke: currentColor; stroke-width: 2;
-                     stroke-linecap: round; stroke-linejoin: round;
-                     color: var(--muted); pointer-events: none; }
-.font-picker select:hover ~ .font-picker-arrow,
-.font-picker select:focus-visible ~ .font-picker-arrow { color: var(--accent); }
+/* the link picker's own box takes the colour it is offering, so the
+   closed box previews the current choice the way the font picker's
+   does; the choices that leave links their inherited ink resolve to
+   currentColor, which is the picker's own muted gray */
+.link-picker select { color: var(--link); }
+.font-picker select:hover, .font-picker select:focus-visible,
+.link-picker select:hover, .link-picker select:focus-visible { color: var(--accent); }
+.picker-arrow { position: absolute; right: 1rem; top: 50%;
+                transform: translateY(-50%); width: .85rem; height: .85rem;
+                fill: none; stroke: currentColor; stroke-width: 2;
+                stroke-linecap: round; stroke-linejoin: round;
+                color: var(--muted); pointer-events: none; }
+.font-picker select:hover ~ .picker-arrow,
+.font-picker select:focus-visible ~ .picker-arrow,
+.link-picker select:hover ~ .picker-arrow,
+.link-picker select:focus-visible ~ .picker-arrow { color: var(--accent); }
 
 /* the feed mark, in the header nav and beside a tag's or author's
    heading where that term has a feed of its own */
@@ -239,6 +294,18 @@ a:hover { text-decoration-line: underline; }
         font-size: 1.25rem; line-height: 1.6;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
+/* A heading takes the accent as a rule beneath it, never as its own
+   colour: #f37626 sets at 2.83:1 on the white card, under even the 3:1
+   floor large text asks for, so it belongs on the page as a mark and
+   not as words. The bar is the nav's own 3px accent rule, cut short so
+   it reads as emphasis under the heading rather than as a divider
+   across the column, and it is drawn on the title and the section
+   headings only -- deeper levels are structure, not signposts. */
+.post h1::after, .post h2::after { content: ""; display: block;
+                                   width: 2.5rem; height: 3px;
+                                   margin: .45rem 0 0; border-radius: 2px;
+                                   background: var(--accent); }
+.post h2 { margin-top: 2.2rem; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
 /* A tag is a pill, in the article byline and on a card alike: one
    form for the term wherever it appears. Hover colours the border, not

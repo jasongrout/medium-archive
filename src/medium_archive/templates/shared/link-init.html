@@ -1,0 +1,10 @@
+<script>
+(function () {
+  try {
+    var link = localStorage.getItem("link");
+    if (link === "orange-dark" || link === "petrol" || link === "blue" ||
+        link === "link-blue" || link === "petrol-aaa")
+      document.documentElement.setAttribute("data-link", link);
+  } catch (e) {}
+})();
+</script>

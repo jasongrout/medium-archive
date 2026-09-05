@@ -67,6 +67,7 @@
 {{ end }}{{ end }}{{ range .AlternativeOutputFormats }}<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ if $.IsHome }}{{ site.Title }}{{ else }}{{ $.Title }} · {{ site.Title }}{{ end }}">
 {{ end }}<!-- @include shared/theme-init.html -->
 <!-- @include shared/font-init.html -->
+<!-- @include shared/link-init.html -->
 {{ with site.Params.favicon }}<link rel="icon" href="{{ . | relURL }}">
 {{ end }}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,6 +96,7 @@
 {{ block "main" . }}{{ end }}
 </main>
 <footer class="wrap site-footer">{{ site.Params.description }}</footer>
+<!-- @include shared/link-picker.html -->
 <!-- @include shared/font-picker.html -->
 </body>
 </html>

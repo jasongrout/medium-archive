@@ -712,6 +712,12 @@ def test_theme_picker_and_dark_scheme(archive):
                        "source-serif", "atkinson", "nunito-sans",
                        "ibm-plex-sans", "ibm-plex-serif"):
             assert f'<option value="{choice}"' in text, base
+        for choice in ("orange", "orange-dark", "petrol", "blue",
+                       "link-blue", "petrol-aaa"):
+            assert f'<option value="{choice}"' in text, base
+        # the link picker rides above the font one, so it is spliced in
+        # first (the stack grows upwards from the corner)
+        assert text.index("link-picker") < text.index("font-picker"), base
         # every family the picker offers beyond the launch stack and the
         # platform's own is a webfont: unlinked, those choices degrade to
         # their fallbacks silently, looking like a styling bug rather than
@@ -725,6 +731,7 @@ def test_theme_picker_and_dark_scheme(archive):
         # page cannot flash the wrong scheme or font
         assert text.index("localStorage.getItem") < text.index("stylesheet")
         assert text.index('localStorage.getItem("font")') < text.index("stylesheet")
+        assert text.index('localStorage.getItem("link")') < text.index("stylesheet")
     # redirect stubs load no stylesheet, so they must paint the palette
     # themselves -- following a redirect must not flash white in dark mode
     for stub_source in ((hugo_site / "layouts/alias.html").read_text(),
@@ -734,7 +741,7 @@ def test_theme_picker_and_dark_scheme(archive):
     # the snippets embed verbatim, so they must carry no template syntax
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
-                 "term-sort", "announcement",
+                 "link-init", "link-picker", "term-sort", "announcement",
                  "nav-current", "image-zoom", "code-copy", "feed-icon",
                  "share-icons"):
         snippet = sites.template_text(f"shared/{name}.html")
