@@ -741,8 +741,9 @@ def test_theme_picker_and_dark_scheme(archive):
     # the other engine would mangle
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
                  "link-init", "link-picker", "term-sort", "announcement",
-                 "nav-current", "image-zoom", "code-copy", "feed-icon",
-                 "share-icons", "newsletter"):
+                 "nav-current", "image-zoom", "code-copy",
+                 "heading-anchor", "feed-icon", "share-icons",
+                 "newsletter"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -1036,6 +1037,46 @@ def test_code_copy(archive):
     # keyboard, and always shown where there is no hover
     assert ".code-block:hover .code-copy, .code-copy:focus-visible { opacity: 1; }" in css
     assert "@media (hover: none) { .code-copy { opacity: 1; } }" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_heading_anchor(archive):
+    # post pages carry the per-heading link mark, on both engines
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    for page in (hugo_site / "layouts/page.html",
+                 pelican_site / "theme/templates/article.html"):
+        text = page.read_text()
+        assert '<template class="heading-anchor-template">' in text, page
+        # the mark follows the article whose headings it serves
+        assert text.index("</article>") < text.index("heading-anchor-template"), page
+        # every body heading that has an id gets one, cloned from the
+        # template; the ids are the readers' own, so the script makes none
+        assert 'article.querySelectorAll(' in text, page
+        assert '"h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]"' in text, page
+        assert "template.content.firstElementChild.cloneNode(true)" in text, page
+        assert 'link.setAttribute("href", "#" + heading.id)' in text, page
+        # an SVG is not a label, so the link carries its own
+        assert 'aria-label="Link to this heading"' in text, page
+    # a plain link, so the browser's own handling applies: the snippet
+    # binds no click of its own, and sets no id the readers didn't give
+    snippet = sites.template_text("shared/heading-anchor.html")
+    assert "addEventListener(\"click\"" not in snippet
+    assert "preventDefault" not in snippet
+    assert "heading.id =" not in snippet
+    css = (hugo_site / "static/css/style.css").read_text()
+    # hidden until its heading is hovered or the mark reached by
+    # keyboard, and always shown where there is no hover; by opacity,
+    # so revealing it never re-wraps the heading
+    assert ".heading-anchor { margin-left: .3em; color: var(--muted); opacity: 0; }" in css
+    assert (".post :hover > .heading-anchor,\n"
+            ".heading-anchor:focus-visible { opacity: 1; }") in css
+    assert "@media (hover: none) { .heading-anchor { opacity: 1; } }" in css
+    # a mark, not words: no rule under it, and the accent only under
+    # the pointer, where the copy button takes it too
+    assert ".heading-anchor, .heading-anchor:hover { text-decoration-line: none; }" in css
+    assert (".heading-anchor:hover, .heading-anchor:focus-visible"
+            " { color: var(--accent); }") in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
 
 

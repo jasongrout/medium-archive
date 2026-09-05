@@ -1,0 +1,25 @@
+<template class="heading-anchor-template">
+<a class="heading-anchor" href="#" aria-label="Link to this heading" title="Link to this heading">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+</a>
+</template>
+<script>
+(function () {
+  function init() {
+    var article = document.querySelector(".post");
+    var template = document.querySelector(".heading-anchor-template");
+    if (!article || !template || !template.content) return;
+    var headings = article.querySelectorAll(
+      "h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
+    Array.prototype.forEach.call(headings, function (heading) {
+      if (heading.querySelector(".heading-anchor")) return;
+      var link = template.content.firstElementChild.cloneNode(true);
+      link.setAttribute("href", "#" + heading.id);
+      heading.appendChild(link);
+    });
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>

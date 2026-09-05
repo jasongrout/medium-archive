@@ -217,6 +217,14 @@ with none stored, the system scheme decides. The theme provides:
   block is hovered or the button is reached by keyboard, and always on
   a touch screen. Gists and Carbon snippets the archive inlined as
   code blocks get one too.
+- A link mark on every heading in an article, the affordance
+  jupyter.org's own pages carry: hovering a heading shows a chain link
+  beside it, and following it puts that heading's `#anchor` in the
+  address bar, so a reader can send someone to the section of a long
+  post they mean rather than to its top. It shows on hover, on keyboard
+  focus, and always on a touch screen. The ids it links are the ones
+  both readers already give every heading, the same ones search results
+  anchor to.
 - Code blocks at a fixed 14px, Medium's own size, so an 80-column
   block fits the column without scrolling, rather than a size that
   follows the prose and held 66. Blocks that name a language are
