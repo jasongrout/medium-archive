@@ -961,6 +961,33 @@ def site_profiles(config: dict) -> list:
     return list(dict.fromkeys(profiles))
 
 
+# site.json's "newsletter", the signup band both themes put at the foot
+# of every page (jupyter.org's own, which is where the shape of it comes
+# from). The form is a HubSpot embed, named the way HubSpot names its
+# three parts, so the values are the ones already on hand for whoever
+# owns the form; the region is optional, since HubSpot's own default is
+# the one most portals are on.
+NEWSLETTER_KEYS = ("heading", "hubspot_portal", "hubspot_form")
+
+
+def newsletter_params(config: dict):
+    """site.json's "newsletter" as the params both themes render the
+    signup band from, or None when there is none to render. A partial
+    entry is a mistake worth hearing about rather than a band quietly
+    missing from the built site, so what it lacks is named."""
+    entry = config.get("newsletter") or {}
+    if not entry:
+        return None
+    missing = [key for key in NEWSLETTER_KEYS if not entry.get(key)]
+    if missing:
+        print("newsletter band skipped: site.json's \"newsletter\" is "
+              "missing " + ", ".join(missing), file=sys.stderr)
+        return None
+    params = {key: str(entry[key]) for key in NEWSLETTER_KEYS}
+    params["hubspot_region"] = str(entry.get("hubspot_region") or "na1")
+    return params
+
+
 _CAPTION_LINK_RE = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
 _CAPTION_MARK_RE = re.compile(r"\*\*|__|(?<!\w)[*_](?=\S)|(?<=\S)[*_](?!\w)|`")
 

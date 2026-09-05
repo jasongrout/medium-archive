@@ -67,7 +67,8 @@ import sys
 from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, front_matter_yaml,
-                    load_site_inputs, old_paths, page_stems, quote_arg,
+                    load_site_inputs, newsletter_params, old_paths,
+                    page_stems, quote_arg,
                     redirect_rules, redirects_file, rewrite_figures,
                     site_profiles, write_data_files,
                     write_redirects_csv, write_templates)
@@ -244,6 +245,11 @@ def build_site(out):
     write_data_files(site, manifest, out)
 
     params = {"description": config.get("description", "")}
+    # "footer": the line under every page, Markdown, with `{year}` the
+    # year of the build (baseof.html renders it); without it the footer
+    # carries the site's description, as it always has
+    if config.get("footer"):
+        params["footer"] = config["footer"]
     # "avatar" (site.json top level, or hugo section): a hand-picked site
     # logo, shown in the header; "favicon" likewise: the tab icon, at the
     # site root so browsers that ask for /favicon.ico by convention are
@@ -258,6 +264,20 @@ def build_site(out):
         site / "static", "favicon")
     if favicon:
         params["favicon"] = favicon
+    # "logo" (site.json top level, or hugo section): a masthead logo
+    # that stands in for the site's name -- a wordmark, the way
+    # jupyter.org's navbar carries its rectangle logo -- with
+    # "logo_dark" the same mark drawn for the dark palette
+    logo = copy_site_asset(
+        out, hugo_config.get("logo") or config.get("logo"),
+        site / "static" / "img", "logo")
+    if logo:
+        params["logo"] = f"img/{logo}"
+        logo_dark = copy_site_asset(
+            out, hugo_config.get("logo_dark") or config.get("logo_dark"),
+            site / "static" / "img", "logo-dark")
+        if logo_dark:
+            params["logo_dark"] = f"img/{logo_dark}"
     # "announcement": a site-wide banner above the header -- an http(s)
     # URL the theme fetches client-side (empty content hides the banner,
     # like Sphinx themes' html announcement option), or literal HTML
@@ -273,6 +293,11 @@ def build_site(out):
     # elsewhere, the Organization's sameAs in the structured data
     if site_profiles(config):
         params["profiles"] = site_profiles(config)
+    # "newsletter": the signup band at the foot of every page (heading
+    # plus the HubSpot form's ids -- see sites.newsletter_params)
+    newsletter = newsletter_params(config)
+    if newsletter:
+        params["newsletter"] = newsletter
     # "share_image": the og:image of every page without a cover of its
     # own (listings, posts with no usable image), under assets/ so the
     # theme can read its dimensions

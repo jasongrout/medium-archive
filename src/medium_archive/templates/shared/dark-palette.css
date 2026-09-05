@@ -8,4 +8,6 @@
   --link: var(--link-d); --link-rule: var(--link-rule-d);
   --syn-keyword: #ff7b72; --syn-string: #a5d6ff; --syn-comment: #8b949e;
   --syn-number: #79c0ff; --syn-name: #d2a8ff; --syn-builtin: #ffa657;
+  /* the masthead logo drawn for this palette (see .site-logo) */
+  --logo-light: none; --logo-dark: block;
   color-scheme: dark;

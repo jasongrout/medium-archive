@@ -24,6 +24,10 @@
            light set (see the token rules) */
         --syn-keyword: #cf222e; --syn-string: #0a3069; --syn-comment: #6e7781;
         --syn-number: #0550ae; --syn-name: #6639ba; --syn-builtin: #953800;
+        /* which of the two masthead logos is the one on show (see
+           .site-logo): a palette value like the colours, so the pair
+           needs no scheme rule of its own */
+        --logo-light: block; --logo-dark: none;
         color-scheme: light; }
 :root[data-theme="dark"] {
 /* @include shared/dark-palette.css */
@@ -185,6 +189,18 @@ a:hover { text-decoration-line: underline; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
+/* jupyter.org's masthead, for an archive that has a logo of its own to
+   stand in for its name (site.json "logo"): the project's rectangle
+   logo, wordmark and all, at the 40px that navbar sets it in, with no
+   title text beside it. A second file ("logo_dark") is the same mark
+   drawn for the dark palette, since the grey wordmark of the light one
+   all but disappears on the dark header; the palettes' --logo-* values
+   pick between the pair. The link carries the site's name as its
+   aria-label, so it reads the same whichever file is showing and
+   whether or not either has loaded. */
+.site-title img.site-logo { height: 2.5rem; }
+.site-title img.site-logo-light { display: var(--logo-light); }
+.site-title img.site-logo-dark { display: var(--logo-dark); }
 /* the masthead is the site's name, not a link among links: no rule on
    hover either (a:hover outranks .site-title, so it says so itself) */
 .site-title:hover { text-decoration-line: none; }
@@ -607,5 +623,26 @@ ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
                            color: var(--ink) !important; }
 #search .pf-heading-excerpt { color: var(--muted) !important;
                               font-size: .9rem !important; }
+/* The signup band jupyter.org closes its pages with, drawn in this
+   site's own furniture rather than that page's: a full-bleed card on
+   the bottom edge, ruled off from the page above it the way the "More
+   posts" block is, its heading at the same size and weight as that
+   block's, and the fields and button below it in the page's own ink and
+   accent. The form is HubSpot's, rendered into .newsletter-form inside
+   an iframe of its own, which no stylesheet here can reach: its look is
+   read off these same tokens and passed to the embed as a string
+   (shared/newsletter.html), laid out the way jupyter.org reads down --
+   heading, the fields on one row, the consent copy under them, the
+   button below that -- and that snippet is also where the band is
+   unhidden, once there is a form to show. */
+.newsletter { background: var(--card); border-top: 1px solid var(--line);
+              margin-top: 3rem; padding: 2.5rem 0; }
+.newsletter[hidden] { display: none; }
+.newsletter h2 { font-size: 1.6rem; font-weight: 400; line-height: 1.25;
+                 margin: 0 0 1.5rem; }
+/* the footer line is Markdown (site.json "footer"), so it arrives
+   wrapped in a paragraph of its own; the footer's own padding is the
+   space around it */
 .site-footer { color: var(--muted); font-size: .85rem; padding-top: 1rem;
                padding-bottom: 2.5rem; }
+.site-footer p { margin: 0; }

@@ -176,10 +176,18 @@ with none stored, the system scheme decides. The theme provides:
   sortable by name or by post count.
 - An optional header logo and browser-tab icon: `site.json`'s
   `"avatar"` and `"favicon"`, archive-relative image paths copied into
-  the site so it stays self-contained.
+  the site so it stays self-contained. A publication with a wordmark of
+  its own gives it as `"logo"` instead, and it stands in the header for
+  the site's name, the way jupyter.org's navbar carries its rectangle
+  logo; `"logo_dark"` is the same mark drawn for the dark palette,
+  since a logo set in grey ink all but disappears on a dark header.
 - The landing-page blurb, `site.json`'s `"intro"`, as Markdown above the
   card grid. Hugo renders it from the section's own content; the pelican
   config renders the same Markdown, since Jinja has no filter for it.
+- The line under every page, `site.json`'s `"footer"`, as Markdown too,
+  with `{year}` in it standing for the year the site is built -- so a
+  trademark or copyright notice stays current, as jupyter.org's own
+  footer keeps it. Unset, the footer carries the site's description.
 - An optional site-wide announcement banner above the header, from
   `site.json`'s `"announcement"`: either an http(s) URL fetched
   client-side or literal HTML. The URL form is the mechanism behind
@@ -188,6 +196,15 @@ with none stored, the system scheme decides. The theme provides:
   project's documentation sites alike, and empty content hides the
   banner. Dismissal persists per browser, and a changed announcement
   clears it.
+- An optional newsletter signup band at the foot of every page, from
+  `site.json`'s `"newsletter"`: a heading and a HubSpot form, the
+  section jupyter.org closes its own pages with, laid out the way that
+  page reads down -- heading, the fields on one row, the consent copy,
+  the button -- and drawn in the site's own type and colours. The form renders inside HubSpot's iframe, so
+  the site's ink, accent and body face are passed to the embed and
+  re-passed whenever the reader changes the theme or the font; the band
+  stays hidden unless the embed loads, so a blocked script leaves no
+  heading promising a form.
 - Click-to-zoom body images. Clicking an image (or pressing Enter on
   it) whose original holds more detail than the article column shows
   opens it full size in a modal. This is the one Medium reading
@@ -396,22 +413,28 @@ publication rather than the tool. Every key is optional.
 | `title` | site title: the header, `<title>`, and every feed's name |
 | `description` | tagline under the title, and the feeds' description |
 | `intro` | landing-page blurb (Markdown), rendered by every landing page |
+| `footer` | the line under every page (Markdown), `{year}` standing for the year the site is built; unset, the footer carries `description` |
 | `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter. Unset, the exporters warn and fall back to a placeholder, so share links and social previews point at a domain you do not own |
 | `avatar` | archive-relative image path for the header logo |
+| `logo` | archive-relative image path for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
+| `logo_dark` | the same mark drawn for the dark palette, which the palettes switch between; only read when `logo` is set |
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
+| `newsletter` | the signup band at the foot of every page: `{"heading": ..., "hubspot_portal": ..., "hubspot_form": ..., "hubspot_region": ...}`. The heading and the first two ids are required (a partial entry is reported and the band left out); the region defaults to `"na1"` |
 | `noindex` | `true` keeps search engines off the whole deployment (a `noindex` robots tag on every page, a `robots.txt` that disallows all): for previews and staging, which would otherwise be indexed as a copy of the real site |
 | `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
 | `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
-| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`favicon`, and extra `params` for the generated config |
+| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`logo`/`logo_dark`/`favicon`, and extra `params` for the generated config |
 
 The `hugo` section in full:
 
 ```json
 "hugo": {"locale": "en",                    // defaultContentLanguage
          "avatar": "avatar.png",            // overrides the top-level key
+         "logo": "logo.png",                // overrides the top-level key
+         "logo_dark": "logo-dark.png",      // overrides the top-level key
          "favicon": "favicon.ico",          // overrides the top-level key
          "params": {"motto": "..."}}        // extra/override [params]
 ```

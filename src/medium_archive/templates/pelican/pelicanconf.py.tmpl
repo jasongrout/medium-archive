@@ -57,6 +57,11 @@ CATEGORY_URL = ""               # tags and authors classify posts;
 CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = $avatar
 FAVICON = $favicon
+# a masthead logo that stands in for the site's name (site.json "logo"),
+# and the same mark drawn for the dark palette ("logo_dark"); with one
+# set the header shows it instead of the avatar and the name
+LOGO = $logo
+LOGO_DARK = $logo_dark
 ANNOUNCEMENT = $announcement
 # site.json's "intro": the landing-page blurb. It is Markdown, like
 # the hugo site's content/_index.md, and is rendered here because
@@ -64,6 +69,11 @@ ANNOUNCEMENT = $announcement
 # rendering waits for the reader's parser, at the end of this file, so
 # that the blurb is read exactly as a post is.
 _INTRO_MD = $intro
+# site.json's "footer": the line under every page, Markdown like the
+# blurb above and rendered with it below. `{year}` in it becomes the
+# year the site is built, so a copyright notice stays current the way
+# jupyter.org's own footer does.
+_FOOTER_MD = $footer
 # keep search engines off this deployment (a preview): a noindex robots
 # tag on every page, and a robots.txt that disallows all
 NOINDEX = $noindex
@@ -73,6 +83,9 @@ TWITTER = $twitter
 # X/Twitter profile the handle names): the Organization's sameAs in
 # every page's structured data
 PROFILES = $profiles
+# site.json's "newsletter": the heading and HubSpot form ids of the
+# signup band at the foot of every page, or None for no band
+NEWSLETTER = $newsletter
 # the og:image of a page with no cover of its own (site.json
 # "share_image"), with its pixel size; and the size covers are baked
 # to (None when they kept their source size, without Pillow)
@@ -88,6 +101,7 @@ COVER_SIZE = $cover_size
 # a checked-in copy of a site corrects by hand. They are read here, at
 # config time, so the rest of this file and the site plugin below see
 # ordinary Python dicts.
+import datetime as _datetime
 import json as _json
 import os as _os
 
@@ -398,5 +412,9 @@ class _CommonMarkPlugin:
         signals.readers_init.connect(_use_reader)
 
 
-# the landing-page blurb, read as CommonMark like everything else here
+# the landing-page blurb and the footer line, read as CommonMark like
+# everything else here; the footer's `{year}` is the build's year
 INTRO = _make_md().render(_INTRO_MD) if _INTRO_MD else None
+FOOTER = (_make_md().render(
+    _FOOTER_MD.replace("{year}", _datetime.date.today().strftime("%Y")))
+    if _FOOTER_MD else None)
