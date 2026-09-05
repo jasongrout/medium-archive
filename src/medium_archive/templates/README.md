@@ -80,14 +80,16 @@ These embed verbatim in both engines' pages, so they must carry no
   floating stack, since the two are the same kind of question. It
   exists for the same reason: to compare candidates on real posts
   before the blog settles on one. A stored choice pins `data-link` on
-  `<html>`; no attribute means the default, ink words under an accent
-  rule. The choices are the default; the same rule darkened to clear
-  3:1 against the card; three blues that colour the word and its rule
-  together, at the accent's OKLCH complement (228deg) and two steps
-  round towards a conventional link blue; that complement again at the
-  7:1 the body grays hold; and, as the two controls the rest are read
-  against, the plainest link there is (ink words under a rule in that
-  same ink) and the browser's own, its colour and its own rule.
+  `<html>`; no attribute means the default, the plainest link there
+  is: ink words under a rule in that same ink, at the browser's own
+  weight and position. The other choices are two blues that colour the
+  word and its rule together, both at the accent's OKLCH complement
+  (228deg) and a step round towards a conventional link blue -- one at
+  the 7:1 the body grays hold, one at 5.5:1, which keeps three times
+  the separation from the body ink -- and the browser's own link, its
+  colour and its own rule, as the control the rest are read against.
+  The accent is not among them: at 2.83:1 it sits under the 3:1 a
+  non-text indicator wants, so it marks headings and chrome instead.
   `card.css` states a choice as a pair of values, light and dark, so a
   candidate is one `:root[data-link=...]` block and no scheme rules of
   its own; it also carries the reasoning behind the numbers. The losing

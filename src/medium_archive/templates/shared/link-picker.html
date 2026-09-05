@@ -1,12 +1,8 @@
 <span class="link-picker" hidden>
 <select aria-label="Link color">
-<option value="orange">Orange rule</option>
-<option value="orange-dark">Orange rule, darker</option>
-<option value="petrol">Petrol</option>
-<option value="blue">Blue</option>
-<option value="link-blue">Link blue</option>
-<option value="petrol-aaa">Petrol, AAA</option>
 <option value="ink">Ink rule</option>
+<option value="petrol-aaa">Petrol, AAA</option>
+<option value="link-blue">Link blue</option>
 <option value="browser">Browser default</option>
 </select>
 <svg class="picker-arrow" viewBox="0 0 24 24" aria-hidden="true">
@@ -22,10 +18,10 @@
   var options = select.options;
   function apply(choice) {
     select.value = choice;
-    if (choice === "orange") root.removeAttribute("data-link");
+    if (choice === "ink") root.removeAttribute("data-link");
     else root.setAttribute("data-link", choice);
     try {
-      if (choice === "orange") localStorage.removeItem("link");
+      if (choice === "ink") localStorage.removeItem("link");
       else localStorage.setItem("link", choice);
     } catch (e) {}
   }
@@ -37,7 +33,7 @@
   for (var i = 0; i < options.length; i++) {
     if (options[i].value === stored) known = true;
   }
-  apply(known ? stored : "orange");
+  apply(known ? stored : "ink");
   picker.hidden = false;
 })();
 </script>

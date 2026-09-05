@@ -712,8 +712,7 @@ def test_theme_picker_and_dark_scheme(archive):
                        "source-serif", "atkinson", "nunito-sans",
                        "ibm-plex-sans", "ibm-plex-serif"):
             assert f'<option value="{choice}"' in text, base
-        for choice in ("orange", "orange-dark", "petrol", "blue",
-                       "link-blue", "petrol-aaa", "ink", "browser"):
+        for choice in ("ink", "petrol-aaa", "link-blue", "browser"):
             assert f'<option value="{choice}"' in text, base
         # the link picker rides above the font one, so it is spliced in
         # first (the stack grows upwards from the corner)

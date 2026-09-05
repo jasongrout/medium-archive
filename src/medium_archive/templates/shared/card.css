@@ -11,11 +11,14 @@
         /* The link colour the picker offers (see link-picker.html).
            Every choice states a light value and a dark one; the palette
            in force picks between them, so a choice itself carries no
-           scheme rules. currentColor on --link leaves the word the ink
-           it inherits, which is the default here: the rule alone marks
-           the link, in the accent. */
-        --link-l: currentColor; --link-rule-l: var(--accent);
-        --link-d: currentColor; --link-rule-d: var(--accent);
+           scheme rules. currentColor is the default, and the whole of
+           it: the word keeps the ink it inherits and the rule follows
+           in that same ink, the plainest link there is. The accent is
+           not among the choices -- at 2.83:1 on the white card and
+           2.58:1 on the page it sits under the 3:1 a non-text
+           indicator wants, so it marks headings and chrome instead. */
+        --link-l: currentColor; --link-rule-l: currentColor;
+        --link-d: currentColor; --link-rule-d: currentColor;
         --link: var(--link-l); --link-rule: var(--link-rule-l);
         /* syntax colours for highlighted code: Primer's prettylights
            light set (see the token rules) */
@@ -99,17 +102,11 @@
 body { margin: 0; background: var(--bg); color: var(--ink);
        font: 1rem/1.65 var(--body-font); }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
-/* Links provide a splash of colour on the page: the accent under the
-   word by default, or, under a picker choice that colours links, the
-   word and its rule together. The offset drops the rule clear of the
-   baseline so text-decoration-skip-ink cuts small nicks around the
-   descenders rather than long gaps -- Source Serif Pro's own underline
-   sits at -0.05em, where its descenders (-0.249em) break the line into
-   pieces and a thin rule reads thinner still. */
+/* A link is a word and its rule, both in whichever colour the choice
+   in force names; the rule keeps the browser's own weight and position
+   unless the choice tunes them. */
 a { color: var(--link); text-decoration-line: underline;
     text-decoration-color: var(--link-rule);
-    text-decoration-thickness: 1px;
-    text-underline-offset: .15em;
  }
 /* Links that are components rather than words -- the site title and
    nav, card covers and titles, tag pills, chips, page numbers, the
@@ -120,50 +117,30 @@ a { color: var(--link); text-decoration-line: underline;
 .tag, .share-link, .chip, ul.pagination .page-link,
 .archives a { text-decoration-line: none; color: currentColor; }
 a:hover { text-decoration-line: underline; }
-/* The link choices. The accent is 2.83:1 on the white card and 2.58:1
-   on the page, under the 3:1 a non-text indicator wants, which is what
-   makes the default rule read faint rather than thin; "orange-dark"
-   fixes that in colour alone, at 4.03:1. The rest move the signal into
-   the word and let the rule follow it in currentColor: blues drawn at
-   the accent's complement in OKLCH (its hue is 48deg, so 228deg) and
-   two steps round towards a conventional link blue, each at 5.5:1 on
-   the card -- 3.1:1 against the body ink, which is what makes them
-   read as links rather than as dark text. "petrol-aaa" is the same
-   complement taken to the 7:1 the body grays hold, where it gains page
-   contrast but loses most of its separation from the ink (2.4:1). The
-   dark values sit at ~7:1 on the dark cards. */
-:root[data-link="orange-dark"] { --link-rule-l: #cf5d18; }
-:root[data-link="petrol"] { --link-l: #017194; --link-d: #09b6ea;
-                            --link-rule-l: currentColor;
-                            --link-rule-d: currentColor; }
-:root[data-link="blue"] { --link-l: #026fa4; --link-d: #23b2ff;
-                          --link-rule-l: currentColor;
-                          --link-rule-d: currentColor; }
-:root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe;
-                               --link-rule-l: currentColor;
-                               --link-rule-d: currentColor; }
-:root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
-                                --link-rule-l: currentColor;
-                                --link-rule-d: currentColor; }
-/* The last two are the controls the rest are read against, and the
-   only choices that hand the rule back to the browser's own weight and
-   position rather than the offset above. "ink" keeps the word the ink
-   it inherits -- the --link default, so it states only the rule -- and
-   underlines it in that same ink, the plainest link there is: no
-   colour anywhere, the rule carrying the whole signal at the browser's
-   own contrast. "browser" is a link drawn the way the browser draws
-   one with no stylesheet at all, in LinkText, the reader's own
-   platform link colour in the scheme the palette has declared. Visited
-   links are left alone: VisitedText would land on card titles and nav
-   items too, which the reset above cannot outrank. */
-:root[data-link="ink"] { --link-rule-l: currentColor;
-                         --link-rule-d: currentColor; }
-:root[data-link="browser"] { --link-l: LinkText; --link-d: LinkText;
-                             --link-rule-l: currentColor;
-                             --link-rule-d: currentColor; }
-:root[data-link="ink"] a, :root[data-link="browser"] a {
-                               text-decoration-thickness: auto;
-                               text-underline-offset: auto; }
+/* The choices that colour the link. Both are the accent's complement
+   in OKLCH -- its hue is 48deg, so 228deg -- and a step round towards
+   a conventional link blue: "petrol-aaa" at the 7:1 the body grays
+   hold, "link-blue" at 5.5:1 on the card, which is 3.1:1 against the
+   body ink where the AAA one is 2.4:1 -- the separation that decides
+   whether a link reads as a link or as dark text. The dark values sit
+   at ~7:1 on the dark cards. Both tune the rule, where the default
+   leaves it to the browser: a 1px rule dropped clear of the baseline,
+   so text-decoration-skip-ink cuts small nicks around the descenders
+   rather than long gaps. (Source Serif Pro's own underline sits at
+   -0.05em, where its descenders at -0.249em break the line into
+   pieces and a thin rule reads thinner still.) */
+:root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea; }
+:root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe; }
+:root[data-link="petrol-aaa"] a, :root[data-link="link-blue"] a {
+                               text-decoration-thickness: 1px;
+                               text-underline-offset: .15em; }
+/* "browser" is the control the rest are read against: a link drawn the
+   way the browser draws one with no stylesheet at all, in LinkText,
+   the reader's own platform link colour in the scheme the palette has
+   declared. Visited links are left alone: VisitedText would land on
+   card titles and nav items too, which the reset above cannot
+   outrank. */
+:root[data-link="browser"] { --link-l: LinkText; --link-d: LinkText; }
 
 /* jupyter.org's .global-banner styling, so a shared announcement file
    looks the same here as there: white on the accent with a soft
