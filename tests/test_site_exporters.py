@@ -742,7 +742,7 @@ def test_theme_picker_and_dark_scheme(archive):
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
                  "link-init", "link-picker", "term-sort", "announcement",
                  "nav-current", "image-zoom", "code-copy", "feed-icon",
-                 "share-icons"):
+                 "share-icons", "newsletter"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the config must still be valid
@@ -782,6 +782,106 @@ def test_announcement_banner(archive):
         assert text.index("announcement-cache") < text.index("fetch(source)"), base
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".announcement" in css and ".announcement-close" in css
+
+
+def test_newsletter_band(archive):
+    # jupyter.org's signup band at the foot of every page: the heading
+    # from site.json, the HubSpot form's ids on the section the snippet
+    # reads them off, and the band hidden until that form is on its way
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["newsletter"] = {
+        "heading": "Subscribe for updates",
+        "hubspot_portal": "8112310",
+        "hubspot_form": "3a79d744-5260-4a98-b069-39defccc8f42",
+    }
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    hugo_config = (hugo_site / "hugo.toml").read_text()
+    assert "[params.newsletter]" in hugo_config
+    assert 'hubspot_portal = "8112310"' in hugo_config
+    # the region is optional: HubSpot's own default stands in
+    assert 'hubspot_region = "na1"' in hugo_config
+    pelican_config = (pelican_site / "pelicanconf.py").read_text()
+    assert '"hubspot_form": "3a79d744-5260-4a98-b069-39defccc8f42"' in pelican_config
+    for base in (hugo_site / "layouts/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        text = base.read_text()
+        assert 'class="newsletter"' in text, base
+        for attr in ("data-hs-portal", "data-hs-form", "data-hs-region"):
+            assert attr in text, (base, attr)
+        assert 'class="newsletter-form"' in text, base
+        # the band closes the page: after the article, before the
+        # footer line, as it is on jupyter.org
+        assert text.index("</main>") < text.index('class="newsletter"'), base
+        assert text.index('class="newsletter"') < text.index("site-footer"), base
+        # hidden markup, revealed only once the embed has loaded, so a
+        # blocked script leaves no heading promising a form
+        assert re.search(r'class="newsletter"[^>]*hidden', text), base
+        assert "band.hidden = false" in text, base
+        assert "js.hsforms.net" in text and "hbspt.forms.create" in text, base
+        # the form renders in an iframe the page's CSS cannot reach, so
+        # its look is passed to the embed -- with this site's accent on
+        # the button, not the colour jupyter.org hard-codes
+        assert "--accent" in text and ".hs-button" in text, base
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert ".newsletter " in css and ".newsletter h2" in css
+    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+def test_newsletter_band_absent_or_incomplete(archive, capsys):
+    # no "newsletter" at all: no band, and configs that are still valid
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert "[params.newsletter]" not in (hugo_site / "hugo.toml").read_text()
+    assert "NEWSLETTER = None" in (pelican_site / "pelicanconf.py").read_text()
+    # the band's markup is guarded by that setting, so an archive that
+    # configures no newsletter renders no empty band
+    assert ("{{ with site.Params.newsletter }}<section class=\"newsletter\""
+            in (hugo_site / "layouts/baseof.html").read_text())
+    assert ("{% if NEWSLETTER %}<section class=\"newsletter\""
+            in (pelican_site / "theme/templates/base.html").read_text())
+    # a half-filled entry is a mistake worth hearing about, not a band
+    # quietly missing from the built site
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["newsletter"] = {"heading": "Subscribe for updates"}
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo.build_site(archive)
+    err = capsys.readouterr().err
+    assert "hubspot_portal" in err and "hubspot_form" in err
+
+
+def test_masthead_logo(archive):
+    # site.json's "logo": a wordmark standing in for the site's name in
+    # the header, the way jupyter.org's navbar carries its rectangle
+    # logo, with "logo_dark" the same mark for the dark palette
+    (archive / "logo.svg").write_bytes(b"<svg/>")
+    (archive / "logo-dark.svg").write_bytes(b"<svg dark/>")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["logo"], cfg["logo_dark"] = "logo.svg", "logo-dark.svg"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert 'logo = "img/logo.svg"' in (hugo_site / "hugo.toml").read_text()
+    assert 'logo_dark = "img/logo-dark.svg"' in (hugo_site / "hugo.toml").read_text()
+    assert (hugo_site / "static/img/logo.svg").read_bytes() == b"<svg/>"
+    assert (pelican_site / "theme/static/img/logo-dark.svg").read_bytes() == b"<svg dark/>"
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert 'LOGO = "theme/img/logo.svg"' in config
+    assert 'LOGO_DARK = "theme/img/logo-dark.svg"' in config
+    for base in (hugo_site / "layouts/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        text = base.read_text()
+        assert "site-logo-light" in text and "site-logo-dark" in text, base
+        # the pair carries no alt text of its own -- either image would
+        # name the link twice over -- so the link is named once, on the
+        # anchor, and reads the same whichever one is showing
+        assert "aria-label" in text, base
+    # the palettes pick between the two, like every other value that
+    # differs between them
+    css = (hugo_site / "static/css/style.css").read_text()
+    assert "--logo-light: block" in css and "--logo-dark: block" in css
+    assert "display: var(--logo-light)" in css
 
 
 def test_nav_current_highlight(archive):

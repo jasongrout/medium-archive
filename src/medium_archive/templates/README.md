@@ -193,6 +193,20 @@ These embed verbatim in both engines' pages, so they must carry no
   names Chroma (Hugo, with `noClasses` off in `hugo.toml.tmpl`) and
   Pygments (Pelican, through the fence rule in the generated config's
   reader, which names the same `highlight` class) share.
+- `newsletter.html` renders the signup band both base templates close
+  a page with (site.json `"newsletter"`), the section jupyter.org ends
+  its own pages on. The form is a HubSpot embed, which draws itself
+  inside an iframe no stylesheet here can reach, so the band's own
+  tokens -- ink, muted, accent, the body face -- are read off the page
+  and handed to the embed as the CSS string it styles that iframe
+  with; the button takes the accent with the text-shadow the
+  announcement banner uses, the accent being too light a ground for
+  plain white text. Those values are baked in at render time, so the
+  form is drawn again whenever the theme or font picker changes them,
+  and when the system scheme changes with no choice pinned. The band's
+  markup is emitted hidden and shown here, once the embed has loaded:
+  a reader whose extension blocks it, or whose form has been deleted,
+  is never left with a heading offering a form that will not arrive.
 - `card.css` is the card-grid look, written as both the hugo theme's
   and the pelican theme's stylesheet.
 

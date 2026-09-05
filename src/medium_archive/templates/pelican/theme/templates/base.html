@@ -77,7 +77,11 @@
 {% if ANNOUNCEMENT %}<div class="announcement" data-source="{{ ANNOUNCEMENT|e }}" hidden></div>
 <!-- @include shared/announcement.html -->
 {% endif %}<header class="site-header"><div class="wrap bar">
-<a class="site-title" href="{{ SITEURL }}/">{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}</a>
+{# the masthead: a logo of the publication's own standing in for its
+   name (site.json "logo", with "logo_dark" the same mark drawn for the
+   dark palette), as jupyter.org's navbar carries its rectangle logo;
+   failing that, the site's name, with the avatar beside it #}
+<a class="site-title" href="{{ SITEURL }}/"{% if LOGO %} aria-label="{{ SITENAME }}"{% endif %}>{% if LOGO %}<img class="site-logo{% if LOGO_DARK %} site-logo-light{% endif %}" src="{{ SITEURL }}/{{ LOGO }}" alt="">{% if LOGO_DARK %}<img class="site-logo site-logo-dark" src="{{ SITEURL }}/{{ LOGO_DARK }}" alt="">{% endif %}{% else %}{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}{% endif %}</a>
 <nav>
 <a href="{{ SITEURL }}/">Blog</a>
 <a href="{{ SITEURL }}/tags/">Tags</a>
@@ -94,7 +98,19 @@
 <main class="wrap">
 {% block content %}{% endblock %}
 </main>
-<footer class="wrap site-footer">{{ SITESUBTITLE }}</footer>
+{# jupyter.org's newsletter band (site.json "newsletter"), the last
+   thing on every page there and here: the heading, and the HubSpot
+   signup form the snippet renders into it. Hidden until that form is
+   on its way, so a blocked embed leaves no heading promising a form
+   that will never arrive. #}
+{% if NEWSLETTER %}<section class="newsletter" data-hs-portal="{{ NEWSLETTER.hubspot_portal }}" data-hs-form="{{ NEWSLETTER.hubspot_form }}" data-hs-region="{{ NEWSLETTER.hubspot_region }}" hidden>
+<div class="wrap">
+<h2 id="newsletter">{{ NEWSLETTER.heading }}</h2>
+<div class="newsletter-form"></div>
+</div>
+</section>
+<!-- @include shared/newsletter.html -->
+{% endif %}<footer class="wrap site-footer">{{ SITESUBTITLE }}</footer>
 <!-- @include shared/link-picker.html -->
 <!-- @include shared/font-picker.html -->
 </body>

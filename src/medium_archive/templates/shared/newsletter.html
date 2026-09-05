@@ -1,0 +1,96 @@
+<script>
+(function () {
+  var band = document.querySelector(".newsletter");
+  var target = band && band.querySelector(".newsletter-form");
+  if (!target) return;
+  var root = document.documentElement;
+  function token(name, fallback) {
+    return getComputedStyle(root).getPropertyValue(name).trim() || fallback;
+  }
+  // The form renders inside HubSpot's own iframe, which the site's
+  // stylesheet cannot reach, so the page's tokens are read here and
+  // passed to the embed as a string: the fields take the body's ink and
+  // face, the button the accent (white on it at the text-shadow the
+  // announcement banner uses, since the accent is a 2.8:1 ground), and
+  // the consent copy the muted gray the rest of the chrome is set in.
+  function formCss() {
+    var ink = token("--ink", "#1c1c1c");
+    var muted = token("--muted", "#525252");
+    var accent = token("--accent", "#f37626");
+    var error = token("--error-ink", "#dc2626");
+    var face = getComputedStyle(document.body).fontFamily;
+    return [
+      "body { font-family: " + face + "; }",
+      ".hs-form { display: flex; flex-wrap: wrap; gap: 1rem;" +
+        " align-items: flex-end; font-size: 1rem; }",
+      ".hs-form-field { flex: 1 1 15rem; position: relative;" +
+        " padding-bottom: 1.4em; }",
+      ".hs-form-field label { color: " + muted + " !important;" +
+        " font-size: 0.85em; }",
+      ".hs-form-field .input { margin: 0 !important; }",
+      ".hs-input { width: 100% !important; background: transparent !important;" +
+        " color: " + ink + " !important; font: inherit !important;" +
+        " border: none !important; border-bottom: 1px solid " + muted +
+        " !important; padding: 0.5em 0 !important; margin: 0 !important;" +
+        " outline: none !important; box-shadow: none !important; }",
+      ".hs-input::placeholder { color: " + muted + " !important; opacity: 1 !important; }",
+      ".hs-input:focus { border-bottom-color: " + accent + " !important;" +
+        " border-bottom-width: 2px !important; }",
+      ".hs-input.error { border-bottom-style: dashed !important; }",
+      "select.hs-input { appearance: auto; color: " + ink + " !important; }",
+      ".hs-richtext { flex: 1 1 20rem; color: " + muted + ";" +
+        " font-size: 0.85em; line-height: 1.5; }",
+      ".hs-richtext a { color: inherit; }",
+      ".hs-submit { flex: 0 0 auto; }",
+      ".hs-button { background: " + accent + " !important; color: #fff !important;" +
+        " text-shadow: 0 0 4px #000 !important; border: none !important;" +
+        " font: inherit !important; font-weight: 600 !important;" +
+        " padding: 0.6em 2em; border-radius: 999px; cursor: pointer; }",
+      ".hs-error-msgs { position: absolute; left: 0; bottom: 0; color: " + error + ";" +
+        " list-style: none; padding: 0; margin: 0; font-size: 0.8em; }"
+    ].join("\n");
+  }
+  function render() {
+    if (!window.hbspt) return;
+    target.innerHTML = "";
+    window.hbspt.forms.create({
+      region: band.getAttribute("data-hs-region"),
+      portalId: band.getAttribute("data-hs-portal"),
+      formId: band.getAttribute("data-hs-form"),
+      target: ".newsletter-form",
+      css: formCss()
+    });
+  }
+  var embed = document.createElement("script");
+  embed.src = "https://js.hsforms.net/forms/embed/v2.js";
+  embed.async = true;
+  embed.onload = function () {
+    if (!window.hbspt) return;
+    // The band is shown before the form is created, not after: an
+    // iframe laid out inside a hidden element measures itself at zero
+    // and keeps that height once shown. Everything that can fail --
+    // the embed blocked by an extension, served an error, or gone --
+    // has failed by this point, so a reader who will never see a form
+    // is never shown the heading that promises one.
+    band.hidden = false;
+    render();
+    // The palette and the body face are the reader's to change at any
+    // moment, and those values are baked into the iframe at render
+    // time, so the form is drawn again when either changes: on the
+    // picker's attributes, and on the system scheme itself while no
+    // choice is pinned. A form part-way filled in is rare enough
+    // beside a theme switch to be worth losing.
+    var pending;
+    new MutationObserver(function () {
+      clearTimeout(pending);
+      pending = setTimeout(render, 50);
+    }).observe(root, {attributes: true,
+                      attributeFilter: ["data-theme", "data-font"]});
+    if (window.matchMedia) {
+      var scheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (scheme.addEventListener) scheme.addEventListener("change", render);
+    }
+  };
+  document.head.appendChild(embed);
+})();
+</script>

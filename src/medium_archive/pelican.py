@@ -90,7 +90,8 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
                     front_matter_yaml, image_size, load_site_inputs,
-                    page_stems, quote_arg, rewrite_figures, site_profiles,
+                    newsletter_params, page_stems, quote_arg,
+                    rewrite_figures, site_profiles,
                     template_text, write_data_files, write_redirects_csv,
                     write_templates)
 
@@ -208,6 +209,14 @@ def build_site(out):
                              site / "theme" / "static" / "img", "avatar")
     favicon = copy_site_asset(out, config.get("favicon"),
                               site / "theme" / "static", "favicon")
+    # a masthead logo that stands in for the site's name -- a wordmark,
+    # the way jupyter.org's navbar carries its rectangle logo -- and the
+    # same mark drawn for the dark palette
+    logo = copy_site_asset(out, config.get("logo"),
+                           site / "theme" / "static" / "img", "logo")
+    logo_dark = (copy_site_asset(out, config.get("logo_dark"),
+                                 site / "theme" / "static" / "img",
+                                 "logo-dark") if logo else None)
     # the og:image of every page without a cover of its own, with its
     # dimensions read here (the theme has no image pipeline)
     share = copy_site_asset(out, config.get("share_image"),
@@ -223,6 +232,8 @@ def build_site(out):
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
         avatar=setting(avatar and f"theme/img/{avatar}"),
         favicon=setting(favicon and f"theme/{favicon}"),
+        logo=setting(logo and f"theme/img/{logo}"),
+        logo_dark=setting(logo_dark and f"theme/img/{logo_dark}"),
         # a site-wide banner above the header -- an http(s) URL the theme
         # fetches client-side (empty content hides the banner, like Sphinx
         # themes' html announcement option), or literal HTML
@@ -233,6 +244,9 @@ def build_site(out):
         noindex="True" if config.get("noindex") else "False",
         twitter=setting(config.get("twitter")),
         profiles=json.dumps(site_profiles(config)),
+        # the signup band at the foot of every page: its heading and
+        # the HubSpot form's ids (see sites.newsletter_params)
+        newsletter=setting(newsletter_params(config)),
         share_image=setting(share and f"theme/img/{share}"),
         share_image_size=setting(share_size and list(share_size)),
         cover_size=setting(list(COVER_SIZE) if covers.pillow else None),

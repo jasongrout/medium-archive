@@ -57,6 +57,11 @@ CATEGORY_URL = ""               # tags and authors classify posts;
 CATEGORY_SAVE_AS = ""           # the category axis stays unused
 AVATAR = $avatar
 FAVICON = $favicon
+# a masthead logo that stands in for the site's name (site.json "logo"),
+# and the same mark drawn for the dark palette ("logo_dark"); with one
+# set the header shows it instead of the avatar and the name
+LOGO = $logo
+LOGO_DARK = $logo_dark
 ANNOUNCEMENT = $announcement
 # site.json's "intro": the landing-page blurb. It is Markdown, like
 # the hugo site's content/_index.md, and is rendered here because
@@ -73,6 +78,9 @@ TWITTER = $twitter
 # X/Twitter profile the handle names): the Organization's sameAs in
 # every page's structured data
 PROFILES = $profiles
+# site.json's "newsletter": the heading and HubSpot form ids of the
+# signup band at the foot of every page, or None for no band
+NEWSLETTER = $newsletter
 # the og:image of a page with no cover of its own (site.json
 # "share_image"), with its pixel size; and the size covers are baked
 # to (None when they kept their source size, without Pillow)
