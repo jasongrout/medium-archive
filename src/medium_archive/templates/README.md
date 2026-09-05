@@ -252,9 +252,11 @@ section and a term's page share `section.html`, written to the site as
   keywords) and an author page's `ProfilePage`. Built as dicts and
   jsonified so every value is escaped for a `<script>`.
 - `layouts/_partials/related.html` closes a post page with up to three
-  related posts (Hugo's related content, by the `[related]` indices
+  more posts (Hugo's related content, by the `[related]` indices
   the generated config sets: shared tags, then author, then date), as
-  listing cards, kept out of the search index.
+  listing cards, kept out of the search index. The block is headed
+  "More posts": the scoring guesses at a kinship from tags and
+  bylines, so the heading claims none.
 - `layouts/robots.txt` names the sitemap Hugo generates, or disallows
   everything when site.json sets `"noindex"` (the same switch puts a
   `noindex` robots tag on every page, as a page's own front matter
@@ -315,9 +317,9 @@ section and a term's page share `section.html`, written to the site as
   `_redirects` file both exporters write), the responsive body images
   the hugo theme's render hook produces (with the first one eager, as
   there), the sitemap and robots.txt Hugo generates on its own, the
-  related posts Hugo's related content gives each post (scored the
-  same way: shared tags, then author, then date; `article.html` reads
-  `article.related_posts`), and the
+  "More posts" block Hugo's related content gives each post (scored
+  the same way: shared tags, then author, then date; `article.html`
+  reads `article.related_posts`), and the
   names tags and authors are shown under (from `TAG_DISPLAY` and
   `AUTHOR_DISPLAY`, the config's reading of `data/tags.json` and
   `data/authornames.json`, set on the `Tag` and `Author` objects so the

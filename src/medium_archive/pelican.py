@@ -71,9 +71,9 @@ pages Hugo renders for aliases, working on any static host -- plus the
 same map as a `_redirects` file for hosts that turn one into HTTP 301s.
 The plugin also writes what Pelican has no built-in for and Hugo emits
 on its own: a sitemap.xml of the site's pages (post lastmod from the
-updated date) and a robots.txt naming it, and the related posts each
-post page closes with (by shared tags, then author, then date); the
-theme's pages carry the metadata search engines and share targets read
+updated date) and a robots.txt naming it, and the "More posts" block
+each post page closes with (by shared tags, then author, then date);
+the theme's pages carry the metadata search engines and share targets read
 (see templates/README.md): the structured data's author and publisher
 profiles come from AUTHOR_LINKS (data/authors.json: the Medium profile
 of every byline) and site.json's "profiles"/"twitter", the og:image of a page with no

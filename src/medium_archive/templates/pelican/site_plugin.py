@@ -325,7 +325,7 @@ def _name_authors(article_generator):
 
 
 def related_posts(article, articles, limit=3):
-    # The posts most like this one, for the "Related posts" block at
+    # The posts most like this one, for the "More posts" block at
     # the foot of its page: scored the way the hugo site's [related]
     # config scores them -- a shared tag counts for most, a shared
     # author for some, and among equals the nearer in time comes
