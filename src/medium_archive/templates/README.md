@@ -75,6 +75,25 @@ These embed verbatim in both engines' pages, so they must carry no
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
   than another pass over the rules that use them.
+- `link-init.html` and `link-picker.html` are the same pair again for
+  link colour, and the picker sits directly above the font one in the
+  floating stack, since the two are the same kind of question. It
+  exists for the same reason: to compare candidates on real posts
+  before the blog settles on one. A stored choice pins `data-link` on
+  `<html>`; no attribute means the default, the plainest link there
+  is: ink words under a rule in that same ink, at the browser's own
+  weight and position. The other choices are two blues that colour the
+  word and its rule together, both at the accent's OKLCH complement
+  (228deg) and a step round towards a conventional link blue -- one at
+  the 7:1 the body grays hold, one at 5.5:1, which keeps three times
+  the separation from the body ink -- and the browser's own link, its
+  colour and its own rule, as the control the rest are read against.
+  The accent is not among them: at 2.83:1 it sits under the 3:1 a
+  non-text indicator wants, so it marks headings and chrome instead.
+  `card.css` states a choice as a pair of values, light and dark, so a
+  candidate is one `:root[data-link=...]` block and no scheme rules of
+  its own; it also carries the reasoning behind the numbers. The losing
+  choices, and the picker with them, come out once the blog decides.
 - `term-sort.html` is the tag/author chip indexes' sort control: by
   name (A-Z, the order the generators emit, so the no-JS page reads the
   same) or by count, most posts first. Hidden until its script runs;
