@@ -243,8 +243,22 @@ a:hover { text-decoration-line: underline; }
    the 2.8:1 the link rule exists to avoid. The bar reaches the edge
    by padding each item down through the bar's own bottom padding and
    pulling it back with a matching negative margin, so the bar sits
-   on the header's border rather than under the text. */
-.site-header nav a { display: inline-block; margin-left: 1.25rem;
+   on the header's border rather than under the text.
+
+   That pull is also why the nav is a flex row rather than a line of
+   inline-blocks: on a narrow screen its items wrap, and an inline line
+   box is sized to the pulled-in margin box, so each wrapped row would
+   be laid .9375rem short of the row above and the row above would draw
+   its accent bar straight through the words below it. A flex row is
+   measured by that same margin box, but row-gap adds the space back:
+   1.25rem clears the .9375rem the pull takes out and leaves a little
+   air besides, so each row stands clear of the one above while the
+   last row still lands its bar on the header's border. The gaps space
+   the items along the row too, so no item carries a margin of its
+   own. */
+.site-header nav { display: flex; flex-wrap: wrap; align-items: center;
+                   column-gap: 1.25rem; row-gap: 1.25rem; }
+.site-header nav a { display: inline-block;
                      padding-bottom: calc(.9375rem - 3px); margin-bottom: -.9375rem;
                      border-bottom: 3px solid transparent;
                      color: var(--soft); font-weight: 500; }
@@ -252,8 +266,7 @@ a:hover { text-decoration-line: underline; }
 .site-header nav a[aria-current="page"] { color: var(--ink); font-weight: 700;
                                           border-bottom-color: var(--accent); }
 
-.theme-picker { display: inline-flex; vertical-align: middle;
-                margin-left: 1.25rem; }
+.theme-picker { display: inline-flex; vertical-align: middle; }
 .theme-picker[hidden] { display: none; }
 .theme-picker button {
                        display: inline-flex; align-items: center;
