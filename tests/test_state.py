@@ -177,12 +177,35 @@ def test_title_after_hero_image_is_dropped():
     assert md == "![](https://miro.medium.com/v2/1*hero.png)\n\nBody text.\n"
 
 
-def test_subtitle_heading_after_title_is_dropped():
+def test_subtitle_heading_after_title_becomes_the_lede_paragraph():
+    # the subtitle is the post's opening line, not a section heading:
+    # it stays in the body, as the paragraph the page renders
     md = md_of_state(make_state([
         para(0, "H3", "My Post"),
         para(1, "H4", "The subtitle."),
         para(2, "P", "Body text.")]))
-    assert md == "Body text.\n"
+    assert md == "The subtitle.\n\nBody text.\n"
+
+
+def test_the_lede_keeps_the_links_the_stored_summary_drops():
+    # Medium's stored summary is plain text, cut to length; the lede
+    # itself carries the links, which is why it belongs in the body
+    sub = para(1, "H4", "Join us on October 19 for a full day.")
+    sub["markups"] = [{"type": "A", "start": 11, "end": 21,
+                       "href": "https://example.com/day"}]
+    md = md_of_state(make_state(
+        [para(0, "H3", "My Post"), sub, para(2, "P", "Body text.")],
+        previewContent={"subtitle": "Join us on October 19 for a full…"}))
+    assert md.startswith(
+        "Join us on [October 19](https://example.com/day) for a full day.\n")
+
+
+def test_a_heading_that_is_not_the_subtitle_stays_a_heading():
+    md = md_of_state(make_state([
+        para(0, "H3", "My Post"),
+        para(1, "H4", "Getting started"),
+        para(2, "P", "Body text.")]))
+    assert md == "### Getting started\n\nBody text.\n"
 
 
 def test_section_boundaries_become_dividers():

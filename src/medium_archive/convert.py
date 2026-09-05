@@ -913,7 +913,9 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
         body = state_body(state, raw.name, info["title"], media)
         body_source = "state"
     elif have_feed:                    # a capture with no usable state
-        body, body_source = feed_body(feed_item["content_html"]), "feed"
+        body = feed_body(feed_item["content_html"], info["title"],
+                         info["description"])
+        body_source = "feed"
     else:                              # a page without embedded state
         body, body_source = page_body(soup, info["tags"], info["title"]), "page"
 

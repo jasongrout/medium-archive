@@ -20,7 +20,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from bs4 import BeautifulSoup
 
-from .pages import heading_is_title, untruncated_title
+from .pages import heading_is_subtitle, heading_is_title, untruncated_title
 
 APOLLO_RE = re.compile(r"window\.__APOLLO_STATE__\s*=\s*")
 
@@ -366,10 +366,6 @@ def _mixtape(p) -> str:
             f"{escape(title or href)}</a></p>")
 
 
-def _norm(s: str) -> str:
-    return re.sub(r"\s+", " ", (s or "").replace("\u200a", " ")).strip().lower()
-
-
 def _lead_heading(paragraphs: list) -> int | None:
     """Index of the post's opening heading: the first paragraph, or the
     first after the hero images and embeds that may precede it."""
@@ -392,28 +388,27 @@ def state_title(state: dict, medium_id: str, title: str) -> str:
     return untruncated_title(title, heading)
 
 
-def _lead_skips(paragraphs: list, post: dict, title: str) -> set:
-    """Indices of the leading title/subtitle headings. The title is
-    rendered as the leading heading (sometimes after a hero image) and
-    the subtitle as the heading right after it; both live in the front
-    matter, so the repeats are dropped (page_body does the same via
-    <h1> and .pw-subtitle-paragraph). The stored title and subtitle may
-    be truncated with a trailing ellipsis."""
+def _lead_indices(paragraphs: list, post: dict, title: str) -> tuple:
+    """(index of the leading title heading, index of the subtitle
+    heading), either None. The title is rendered as the leading heading
+    (sometimes after a hero image) and the subtitle as the heading right
+    after it; the title lives in the front matter, so its repeat is
+    dropped, while the subtitle is the post's lede and stays, rendered
+    as a paragraph (page_body does the same via <h1> and
+    .pw-subtitle-paragraph). The stored title and subtitle may be
+    truncated with a trailing ellipsis."""
     titles = {title or "", post.get("title") or ""} - {""}
-    skips = set()
     i = _lead_heading(paragraphs)
-    if i is not None and any(heading_is_title(paragraphs[i].get("text") or "", t)
-                             for t in titles):
-        skips.add(i)
-        sub = _norm(((post.get("extendedPreviewContent") or {}).get("subtitle")
-                     or (post.get("previewContent") or {}).get("subtitle")
-                     or "").rstrip("…"))
-        j = i + 1
-        if sub and j < len(paragraphs) and paragraphs[j].get("type") in HEADINGS:
-            head = _norm(paragraphs[j].get("text") or "")
-            if head and (head.startswith(sub) or sub.startswith(head)):
-                skips.add(j)
-    return skips
+    if i is None or not any(heading_is_title(paragraphs[i].get("text") or "", t)
+                            for t in titles):
+        return None, None
+    sub = ((post.get("extendedPreviewContent") or {}).get("subtitle")
+           or (post.get("previewContent") or {}).get("subtitle") or "")
+    j = i + 1
+    if j < len(paragraphs) and paragraphs[j].get("type") in HEADINGS \
+            and heading_is_subtitle(paragraphs[j].get("text") or "", sub):
+        return i, j
+    return i, None
 
 
 def _section_breaks(post: dict) -> set:
@@ -453,15 +448,17 @@ def state_body(state: dict, medium_id: str, title: str = "",
             list_tag = None
 
     paragraphs = _paragraphs(state, post)
-    skips = _lead_skips(paragraphs, post, title)
+    title_i, subtitle_i = _lead_indices(paragraphs, post, title)
     breaks = _section_breaks(post)
     for i, p in enumerate(paragraphs):
-        if i in skips:
+        if i == title_i:                # the title, kept in front matter
             continue
         if i in breaks:
             close_list()
             parts.append("<hr>")
-        ptype = p.get("type") or "P"
+        # the subtitle heading is the post's lede, not a section
+        # heading; it converts as the paragraph the page renders
+        ptype = "P" if i == subtitle_i else (p.get("type") or "P")
         rich = lambda: _rich_text(p.get("text") or "", p.get("markups"), state)
         if ptype in ("ULI", "OLI"):
             tag = "ul" if ptype == "ULI" else "ol"

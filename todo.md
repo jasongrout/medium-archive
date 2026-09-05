@@ -40,8 +40,9 @@ and the offline test suite.
   did: caption under its picture, styled by CSS, associated with the
   image for assistive tech. A caption whose figure lost its image
   renders in italics. A leading heading that repeats the post title is
-  dropped. A body never opens with the divider left by the removed
-  subtitle block. Whitespace-only hard-break lines normalize to blank
+  dropped, and the subtitle heading under it stays, as the lede
+  paragraph it renders as. A body never opens with the divider left by
+  the removed title block. Whitespace-only hard-break lines normalize to blank
   lines outside code fences. Iframes render as `[embed: url](url)`.
   `slug_of` percent-decodes, so directory names cannot mix encoded and
   decoded forms of one slug, and `resolve_canonical` compares decoded.
@@ -575,6 +576,27 @@ Feeds and sharing:
   route the script used was real, for the record: Mastodon's
   `render_initial_state` joins its `title`, `text` and `url` params
   into the compose box.
+
+- **The subtitle is body, not metadata.** Medium's editor stores a
+  post's lede as a heading right under the title and derives the post's
+  summary from it, capped and stripped of its links; every body source
+  marks the two the same way (`.graf--subtitle` in an export,
+  `.pw-subtitle-paragraph` on a rendered page, the heading after the
+  title in the editor state, the leading heading of an RSS body). All
+  four used to drop it as a repeat of the front matter's
+  `description`, which no story page renders -- so the lede, and the
+  links only it carried, appeared nowhere but a card's summary text.
+  Now the title repeat still goes and the subtitle stays, converted as
+  the paragraph the page renders it as rather than the heading the
+  editor stored, so every body source produces the same Markdown and
+  every generator shows the lede without a template of its own.
+  `description` is unchanged: the capped summary for search results and
+  share cards. In the reference archive this restored the lede to 23
+  posts (`compare` and `compare --state` parity unchanged), and the RSS
+  case got a correctness fix on the way: a feed body's leading heading
+  was dropped as a "repeated title" whatever it held, which in both
+  archived instances was the subtitle; it is now matched against the
+  title and the summary, and a real section heading stays a heading.
 
 ## Remaining
 

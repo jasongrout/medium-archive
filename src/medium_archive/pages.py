@@ -1,6 +1,15 @@
 """Post page parsing: metadata extraction and body cleanup.
 
 Shared by fetch (for the publish-date check) and convert.
+
+A note on subtitles, since every body source here handles one. Medium's
+editor stores a post's lede as a heading right under the title, and
+also derives the post's summary from it -- capped, and stripped of the
+links it carries. The title is chrome (it is the page's own <h1>, and
+the front matter's) and a body repeat of it goes; the subtitle is
+content, and stays, as the opening paragraph its rendering makes it.
+The capped summary in `description` is for search results and share
+cards, not a substitute for the lede itself.
 """
 
 import json
@@ -82,6 +91,9 @@ def meta(soup, **attrs) -> str | None:
 
 ELLIPSIS = "\u2026"
 
+# the mark of a cut Medium made: its ellipsis, or three periods
+TRAILING_CUT_RE = re.compile(r"(?:\u2026|\.\.\.)\s*$")
+
 
 def norm_title(s: str) -> str:
     """A title or heading in comparable form: case-folded, with the
@@ -106,6 +118,21 @@ def heading_is_title(heading: str, title: str) -> bool:
     if h == t:
         return True
     return t.endswith(ELLIPSIS) and h.startswith(t[:-1].rstrip())
+
+
+def heading_is_subtitle(heading: str, subtitle: str) -> bool:
+    """Whether a body heading is the post's subtitle -- the lede Medium
+    renders under the title and stores, separately, as the post's
+    summary.
+
+    The stored summary is capped (Medium cuts it with an ellipsis), and
+    on a post whose lede runs past the cap it is a prefix of the
+    heading; on a post whose summary was built from more than the lede
+    the heading is a prefix of it instead. Either way the two share
+    their opening, which no section heading of the body does.
+    """
+    h, s = norm_title(heading), norm_title(TRAILING_CUT_RE.sub("", subtitle or ""))
+    return bool(h and s and (h.startswith(s) or s.startswith(h)))
 
 
 def untruncated_title(title: str, heading: str) -> str:
@@ -307,9 +334,14 @@ def split_pre_paragraphs(article):
 def page_body(soup, tags=(), title=""):
     """<article> with Medium chrome removed."""
     article = soup.find("article") or soup.body
+    # The subtitle is the post's lede, rendered as a heading only because
+    # that is how Medium's editor stores it; it stays as the body's
+    # opening paragraph (see the module note on subtitles).
+    for sub in article.select(".pw-subtitle-paragraph"):
+        sub.name = "p"
+        sub.attrs = {}
     for sel in (
         "h1",                      # title lives in front matter
-        ".pw-subtitle-paragraph",  # subtitle is metadata, not body
         '[data-testid="authorName"]',
         '[data-testid="storyPublishDate"]',
         '[data-testid="storyReadTime"]',
@@ -365,12 +397,21 @@ def page_body(soup, tags=(), title=""):
     return article
 
 
-def feed_body(content_html: str):
+def feed_body(content_html: str, title: str = "", subtitle: str = ""):
+    """The RSS item's body cleaned for conversion. A feed body opens
+    with a heading in two cases: a post that repeats its title in the
+    body (chrome, dropped) and one with a subtitle (the lede, kept as
+    the paragraph it is). A leading heading that is neither is the
+    post's first section heading, and stays a heading."""
     soup = BeautifulSoup(f"<article>{content_html}</article>", "html.parser")
     article = soup.article
     strip_tracking_pixels(article)
     first = article.find(["h1", "h2", "h3", "h4"])
-    if first and first is article.find(True):   # repeated title
-        first.decompose()
+    if first and first is article.find(True):
+        text = first.get_text(" ", strip=True)
+        if heading_is_title(text, title):
+            first.decompose()
+        elif heading_is_subtitle(text, subtitle):
+            first.name = "p"
     strip_medium_footer(article)
     return article

@@ -36,7 +36,7 @@ FIELDS_TABLE = """\
 | `slug`          | `original_path` with the id suffix removed, percent-decoded |
 | `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
-| `description`   | the summary alone: the subtitle (from the account export), or Medium's summary text with the title it repeats removed |
+| `description`   | the summary alone: the subtitle (from the account export), or Medium's summary text with the title it repeats removed; a summary for search results and share cards, capped and stripped of links by Medium -- the post's own subtitle line stays in the body |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state), after `tags.json` cleanup when present; always slugs -- `tags.json`'s `"display"` names them at render time, in the sites, not here |
 | `images`        | relative paths of images used by the body |
 | `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML), `ghost` (Ghost page from a Wayback capture) or `state` (reconstructed from a shell page's embedded editor state) |"""
@@ -301,6 +301,13 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 * Medium boilerplate is stripped in `convert` and still present in
   `../raw/<id>/page.html`: "was originally published in ... on Medium",
   stat tracking pixels, clap/share UI, the author header.
+* A body repeat of the post's title is dropped -- the title is the
+  page's own heading, and the front matter's. The subtitle is not: it is
+  the post's opening line, rendered as a heading only because that is
+  how Medium's editor stores it, so it stays in the body as the
+  paragraph it renders as. The `description` beside it is the summary
+  Medium derived from that line for search results and share cards --
+  capped, with its links stripped -- and not a copy of it.
 * Body source preference is `export` > `state` > `feed` > `page`,
   overridden with `convert --prefer-page`. Export bodies are the Medium
   editor's own HTML and convert most faithfully. `state` is the same

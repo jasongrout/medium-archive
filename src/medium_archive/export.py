@@ -39,14 +39,19 @@ def parse_export(text: str) -> dict:
 
 
 def export_body(soup):
-    """The export body cleaned for conversion: the repeated title/subtitle
-    grafs and the leading section divider go (they live in front matter);
-    later section dividers stay and become thematic breaks."""
+    """The export body cleaned for conversion: the repeated title and
+    kicker grafs and the leading section divider go (the title lives in
+    front matter); later section dividers stay and become thematic
+    breaks. The subtitle graf is the post's lede and stays, as the
+    paragraph it renders as (see the note in pages)."""
     body = soup.select_one('section[data-field="body"]') or soup
     divider = body.find("div", class_="section-divider")
     if divider:
         divider.decompose()
-    for t in body.select(".graf--title, .graf--subtitle, .graf--kicker"):
+    for sub in body.select(".graf--subtitle"):
+        sub.name = "p"
+        sub.attrs = {}
+    for t in body.select(".graf--title, .graf--kicker"):
         t.decompose()
     # The editor's h3/h4 render as h2/h3 on the page; shift to match, so
     # converted output is identical whichever body source is used.

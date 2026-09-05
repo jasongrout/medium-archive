@@ -656,6 +656,20 @@ no longer lists, work through the steps in order:
   arrives clean. A title that is itself ellipsis-truncated is left
   alone: there is no telling where it ended, so cutting it would strand
   its tail at the front of the description.
+* The subtitle stays in the body. Medium's editor stores a post's lede
+  as a heading under the title and derives the post's summary from it,
+  and every body source marks the two the same way -- `.graf--subtitle`
+  in an export, `.pw-subtitle-paragraph` on a rendered page, the
+  heading after the title in the editor state, the leading heading of
+  an RSS body. The title is chrome there (it is the page's own `<h1>`,
+  and the front matter's) and a body repeat of it goes; the subtitle is
+  content, and the only place its links survive, since the summary
+  Medium derived from it is plain text cut to length. So `convert`
+  keeps it, as the paragraph the page renders it as rather than the
+  heading the editor stored -- which is also what makes the same post
+  convert identically from any of the four sources. `description`
+  remains the summary, for search results and share cards; a story page
+  showing it as well would repeat the lede rather than restore it.
 * A post whose author set no title gets one from Medium: the text of
   its opening heading, cut to about a hundred characters with an
   ellipsis. That cut form is what the stored title, the JSON-LD headline
