@@ -338,6 +338,29 @@ a:hover { text-decoration-line: underline; }
                   height: 2px; margin: .5rem 0 0;
                   background: var(--accent); }
 .post h2 { margin-top: 2.2rem; }
+/* The link mark heading-anchor.html hangs on the end of every heading
+   in the body, the affordance jupyter.org's own pages carry: it
+   addresses the section it sits in, so a reader can send someone to
+   the part of a long post they mean rather than to its top. When it
+   shows follows the copy button's rule -- while its heading is
+   hovered, while the mark itself is focused, always where there is no
+   hover -- so a heading reads as its own words until the pointer is on
+   it; hiding it by opacity rather than display keeps the space it
+   takes reserved, so revealing it never re-wraps the heading. Its
+   only parent is the heading it marks, which is what the descendant
+   hover selector says. It is sized and spaced in em, so it stays in
+   proportion to whichever level it marks, and it takes the accent only
+   under the pointer, as the copy button does: at rest it is the muted
+   grey, which clears contrast where the accent would not (above). No
+   rule under it, at rest or on hover: an underline is for a link that
+   is words. */
+.heading-anchor { margin-left: .3em; color: var(--muted); opacity: 0; }
+.heading-anchor, .heading-anchor:hover { text-decoration-line: none; }
+.post :hover > .heading-anchor,
+.heading-anchor:focus-visible { opacity: 1; }
+@media (hover: none) { .heading-anchor { opacity: 1; } }
+.heading-anchor svg { width: .8em; height: .8em; vertical-align: baseline; }
+.heading-anchor:hover, .heading-anchor:focus-visible { color: var(--accent); }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
 /* A tag is a pill, in the article byline and on a card alike: one
    form for the term wherever it appears. Hover colours the border, not

@@ -179,6 +179,27 @@ These embed verbatim in both engines' pages, so they must carry no
   through, since a changed button label is not read out. Without the
   async clipboard API (an insecure origin) no button is added, so the
   page never shows a button that cannot work.
+- `heading-anchor.html` is the link mark on every heading of an
+  article, the affordance jupyter.org's pages carry: hovering a heading
+  shows a chain link that addresses that heading, so a reader can send
+  someone to a section of a long post. It is spliced into the post
+  templates beside `code-copy.html`, since only article pages have body
+  headings. Both readers already give every body heading an id (hugo's
+  goldmark, and the anchors plugin the pelican config's reader
+  enables), so the script adds none: it links the ids that are there,
+  which is also why the article's own `<h1>` title, written by the
+  template and carrying no id, never gets one. The mark is a
+  `<template>` cloned per heading, like the copy button's, and it is a
+  plain `<a href="#id">` with no click handler of its own, so the
+  browser's own link handling applies -- middle-click, and the copy
+  link address a reader is really after. When it shows is the
+  stylesheet's business, explained there. It could as well be markup
+  (a goldmark heading render hook, and the pelican anchors plugin's
+  own `permalink`), and is a script for two reasons: that would be two
+  implementations of one mark to keep in step, and it would put the
+  mark inside the post's content, which is what the feeds carry and
+  what Pagefind indexes at build time. Added at read time it is in
+  neither.
 - `dark-palette.css` is included twice by `card.css`: once for an
   explicit picker choice (`data-theme="dark"`) and once for a dark
   system scheme with no stored choice. `--accent` doubles as the link
