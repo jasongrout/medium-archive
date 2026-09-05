@@ -145,6 +145,18 @@ a:hover { text-decoration-line: underline; }
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
                                 --link-rule-l: currentColor;
                                 --link-rule-d: currentColor; }
+/* "browser" is the control the rest are read against: a link drawn
+   the way the browser draws one with no stylesheet at all. LinkText is
+   the reader's own -- their platform's link blue, in the scheme the
+   palette has declared -- and the rule goes back to the browser's own
+   weight and position, so this choice alone drops the offset above.
+   Visited links are left alone: the colour would land on card titles
+   and nav items too, which the reset above cannot outrank. */
+:root[data-link="browser"] { --link-l: LinkText; --link-d: LinkText;
+                             --link-rule-l: currentColor;
+                             --link-rule-d: currentColor; }
+:root[data-link="browser"] a { text-decoration-thickness: auto;
+                               text-underline-offset: auto; }
 
 /* jupyter.org's .global-banner styling, so a shared announcement file
    looks the same here as there: white on the accent with a soft
