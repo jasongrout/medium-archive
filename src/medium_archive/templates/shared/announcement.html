@@ -16,7 +16,16 @@
       shown = null;
       return;
     }
-    banner.innerHTML = html;
+    // the announcement rides in a wrapper of its own, as it does in
+    // jupyter.org's .global-banner-content: the banner's own box keeps
+    // the smaller measure its padding and dismiss button are drawn
+    // against, and the wrapper sets the announcement's own size (see
+    // .announcement-content), whether the source gives markup or text
+    banner.innerHTML = "";
+    var content = document.createElement("div");
+    content.className = "announcement-content";
+    content.innerHTML = html;
+    banner.appendChild(content);
     var close = document.createElement("button");
     close.type = "button";
     close.className = "announcement-close";
