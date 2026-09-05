@@ -101,5 +101,6 @@ def test_export_body_keeps_the_subtitle_graf_as_the_lede():
     lede = body.find("p")
     assert lede.get_text(" ", strip=True) == "Join us on October 19 ."
     assert lede.find("a")["href"] == "https://example.com/day"
+    assert lede.find("em") is not None      # set apart, as the page sets it
     # the section heading still shifts a level; the lede is no heading
     assert [h.name for h in body.find_all(["h2", "h3", "h4"])] == ["h2"]

@@ -395,6 +395,8 @@ def test_the_rendered_subtitle_stays_as_the_lede_paragraph():
     lede = body.find("p")
     assert lede.get_text(" ", strip=True) == "Join us on October 19 ."
     assert lede.find("a")["href"] == "https://example.com/day"
+    # and it is set apart the one way a Markdown body can say so
+    assert lede.find("em") is not None and lede.find("em").find("a") is not None
 
 
 def test_feed_body_drops_a_title_repeat_and_keeps_the_lede():
@@ -411,6 +413,7 @@ def test_feed_body_drops_a_title_repeat_and_keeps_the_lede():
                      title="My Great Post", subtitle="A summary of the…")
     assert body.find("h4") is None
     assert body.find("p").get_text() == "A summary of the whole thing."
+    assert body.find("p").find("em") is not None
 
     body = feed_body("<h4>Introduction</h4><p>Real content.</p>",
                      title="My Great Post", subtitle="A summary.")

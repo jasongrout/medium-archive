@@ -667,7 +667,13 @@ no longer lists, work through the steps in order:
   Medium derived from it is plain text cut to length. So `convert`
   keeps it, as the paragraph the page renders it as rather than the
   heading the editor stored -- which is also what makes the same post
-  convert identically from any of the four sources. `description`
+  convert identically from any of the four sources -- and sets it in
+  italics, the one distinction a Markdown body can carry for a line the
+  page set apart, and one every renderer downstream already reads. A
+  lede whose author already set it apart, with emphasis of their own
+  anywhere in it, is left exactly as written: emphasis nested inside
+  emphasis reads as neither, and theirs is the distinction worth
+  keeping. `description`
   remains the summary, for search results and share cards; a story page
   showing it as well would repeat the lede rather than restore it.
 * A post whose author set no title gets one from Medium: the text of

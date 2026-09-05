@@ -589,10 +589,16 @@ Feeds and sharing:
   Now the title repeat still goes and the subtitle stays, converted as
   the paragraph the page renders it as rather than the heading the
   editor stored, so every body source produces the same Markdown and
-  every generator shows the lede without a template of its own.
+  every generator shows the lede without a template of its own. It is
+  set in italics, which is the one way a Markdown body says a line is
+  set apart, and reaches every generator without a front-matter field
+  or a template; a lede the author already set apart (any emphasis of
+  their own in it) is left exactly as written, since emphasis nested
+  inside emphasis reads as neither.
   `description` is unchanged: the capped summary for search results and
-  share cards. In the reference archive this restored the lede to 23
-  posts (`compare` and `compare --state` parity unchanged), and the RSS
+  share cards. In the reference archive this restored the lede to 24
+  posts, 20 of them italicized and 4 left as their authors set them
+  (`compare` and `compare --state` parity unchanged), and the RSS
   case got a correctness fix on the way: a feed body's leading heading
   was dropped as a "repeated title" whatever it held, which in both
   archived instances was the subtitle; it is now matched against the

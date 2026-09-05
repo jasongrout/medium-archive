@@ -179,12 +179,26 @@ def test_title_after_hero_image_is_dropped():
 
 def test_subtitle_heading_after_title_becomes_the_lede_paragraph():
     # the subtitle is the post's opening line, not a section heading:
-    # it stays in the body, as the paragraph the page renders
+    # it stays in the body, as the italicized paragraph the page sets
+    # apart
     md = md_of_state(make_state([
         para(0, "H3", "My Post"),
         para(1, "H4", "The subtitle."),
         para(2, "P", "Body text.")]))
-    assert md == "The subtitle.\n\nBody text.\n"
+    assert md == "*The subtitle.*\n\nBody text.\n"
+
+
+def test_a_lede_the_author_set_apart_is_left_alone():
+    # emphasis nested inside emphasis reads as neither, and the
+    # author's own is the distinction worth keeping -- bold included
+    for markup in ("EM", "STRONG"):
+        sub = para(1, "H4", "TL;DR: it ships today.")
+        sub["markups"] = [{"type": markup, "start": 0, "end": 6}]
+        md = md_of_state(make_state(
+            [para(0, "H3", "My Post"), sub, para(2, "P", "Body text.")],
+            previewContent={"subtitle": "TL;DR: it ships today."}))
+        marker = "*" if markup == "EM" else "**"
+        assert md == f"{marker}TL;DR:{marker} it ships today.\n\nBody text.\n"
 
 
 def test_the_lede_keeps_the_links_the_stored_summary_drops():
@@ -197,7 +211,7 @@ def test_the_lede_keeps_the_links_the_stored_summary_drops():
         [para(0, "H3", "My Post"), sub, para(2, "P", "Body text.")],
         previewContent={"subtitle": "Join us on October 19 for a full…"}))
     assert md.startswith(
-        "Join us on [October 19](https://example.com/day) for a full day.\n")
+        "*Join us on [October 19](https://example.com/day) for a full day.*\n")
 
 
 def test_a_heading_that_is_not_the_subtitle_stays_a_heading():

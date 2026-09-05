@@ -7,9 +7,11 @@ editor stores a post's lede as a heading right under the title, and
 also derives the post's summary from it -- capped, and stripped of the
 links it carries. The title is chrome (it is the page's own <h1>, and
 the front matter's) and a body repeat of it goes; the subtitle is
-content, and stays, as the opening paragraph its rendering makes it.
-The capped summary in `description` is for search results and share
-cards, not a substitute for the lede itself.
+content, and stays, as the opening paragraph its rendering makes it --
+italicized, since emphasis is the one distinction a Markdown body can
+carry for a line the page set apart (see as_lede). The capped summary
+in `description` is for search results and share cards, not a
+substitute for the lede itself.
 """
 
 import json
@@ -94,6 +96,10 @@ ELLIPSIS = "\u2026"
 # the mark of a cut Medium made: its ellipsis, or three periods
 TRAILING_CUT_RE = re.compile(r"(?:\u2026|\.\.\.)\s*$")
 
+# emphasis of the author's own, inside a line about to be italicized
+EMPHASIS_TAGS = ("em", "i", "strong", "b")
+EMPHASIS_RE = re.compile(r"<(?:%s)[ >]" % "|".join(EMPHASIS_TAGS))
+
 
 def norm_title(s: str) -> str:
     """A title or heading in comparable form: case-folded, with the
@@ -133,6 +139,35 @@ def heading_is_subtitle(heading: str, subtitle: str) -> bool:
     """
     h, s = norm_title(heading), norm_title(TRAILING_CUT_RE.sub("", subtitle or ""))
     return bool(h and s and (h.startswith(s) or s.startswith(h)))
+
+
+def lede_html(inner: str) -> str:
+    """A subtitle's inline HTML, italicized -- the string form of
+    as_lede, for the body source that builds its HTML rather than
+    parsing it (state_body)."""
+    return inner if EMPHASIS_RE.search(inner) else f"<em>{inner}</em>"
+
+
+def as_lede(tag):
+    """Turn a subtitle element into the body's lede: a paragraph, in
+    italics.
+
+    Medium sets the subtitle apart typographically, and emphasis is the
+    only way a Markdown body says "this line is set apart" -- one that
+    every renderer downstream already carries, without a front-matter
+    field or a template of its own. A line the author already set apart
+    (any emphasis of their own in it) is left exactly as it is: theirs
+    is the distinction worth keeping, and Markdown reads emphasis
+    nested inside emphasis as neither.
+    """
+    tag.name = "p"
+    tag.attrs = {}
+    if tag.get_text(strip=True) and tag.find(EMPHASIS_TAGS) is None:
+        em = BeautifulSoup("", "html.parser").new_tag("em")
+        for child in list(tag.contents):
+            em.append(child.extract())
+        tag.append(em)
+    return tag
 
 
 def untruncated_title(title: str, heading: str) -> str:
@@ -338,8 +373,7 @@ def page_body(soup, tags=(), title=""):
     # that is how Medium's editor stores it; it stays as the body's
     # opening paragraph (see the module note on subtitles).
     for sub in article.select(".pw-subtitle-paragraph"):
-        sub.name = "p"
-        sub.attrs = {}
+        as_lede(sub)
     for sel in (
         "h1",                      # title lives in front matter
         '[data-testid="authorName"]',
@@ -412,6 +446,6 @@ def feed_body(content_html: str, title: str = "", subtitle: str = ""):
         if heading_is_title(text, title):
             first.decompose()
         elif heading_is_subtitle(text, subtitle):
-            first.name = "p"
+            as_lede(first)
     strip_medium_footer(article)
     return article

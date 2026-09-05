@@ -16,6 +16,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
+from .pages import as_lede
 from .urls import canonical_url, medium_id
 
 
@@ -49,8 +50,7 @@ def export_body(soup):
     if divider:
         divider.decompose()
     for sub in body.select(".graf--subtitle"):
-        sub.name = "p"
-        sub.attrs = {}
+        as_lede(sub)
     for t in body.select(".graf--title, .graf--kicker"):
         t.decompose()
     # The editor's h3/h4 render as h2/h3 on the page; shift to match, so

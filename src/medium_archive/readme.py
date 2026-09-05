@@ -305,7 +305,9 @@ The front matter block between `---` lines is JSON, which is valid YAML.
   page's own heading, and the front matter's. The subtitle is not: it is
   the post's opening line, rendered as a heading only because that is
   how Medium's editor stores it, so it stays in the body as the
-  paragraph it renders as. The `description` beside it is the summary
+  paragraph it renders as, in italics -- the one way a Markdown body
+  says a line is set apart. A lede the author already set apart, with
+  emphasis of their own in it, keeps exactly the emphasis they wrote. The `description` beside it is the summary
   Medium derived from that line for search results and share cards --
   capped, with its links stripped -- and not a copy of it.
 * Body source preference is `export` > `state` > `feed` > `page`,
