@@ -110,7 +110,11 @@
 </div>
 </section>
 <!-- @include shared/newsletter.html -->
-{% endif %}<footer class="wrap site-footer">{{ SITESUBTITLE }}</footer>
+{% endif %}{# the line under every page: site.json's "footer", read as
+   Markdown by the config (with `{year}` the year of the build, so a
+   copyright notice stays current as jupyter.org's own footer keeps
+   it); with no footer set, the site's description, as before #}
+<footer class="wrap site-footer">{% if FOOTER %}{{ FOOTER|safe }}{% else %}{{ SITESUBTITLE }}{% endif %}</footer>
 <!-- @include shared/link-picker.html -->
 <!-- @include shared/font-picker.html -->
 </body>

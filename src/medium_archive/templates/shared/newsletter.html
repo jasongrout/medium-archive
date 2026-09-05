@@ -17,7 +17,10 @@
   // the fields on one row, the consent copy on its own beneath them,
   // and the button below that. The last two are given a full-width
   // basis rather than left to wrap there by arithmetic, so the order
-  // holds however many fields the form is later given.
+  // holds however many fields the form is later given. Neither the
+  // heading (card.css) nor the consent copy is held to a measure of
+  // its own: both run the width of the band, so a wide window sets
+  // them in the fewest lines rather than a narrow column of them.
   function formCss() {
     var ink = token("--ink", "#1c1c1c");
     var muted = token("--muted", "#525252");
@@ -44,7 +47,7 @@
       ".hs-input.error { border-bottom-style: dashed !important; }",
       "select.hs-input { appearance: auto; color: " + ink + " !important; }",
       ".hs-richtext { flex: 1 0 100%; margin: 0; color: " + muted + ";" +
-        " font-size: 0.85em; line-height: 1.5; max-width: 60ch; }",
+        " font-size: 0.85em; line-height: 1.5; }",
       ".hs-richtext a { color: inherit; }",
       ".hs-submit { flex: 1 0 100%; }",
       ".hs-button { background: " + accent + " !important; color: #fff !important;" +

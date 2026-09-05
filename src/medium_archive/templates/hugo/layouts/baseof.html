@@ -111,7 +111,11 @@
 </div>
 </section>
 <!-- @include shared/newsletter.html -->
-{{ end }}<footer class="wrap site-footer">{{ site.Params.description }}</footer>
+{{ end }}{{/* the line under every page: site.json's "footer" as
+     Markdown, with `{year}` the year of the build so a copyright
+     notice stays current, as jupyter.org's own footer keeps it; with
+     no footer set, the site's description, as before */}}
+<footer class="wrap site-footer">{{ with site.Params.footer }}{{ replace . "{year}" (now.Format "2006") | markdownify }}{{ else }}{{ site.Params.description }}{{ end }}</footer>
 <!-- @include shared/link-picker.html -->
 <!-- @include shared/font-picker.html -->
 </body>

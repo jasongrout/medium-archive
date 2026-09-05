@@ -239,8 +239,10 @@ def build_site(out):
         # themes' html announcement option), or literal HTML
         announcement=(json.dumps(config["announcement"], ensure_ascii=False)
                       if config.get("announcement") else "None"),
-        # the landing-page blurb, Markdown; the config renders it
+        # the landing-page blurb and the footer line, Markdown; the
+        # config renders both
         intro=setting(config.get("intro")),
+        footer=setting(config.get("footer")),
         noindex="True" if config.get("noindex") else "False",
         twitter=setting(config.get("twitter")),
         profiles=json.dumps(site_profiles(config)),

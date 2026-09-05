@@ -245,6 +245,11 @@ def build_site(out):
     write_data_files(site, manifest, out)
 
     params = {"description": config.get("description", "")}
+    # "footer": the line under every page, Markdown, with `{year}` the
+    # year of the build (baseof.html renders it); without it the footer
+    # carries the site's description, as it always has
+    if config.get("footer"):
+        params["footer"] = config["footer"]
     # "avatar" (site.json top level, or hugo section): a hand-picked site
     # logo, shown in the header; "favicon" likewise: the tab icon, at the
     # site root so browsers that ask for /favicon.ico by convention are

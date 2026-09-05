@@ -829,6 +829,9 @@ def test_newsletter_band(archive):
         # full-width basis so the order holds at any field count
         assert '".hs-richtext { flex: 1 0 100%;' in text, base
         assert '".hs-submit { flex: 1 0 100%; }"' in text, base
+        # and neither the copy nor the heading is held to a measure of
+        # its own: both run the width of the band
+        assert "max-width" not in text.split(".hs-richtext")[1][:200], base
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".newsletter " in css and ".newsletter h2" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
@@ -854,6 +857,50 @@ def test_newsletter_band_absent_or_incomplete(archive, capsys):
     hugo.build_site(archive)
     err = capsys.readouterr().err
     assert "hubspot_portal" in err and "hubspot_form" in err
+
+
+def test_footer_line(archive):
+    # site.json's "footer" is the line under every page, Markdown, with
+    # {year} the year of the build -- jupyter.org's trademark notice,
+    # which carries a link and a copyright year, is the shape of it
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["footer"] = ("Trademarks are registered by "
+                     "[LF Charities](https://lf-charities.org/). \u00a9 {year}")
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert "[LF Charities](https://lf-charities.org/)" in (
+        hugo_site / "hugo.toml").read_text()
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert "_FOOTER_MD = " in config
+    # the year is substituted where the site is built, not baked into
+    # the generated source, which stays the same from one build to the
+    # next (and from one year to the next)
+    assert '{year}' in config
+    assert "_FOOTER_MD.replace(\"{year}\"" in config
+    for base, render in ((hugo_site / "layouts/baseof.html",
+                          'replace . "{year}"'),
+                         (pelican_site / "theme/templates/base.html",
+                          "FOOTER|safe")):
+        text = base.read_text()
+        assert render in text, base
+        assert "site-footer" in text, base
+    # the line is a paragraph of Markdown, so the footer spaces itself
+    assert ".site-footer p { margin: 0; }" in (
+        hugo_site / "static/css/style.css").read_text()
+
+
+def test_footer_falls_back_to_the_description(archive):
+    # no "footer": the site's description, as the footer has always
+    # carried, and a config that is still valid Python
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert "footer = " not in (hugo_site / "hugo.toml").read_text()
+    assert "_FOOTER_MD = None" in (pelican_site / "pelicanconf.py").read_text()
+    assert "{{ site.Params.description }}" in (
+        hugo_site / "layouts/baseof.html").read_text()
+    assert "{{ SITESUBTITLE }}" in (
+        pelican_site / "theme/templates/base.html").read_text()
 
 
 def test_masthead_logo(archive):
@@ -1158,15 +1205,19 @@ def test_pelican_escapes_by_default(archive):
                 '"extensions": []'):
         assert key in config, key
     # the genuinely-HTML values in the theme, and the only ones: the
-    # rendered body, and the landing-page intro the config renders from
-    # site.json's Markdown. The intro is hand-written and versioned with
-    # the archive, unlike a title or a tag name, which come from whoever
-    # wrote the post -- that is what makes it safe to mark safe.
+    # rendered body, and the landing-page intro and footer line the
+    # config renders from site.json's Markdown. Both of those are
+    # hand-written and versioned with the archive, unlike a title or a
+    # tag name, which come from whoever wrote the post -- that is what
+    # makes them safe to mark safe.
     templates = site / "theme/templates"
     safe = [(f.name, line.strip()) for f in sorted(templates.glob("*.html"))
             for line in f.read_text().splitlines() if "|safe" in line]
     assert safe == [
         ("article.html", "{{ article.content|safe }}"),
+        ("base.html",
+         '<footer class="wrap site-footer">{% if FOOTER %}{{ FOOTER|safe }}'
+         '{% else %}{{ SITESUBTITLE }}{% endif %}</footer>'),
         ("index.html",
          '{% if INTRO %}<div class="intro">{{ INTRO|safe }}</div>{% endif %}'),
     ], safe

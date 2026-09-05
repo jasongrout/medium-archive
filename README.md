@@ -184,6 +184,10 @@ with none stored, the system scheme decides. The theme provides:
 - The landing-page blurb, `site.json`'s `"intro"`, as Markdown above the
   card grid. Hugo renders it from the section's own content; the pelican
   config renders the same Markdown, since Jinja has no filter for it.
+- The line under every page, `site.json`'s `"footer"`, as Markdown too,
+  with `{year}` in it standing for the year the site is built -- so a
+  trademark or copyright notice stays current, as jupyter.org's own
+  footer keeps it. Unset, the footer carries the site's description.
 - An optional site-wide announcement banner above the header, from
   `site.json`'s `"announcement"`: either an http(s) URL fetched
   client-side or literal HTML. The URL form is the mechanism behind
@@ -409,6 +413,7 @@ publication rather than the tool. Every key is optional.
 | `title` | site title: the header, `<title>`, and every feed's name |
 | `description` | tagline under the title, and the feeds' description |
 | `intro` | landing-page blurb (Markdown), rendered by every landing page |
+| `footer` | the line under every page (Markdown), `{year}` standing for the year the site is built; unset, the footer carries `description` |
 | `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter. Unset, the exporters warn and fall back to a placeholder, so share links and social previews point at a domain you do not own |
 | `avatar` | archive-relative image path for the header logo |
 | `logo` | archive-relative image path for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
