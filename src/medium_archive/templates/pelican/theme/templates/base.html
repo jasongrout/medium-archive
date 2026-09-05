@@ -80,8 +80,11 @@
 {# the masthead: a logo of the publication's own standing in for its
    name (site.json "logo", with "logo_dark" the same mark drawn for the
    dark palette), as jupyter.org's navbar carries its rectangle logo;
-   failing that, the site's name, with the avatar beside it #}
-<a class="site-title" href="{{ SITEURL }}/"{% if LOGO %} aria-label="{{ SITENAME }}"{% endif %}>{% if LOGO %}<img class="site-logo{% if LOGO_DARK %} site-logo-light{% endif %}" src="{{ SITEURL }}/{{ LOGO }}" alt="">{% if LOGO_DARK %}<img class="site-logo site-logo-dark" src="{{ SITEURL }}/{{ LOGO_DARK }}" alt="">{% endif %}{% else %}{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}{% endif %}</a>
+   failing that, the site's name, with the avatar beside it. It links
+   to the site's home, or to site.json's "logo_link" where the mark
+   stands for something larger than the blog -- and then the link is
+   named by where it goes, not by this site #}
+<a class="site-title" href="{% if LOGO_LINK %}{{ LOGO_LINK.url }}{% else %}{{ SITEURL }}/{% endif %}"{% if LOGO %} aria-label="{% if LOGO_LINK %}{{ LOGO_LINK.label }}{% else %}{{ SITENAME }}{% endif %}"{% endif %}>{% if LOGO %}<img class="site-logo{% if LOGO_DARK %} site-logo-light{% endif %}" src="{{ SITEURL }}/{{ LOGO }}" alt="">{% if LOGO_DARK %}<img class="site-logo site-logo-dark" src="{{ SITEURL }}/{{ LOGO_DARK }}" alt="">{% endif %}{% else %}{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}{% endif %}</a>
 <nav>
 <a href="{{ SITEURL }}/">Blog</a>
 <a href="{{ SITEURL }}/tags/">Tags</a>
