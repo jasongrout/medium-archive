@@ -51,7 +51,11 @@ Last full validation, all three against all 333 posts:
   card grid of cover-image cards with tag links, excerpt and byline,
   paginated at 24, plus tag/author card listings, per-term RSS, alias
   redirect stubs for old Medium slug+id, `/p/<id>` and Ghost-era paths,
-  and the Jupyter avatar in the header. Images are optimized natively:
+  and the Jupyter rectangle logo in the header (jupyter/design, `logos/
+  Rectangle Logo/rectanglelogo-greytext-orangebody-greymoons` for the
+  light palette and `rectanglelogo-whitetext-orangebody-whitemoons` for
+  the dark one, both copied unaltered as `logo.svg` and `logo-dark.svg`;
+  jupyter.org serves the same two files). Images are optimized natively:
   640×360 cover thumbnails and responsive lazily-loaded webp variants
   for body images (about 2100 processed images, about 2 min build).
   `pagefind --site public` after `hugo` gives /search/, a results page
