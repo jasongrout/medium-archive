@@ -124,7 +124,11 @@ These embed verbatim in both engines' pages, so they must carry no
   does not shift the layout when the banner arrives; the live fetch
   corrects a changed announcement after the fact. Dismissal persists
   per browser keyed by the banner's content, so a changed announcement
-  shows again.
+  shows again. Whatever the source gives is wrapped in an
+  `.announcement-content` div, the shape jupyter.org's banner has:
+  its box holds the smaller measure the padding and the dismiss button
+  are drawn in ems against, and the wrapper holds the announcement's
+  own 18px, so the banner stands the same 43.8px tall as that one.
 - `share-icons.html` is the five share marks as one hidden `<symbol>`
   sprite the post pages `<use>`: LinkedIn's, Facebook's, Bluesky's and
   Mastodon's own logomarks (Simple Icons' reproductions, at their 24x24

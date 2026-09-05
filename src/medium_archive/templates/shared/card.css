@@ -164,28 +164,60 @@ a:hover { text-decoration-line: underline; }
    outrank. */
 :root[data-link="browser"] { --link-l: LinkText; --link-d: LinkText; }
 
-/* jupyter.org's .global-banner styling, so a shared announcement file
-   looks the same here as there: white on the accent with a soft
-   shadow, in its font stack at 18px regular on a 27px line */
+/* jupyter.org's .global-banner, box for box, so a shared announcement
+   file looks the same here as there: white on the accent with a soft
+   shadow, in its font stack, and 43.8px tall with a one-line
+   announcement in it.
+
+   That height is the sum of two different measures, which is why the
+   banner is drawn in two elements like jupyter.org's. Its box sits at
+   the 14px/20px its body sets -- every em the box states is a 14px
+   one, so .6em of padding is 8.4px and the 1.4em dismiss is 19.6px --
+   while the announcement inside it is the 18px/27px that site sets
+   running text in (there, a <p> in .global-banner-content picking up
+   the site's own paragraph rule). .announcement-content carries the
+   18px here instead of a <p> rule, so an announcement that is bare
+   text rather than markup reads at that same size; the script wraps
+   whatever the source gives in it. */
 .announcement { position: relative; background: var(--accent); color: #fff;
                 text-shadow: 0 0 4px #000;
                 text-align: center;
-                font: 400 1.125rem/1.5 "Myriad Pro", "Helvetica Neue",
+                font: 400 .875rem/1.42857143 "Myriad Pro", "Helvetica Neue",
                       Helvetica, Arial, sans-serif;
                 padding: .6em 2.5em; }
 .announcement[hidden] { display: none; }
+.announcement-content { font-size: 1.125rem; line-height: 1.5; }
 .announcement p { margin: 0; }
 .announcement a { color: #fff; text-decoration: underline;
                   text-decoration-thickness: 2px; }
+/* The x is jupyter.org's own: the same U+00D7, at the same 1.4em of
+   the box's 14px, drawn in the same face. A button takes the
+   browser's UI font unless a rule says otherwise -- which is what set
+   this one apart, a system-ui x beside jupyter.org's Helvetica one --
+   and jupyter.org's inherits its banner box, whose family is that
+   site's body stack. Naming that stack rather than inheriting drops
+   the "Myriad Pro" the announcement itself leads with: that is the
+   face jupyter.org sets the announcement in but not its x, and while
+   no site here loads Myriad Pro as a webfont, a reader who has it
+   installed would otherwise see an x this site draws in it and that
+   one does not. */
 .announcement-close { position: absolute; right: .5em; top: 50%;
                       transform: translateY(-50%); padding: .2em .4em;
                       border: 0; background: none; color: inherit;
                       text-shadow: inherit;
+                      font-family: "Helvetica Neue", Helvetica, Arial,
+                                   sans-serif;
                       font-size: 1.4em; line-height: 1; cursor: pointer; }
 
+/* The header stands as tall as jupyter.org's navbar, so a reader
+   moving between the two sites sees the same masthead: its 15px of
+   padding above and below a 40px logo, over a 1px rule -- 71px in
+   all. .9375rem is that 15px; the nav items' tab bar below is drawn
+   against the same figure. */
 .site-header { background: var(--card); border-bottom: 1px solid var(--line); }
 .site-header .bar { display: flex; align-items: center; justify-content: space-between;
-                    flex-wrap: wrap; gap: .5rem; padding-top: .9rem; padding-bottom: .9rem; }
+                    flex-wrap: wrap; gap: .5rem;
+                    padding-top: .9375rem; padding-bottom: .9375rem; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
@@ -213,7 +245,7 @@ a:hover { text-decoration-line: underline; }
    pulling it back with a matching negative margin, so the bar sits
    on the header's border rather than under the text. */
 .site-header nav a { display: inline-block; margin-left: 1.25rem;
-                     padding-bottom: calc(.9rem - 3px); margin-bottom: -.9rem;
+                     padding-bottom: calc(.9375rem - 3px); margin-bottom: -.9375rem;
                      border-bottom: 3px solid transparent;
                      color: var(--soft); font-weight: 500; }
 .site-header nav a:hover { color: var(--ink); }
