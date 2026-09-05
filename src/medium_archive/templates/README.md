@@ -85,12 +85,13 @@ These embed verbatim in both engines' pages, so they must carry no
   3:1 against the card; three blues that colour the word and its rule
   together, at the accent's OKLCH complement (228deg) and two steps
   round towards a conventional link blue; that complement again at the
-  7:1 the body grays hold; and the browser's own link, its colour and
-  its own rule, as the control the rest are read against. `card.css`
-  states a choice as a pair of values, light and dark, so a candidate
-  is one `:root[data-link=...]` block and no scheme rules of its own;
-  it also carries the reasoning behind the numbers. The losing choices, and the picker with them,
-  come out once the blog decides.
+  7:1 the body grays hold; and, as the two controls the rest are read
+  against, the plainest link there is (ink words under a rule in that
+  same ink) and the browser's own, its colour and its own rule.
+  `card.css` states a choice as a pair of values, light and dark, so a
+  candidate is one `:root[data-link=...]` block and no scheme rules of
+  its own; it also carries the reasoning behind the numbers. The losing
+  choices, and the picker with them, come out once the blog decides.
 - `term-sort.html` is the tag/author chip indexes' sort control: by
   name (A-Z, the order the generators emit, so the no-JS page reads the
   same) or by count, most posts first. Hidden until its script runs;

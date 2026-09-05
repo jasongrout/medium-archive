@@ -145,17 +145,24 @@ a:hover { text-decoration-line: underline; }
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
                                 --link-rule-l: currentColor;
                                 --link-rule-d: currentColor; }
-/* "browser" is the control the rest are read against: a link drawn
-   the way the browser draws one with no stylesheet at all. LinkText is
-   the reader's own -- their platform's link blue, in the scheme the
-   palette has declared -- and the rule goes back to the browser's own
-   weight and position, so this choice alone drops the offset above.
-   Visited links are left alone: the colour would land on card titles
-   and nav items too, which the reset above cannot outrank. */
+/* The last two are the controls the rest are read against, and the
+   only choices that hand the rule back to the browser's own weight and
+   position rather than the offset above. "ink" keeps the word the ink
+   it inherits -- the --link default, so it states only the rule -- and
+   underlines it in that same ink, the plainest link there is: no
+   colour anywhere, the rule carrying the whole signal at the browser's
+   own contrast. "browser" is a link drawn the way the browser draws
+   one with no stylesheet at all, in LinkText, the reader's own
+   platform link colour in the scheme the palette has declared. Visited
+   links are left alone: VisitedText would land on card titles and nav
+   items too, which the reset above cannot outrank. */
+:root[data-link="ink"] { --link-rule-l: currentColor;
+                         --link-rule-d: currentColor; }
 :root[data-link="browser"] { --link-l: LinkText; --link-d: LinkText;
                              --link-rule-l: currentColor;
                              --link-rule-d: currentColor; }
-:root[data-link="browser"] a { text-decoration-thickness: auto;
+:root[data-link="ink"] a, :root[data-link="browser"] a {
+                               text-decoration-thickness: auto;
                                text-underline-offset: auto; }
 
 /* jupyter.org's .global-banner styling, so a shared announcement file
@@ -309,13 +316,14 @@ a:hover { text-decoration-line: underline; }
 /* A heading takes the accent as a rule beneath it, never as its own
    colour: #f37626 sets at 2.83:1 on the white card, under even the 3:1
    floor large text asks for, so it belongs on the page as a mark and
-   not as words. The bar is the nav's own 3px accent rule, cut short so
-   it reads as emphasis under the heading rather than as a divider
-   across the column, and it is drawn on the title and the section
+   not as words. The rule runs the column's full measure, where a stub
+   under a heading several times its length reads as an unfinished
+   edge; at that width it carries some twenty times the ink, so it is
+   drawn a pixel thinner than the nav's 3px bar to keep the weight
+   where the short one had it. It marks the title and the section
    headings only -- deeper levels are structure, not signposts. */
 .post h1::after, .post h2::after { content: ""; display: block;
-                                   width: 2.5rem; height: 3px;
-                                   margin: .45rem 0 0; border-radius: 2px;
+                                   height: 2px; margin: .5rem 0 0;
                                    background: var(--accent); }
 .post h2 { margin-top: 2.2rem; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
