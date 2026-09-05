@@ -190,10 +190,23 @@ a:hover { text-decoration-line: underline; }
 .announcement p { margin: 0; }
 .announcement a { color: #fff; text-decoration: underline;
                   text-decoration-thickness: 2px; }
+/* The x is jupyter.org's own: the same U+00D7, at the same 1.4em of
+   the box's 14px, drawn in the same face. A button takes the
+   browser's UI font unless a rule says otherwise -- which is what set
+   this one apart, a system-ui x beside jupyter.org's Helvetica one --
+   and jupyter.org's inherits its banner box, whose family is that
+   site's body stack. Naming that stack rather than inheriting drops
+   the "Myriad Pro" the announcement itself leads with: that is the
+   face jupyter.org sets the announcement in but not its x, and while
+   no site here loads Myriad Pro as a webfont, a reader who has it
+   installed would otherwise see an x this site draws in it and that
+   one does not. */
 .announcement-close { position: absolute; right: .5em; top: 50%;
                       transform: translateY(-50%); padding: .2em .4em;
                       border: 0; background: none; color: inherit;
                       text-shadow: inherit;
+                      font-family: "Helvetica Neue", Helvetica, Arial,
+                                   sans-serif;
                       font-size: 1.4em; line-height: 1; cursor: pointer; }
 
 /* The header stands as tall as jupyter.org's navbar, so a reader
