@@ -320,11 +320,12 @@ a:hover { text-decoration-line: underline; }
    under a heading several times its length reads as an unfinished
    edge; at that width it carries some twenty times the ink, so it is
    drawn a pixel thinner than the nav's 3px bar to keep the weight
-   where the short one had it. It marks the title and the section
-   headings only -- deeper levels are structure, not signposts. */
-.post h1::after, .post h2::after { content: ""; display: block;
-                                   height: 2px; margin: .5rem 0 0;
-                                   background: var(--accent); }
+   where the short one had it. It marks the section headings only: the
+   title needs no rule under it, since the byline already sets it off
+   from what follows, and deeper levels are structure, not signposts. */
+.post h2::after { content: ""; display: block;
+                  height: 2px; margin: .5rem 0 0;
+                  background: var(--accent); }
 .post h2 { margin-top: 2.2rem; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
 /* A tag is a pill, in the article byline and on a card alike: one
