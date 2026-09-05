@@ -63,10 +63,28 @@
         --system-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
                        monospace;
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --source-sans: "Source Sans Pro", "Helvetica Neue", Helvetica,
-                       Arial, sans-serif;
-        --source-serif: "Source Serif Pro", Georgia, Cambria,
-                        "Times New Roman", Times, serif;
+        /* Source Sans 3 and Source Serif 4 are the current generation
+           of Adobe's superfamily: the same text designs, redrawn as
+           variable faces, extending and replacing Source Sans Pro and
+           Source Serif Pro. Each keeps its Pro predecessor behind it
+           in the stack for a reader who has the older family installed
+           locally but not the new one. The mono is not renamed -- Source
+           Code Pro is itself the current face. */
+        --source-sans: "Source Sans 3", "Source Sans Pro",
+                       "Helvetica Neue", Helvetica, Arial, sans-serif;
+        /* Source Serif 4 carries an optical-size axis besides (opsz
+           8-60), one the browser drives itself: font-optical-sizing is
+           auto by default, so serif text is drawn for the size it is
+           set at -- wider, more openly spaced and a touch sturdier as
+           it shrinks, narrower and more tightly set as it grows. The
+           article's running text at 1.25rem lands on the axis default
+           of 20, so it gets what a static face would have given it;
+           the axis earns its place on the sizes around it (a table's
+           .9em) and on any reading size the column might take later.
+           Source Sans 3 has no counterpart axis to match it with:
+           Adobe drew optical masters for the serif only. */
+        --source-serif: "Source Serif 4", "Source Serif Pro", Georgia,
+                        Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
                        Menlo, Consolas, monospace;
         --atkinson: "Atkinson Hyperlegible", "Helvetica Neue", Helvetica,
@@ -126,8 +144,8 @@ a:hover { text-decoration-line: underline; }
    at ~7:1 on the dark cards. Both tune the rule, where the default
    leaves it to the browser: a 1px rule dropped clear of the baseline,
    so text-decoration-skip-ink cuts small nicks around the descenders
-   rather than long gaps. (Source Serif Pro's own underline sits at
-   -0.05em, where its descenders at -0.249em break the line into
+   rather than long gaps. (Source Serif 4's own underline sits at
+   -0.05em, where its descenders at -0.25em break the line into
    pieces and a thin rule reads thinner still.) */
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea; }
 :root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe; }
