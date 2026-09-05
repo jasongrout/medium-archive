@@ -264,11 +264,13 @@ with none stored, the system scheme decides. The theme provides:
     Both themes declare `og:image:width`/`og:image:height`, so
     Facebook renders the large card on the first share instead of
     after a fetch of its own.
-  - Related posts under every article (up to three, by shared tags,
-    then author, then date): the links that give a post ten years
-    deep in the listings a path in from another, for readers and
+  - A "More posts" block under every article (up to three, by shared
+    tags, then author, then date): the links that give a post ten
+    years deep in the listings a path in from another, for readers and
     crawlers alike. Hugo's related content, configured in the
-    generated config; the pelican plugin scores the same way.
+    generated config; the pelican plugin scores the same way. The
+    heading stays neutral because the scoring only guesses at a
+    kinship -- it reads tags and bylines, not the posts.
   - Alt text from captions: a captioned image with no alt of its own
     (most Medium images) takes its caption's plain text as its alt in
     the built sites, for screen readers and image search.

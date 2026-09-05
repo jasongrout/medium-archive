@@ -19,12 +19,13 @@
 {{ article.content|safe }}
 {{ share(post_url, post_title) }}
 </article>
-{# related posts (article.related_posts, from the site plugin: by
+{# more posts (article.related_posts, from the site plugin: by
    shared tags, then author, then date), the listing cards; kept out
-   of the search index, since the words are the other posts' #}
+   of the search index, since the words are the other posts'. Titled
+   as hugo's _partials/related.html titles it #}
 {% if article.related_posts %}
 <section class="related" data-pagefind-ignore>
-<h2 class="page-title">Related posts</h2>
+<h2 class="page-title">More posts</h2>
 <div class="card-grid">
 {% for related in article.related_posts %}{{ card(related) }}{% endfor %}
 </div>

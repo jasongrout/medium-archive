@@ -1,15 +1,17 @@
-{{- /* Related posts under an article (ctx: the post): up to three other
+{{- /* More posts under an article (ctx: the post): up to three other
        posts by shared tags, then author, then date (the [related]
-       config), as WordPress's SEO plugins and Jetpack append. Ten
-       years of posts at 24 a listing page leaves most of an archive
-       many clicks deep; these links are the ones that give an old post
-       a path in from another, for a reader and a crawler alike. The
-       cards are the listing cards, so the block reads as the site
-       does; kept out of the search index, since the words are the
-       other posts'. */ -}}
+       config), as WordPress's SEO plugins and Jetpack append. Titled
+       "More posts", not "Related posts": the scoring guesses at a
+       kinship from tags and bylines, and claims nothing about what
+       the posts are about. Ten years of posts at 24 a listing page
+       leaves most of an archive many clicks deep; these links are the
+       ones that give an old post a path in from another, for a reader
+       and a crawler alike. The cards are the listing cards, so the
+       block reads as the site does; kept out of the search index,
+       since the words are the other posts'. */ -}}
 {{- with (where site.RegularPages "Type" "posts").Related . | first 3 }}
 <section class="related" data-pagefind-ignore>
-<h2 class="page-title">Related posts</h2>
+<h2 class="page-title">More posts</h2>
 <div class="card-grid">
 {{ range . }}{{ partial "card.html" . }}{{ end }}
 </div>

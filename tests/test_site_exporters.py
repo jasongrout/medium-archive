@@ -1525,9 +1525,11 @@ def test_structured_data_graph(archive):
 
 
 def test_related_posts(archive):
-    """Each post page closes with related posts, by shared tags, then
+    """Each post page closes with more posts, by shared tags, then
     author, then date: Hugo's related content, configured in the
-    generated config; the pelican plugin scores the same way."""
+    generated config; the pelican plugin scores the same way. The
+    block is headed "More posts" in both sites -- the scoring guesses
+    at a kinship from tags and bylines, so the heading claims none."""
     hugo_site = hugo.build_site(archive)
     config = (hugo_site / "hugo.toml").read_text()
     assert "[related]" in config and 'name = "tags"' in config
@@ -1536,7 +1538,13 @@ def test_related_posts(archive):
     assert '(where site.RegularPages "Type" "posts").Related' in related and 'partial "card.html"' in related
     assert "| first 3 }}" in related     # three, the width of the home page's card rows
     pelican_site = pelican.build_site(archive)
-    assert "article.related_posts" in (pelican_site / "theme/templates/article.html").read_text()
+    article = (pelican_site / "theme/templates/article.html").read_text()
+    assert "article.related_posts" in article
+    # the same neutral heading in both sites: the scoring only guesses
+    # at a kinship, so the heading does not head them "Related posts"
+    for markup in (related, article):
+        assert '<h2 class="page-title">More posts</h2>' in markup
+        assert '"page-title">Related posts' not in markup
     namespace = config_namespace(pelican_site)
     from datetime import datetime
     day = lambda n: datetime(2020, 1, n)

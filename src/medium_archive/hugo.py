@@ -29,8 +29,8 @@ profile of every byline) and site.json's "profiles"/"twitter", the
 og:image of a page with no cover from its "share_image", and a post
 that declared a canonical on another host (Medium's "originally
 published at") carries it as `canonical` in its front matter; the
-Medium copy is never a page's canonical. Each post page closes with
-related posts (Hugo's related content, by shared tags).
+Medium copy is never a page's canonical. Each post page closes with a
+"More posts" block (Hugo's related content, by shared tags).
 
 Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
 are exactly the archive's tag; the names tags are shown under
