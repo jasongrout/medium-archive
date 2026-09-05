@@ -133,9 +133,9 @@ tags.json                     optional hand-written tag cleanup ("drop",
                                 by convert to front matter
 site.json                     optional hand-written site settings read by
                                 every site exporter: title, description,
-                                intro (landing page), base_url, avatar,
-                                logo, favicon, announcement, newsletter,
-                                image caps, hugo
+                                intro (landing page), footer, base_url,
+                                avatar, logo, favicon, announcement,
+                                newsletter, image caps, hugo
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
 redirects.csv                 original_path, medium_id, original_url,
