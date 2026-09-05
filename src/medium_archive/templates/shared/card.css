@@ -72,11 +72,17 @@
            Code Pro is itself the current face. */
         --source-sans: "Source Sans 3", "Source Sans Pro",
                        "Helvetica Neue", Helvetica, Arial, sans-serif;
-        /* Source Serif 4 carries an optical-size axis besides, one the
-           browser drives itself (font-optical-sizing is auto by
-           default), so the article's 1.25rem running text is set in the
-           drawing meant for reading sizes rather than one scaled from a
-           single master. */
+        /* Source Serif 4 carries an optical-size axis besides (opsz
+           8-60), one the browser drives itself: font-optical-sizing is
+           auto by default, so serif text is drawn for the size it is
+           set at -- wider, more openly spaced and a touch sturdier as
+           it shrinks, narrower and more tightly set as it grows. The
+           article's running text at 1.25rem lands on the axis default
+           of 20, so it gets what a static face would have given it;
+           the axis earns its place on the sizes around it (a table's
+           .9em) and on any reading size the column might take later.
+           Source Sans 3 has no counterpart axis to match it with:
+           Adobe drew optical masters for the serif only. */
         --source-serif: "Source Serif 4", "Source Serif Pro", Georgia,
                         Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
