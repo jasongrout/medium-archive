@@ -1002,6 +1002,25 @@ def test_nav_current_highlight(archive):
     assert 'a[aria-current="page"]' in (hugo_site / "static/css/style.css").read_text()
 
 
+def test_nav_wraps_without_overlapping_itself(archive):
+    # A phone-width screen wraps the nav, and each item is pulled
+    # .9375rem down the header to land its tab bar on the header's
+    # border. Laid out as inline-blocks the two together overlapped:
+    # a line box is sized to the pulled-in margin box, so a wrapped
+    # row was laid that .9375rem short and the row above printed its
+    # accent bar through the words below it. The rows are flex rows
+    # now, and the row-gap gives that space back with room to spare.
+    css = (hugo.build_site(archive) / "static/css/style.css").read_text()
+    nav = css[css.index(".site-header nav {"):]
+    nav = nav[:nav.index("}")]
+    assert "flex-wrap: wrap" in nav and "row-gap: 1.25rem" in nav
+    item = css[css.index(".site-header nav a {"):css.index(".site-header nav a:hover")]
+    assert "margin-bottom: -.9375rem" in item
+    # the row's own gaps space the items, so no item carries a margin
+    # that would indent the start of a wrapped row
+    assert "margin-left" not in item
+
+
 def test_term_sort_control(archive):
     # the tag/author chip indexes carry the name/count sort control,
     # placed above the chip list it reorders
