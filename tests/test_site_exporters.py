@@ -937,6 +937,57 @@ def test_masthead_logo(archive):
     assert "display: var(--logo-light)" in css
 
 
+def test_masthead_logo_link(archive):
+    # site.json's "logo_link": a mark that stands for something larger
+    # than the blog (the Jupyter mark over a Jupyter blog) links there
+    # instead of to the site's home, and the link reads under that
+    # address's host rather than the site's own title
+    (archive / "logo.svg").write_bytes(b"<svg/>")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["logo"], cfg["logo_link"] = "logo.svg", "https://jupyter.org"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    toml = (hugo_site / "hugo.toml").read_text()
+    assert "[params.logo_link]" in toml
+    assert 'url = "https://jupyter.org"' in toml
+    assert 'label = "jupyter.org"' in toml
+    assert ('LOGO_LINK = {"url": "https://jupyter.org", '
+            '"label": "jupyter.org"}') in (
+        pelican_site / "pelicanconf.py").read_text()
+    # the nav still carries the way home, so the site is not left
+    # without a link to its own landing page
+    for base, home in ((hugo_site / "layouts/baseof.html",
+                        '<a href="{{ site.Home.RelPermalink }}">Blog</a>'),
+                       (pelican_site / "theme/templates/base.html",
+                        '<a href="{{ SITEURL }}/">Blog</a>')):
+        assert home in base.read_text(), base
+
+
+def test_masthead_link_defaults_home(archive):
+    # no "logo_link": the masthead links to the site's own home, named
+    # by the site's title, as it always has
+    (archive / "logo.svg").write_bytes(b"<svg/>")
+    cfg = json.loads((archive / "site.json").read_text())
+    cfg["logo"] = "logo.svg"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert "logo_link" not in (hugo_site / "hugo.toml").read_text()
+    assert "LOGO_LINK = None" in (
+        pelican_site / "pelicanconf.py").read_text()
+    # and with no logo to carry it the link is not read at all: the
+    # masthead is then the site's own name, which cannot lead off-site
+    del cfg["logo"]
+    cfg["logo_link"] = "https://jupyter.org"
+    (archive / "site.json").write_text(json.dumps(cfg))
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    assert "logo_link" not in (hugo_site / "hugo.toml").read_text()
+    assert "LOGO_LINK = None" in (
+        pelican_site / "pelicanconf.py").read_text()
+
+
 def test_nav_current_highlight(archive):
     # the nav link whose path prefixes the current page's gets
     # aria-current, which the stylesheet paints in the accent

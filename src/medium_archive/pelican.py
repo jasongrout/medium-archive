@@ -90,8 +90,8 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
                     front_matter_yaml, image_size, load_site_inputs,
-                    newsletter_params, page_stems, quote_arg,
-                    rewrite_figures, site_profiles,
+                    masthead_link, newsletter_params, page_stems,
+                    quote_arg, rewrite_figures, site_profiles,
                     template_text, write_data_files, write_redirects_csv,
                     write_templates)
 
@@ -234,6 +234,10 @@ def build_site(out):
         favicon=setting(favicon and f"theme/{favicon}"),
         logo=setting(logo and f"theme/img/{logo}"),
         logo_dark=setting(logo_dark and f"theme/img/{logo_dark}"),
+        # where the mark points when it stands for something larger
+        # than the blog (see sites.masthead_link); read, like the dark
+        # mark, only where there is a logo to carry the link
+        logo_link=setting(logo and masthead_link(config)),
         # a site-wide banner above the header -- an http(s) URL the theme
         # fetches client-side (empty content hides the banner, like Sphinx
         # themes' html announcement option), or literal HTML

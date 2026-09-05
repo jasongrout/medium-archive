@@ -67,8 +67,8 @@ import sys
 from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, front_matter_yaml,
-                    load_site_inputs, newsletter_params, old_paths,
-                    page_stems, quote_arg,
+                    load_site_inputs, masthead_link, newsletter_params,
+                    old_paths, page_stems, quote_arg,
                     redirect_rules, redirects_file, rewrite_figures,
                     site_profiles, write_data_files,
                     write_redirects_csv, write_templates)
@@ -278,6 +278,13 @@ def build_site(out):
             site / "static" / "img", "logo-dark")
         if logo_dark:
             params["logo_dark"] = f"img/{logo_dark}"
+        # "logo_link": where the mark points when it stands for
+        # something larger than the blog (the Jupyter blog's Jupyter
+        # mark, and jupyter.org); unset, the masthead points at the
+        # site's own home, as it does without a logo at all
+        link = masthead_link(config)
+        if link:
+            params["logo_link"] = link
     # "announcement": a site-wide banner above the header -- an http(s)
     # URL the theme fetches client-side (empty content hides the banner,
     # like Sphinx themes' html announcement option), or literal HTML

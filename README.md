@@ -181,6 +181,12 @@ with none stored, the system scheme decides. The theme provides:
   the site's name, the way jupyter.org's navbar carries its rectangle
   logo; `"logo_dark"` is the same mark drawn for the dark palette,
   since a logo set in grey ink all but disappears on a dark header.
+  A mark that stands for something larger than the blog points at it:
+  `"logo_link"` is the address the masthead links to instead of the
+  site's own home -- jupyter.org for the Jupyter blog's Jupyter mark --
+  and the link then reads under that address's host, since naming it
+  with the site's title would promise a reader the blog and hand them
+  somewhere else. The nav's own "Blog" link still leads home.
 - The landing-page blurb, `site.json`'s `"intro"`, as Markdown above the
   card grid. Hugo renders it from the section's own content; the pelican
   config renders the same Markdown, since Jinja has no filter for it.
@@ -426,6 +432,7 @@ publication rather than the tool. Every key is optional.
 | `avatar` | archive-relative image path for the header logo |
 | `logo` | archive-relative image path for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
 | `logo_dark` | the same mark drawn for the dark palette, which the palettes switch between; only read when `logo` is set |
+| `logo_link` | where the masthead links, for a mark that stands for something larger than the blog (`"https://jupyter.org"` under the Jupyter blog's Jupyter mark); unset, it links to the site's own home. The link is labelled with the address's host rather than the site's title; only read when `logo` is set |
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
 | `newsletter` | the signup band at the foot of every page: `{"heading": ..., "hubspot_portal": ..., "hubspot_form": ..., "hubspot_region": ...}`. The heading and the first two ids are required (a partial entry is reported and the band left out); the region defaults to `"na1"` |

@@ -961,6 +961,21 @@ def site_profiles(config: dict) -> list:
     return list(dict.fromkeys(profiles))
 
 
+def masthead_link(config: dict):
+    """site.json's "logo_link" as the href and the accessible name of
+    the masthead's link, or None when the masthead links to the site's
+    own home, as it does by default. A logo is set as that link when it
+    stands for something larger than the blog -- the Jupyter blog's
+    masthead carries the Jupyter mark, which belongs to jupyter.org --
+    and then the site's title is the wrong name for the link: it would
+    promise a reader the blog and hand them somewhere else. So the link
+    is named by where it goes, its host."""
+    url = (config.get("logo_link") or "").strip()
+    if not url:
+        return None
+    return {"url": url, "label": urlsplit(url).netloc or url}
+
+
 # site.json's "newsletter", the signup band both themes put at the foot
 # of every page (jupyter.org's own, which is where the shape of it comes
 # from). The form is a HubSpot embed, named the way HubSpot names its
