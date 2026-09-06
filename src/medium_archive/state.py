@@ -20,7 +20,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from bs4 import BeautifulSoup
 
-from .pages import (heading_is_subtitle, heading_is_title, lede_html,
+from .pages import (SUBTITLE_ATTR, heading_is_subtitle, heading_is_title,
                     untruncated_title)
 
 APOLLO_RE = re.compile(r"window\.__APOLLO_STATE__\s*=\s*")
@@ -460,11 +460,11 @@ def state_body(state: dict, medium_id: str, title: str = "",
         ptype = p.get("type") or "P"
         rich = lambda: _rich_text(p.get("text") or "", p.get("markups"), state)
         if i == subtitle_i:
-            # the subtitle heading is the post's lede, not a section
-            # heading: the italicized paragraph the page sets apart
-            # (pages.as_lede)
+            # the subtitle heading is the page's subtitle line, not a
+            # section heading; convert lifts it out of the body into the
+            # front matter (pages.mark_subtitle)
             close_list()
-            parts.append(f"<p>{lede_html(rich())}</p>")
+            parts.append(f'<p {SUBTITLE_ATTR}="1">{rich()}</p>')
             continue
         if ptype in ("ULI", "OLI"):
             tag = "ul" if ptype == "ULI" else "ol"

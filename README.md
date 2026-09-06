@@ -656,26 +656,32 @@ no longer lists, work through the steps in order:
   arrives clean. A title that is itself ellipsis-truncated is left
   alone: there is no telling where it ended, so cutting it would strand
   its tail at the front of the description.
-* The subtitle stays in the body. Medium's editor stores a post's lede
-  as a heading under the title and derives the post's summary from it,
-  and every body source marks the two the same way -- `.graf--subtitle`
-  in an export, `.pw-subtitle-paragraph` on a rendered page, the
-  heading after the title in the editor state, the leading heading of
-  an RSS body. The title is chrome there (it is the page's own `<h1>`,
-  and the front matter's) and a body repeat of it goes; the subtitle is
-  content, and the only place its links survive, since the summary
-  Medium derived from it is plain text cut to length. So `convert`
-  keeps it, as the paragraph the page renders it as rather than the
-  heading the editor stored -- which is also what makes the same post
-  convert identically from any of the four sources -- and sets it in
-  italics, the one distinction a Markdown body can carry for a line the
-  page set apart, and one every renderer downstream already reads. A
-  lede whose author already set it apart, with emphasis of their own
-  anywhere in it, is left exactly as written: emphasis nested inside
-  emphasis reads as neither, and theirs is the distinction worth
-  keeping. `description`
-  remains the summary, for search results and share cards; a story page
-  showing it as well would repeat the lede rather than restore it.
+* The subtitle is a page's second line, not a body's first. Medium's
+  editor stores a post's lede as a heading under the title and derives
+  the post's summary from it, and every body source marks the two the
+  same way -- `.graf--subtitle` in an export, `.pw-subtitle-paragraph`
+  on a rendered page, the heading after the title in the editor state,
+  the leading heading of an RSS body. The title is chrome there (it is
+  the page's own `<h1>`, and the front matter's) and a body repeat of
+  it goes. The subtitle is content: Medium renders it under the title,
+  in the heading font, above the byline, so `convert` lifts it into the
+  front matter as `subtitle` -- inline Markdown, with the links the
+  summary lost -- and every site's post template renders it in its own
+  element there (`.post-subtitle`). Marking it the same way from every
+  source is also what keeps one post converting identically whichever
+  source it comes from. MyST is the one site that shows it as plain
+  text: mystmd keeps a frontmatter `subtitle` as a string and never
+  parses Markdown in it, so its links stay behind in `posts/`.
+* `description` is the summary beside it, and stays plain text: it is
+  read as an HTML attribute (`<meta name="description">`,
+  `og:description`) and as JSON-LD, none of which render Markdown. What
+  it no longer has to be is cut short. Medium caps the summary it
+  stores and serves, ending it in an ellipsis mid-sentence, and derives
+  it from the subtitle in the first place -- so where the stored
+  summary is a cut prefix of the post's own subtitle line, `convert`
+  completes it from that line (`untruncated_summary`). A summary
+  Medium cut from body prose instead of a subtitle has no such source
+  and stays as it arrived.
 * A post whose author set no title gets one from Medium: the text of
   its opening heading, cut to about a hundred characters with an
   ellipsis. That cut form is what the stored title, the JSON-LD headline

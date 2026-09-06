@@ -27,6 +27,7 @@ FIELDS_TABLE = """\
 | field           | meaning |
 |-----------------|---------|
 | `title`         | post title; one Medium cut short with an ellipsis (an untitled post is titled with its opening heading, capped at about a hundred characters) is completed from that heading |
+| `subtitle`      | the post's subtitle line, as inline Markdown (its links kept), "" when it has none: what Medium renders under the title, and what each site's post template renders there |
 | `authors`       | the post's authors, each `{"name", "url"}`: display name (JSON-LD, the export byline, or RSS `dc:creator`) and Medium profile URL, if present (null otherwise) |
 | `date`          | publish timestamp (ISO 8601, UTC) |
 | `updated`       | last-modified timestamp, if present |
@@ -36,7 +37,7 @@ FIELDS_TABLE = """\
 | `slug`          | `original_path` with the id suffix removed, percent-decoded |
 | `canonical_url` | canonical URL the post declared when it names a different page -- a story imported from a gist, or a Ghost-migrated post's pre-migration slug (null otherwise); provenance, not identity |
 | `ghost_url`     | the post's URL on the blog's Ghost incarnation, when a capture is attached (null otherwise); old inbound links may carry this path |
-| `description`   | the summary alone: the subtitle (from the account export), or Medium's summary text with the title it repeats removed; a summary for search results and share cards, capped and stripped of links by Medium -- the post's own subtitle line stays in the body |
+| `description`   | the summary alone: the subtitle (from the account export), or Medium's summary text with the title it repeats removed. Plain text, for search results and share cards; where Medium cut it at its cap, it is completed from `subtitle`, which is the line it was cut from |
 | `tags`          | tag slugs (RSS categories, scraped tag links, or page state), after `tags.json` cleanup when present; always slugs -- `tags.json`'s `"display"` names them at render time, in the sites, not here |
 | `images`        | relative paths of images used by the body |
 | `body_source`   | `export` (account export), `feed` (RSS `content:encoded`), `page` (rendered HTML), `ghost` (Ghost page from a Wayback capture) or `state` (reconstructed from a shell page's embedded editor state) |"""
@@ -302,14 +303,14 @@ The front matter block between `---` lines is JSON, which is valid YAML.
   `../raw/<id>/page.html`: "was originally published in ... on Medium",
   stat tracking pixels, clap/share UI, the author header.
 * A body repeat of the post's title is dropped -- the title is the
-  page's own heading, and the front matter's. The subtitle is not: it is
-  the post's opening line, rendered as a heading only because that is
-  how Medium's editor stores it, so it stays in the body as the
-  paragraph it renders as, in italics -- the one way a Markdown body
-  says a line is set apart. A lede the author already set apart, with
-  emphasis of their own in it, keeps exactly the emphasis they wrote. The `description` beside it is the summary
-  Medium derived from that line for search results and share cards --
-  capped, with its links stripped -- and not a copy of it.
+  page's own heading, and the front matter's. The subtitle is neither
+  dropped nor left in the body: Medium renders it under the title, in
+  the heading font and above the byline, so it is lifted into the front
+  matter's `subtitle` (as inline Markdown, links and all) and each
+  site's post template renders it there. The `description` beside it is
+  the summary Medium derived from that same line for search results and
+  share cards: plain text, and completed from `subtitle` where Medium
+  cut it at its cap.
 * Body source preference is `export` > `state` > `feed` > `page`,
   overridden with `convert --prefer-page`. Export bodies are the Medium
   editor's own HTML and convert most faithfully. `state` is the same

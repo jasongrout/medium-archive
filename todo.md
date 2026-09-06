@@ -577,7 +577,7 @@ Feeds and sharing:
   `render_initial_state` joins its `title`, `text` and `url` params
   into the compose box.
 
-- **The subtitle is body, not metadata.** Medium's editor stores a
+- **The subtitle is the page's second line.** Medium's editor stores a
   post's lede as a heading right under the title and derives the post's
   summary from it, capped and stripped of its links; every body source
   marks the two the same way (`.graf--subtitle` in an export,
@@ -586,23 +586,32 @@ Feeds and sharing:
   four used to drop it as a repeat of the front matter's
   `description`, which no story page renders -- so the lede, and the
   links only it carried, appeared nowhere but a card's summary text.
-  Now the title repeat still goes and the subtitle stays, converted as
-  the paragraph the page renders it as rather than the heading the
-  editor stored, so every body source produces the same Markdown and
-  every generator shows the lede without a template of its own. It is
-  set in italics, which is the one way a Markdown body says a line is
-  set apart, and reaches every generator without a front-matter field
-  or a template; a lede the author already set apart (any emphasis of
-  their own in it) is left exactly as written, since emphasis nested
-  inside emphasis reads as neither.
-  `description` is unchanged: the capped summary for search results and
-  share cards. In the reference archive this restored the lede to 24
-  posts, 20 of them italicized and 4 left as their authors set them
-  (`compare` and `compare --state` parity unchanged), and the RSS
-  case got a correctness fix on the way: a feed body's leading heading
-  was dropped as a "repeated title" whatever it held, which in both
-  archived instances was the subtitle; it is now matched against the
-  title and the summary, and a real section heading stays a heading.
+  Now each source marks it (`mark_subtitle`) and `convert` lifts it
+  into the front matter as `subtitle`, inline Markdown with its links,
+  which the hugo and pelican post templates render in a
+  `.post-subtitle` element between the title and the byline -- the
+  heading font, grey, at a size between title and body, which is where
+  and how Medium renders it. Body text it is not, and italics (the
+  shape it took for one commit, being the only thing a Markdown body
+  can say about a line) read worse than the plain roman line Medium
+  sets. MyST has the same frontmatter field and its theme puts it in
+  the same place, but mystmd keeps `subtitle` a string and parses no
+  Markdown in it, so that site alone shows the line as plain text.
+  `description` is still the summary for search results and share
+  cards, and still plain text -- a `<meta>` attribute and JSON-LD
+  render no Markdown -- but it is no longer cut short: where Medium's
+  capped summary is a prefix of the post's own subtitle line, it is
+  completed from that line (`untruncated_summary`). In the reference
+  archive that is 24 posts with a subtitle, whose summaries all
+  complete (three of them now past the 160 characters a search result
+  shows, where a cut sentence sat before); the 185 summaries Medium cut
+  from body prose rather than from a subtitle have no such source and
+  stay as they arrived. The RSS case got a correctness fix on the way:
+  a feed body's leading heading was dropped as a "repeated title"
+  whatever it held, which in both archived instances was the subtitle;
+  it is now matched against the title and the summary, and a real
+  section heading stays a heading.
+
 
 ## Remaining
 

@@ -35,6 +35,7 @@ from urllib.parse import unquote, urlsplit
 import yaml
 
 from .lint import split_post
+from .pages import markdown_text
 from .tags import display_name, load_tag_display
 from .urls import medium_id
 
@@ -1003,21 +1004,13 @@ def newsletter_params(config: dict):
     return params
 
 
-_CAPTION_LINK_RE = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
-_CAPTION_MARK_RE = re.compile(r"\*\*|__|(?<!\w)[*_](?=\S)|(?<=\S)[*_](?!\w)|`")
-
-
 def caption_text(caption: str) -> str:
-    """A caption's plain text, for an image whose alt is empty: the
-    link text of its links, no emphasis or code marks, no HTML tags,
-    whitespace collapsed. Most Medium images carry no alt while their
+    """A caption's plain text, for an image whose alt is empty (see
+    pages.markdown_text). Most Medium images carry no alt while their
     captions describe them exactly; WordPress's SEO plugins fill an
     empty alt the same way (from the caption, else the title), and it
     is what a screen reader, and image search, would otherwise miss."""
-    text = re.sub(r"<[^>]+>", "", caption)
-    text = _CAPTION_LINK_RE.sub(r"\1", text)
-    text = _CAPTION_MARK_RE.sub("", text)
-    return " ".join(text.split())
+    return markdown_text(caption)
 
 
 def quote_arg(value: str) -> str:
@@ -1150,7 +1143,11 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
         # its generator wants it (see first_image); found before the
         # transform, which may rewrite image references into a
         # generator's own syntax
-        p = dict(p, first_image=first_image(body))
+        p = dict(p, first_image=first_image(body),
+                 # the subtitle is rendered by the post template, from
+                 # front matter, so its in-publication links are
+                 # rewritten here rather than by the body pass above
+                 subtitle=rewrite_body(p.get("subtitle") or "", target_for))
         if transform is not None:
             body = transform(body)
         page_dir = site / "content" / "posts" / stems[url]

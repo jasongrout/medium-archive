@@ -26,7 +26,8 @@ from .images import (giphy_media, image_source, same_medium_asset,
                      sniff_image_ext)
 from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     ghost_body, ghost_metadata, is_ghost_page, page_body,
-                    parse_ld_json, strip_title_prefix)
+                    parse_ld_json, pop_subtitle, strip_title_prefix,
+                    untruncated_summary)
 from .state import (apollo_post_state, gist_blocks, gist_code_blocks,
                     state_body, state_metadata, state_title)
 from .readme import write_posts_readme, write_readme, write_sites_readme
@@ -548,6 +549,20 @@ def _archived_gist_files(media: dict, gist_id: str) -> dict | None:
     return None
 
 
+def inline_markdown(html: str, base_url: str, img_map: dict, raw: Path) -> str:
+    """A fragment of inline HTML as one line of Markdown, through the
+    same conversion the body gets (links resolved and de-tracked,
+    emphasis Markdown cannot carry written as HTML). For the subtitle,
+    which is a line of a page rather than a block of a body: any break
+    in it becomes a space, so the value stays a single line that front
+    matter and a template can carry."""
+    if not html:
+        return ""
+    body = BeautifulSoup(f"<article><p>{html}</p></article>", "html.parser")
+    markdown, _ = to_markdown(body, base_url, img_map, raw)
+    return " ".join(markdown.split())
+
+
 def to_markdown(body, base_url: str, img_map: dict, raw: Path,
                 out_dir: Path | None = None, media: dict | None = None):
     """Rewrite images, iframes and links in a body and render it to
@@ -924,6 +939,14 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     if gmeta and body_source != "ghost":
         collapse_br_pairs(body)
 
+    # The subtitle its source marked is the page's second line, not the
+    # body's first: it leaves for the front matter, as the inline
+    # Markdown the post templates render (see pages, on subtitles).
+    subtitle = inline_markdown(pop_subtitle(body), info["url"], img_map, raw)
+    # Medium cuts the summary it stores mid-sentence; the subtitle it cut
+    # it from is right here, whole (see pages.untruncated_summary).
+    info["description"] = untruncated_summary(info["description"], subtitle)
+
     out_dir = posts_root / f"{(info['date'] or '')[:10] or 'undated'}-{slug_of(url)}"
     shutil.rmtree(out_dir, ignore_errors=True)
     out_dir.mkdir(parents=True)
@@ -939,6 +962,9 @@ def convert_post(url: str, raw: Path, posts_root: Path, prefer_page: bool,
     ghost_url = gmeta.get("original_url")
     front = {
         "title": info["title"],
+        # the page's subtitle line, rendered under the title by every
+        # site's post template; "" when the post has none
+        "subtitle": subtitle,
         "authors": info["authors"],
         "date": info["date"],
         "updated": info["updated"],

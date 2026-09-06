@@ -382,42 +382,44 @@ def test_leading_heading_that_is_not_the_title_stays():
     assert body.find("h3") is not None
 
 
-def test_the_rendered_subtitle_stays_as_the_lede_paragraph():
-    # the subtitle is rendered as a heading, but it is the post's
-    # opening line -- and the only place its links survive, since the
-    # summary derived from it is plain text, cut to length
+def test_the_rendered_subtitle_is_marked_for_the_front_matter():
+    # the subtitle is the page's second line, not the body's first: the
+    # body source marks it and convert lifts it out (pop_subtitle)
+    from medium_archive.pages import pop_subtitle
+
     html = ('<article><h1>My Great Post</h1>'
             '<h2 class="pw-subtitle-paragraph">Join us on '
             '<a href="https://example.com/day">October 19</a>.</h2>'
-            '<p>Real content.</p></article>')
+            "<p>Real content.</p></article>")
     body = page_body(BeautifulSoup(html, "html.parser"), title="My Great Post")
     assert body.find("h1") is None and body.find("h2") is None
-    lede = body.find("p")
-    assert lede.get_text(" ", strip=True) == "Join us on October 19 ."
-    assert lede.find("a")["href"] == "https://example.com/day"
-    # and it is set apart the one way a Markdown body can say so
-    assert lede.find("em") is not None and lede.find("em").find("a") is not None
+    assert pop_subtitle(body) == ('Join us on <a href="https://example.com/day">'
+                                  "October 19</a>.")
+    # what is left is the body alone, and nothing is left to lift twice
+    assert body.get_text(" ", strip=True) == "Real content."
+    assert pop_subtitle(body) == ""
 
 
-def test_feed_body_drops_a_title_repeat_and_keeps_the_lede():
+def test_feed_body_drops_a_title_repeat_and_marks_the_subtitle():
     # Medium's RSS body opens with a heading in two cases: a post that
-    # repeats its title (chrome) and one with a subtitle (the lede)
-    from medium_archive.pages import feed_body
+    # repeats its title (chrome) and one with a subtitle (the page's
+    # second line, marked for the front matter)
+    from medium_archive.pages import feed_body, pop_subtitle
 
     body = feed_body("<h4>My Great Post</h4><p>Real content.</p>",
                      title="My Great Post", subtitle="A summary.")
-    assert body.find("h4") is None and "Real content" in body.get_text()
+    assert body.find("h4") is None and pop_subtitle(body) == ""
+    assert "Real content" in body.get_text()
 
     body = feed_body("<h4>A summary of the whole thing.</h4>"
                      "<p>Real content.</p>",
-                     title="My Great Post", subtitle="A summary of the…")
+                     title="My Great Post", subtitle="A summary of the\u2026")
     assert body.find("h4") is None
-    assert body.find("p").get_text() == "A summary of the whole thing."
-    assert body.find("p").find("em") is not None
+    assert pop_subtitle(body) == "A summary of the whole thing."
 
     body = feed_body("<h4>Introduction</h4><p>Real content.</p>",
                      title="My Great Post", subtitle="A summary.")
-    assert body.find("h4") is not None
+    assert body.find("h4") is not None and pop_subtitle(body) == ""
 
 
 def test_empty_app_shell_fails_instead_of_converting_chrome(tmp_path):

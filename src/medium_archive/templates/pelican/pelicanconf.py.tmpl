@@ -7,6 +7,11 @@ TIMEZONE = "UTC"
 DEFAULT_LANG = "en"
 DEFAULT_DATE_FORMAT = "%B %d, %Y"
 
+# Summary is pelican's own default here; Subtitle joins it because the
+# post's subtitle line is Markdown too (it carries the links Medium
+# stripped from the summary), and article.html renders it as HTML.
+FORMATTED_FIELDS = ["summary", "subtitle"]
+
 # Jinja emits every {{ }} raw unless told otherwise, and pelican leaves
 # it that way (its own default JINJA_ENVIRONMENT sets no autoescape) so
 # that a theme can render article.content, which really is HTML. But a
