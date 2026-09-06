@@ -177,12 +177,60 @@ def test_title_after_hero_image_is_dropped():
     assert md == "![](https://miro.medium.com/v2/1*hero.png)\n\nBody text.\n"
 
 
-def test_subtitle_heading_after_title_is_dropped():
+def test_subtitle_heading_after_title_leaves_the_body(tmp_path):
+    # the subtitle is the page's second line, not the body's first: it
+    # is lifted into the front matter, whole and with its links, and the
+    # body starts at the body
+    raw = tmp_path / MID
+    raw.mkdir()
+    sub = para(1, "H4", "Join us on October 19 for a full day.")
+    sub["markups"] = [{"type": "A", "start": 11, "end": 21,
+                       "href": "https://example.com/day"}]
+    (raw / "page.html").write_text(shell_html(make_state(
+        [para(0, "H3", "My Post"), sub, para(2, "P", "Body text.")],
+        previewContent={"subtitle": "Join us on October 19 for a full\u2026"})))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["subtitle"] == \
+        "Join us on [October 19](https://example.com/day) for a full day."
+    text = (tmp_path / "posts" / "2019-12-29-my-post" / "index.md").read_text()
+    assert text.endswith("---\n\nBody text.\n")
+    # the summary Medium cut at its cap is completed from that same
+    # line, as the plain text a description is read as
+    assert front["description"] == "Join us on October 19 for a full day."
+
+
+def test_a_summary_medium_did_not_cut_is_left_as_it_is(tmp_path):
+    raw = tmp_path / MID
+    raw.mkdir()
+    (raw / "page.html").write_text(shell_html(make_state(
+        [para(0, "H3", "My Post"), para(1, "H4", "The subtitle."),
+         para(2, "P", "Body text.")],
+        previewContent={"subtitle": "The subtitle."})))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["description"] == front["subtitle"] == "The subtitle."
+
+
+def test_a_lede_the_author_marked_up_keeps_its_markup(tmp_path):
+    # the subtitle is Markdown in the front matter, so the emphasis the
+    # author wrote survives; the description beside it is plain text
+    raw = tmp_path / MID
+    raw.mkdir()
+    sub = para(1, "H4", "TL;DR: it ships today.")
+    sub["markups"] = [{"type": "EM", "start": 0, "end": 6}]
+    (raw / "page.html").write_text(shell_html(make_state(
+        [para(0, "H3", "My Post"), sub, para(2, "P", "Body text.")],
+        previewContent={"subtitle": "TL;DR: it ships today."})))
+    front = convert_post(URL, raw, tmp_path / "posts", prefer_page=False)
+    assert front["subtitle"] == "*TL;DR:* it ships today."
+    assert front["description"] == "TL;DR: it ships today."
+
+
+def test_a_heading_that_is_not_the_subtitle_stays_a_heading():
     md = md_of_state(make_state([
         para(0, "H3", "My Post"),
-        para(1, "H4", "The subtitle."),
+        para(1, "H4", "Getting started"),
         para(2, "P", "Body text.")]))
-    assert md == "Body text.\n"
+    assert md == "### Getting started\n\nBody text.\n"
 
 
 def test_section_boundaries_become_dividers():

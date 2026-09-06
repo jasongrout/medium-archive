@@ -1325,6 +1325,11 @@ def test_pelican_escapes_by_default(archive):
     safe = [(f.name, line.strip()) for f in sorted(templates.glob("*.html"))
             for line in f.read_text().splitlines() if "|safe" in line]
     assert safe == [
+        # a FORMATTED_FIELD: the rendered HTML of the subtitle's own
+        # Markdown, like article.content below it
+        ("article.html",
+         '{% if article.subtitle %}<div class="post-subtitle">'
+         "{{ article.subtitle|safe }}</div>{% endif %}"),
         ("article.html", "{{ article.content|safe }}"),
         ("base.html",
          '<footer class="wrap site-footer">{% if FOOTER %}{{ FOOTER|safe }}'
@@ -1332,6 +1337,39 @@ def test_pelican_escapes_by_default(archive):
         ("index.html",
          '{% if INTRO %}<div class="intro">{{ INTRO|safe }}</div>{% endif %}'),
     ], safe
+
+
+def test_the_subtitle_reaches_every_post_page(tmp_path):
+    """The post's subtitle line is front matter, not body, and each
+    site's post template renders it under the title -- with the links
+    the plain-text description lost, and with a link to another post of
+    the publication rewritten to its page, as a body link would be."""
+    manifest = {}
+    make_post(tmp_path, manifest, "first-post", "aaa111aaa111",
+              "2020-01-05T10:00:00Z", "Body.\n",
+              subtitle=f"Read [the sequel]({BASE}/second-post-bbb222bbb222) "
+                       "and [the docs](https://example.org/docs).")
+    make_post(tmp_path, manifest, "second-post", "bbb222bbb222",
+              "2021-03-01T10:00:00Z", "Body.\n")
+    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (tmp_path / "site.json").write_text(json.dumps(
+        {"title": "Example Blog", "base_url": "https://blog.example.org/"}))
+
+    for build in (hugo.build_site, pelican.build_site):
+        site = build(tmp_path)
+        page = (site / "content/posts/first-post/index.md").read_text()
+        line = next(l for l in page.split("\n") if l.startswith("subtitle:"))
+        # the links survive, and the in-publication one points at its page
+        assert "[the sequel](/posts/second-post/)" in line
+        assert "[the docs](https://example.org/docs)" in line
+        # and the body is the body alone
+        assert page.split("\n---\n", 1)[1].strip() == "Body."
+
+    # both post templates render it in the element the shared CSS styles
+    for tpl in ("hugo/layouts/page.html",
+                "pelican/theme/templates/article.html"):
+        assert 'class="post-subtitle"' in sites.template_text(tpl)
+    assert ".post-subtitle {" in sites.template_text("shared/card.css")
 
 
 def test_missing_base_url_is_not_silent(tmp_path, capsys):

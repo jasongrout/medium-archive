@@ -1,6 +1,18 @@
 """Post page parsing: metadata extraction and body cleanup.
 
 Shared by fetch (for the publish-date check) and convert.
+
+A note on subtitles, since every body source here handles one. Medium's
+editor stores a post's lede as a heading right under the title, and
+also derives the post's summary from it -- capped, and stripped of the
+links it carries. The title is chrome (it is the page's own <h1>, and
+the front matter's) and a body repeat of it goes; the subtitle is
+content, and it is not body text either: Medium sets it under the title
+in the heading font, above the byline, and that is what a page carries
+it as. So each body source marks it (mark_subtitle) and convert lifts
+it into the front matter's `subtitle`, which every site's post template
+renders in its own element. The capped summary in `description` is for
+search results and share cards, not a substitute for the lede itself.
 """
 
 import json
@@ -82,6 +94,30 @@ def meta(soup, **attrs) -> str | None:
 
 ELLIPSIS = "\u2026"
 
+# the mark of a cut Medium made: its ellipsis, or three periods
+TRAILING_CUT_RE = re.compile(r"(?:\u2026|\.\.\.)\s*$")
+
+# marks the paragraph a body source made of the post's subtitle, for
+# convert to lift out of the body (see mark_subtitle and pop_subtitle)
+SUBTITLE_ATTR = "data-subtitle"
+
+# what Markdown a line of prose carries, for reading it back as text:
+# a link or image (its text kept, its target dropped) and the emphasis
+# and code marks around a word
+_MD_LINK_RE = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
+_MD_MARK_RE = re.compile(r"\*\*|__|(?<!\w)[*_](?=\S)|(?<=\S)[*_](?!\w)|`")
+
+
+def markdown_text(markdown: str) -> str:
+    """A line of Markdown as plain text: the link text of its links, no
+    emphasis or code marks, no HTML tags, whitespace collapsed. What a
+    field that is read as text rather than rendered -- a description, an
+    alt attribute, MyST's frontmatter subtitle -- can carry."""
+    text = re.sub(r"<[^>]+>", "", markdown or "")
+    text = _MD_LINK_RE.sub(r"\1", text)
+    text = _MD_MARK_RE.sub("", text)
+    return " ".join(text.split())
+
 
 def norm_title(s: str) -> str:
     """A title or heading in comparable form: case-folded, with the
@@ -106,6 +142,70 @@ def heading_is_title(heading: str, title: str) -> bool:
     if h == t:
         return True
     return t.endswith(ELLIPSIS) and h.startswith(t[:-1].rstrip())
+
+
+def heading_is_subtitle(heading: str, subtitle: str) -> bool:
+    """Whether a body heading is the post's subtitle -- the lede Medium
+    renders under the title and stores, separately, as the post's
+    summary.
+
+    The stored summary is capped (Medium cuts it with an ellipsis), and
+    on a post whose lede runs past the cap it is a prefix of the
+    heading; on a post whose summary was built from more than the lede
+    the heading is a prefix of it instead. Either way the two share
+    their opening, which no section heading of the body does.
+    """
+    h, s = norm_title(heading), norm_title(TRAILING_CUT_RE.sub("", subtitle or ""))
+    return bool(h and s and (h.startswith(s) or s.startswith(h)))
+
+
+def mark_subtitle(tag):
+    """Mark a body source's subtitle element for convert to lift out.
+
+    The subtitle is neither chrome nor body text: Medium renders it
+    under the title, in the heading font, above the byline, and every
+    site here does the same from the front matter's `subtitle`. It is
+    marked in place rather than removed so that a body source stays one
+    pass over the page, and so the mark travels with the element
+    through the cleanups that follow.
+    """
+    tag.name = "p"
+    tag.attrs = {SUBTITLE_ATTR: "1"}
+    return tag
+
+
+def pop_subtitle(body) -> str:
+    """The marked subtitle's inline HTML, removed from `body`; "" when
+    the post has none. Called once, by convert, whichever source the
+    body came from."""
+    tag = body.find(attrs={SUBTITLE_ATTR: True})
+    if tag is None:
+        return ""
+    tag.extract()
+    return "".join(str(c) for c in tag.contents).strip()
+
+
+def untruncated_summary(description: str, subtitle: str) -> str:
+    """The summary, completed from the post's own subtitle line when
+    Medium cut it.
+
+    Medium caps the summary it stores and serves (`previewContent`,
+    `og:description`), ending it in an ellipsis mid-sentence, and it
+    derives the thing from the subtitle in the first place. The subtitle
+    the body carried is the whole line, so where the summary is a cut
+    prefix of it the rest is right there. Plain text either way: a
+    description is read as an HTML attribute (`<meta>`, `og:`) and as
+    JSON-LD, none of which render Markdown, so the links stay behind
+    with the subtitle.
+    """
+    text = markdown_text(subtitle)
+    if not text:
+        return description
+    cut = TRAILING_CUT_RE.sub("", description or "").strip()
+    if not cut:
+        return text
+    return text if TRAILING_CUT_RE.search(description or "") \
+        and norm_title(text).startswith(norm_title(cut)) else description
 
 
 def untruncated_title(title: str, heading: str) -> str:
@@ -307,9 +407,13 @@ def split_pre_paragraphs(article):
 def page_body(soup, tags=(), title=""):
     """<article> with Medium chrome removed."""
     article = soup.find("article") or soup.body
+    # The subtitle is rendered as a heading only because that is how
+    # Medium's editor stores it; it is the page's subtitle line, and
+    # leaves the body for the front matter (see the module note).
+    for sub in article.select(".pw-subtitle-paragraph"):
+        mark_subtitle(sub)
     for sel in (
         "h1",                      # title lives in front matter
-        ".pw-subtitle-paragraph",  # subtitle is metadata, not body
         '[data-testid="authorName"]',
         '[data-testid="storyPublishDate"]',
         '[data-testid="storyReadTime"]',
@@ -365,12 +469,21 @@ def page_body(soup, tags=(), title=""):
     return article
 
 
-def feed_body(content_html: str):
+def feed_body(content_html: str, title: str = "", subtitle: str = ""):
+    """The RSS item's body cleaned for conversion. A feed body opens
+    with a heading in two cases: a post that repeats its title in the
+    body (chrome, dropped) and one with a subtitle (marked, for convert
+    to lift into the front matter). A leading heading that is neither
+    is the post's first section heading, and stays a heading."""
     soup = BeautifulSoup(f"<article>{content_html}</article>", "html.parser")
     article = soup.article
     strip_tracking_pixels(article)
     first = article.find(["h1", "h2", "h3", "h4"])
-    if first and first is article.find(True):   # repeated title
-        first.decompose()
+    if first and first is article.find(True):
+        text = first.get_text(" ", strip=True)
+        if heading_is_title(text, title):
+            first.decompose()
+        elif heading_is_subtitle(text, subtitle):
+            mark_subtitle(first)
     strip_medium_footer(article)
     return article

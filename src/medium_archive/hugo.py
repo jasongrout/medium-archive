@@ -148,6 +148,8 @@ def front_matter(url: str, post: dict, cover: str | None = None,
         front["date"] = post["date"]
     if post.get("updated"):
         front["lastmod"] = post["updated"]
+    if post.get("subtitle"):        # the page's subtitle line (page.html)
+        front["subtitle"] = post["subtitle"]
     if post.get("description"):
         front["description"] = post["description"]
     if post.get("tags"):

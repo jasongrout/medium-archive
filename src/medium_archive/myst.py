@@ -31,7 +31,8 @@ import re
 import sys
 from pathlib import Path
 
-from .sites import (IFRAME_RE, VIDEO_RE, Covers, ImagePlacer, LinkMap, by_year, clean_site,
+from .sites import (IFRAME_RE, VIDEO_RE, Covers, ImagePlacer, LinkMap, by_year,
+                    clean_site, markdown_text,
                     load_site_inputs, page_stems, place_images,
                     read_post_body, retarget_images, rewrite_body as _rewrite,
                     rewrite_figures, tag_names, template_text,
@@ -198,6 +199,13 @@ def page_front_matter(post: dict, cover: str | None = None,
     so nothing here derives a URL from a tag and the name is all a
     reader ever sees."""
     lines = [f"title: {_yml(post['title'])}"]
+    # MyST has the field this belongs in, and its theme renders it under
+    # the title as the other two sites' templates do. It carries plain
+    # text, though: mystmd keeps frontmatter title and subtitle as
+    # strings and never parses Markdown in them, so a lede's links are
+    # the one thing this site cannot show (posts/ keeps them).
+    if post.get("subtitle"):
+        lines.append(f"subtitle: {_yml(markdown_text(post['subtitle']))}")
     if post.get("description"):
         lines.append(f"description: {_yml(post['description'])}")
     if cover:

@@ -78,3 +78,29 @@ def test_import_posts_only_zip(tmp_path, capsys):
     entry = index["https://blog.example.com/hello-0123456789ab"]
     assert entry["medium_id"] == "0123456789ab" and entry["in_export"]
     assert "1 posts" in capsys.readouterr().err
+
+
+def test_export_body_marks_the_subtitle_graf_for_the_front_matter():
+    """The export's body section repeats the title and the subtitle as
+    grafs. The title lives in front matter, so its repeat goes; the
+    subtitle is the page's second line, marked here and lifted into the
+    front matter by convert -- the same shape the state and the rendered
+    page convert to."""
+    from medium_archive.export import export_body, parse_export
+    from medium_archive.pages import pop_subtitle
+
+    html = ('<html><body><section data-field="subtitle" class="p-summary">'
+            "Join us on October 19.</section>"
+            '<section data-field="body"><div class="section-inner">'
+            '<div class="section-divider"><hr/></div>'
+            '<h3 class="graf graf--h3 graf--title">My Great Post</h3>'
+            '<h4 class="graf graf--h4 graf--subtitle">Join us on '
+            '<a href="https://example.com/day">October 19</a>.</h4>'
+            '<h3 class="graf graf--h3">A section</h3>'
+            "<p>Real content.</p></div></section></body></html>")
+    body = export_body(parse_export(html)["soup"])
+    assert body.select_one(".graf--title") is None
+    assert pop_subtitle(body) == ('Join us on <a href="https://example.com/day">'
+                                  "October 19</a>.")
+    # the section heading still shifts a level; the subtitle is no heading
+    assert [h.name for h in body.find_all(["h2", "h3", "h4"])] == ["h2"]

@@ -192,6 +192,10 @@ def build_site(out):
         fields["slug"] = stems[url]
         if covers.path(url):
             fields["cover"] = covers.path(url)
+        # the page's subtitle line; a FORMATTED_FIELD in the generated
+        # config, so the reader renders its Markdown (article.html)
+        if post.get("subtitle"):
+            fields["subtitle"] = _one_line(post["subtitle"])
         if post.get("description"):
             fields["summary"] = _one_line(post["description"])
         if canonical_for(post):       # a copy of that page, and says so

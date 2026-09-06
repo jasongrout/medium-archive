@@ -406,6 +406,16 @@ a:hover { text-decoration-line: underline; }
 @media (hover: none) { .heading-anchor { opacity: 1; } }
 .heading-anchor svg { width: .8em; height: .8em; vertical-align: baseline; }
 .heading-anchor:hover, .heading-anchor:focus-visible { color: var(--accent); }
+/* The post's subtitle line, as Medium sets it: its own text under the
+   title and above the byline, in the heading font at a size between the
+   two, grey rather than the title's black. Not the body's first
+   paragraph and not styled like one -- it is the page's second line.
+   The inner <p> is pelican's: a FORMATTED_FIELD arrives as rendered
+   Markdown, a paragraph and all, where hugo's markdownify gives the
+   inline HTML alone. */
+.post-subtitle { color: var(--muted); font-size: 1.45rem; line-height: 1.35;
+                 margin: 0 0 1rem; }
+.post-subtitle p { margin: 0; font: inherit; color: inherit; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
 /* A tag is a pill, in the article byline and on a card alike: one
    form for the term wherever it appears. Hover colours the border, not
@@ -563,11 +573,13 @@ a:hover { text-decoration-line: underline; }
    bare :root above. */
 :root:not([data-font]) .post { font-family: var(--source-serif); }
 :root:not([data-font]) .post :is(h1, h2, h3, h4, h5, h6),
+:root:not([data-font]) .post-subtitle,
 :root:not([data-font]) .post-meta,
 :root:not([data-font]) .post-share,
 :root:not([data-font]) .post figcaption { font-family: var(--body-font); }
 :root[data-font="ibm-plex-serif"] .post { font-family: var(--ibm-plex-serif); }
 :root[data-font="ibm-plex-serif"] .post :is(h1, h2, h3, h4, h5, h6),
+:root[data-font="ibm-plex-serif"] .post-subtitle,
 :root[data-font="ibm-plex-serif"] .post-meta,
 :root[data-font="ibm-plex-serif"] .post-share,
 :root[data-font="ibm-plex-serif"] .post figcaption { font-family: var(--body-font); }
