@@ -76,6 +76,31 @@ Last full validation, all three against all 333 posts:
   warnings are cosmetic empty-image-alt ones; Medium images rarely
   carry alt text.
 
+**Redirects: stub pages, not `_redirects`.** `site.json` sets
+`"redirects": "stubs"`, so the hugo and pelican sites carry a
+meta-refresh stub at every old inbound path and no `_redirects` file.
+The two are alternatives, not layers -- no host reads both -- and the
+host in play here is GitHub Pages, which does not read `_redirects` at
+all: `jupyter.github.io` (jupyter.org) runs on it and reaches for
+`jekyll-redirect-from`, which generates the same kind of stub page, and
+`preview.yml` deploys to it too. So the file was inert weight in every
+build published so far.
+
+The stubs are what puts a directory per old post path in the built site
+root: 684 rules over the 337 posts, of which 323 are top-level
+directories (the Medium slug+id paths), 323 more under `/p/`, and 38
+under `/YYYY/MM/DD/` (Ghost-era). Nothing of that is committed -- the
+stubs are generated into `public/`/`output/` at build time, and
+`redirects.csv` is written under every setting as the map itself.
+
+If the blog ever lands on Netlify or Cloudflare Pages instead, change
+the one setting to `"file"`: those hosts answer `_redirects` with a
+real HTTP 301, and the site root loses the 684 stub files. Do not leave
+it on `"both"` there -- Netlify serves a static file in place of an
+unforced rule at the same path, so the stubs would shadow the 301s and
+answer in their place. See the medium-archive README, "Redirects and
+feeds", for the full matrix.
+
 **The Markdown renderer.** `compare.md` records the comparison behind
 choosing Pelican; `commonmark.md` records what it costs to render its
 posts with a CommonMark parser (markdown-it-py) instead of
