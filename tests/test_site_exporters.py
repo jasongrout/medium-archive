@@ -9,6 +9,7 @@ from pathlib import Path
 from types import ModuleType, SimpleNamespace
 
 import pytest
+from jinja2 import Environment, FileSystemLoader
 
 from medium_archive import hugo, pelican, sites
 
@@ -567,12 +568,17 @@ def test_feed_links_carry_the_rss_mark(archive):
     assert 'aria-label="RSS feed for {{ $.Title }}"' in term
 
     pelican_site = pelican.build_site(archive)
+    # the tag and author pages are one template, over the feed setting
+    # the page it was reached through named
+    term = (pelican_site / "theme/templates/term.html").read_text()
+    assert "term_feed.format(slug=term.slug)" in term
+    assert 'aria-label="RSS feed for {{ term }}"' in term
+    assert "feed-icon" in term
     for page, setting, var in (("tag.html", "TAG_FEED_ATOM", "tag"),
                                ("author.html", "AUTHOR_FEED_ATOM", "author")):
         text = (pelican_site / "theme/templates" / page).read_text()
-        assert f"{setting}.format(slug={var}.slug)" in text
-        assert f'aria-label="RSS feed for {{{{ {var} }}}}"' in text
-        assert "feed-icon" in text
+        assert f"{{% set term, term_feed = {var}, {setting} %}}" in text
+        assert '{% include "term.html" %}' in text
     # the head declares the term's own feed beside the site-wide one
     base = (pelican_site / "theme/templates/base.html").read_text()
     assert "TAG_FEED_ATOM.format(slug=tag.slug)" in base
@@ -679,8 +685,9 @@ def test_pelican_site(archive):
     assert 'FAVICON = "theme/favicon.svg"' in config
     assert (site / "theme/static/favicon.svg").read_bytes() == b"SVG"
     assert 'rel="icon"' in (site / "theme/templates/base.html").read_text()
-    for tpl in ("base", "index", "article", "tag", "tags", "author",
-                "authors", "archives", "search", "macros", "pagination"):
+    for tpl in ("base", "index", "article", "term", "tag", "author",
+                "terms", "tags", "authors", "archives", "search", "macros",
+                "pagination"):
         assert (site / f"theme/templates/{tpl}.html").exists(), tpl
     assert "card-grid" in (site / "theme/static/css/style.css").read_text()
     assert (site / "redirects.csv").exists()
@@ -1027,15 +1034,106 @@ def test_term_sort_control(archive):
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
     for page in (hugo_site / "layouts/taxonomy.html",
-                 pelican_site / "theme/templates/tags.html",
-                 pelican_site / "theme/templates/authors.html"):
+                 pelican_site / "theme/templates/terms.html"):
         text = page.read_text()
         for order in ("name", "count"):
             assert f'data-sort="{order}"' in text, page
         assert text.index("term-sort") < text.index("term-list"), page
+    for page, terms in (("tags.html", "tags"), ("authors.html", "authors")):
+        text = (pelican_site / "theme/templates" / page).read_text()
+        assert f"{{% set terms, terms_title = {terms}," in text
+        assert '{% include "terms.html" %}' in text
     css = (hugo_site / "static/css/style.css").read_text()
     assert ".term-sort" in css
     assert css == (pelican_site / "theme/static/css/style.css").read_text()
+
+
+SITE_URL = "https://blog.example.org"
+
+
+class _Term(str):
+    """A pelican Tag or Author as the theme sees one: it renders as its
+    name and carries the slug and URL the theme builds links from."""
+
+    def __new__(cls, name, kind):
+        term = super().__new__(cls, name)
+        term.name = name
+        term.slug = name.lower().replace(" ", "-")
+        term.url = f"{kind}/{term.slug}/"
+        return term
+
+
+def render_pelican_page(site, template, **context):
+    """One page of the generated theme, rendered with the jinja settings
+    the generated config gives pelican, over the values that page reads."""
+    env = Environment(loader=FileSystemLoader(site / "theme/templates"),
+                      autoescape=True, trim_blocks=True, lstrip_blocks=True)
+    article = SimpleNamespace(
+        title="First Post", url="posts/first-post/", cover=None,
+        summary="Hello.", locale_date="2020-01-05",
+        tags=[_Term("example", "tags")],
+        authors=[_Term("Ada Lovelace", "authors")])
+    values = dict(
+        SITEURL=SITE_URL, SITENAME="Example Blog", SITESUBTITLE="An example.",
+        DEFAULT_LANG="en", THEME_STATIC_DIR="theme", AUTHOR_LINKS={},
+        FEED_ALL_ATOM="feeds/all.atom.xml",
+        TAG_FEED_ATOM="feeds/tag-{slug}.atom.xml",
+        AUTHOR_FEED_ATOM="feeds/author-{slug}.atom.xml",
+        TAGS_URL="tags/", AUTHORS_URL="authors/",
+        articles_page=SimpleNamespace(object_list=[article], number=1,
+                                      has_other_pages=lambda: False))
+    values.update(context)
+    return env.get_template(template).render(**values)
+
+
+def test_taxonomy_pages_render_through_the_shared_templates(archive):
+    """A tag page and an author page are one template (term.html) handed
+    the page's own term, and their chip indexes another (terms.html):
+    the two pages of each pair differed in nothing but the variable's
+    name, so a change to one had to be made twice. Rendered here because
+    the delegation is only right or wrong at render time, and pelican
+    itself is not a dependency of these tests."""
+    site = pelican.build_site(archive)
+    tag = _Term("example", "tags")
+    author = _Term("Ada Lovelace", "authors")
+
+    for page, var, term, feed, index in (
+            ("tag.html", "tag", tag, "feeds/tag-example.atom.xml", "Tags"),
+            ("author.html", "author", author,
+             "feeds/author-ada-lovelace.atom.xml", "Authors")):
+        html = render_pelican_page(site, page, **{var: term},
+                                   output_file=term.url + "index.html")
+        assert f"<title>{term} \u00b7 Example Blog</title>" in html
+        # the term's own heading, with the feed link beside it, and that
+        # same feed declared in the head
+        assert (f'<h1 class="page-title">{term}<a class="feed-link" '
+                f'href="{SITE_URL}/{feed}"') in html
+        assert (f'<link rel="alternate" type="application/atom+xml" '
+                f'href="{SITE_URL}/{feed}"') in html
+        # base.html and jsonld.html still read the page's own tag or
+        # author: the crumbs place it under that taxonomy's index
+        assert f'"name": "{index}"' in html
+        # and the term's posts are there as cards
+        assert (f'<h2 class="card-title"><a href="{SITE_URL}/'
+                f'posts/first-post/">First Post</a></h2>') in html
+
+    # the chip indexes, each over its own taxonomy, in name order
+    beta = _Term("beta", "tags")
+    chips = ('<a class="chip" href="%s/%s">%s <span>%d</span></a>'
+             % (SITE_URL, t.url, t, n) for t, n in ((beta, 2), (tag, 1)))
+    html = render_pelican_page(site, "tags.html", articles_page=None,
+                               output_file="tags/index.html",
+                               tags=[(tag, [1]), (beta, [1, 2])])
+    assert "<title>Tags \u00b7 Example Blog</title>" in html
+    assert '<h1 class="page-title">Tags</h1>' in html
+    assert "\n".join(chips) in html
+    html = render_pelican_page(site, "authors.html", articles_page=None,
+                               output_file="authors/index.html",
+                               authors=[(author, [1])])
+    assert "<title>Authors \u00b7 Example Blog</title>" in html
+    assert '<h1 class="page-title">Authors</h1>' in html
+    assert ('<a class="chip" href="%s/%s">%s <span>1</span></a>'
+            % (SITE_URL, author.url, author)) in html
 
 
 def test_image_zoom(archive):

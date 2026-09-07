@@ -1,0 +1,15 @@
+{# A taxonomy's chip index -- every tag, or every author -- over the
+   (term, articles) pairs tags.html and authors.html hand over as
+   `terms`, under the heading they name in `terms_title`. Pelican hands
+   `tags` over in no particular order (`authors` it sorts itself), so
+   the sort here is what puts the chips in the name order
+   term-sort.html's "name" restores. #}
+{% extends "base.html" %}
+{% block name %}{{ terms_title }}{% endblock %}
+{% block content %}
+<h1 class="page-title">{{ terms_title }}</h1>
+<!-- @include shared/term-sort.html -->
+<p class="term-list">
+{% for term, articles in terms | sort %}<a class="chip" href="{{ SITEURL }}/{{ term.url }}">{{ term }} <span>{{ articles | length }}</span></a>
+{% endfor %}</p>
+{% endblock %}

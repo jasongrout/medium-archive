@@ -25,8 +25,10 @@ medium-archive = "medium_archive.cli:main"
 # markdown-it-py, mdit-py-plugins and pygments are what the
 # generated pelican config reads Markdown with; the tests read that
 # config the way a pelican build does
+# jinja2 renders the pelican theme's taxonomy pages in the tests, the
+# one place a theme template is reached through another
 dev = ["pytest", "pillow", "markdown-it-py", "mdit-py-plugins",
-       "pygments"]
+       "pygments", "jinja2"]
 
 [build-system]
 requires = ["hatchling"]

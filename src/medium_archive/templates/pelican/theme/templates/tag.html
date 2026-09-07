@@ -1,12 +1,3 @@
-{% extends "base.html" %}
-{% from "macros.html" import card with context %}
-{% block name %}{{ tag }}{% endblock %}
-{% block content %}
-<h1 class="page-title">{{ tag }}{% if TAG_FEED_ATOM %}<a class="feed-link" href="{{ SITEURL }}/{{ TAG_FEED_ATOM.format(slug=tag.slug) }}" aria-label="RSS feed for {{ tag }}" title="RSS feed for {{ tag }}">
-<!-- @include shared/feed-icon.html -->
-</a>{% endif %}</h1>
-<div class="card-grid">
-{% for article in articles_page.object_list %}{{ card(article) }}{% endfor %}
-</div>
-{% include "pagination.html" %}
-{% endblock %}
+{# term.html, over this page's tag. #}
+{% set term, term_feed = tag, TAG_FEED_ATOM %}
+{% include "term.html" %}
