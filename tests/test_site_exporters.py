@@ -2083,3 +2083,104 @@ def test_figure_alt_text_cannot_end_its_own_tag(archive):
         img = tag_re.search(html)
         # the tag the post-build pass will read is the whole tag
         assert img.group(0).endswith('data-body-image="">')
+
+
+def set_redirects(archive, mode):
+    """site.json's "redirects" set to one mode, for the exporters to read."""
+    cfg = json.loads((archive / "site.json").read_text())
+    if mode is None:
+        cfg.pop("redirects", None)
+    else:
+        cfg["redirects"] = mode
+    (archive / "site.json").write_text(json.dumps(cfg))
+
+
+def run_pelican_redirects(site, tmp_path):
+    """The generated config's redirect pass, run as a build runs it:
+    the site's own redirects.csv into an empty output directory. The
+    file it wrote (or None) and the stub paths it wrote."""
+    namespace = config_namespace(site)
+    output = tmp_path / "output"
+    output.mkdir()
+    namespace["_write_redirects"](SimpleNamespace(output_path=str(output)))
+    stubs = sorted(str(p.parent.relative_to(output))
+                   for p in output.rglob("index.html"))
+    rules = (output / "_redirects")
+    return (rules.read_text() if rules.exists() else None), stubs
+
+
+def test_redirects_default_to_both_mechanisms(archive, tmp_path):
+    """Unset, "redirects" leaves both mechanisms in place: the stub
+    pages every static host serves, and the `_redirects` file the hosts
+    that read one answer with a real 301. That is the default because
+    it is the only setting that redirects an old link on a host nobody
+    has chosen yet."""
+    set_redirects(archive, None)
+    hugo_site = hugo.build_site(archive)
+    assert post_front(hugo_site, "first-post")["aliases"] == [
+        "/first-post-aaa111aaa111", "/p/aaa111aaa111", "/2015/06/01/first-post"]
+    assert (hugo_site / "static/_redirects").exists()
+
+    pelican_site = pelican.build_site(archive)
+    rules, stubs = run_pelican_redirects(pelican_site, tmp_path)
+    assert "/p/aaa111aaa111 /posts/first-post/ 301" in rules
+    assert "p/aaa111aaa111" in stubs
+
+
+def test_redirects_stubs_only_leaves_no_redirects_file(archive, tmp_path):
+    """"stubs" is what a GitHub Pages deployment wants: it never reads
+    `_redirects`, so the file is inert weight there and the stub pages
+    are the whole mechanism."""
+    set_redirects(archive, "stubs")
+    hugo_site = hugo.build_site(archive)
+    assert "aliases" in post_front(hugo_site, "first-post")
+    assert not (hugo_site / "static/_redirects").exists()
+
+    pelican_site = pelican.build_site(archive)
+    assert "REDIRECT_FILE = False" in (pelican_site / "pelicanconf.py").read_text()
+    rules, stubs = run_pelican_redirects(pelican_site, tmp_path)
+    assert rules is None
+    assert "p/aaa111aaa111" in stubs
+
+
+def test_redirects_file_only_leaves_no_stub_pages(archive, tmp_path):
+    """"file" is what a Netlify or Cloudflare Pages deployment wants: a
+    real HTTP 301 from one text file, and none of the hundreds of stub
+    directories the site root would otherwise carry -- which on Netlify
+    would shadow the rules and answer in their place."""
+    set_redirects(archive, "file")
+    hugo_site = hugo.build_site(archive)
+    assert "aliases" not in post_front(hugo_site, "first-post")
+    assert "/p/aaa111aaa111 /posts/first-post/ 301" in (
+        hugo_site / "static/_redirects").read_text()
+
+    pelican_site = pelican.build_site(archive)
+    assert "REDIRECT_STUBS = False" in (pelican_site / "pelicanconf.py").read_text()
+    rules, stubs = run_pelican_redirects(pelican_site, tmp_path)
+    assert "/p/aaa111aaa111 /posts/first-post/ 301" in rules
+    assert stubs == []
+
+
+def test_redirects_none_still_writes_the_map(archive, tmp_path):
+    """"none" leaves the redirects to a rule set kept somewhere else --
+    and still writes redirects.csv, which is what such a rule set is
+    built from."""
+    set_redirects(archive, "none")
+    hugo_site = hugo.build_site(archive)
+    assert "aliases" not in post_front(hugo_site, "first-post")
+    assert not (hugo_site / "static/_redirects").exists()
+    assert (hugo_site / "redirects.csv").exists()
+
+    pelican_site = pelican.build_site(archive)
+    assert (pelican_site / "redirects.csv").exists()
+    rules, stubs = run_pelican_redirects(pelican_site, tmp_path)
+    assert rules is None and stubs == []
+
+
+def test_an_unknown_redirects_value_is_reported_and_ignored(archive, capsys):
+    """A typo must not silently drop every redirect the site serves."""
+    set_redirects(archive, "netlify")
+    hugo_site = hugo.build_site(archive)
+    assert "'netlify' is not one of" in capsys.readouterr().err
+    assert "aliases" in post_front(hugo_site, "first-post")
+    assert (hugo_site / "static/_redirects").exists()

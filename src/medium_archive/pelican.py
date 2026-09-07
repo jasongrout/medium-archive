@@ -64,11 +64,13 @@ sites.make_cover_thumbnail); without it, cards use the full-size image.
 
 Pelican has no built-in equivalent of Hugo's aliases, so the
 generated config embeds a small plugin (templates/pelican/site_plugin.py,
-appended verbatim): after each build it reads the
-exported redirects.csv and writes a meta-refresh redirect stub at every
-old inbound path (Medium slug+id, /p/<id>, Ghost-era) -- the same stub
-pages Hugo renders for aliases, working on any static host -- plus the
-same map as a `_redirects` file for hosts that turn one into HTTP 301s.
+appended verbatim): after each build it reads the exported redirects.csv
+-- the map of every old inbound path (Medium slug+id, /p/<id>,
+Ghost-era) to the page this site serves -- and renders it as whichever
+mechanism site.json's "redirects" asks for (see sites.REDIRECT_MODES): a
+meta-refresh stub at each old path, the same page Hugo renders for an
+alias and working on any static host; a `_redirects` file for the hosts
+that turn one into HTTP 301s; or both.
 The plugin also writes what Pelican has no built-in for and Hugo emits
 on its own: a sitemap.xml of the site's pages (post lastmod from the
 updated date) and a robots.txt naming it, and the "More posts" block
@@ -91,9 +93,10 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     copy_site_asset, export_content, fill_template,
                     front_matter_yaml, image_size, load_site_inputs,
                     masthead_link, newsletter_params, page_stems,
-                    quote_arg, rewrite_figures, site_profiles,
-                    template_text, write_data_files, write_redirects_csv,
-                    write_templates)
+                    quote_arg, redirect_mode, rewrite_figures,
+                    site_profiles, template_text, wants_redirect_stubs,
+                    wants_redirects_file, write_data_files,
+                    write_redirects_csv, write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
 # templates/README.md). The stylesheet is the card look shared with the
@@ -168,6 +171,7 @@ def _one_line(value: str) -> str:
 def build_site(out):
     manifest, config = load_site_inputs(out)
     stems = page_stems(manifest)
+    mode = redirect_mode(config)        # site.json "redirects"
     site = out / "site-pelican"
     clean_site(site, keep=("output",))
     (site / "content").mkdir(parents=True)
@@ -252,6 +256,10 @@ def build_site(out):
         intro=setting(config.get("intro")),
         footer=setting(config.get("footer")),
         noindex="True" if config.get("noindex") else "False",
+        # which redirect mechanism the embedded plugin renders
+        # redirects.csv as (see sites.REDIRECT_MODES)
+        redirect_stubs="True" if wants_redirect_stubs(mode) else "False",
+        redirect_file="True" if wants_redirects_file(mode) else "False",
         twitter=setting(config.get("twitter")),
         profiles=json.dumps(site_profiles(config)),
         # the signup band at the foot of every page: its heading and

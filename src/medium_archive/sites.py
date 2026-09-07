@@ -832,10 +832,52 @@ def redirects_file(rules) -> str:
     line, the format Netlify, Cloudflare Pages and their imitators read
     from the site root. Where a host honors it, an old link answers
     with a real HTTP 301, which search engines credit to the new page
-    directly; hosts that ignore the file (GitHub Pages) still serve
-    the meta-refresh stubs at the same paths. Rules from
-    redirect_rules() or the rows of redirects.csv."""
+    directly. Rules from redirect_rules() or the rows of
+    redirects.csv."""
     return "".join(f"{old} {new} 301\n" for old, new, *_ in rules)
+
+
+# What a site does about old inbound links, as site.json's "redirects".
+# The two mechanisms are alternatives, not layers: no host reads both,
+# and on a host that reads one the other is inert weight.
+#
+#   stubs   a meta-refresh page at every old path. The only mechanism
+#           GitHub Pages has -- it does not read `_redirects` at all --
+#           and it works on any static host, at the cost of a file per
+#           old path, most of them directories at the site root.
+#   file    a `_redirects` file at the site root, and no stub pages:
+#           one text file, and a real HTTP 301 rather than a
+#           meta refresh. Netlify, Cloudflare Pages and their
+#           imitators; nothing on GitHub Pages.
+#   both    the default, for a host not yet chosen: whichever mechanism
+#           the host reads answers. Netlify is the one host where the
+#           combination is worse than either alone -- a static file
+#           shadows an unforced rule, so the stub answers and the 301
+#           never fires.
+#   none    neither, for a site whose redirects are configured
+#           elsewhere (a CDN rule set, an nginx map). redirects.csv is
+#           still written, since that is the map such a rule set is
+#           built from.
+REDIRECT_MODES = ("both", "stubs", "file", "none")
+
+
+def redirect_mode(config: dict) -> str:
+    """site.json's "redirects" (see REDIRECT_MODES), defaulting to
+    "both"; an unknown value is reported and read as the default."""
+    mode = config.get("redirects", "both")
+    if mode not in REDIRECT_MODES:
+        print(f'site.json "redirects": {mode!r} is not one of '
+              f'{", ".join(REDIRECT_MODES)}; using "both"', file=sys.stderr)
+        return "both"
+    return mode
+
+
+def wants_redirect_stubs(mode: str) -> bool:
+    return mode in ("both", "stubs")
+
+
+def wants_redirects_file(mode: str) -> bool:
+    return mode in ("both", "file")
 
 
 def canonical_for(post: dict) -> str | None:

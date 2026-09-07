@@ -14,26 +14,31 @@ STUB = """<!DOCTYPE html>
 """
 
 
-def _write_redirect_stubs(pelican_obj):
-    # Pelican has no aliases feature, so after each build this writes a
-    # meta-refresh stub at every old inbound path from redirects.csv --
-    # the exporter's map of Medium slug+id, /p/<id> and Ghost-era paths
-    # to the pages this site serves. Works on any static host. The same
-    # map goes to the site root as a `_redirects` file, one
-    # `old new 301` rule per line, which Netlify, Cloudflare Pages and
-    # their imitators answer with a real HTTP 301 -- credited by search
-    # engines to the new page directly; a host that ignores the file
-    # serves the stubs.
+def _write_redirects(pelican_obj):
+    # Old inbound links, from the exporter's redirects.csv -- its map of
+    # Medium slug+id, /p/<id> and Ghost-era paths to the pages this site
+    # serves -- rendered as whichever mechanism REDIRECT_STUBS and
+    # REDIRECT_FILE ask for (see the settings above).
+    #
+    # Pelican has no aliases feature, so the stubs are written here: a
+    # meta-refresh page at every old path, the same page Hugo renders
+    # for an alias.
     import csv
     import os
+    if not (REDIRECT_STUBS or REDIRECT_FILE):
+        return
     here = os.path.dirname(os.path.abspath(__file__))
     with open(os.path.join(here, "redirects.csv"), newline="",
               encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
-    with open(os.path.join(pelican_obj.output_path, "_redirects"), "w",
-              encoding="utf-8") as fh:
-        fh.writelines(f"{row['old_path']} {row['new_path']} 301\n"
-                      for row in rows)
+    if REDIRECT_FILE:
+        with open(os.path.join(pelican_obj.output_path, "_redirects"), "w",
+                  encoding="utf-8") as fh:
+            fh.writelines(f"{row['old_path']} {row['new_path']} 301\n"
+                          for row in rows)
+        print(f"_redirects: {len(rows)} rules written from redirects.csv")
+    if not REDIRECT_STUBS:
+        return
     written = 0
     for row in rows:
         parts = [p for p in row["old_path"].split("/") if p]
@@ -363,7 +368,7 @@ class _SitePlugins:
         signals.article_generator_finalized.connect(_collect_sitemap)
         signals.finalized.connect(_prioritize_first_images)
         signals.finalized.connect(_optimize_article_images)
-        signals.finalized.connect(_write_redirect_stubs)
+        signals.finalized.connect(_write_redirects)
         signals.finalized.connect(_write_crawl_files)
 
 
