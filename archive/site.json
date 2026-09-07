@@ -4,6 +4,7 @@
   "intro": "News, release announcements, and community stories from [Project Jupyter](https://jupyter.org)",
   "footer": "The Jupyter® and Jupyter Logo® trademarks are registered with the U.S. Patent & Trademark Office by [LF Charities](https://lf-charities.org/). © {year}",
   "hugo": {},
+  "redirects": "stubs",
   "avatar": "avatar.svg",
   "logo": "logo.svg",
   "logo_dark": "logo-dark.svg",
