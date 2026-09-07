@@ -87,7 +87,7 @@ all: `jupyter.github.io` (jupyter.org) runs on it and reaches for
 build published so far.
 
 The stubs are what puts a directory per old post path in the built site
-root: 684 rules over the 333 posts, of which 323 are top-level
+root: 684 rules over the 337 posts, of which 323 are top-level
 directories (the Medium slug+id paths), 323 more under `/p/`, and 38
 under `/YYYY/MM/DD/` (Ghost-era). Nothing of that is committed -- the
 stubs are generated into `public/`/`output/` at build time, and
