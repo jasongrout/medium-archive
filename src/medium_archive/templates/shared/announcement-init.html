@@ -1,0 +1,24 @@
+<script>
+(function () {
+  var banner = document.querySelector(".announcement");
+  var source = banner.getAttribute("data-source");
+  var html = source;
+  if (/^https?:\/\//i.test(source)) {
+    html = "";
+    try {
+      var cached = JSON.parse(localStorage.getItem("announcement-cache"));
+      if (cached && cached.src === source) html = cached.html;
+    } catch (e) {}
+  }
+  html = (html || "").trim();
+  try {
+    if (localStorage.getItem("announcement-dismissed") === html) html = "";
+  } catch (e) {}
+  if (!html) return;
+  var content = document.createElement("div");
+  content.className = "announcement-content";
+  content.innerHTML = html;
+  banner.appendChild(content);
+  banner.hidden = false;
+})();
+</script>

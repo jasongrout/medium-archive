@@ -71,6 +71,66 @@ def write_templates(site: Path, templates: dict):
         path.write_text(template_text(src), encoding="utf-8")
 
 
+# The site's behaviour: the shared/*.js snippets, in this order, as the
+# one script every page of both themes loads. Each is an IIFE that
+# finds its own markup or leaves, so the order is a reading order
+# rather than a dependency one -- the announcement first, since it is
+# the only one a reader can see arrive.
+BUNDLE = (
+    "shared/announcement.js",
+    "shared/nav-current.js",
+    "shared/theme-picker.js",
+    "shared/font-picker.js",
+    "shared/link-picker.js",
+    "shared/term-sort.js",
+    "shared/image-zoom.js",
+    "shared/code-copy.js",
+    "shared/heading-anchor.js",
+    "shared/newsletter.js",
+)
+
+
+def bundle_js() -> str:
+    """The BUNDLE snippets as one file, each under its own name so a
+    stack trace or a breakpoint lands somewhere a reader can place."""
+    return "".join(f"// {rel}\n{template_text(rel)}\n" for rel in BUNDLE)
+
+
+def write_asset(dst_dir: Path, name: str, text: str) -> str:
+    """text as dst_dir/<stem>.<hash><suffix> for name "<stem><suffix>";
+    the file name written. The hash is of the content, so a changed
+    asset is a changed address: a browser can hold the old one for as
+    long as the host allows and never serve it against markup it does
+    not match. Eight hex digits, the length git shows a commit at and
+    for the same reason -- a collision needs a birthday-paradox 2^16
+    assets, and a site has two."""
+    stem, _, suffix = name.rpartition(".")
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()[:8]
+    written = f"{stem}.{digest}.{suffix}"
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    (dst_dir / written).write_text(text, encoding="utf-8")
+    return written
+
+
+def headers_file(paths) -> str:
+    """A `_headers` file naming the hashed assets as immutable, the
+    format Netlify, Cloudflare Pages and their imitators read from the
+    site root, the same hosts that answer the `_redirects` file written
+    there. Written whatever site.json's "redirects" setting says: this
+    file is about the assets, not about old links. A hashed name is a
+    promise that
+    the file behind it never changes, so a year is only as long as the
+    promise already holds; hosts that ignore the file (GitHub Pages,
+    which serves everything at ten minutes and offers no way to say
+    otherwise) lose the year but keep the guarantee, since a rebuilt
+    asset arrives under a name their cache has never seen."""
+    lines = []
+    for path in paths:
+        lines.append(f"/{path.lstrip('/')}\n")
+        lines.append("  Cache-Control: public, max-age=31536000, immutable\n")
+    return "".join(lines)
+
+
 def copy_site_asset(out: Path, rel, dst_dir: Path, stem: str):
     """An archive-relative image site.json names (the header avatar,
     the tab icon) copied into the site as dst_dir/<stem><its

@@ -776,8 +776,9 @@ src/medium_archive/
                  in-publication link map, image placement, covers,
                  redirect maps, site.json
   templates/     the site scaffolding the exporters copy into each site:
-                 generator configs, themes, CSS, shared JS snippets
-                 (see templates/README.md)
+                 generator configs, themes, the shared stylesheet, and
+                 the JS snippets both card themes bundle into the one
+                 script each site serves (see templates/README.md)
   compare.py     the compare step: verify page vs export conversion agreement
   lint.py        the lint step: scan converted posts for defect signatures
   stats.py       the stats step: summarize the converted archive

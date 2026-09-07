@@ -72,11 +72,20 @@
 {{ end }}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Inter:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:ital,wght@0,400..700;1,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
-<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+{{/* the look and the behaviour, one file each for the whole site,
+     named by a hash of their own contents (see
+     templates/README.md): a reader's browser can hold either for
+     as long as the host allows and never serve it against markup
+     it does not match, since changed contents are a changed
+     address. The script is deferred -- nothing in it paints the
+     page, which is why the three init snippets above, which do,
+     stay inline instead. */}}
+<link rel="stylesheet" href="{{ site.Params.stylesheet | relURL }}">
+<script src="{{ site.Params.script | relURL }}" defer></script>
 </head>
 <body>
 {{ with site.Params.announcement }}<div class="announcement" data-source="{{ . }}" hidden></div>
-<!-- @include shared/announcement.html -->
+<!-- @include shared/announcement-init.html -->
 {{ end }}<header class="site-header"><div class="wrap bar">
 {{/* the masthead: a logo of the publication's own standing in for its
      name (site.json "logo", with "logo_dark" the same mark drawn for
@@ -98,7 +107,6 @@
 <!-- @include shared/theme-picker.html -->
 </nav>
 </div></header>
-<!-- @include shared/nav-current.html -->
 <main class="wrap">
 {{ block "main" . }}{{ end }}
 </main>
@@ -113,7 +121,6 @@
 <div class="newsletter-form"></div>
 </div>
 </section>
-<!-- @include shared/newsletter.html -->
 {{ end }}{{/* the line under every page: site.json's "footer" as
      Markdown, with `{year}` the year of the build so a copyright
      notice stays current, as jupyter.org's own footer keeps it; with

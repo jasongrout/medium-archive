@@ -1,4 +1,3 @@
-<script>
 (function () {
   var links = document.querySelectorAll(".site-header nav a");
   var best = null, bestLen = -1;
@@ -12,4 +11,3 @@
   }
   if (best) best.setAttribute("aria-current", "page");
 })();
-</script>

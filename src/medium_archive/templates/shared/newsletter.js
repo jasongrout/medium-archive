@@ -1,4 +1,3 @@
-<script>
 (function () {
   var band = document.querySelector(".newsletter");
   var target = band && band.querySelector(".newsletter-form");
@@ -101,4 +100,3 @@
   };
   document.head.appendChild(embed);
 })();
-</script>

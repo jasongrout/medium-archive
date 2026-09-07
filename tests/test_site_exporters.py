@@ -16,6 +16,18 @@ from medium_archive import hugo, pelican, sites
 BASE = "https://blog.example.com"
 
 
+def stylesheet(site: Path) -> str:
+    """The site's stylesheet, whatever hash its name carries."""
+    css, = site.glob("**/css/style.*.css")
+    return css.read_text()
+
+
+def script(site: Path) -> str:
+    """The site's one script, whatever hash its name carries."""
+    js, = site.glob("**/js/site.*.js")
+    return js.read_text()
+
+
 def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
               body: str, **extra) -> str:
     url = f"{BASE}/{slug}-{mid}"
@@ -587,7 +599,7 @@ def test_feed_links_carry_the_rss_mark(archive):
     # feed titles itself, so a reader files it under the name it shows
     assert 'site.Home.OutputFormats.Get "rss"' in nav
     assert '{{ $.Title }} · {{ site.Title }}' in nav
-    css = (pelican_site / "theme/static/css/style.css").read_text()
+    css = stylesheet(pelican_site)
     assert ".feed-icon" in css and ".page-title .feed-link" in css
 
 
@@ -689,7 +701,7 @@ def test_pelican_site(archive):
                 "terms", "tags", "authors", "archives", "search", "macros",
                 "pagination"):
         assert (site / f"theme/templates/{tpl}.html").exists(), tpl
-    assert "card-grid" in (site / "theme/static/css/style.css").read_text()
+    assert "card-grid" in stylesheet(site)
     assert (site / "redirects.csv").exists()
     # the embedded plugin turns redirects.csv into redirect stubs and
     # rewrites body images into responsive webp variants
@@ -699,17 +711,99 @@ def test_pelican_site(archive):
     assert "VARIANT_WIDTHS = (480, 736, 1104)" in config
 
 
+def test_one_stylesheet_and_one_script_for_the_whole_site(archive):
+    # The look and the behaviour every page shares are one file each,
+    # not a copy inside every page: fetched once, and held under a name
+    # that is a hash of their own contents, so a rebuilt one is a new
+    # address rather than a stale cache entry.
+    hugo_site = hugo.build_site(archive)
+    pelican_site = pelican.build_site(archive)
+    # both engines serve the same bytes, the shared snippets' own
+    assert script(hugo_site) == script(pelican_site) == sites.bundle_js()
+    assert stylesheet(hugo_site) == sites.template_text("shared/card.css")
+    for name in sites.BUNDLE:
+        assert sites.template_text(name) in sites.bundle_js(), name
+    for site, static in ((hugo_site, hugo_site / "static"),
+                         (pelican_site, pelican_site / "theme/static")):
+        css, = (static / "css").iterdir()
+        js, = (static / "js").iterdir()
+        assert re.fullmatch(r"style\.[0-9a-f]{8}\.css", css.name), css
+        assert re.fullmatch(r"site\.[0-9a-f]{8}\.js", js.name), js
+    # each engine's config names what was actually written, and the
+    # base template links the stylesheet and defers the script
+    hugo_config = (hugo_site / "hugo.toml").read_text()
+    hugo_base = (hugo_site / "layouts/baseof.html").read_text()
+    css, = (hugo_site / "static/css").iterdir()
+    js, = (hugo_site / "static/js").iterdir()
+    assert f'stylesheet = "css/{css.name}"' in hugo_config
+    assert f'script = "js/{js.name}"' in hugo_config
+    assert '<link rel="stylesheet" href="{{ site.Params.stylesheet | relURL }}">' in hugo_base
+    assert '<script src="{{ site.Params.script | relURL }}" defer></script>' in hugo_base
+    pelican_config = (pelican_site / "pelicanconf.py").read_text()
+    pelican_base = (pelican_site / "theme/templates/base.html").read_text()
+    css, = (pelican_site / "theme/static/css").iterdir()
+    js, = (pelican_site / "theme/static/js").iterdir()
+    assert f'STYLE_CSS = "css/{css.name}"' in pelican_config
+    assert f'SITE_JS = "js/{js.name}"' in pelican_config
+    assert ('<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}'
+            '/{{ STYLE_CSS }}">') in pelican_base
+    assert ('<script src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/{{ SITE_JS }}"'
+            ' defer></script>') in pelican_base
+    # what is left inline is the four snippets that cannot wait for a
+    # deferred file: the three that pin a stored choice before the page
+    # is painted, and the announcement's first paint
+    for base in (hugo_base, pelican_base):
+        assert base.count("<script>") == 4, base[:60]
+        assert base.count("<script ") == 1, base[:60]
+    # and no page template carries behaviour of its own at all
+    for page in (hugo_site / "layouts/page.html",
+                 pelican_site / "theme/templates/article.html",
+                 hugo_site / "layouts/taxonomy.html",
+                 pelican_site / "theme/templates/terms.html"):
+        assert "<script" not in page.read_text(), page
+    # a hashed name is a promise the file behind it never changes, so
+    # both are named as immutable to the hosts that read `_headers` --
+    # written to the site root beside `_redirects`, by Hugo from
+    # static/ and by the pelican plugin from the config's HEADERS
+    for headers in ((hugo_site / "static/_headers").read_text(),
+                    pelican_config):
+        assert "Cache-Control: public, max-age=31536000, immutable" in headers
+        assert "/css/style." in headers and "/js/site." in headers
+
+
+def test_an_asset_name_carries_a_hash_of_its_contents(tmp_path):
+    # the same bytes keep the same name from build to build, so a cache
+    # is not thrown away by a rebuild that changed nothing; different
+    # bytes take a name of their own, so a cache is never served stale
+    first = sites.write_asset(tmp_path, "site.js", "one\n")
+    assert sites.write_asset(tmp_path, "site.js", "one\n") == first
+    second = sites.write_asset(tmp_path, "site.js", "two\n")
+    assert second != first
+    assert (tmp_path / first).read_text() == "one\n"
+    assert (tmp_path / second).read_text() == "two\n"
+
+
 def test_theme_picker_and_dark_scheme(archive):
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    css = (hugo_site / "static/css/style.css").read_text()
+    css = stylesheet(hugo_site)
     # dark palette under both routes: an explicit picker choice pins
     # data-theme; with none stored, the system scheme decides
     assert ':root[data-theme="dark"]' in css
     assert "@media (prefers-color-scheme: dark)" in css
     assert ':root:not([data-theme="light"])' in css
     assert ".theme-picker" in css
-    assert (pelican_site / "theme/static/css/style.css").read_text() == css
+    # the button is hidden until its script unhides it, and keeps its
+    # box while it waits -- that script comes with the deferred bundle,
+    # after the parse, and the nav must not reflow around its arrival --
+    # but only where there is scripting to fill it
+    assert ".theme-picker[hidden] { display: none; }" in css
+    assert (":root[data-js] .theme-picker[hidden] { display: inline-flex;"
+            in css)
+    for base in (hugo_site / "layouts/baseof.html",
+                 pelican_site / "theme/templates/base.html"):
+        assert 'setAttribute("data-js", "")' in base.read_text(), base
+    assert stylesheet(pelican_site) == css
     for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):
         text = base.read_text()
@@ -735,24 +829,24 @@ def test_theme_picker_and_dark_scheme(archive):
             assert f"family={family}" in text, (base, family)
         # the stored choices apply before the stylesheet loads, so a
         # page cannot flash the wrong scheme or font
-        assert text.index("localStorage.getItem") < text.index("stylesheet")
-        assert text.index('localStorage.getItem("font")') < text.index("stylesheet")
-        assert text.index('localStorage.getItem("link")') < text.index("stylesheet")
+        sheet = text.index('rel="stylesheet"')
+        assert text.index("localStorage.getItem") < sheet
+        assert text.index('localStorage.getItem("font")') < sheet
+        assert text.index('localStorage.getItem("link")') < sheet
     # redirect stubs load no stylesheet, so they must paint the palette
     # themselves -- following a redirect must not flash white in dark mode
     for stub_source in ((hugo_site / "layouts/alias.html").read_text(),
                         (pelican_site / "pelicanconf.py").read_text()):
         assert "prefers-color-scheme: dark" in stub_source
         assert 'localStorage.getItem("theme")' in stub_source
-    # the snippets embed verbatim, so they must carry no template syntax
-    # the other engine would mangle
-    for name in ("theme-init", "theme-picker", "font-init", "font-picker",
-                 "link-init", "link-picker", "term-sort", "announcement",
-                 "nav-current", "image-zoom", "code-copy",
-                 "heading-anchor", "feed-icon", "share-icons",
-                 "newsletter"):
-        snippet = sites.template_text(f"shared/{name}.html")
-        assert "{{" not in snippet and "{%" not in snippet
+    # the snippets reach both engines' pages verbatim -- spliced in, or
+    # concatenated into the bundle -- so none of them may carry template
+    # syntax the other engine would mangle
+    for snippet in sorted(sites.TEMPLATE_DIR.joinpath("shared").iterdir()):
+        if snippet.suffix not in (".html", ".js"):
+            continue
+        text = sites.template_text(f"shared/{snippet.name}")
+        assert "{{" not in text and "{%" not in text, snippet.name
     # without an avatar or announcement the config must still be valid
     # Python (json.dumps(None) would emit a NameError-raising `null`)
     config = (pelican_site / "pelicanconf.py").read_text()
@@ -770,25 +864,37 @@ def test_announcement_banner(archive):
     pelican_site = pelican.build_site(archive)
     assert f'announcement = "{banner_url}"' in (hugo_site / "hugo.toml").read_text()
     assert f'ANNOUNCEMENT = "{banner_url}"' in (pelican_site / "pelicanconf.py").read_text()
-    for base in (hugo_site / "layouts/baseof.html",
-                 pelican_site / "theme/templates/base.html"):
+    for site, base in ((hugo_site, hugo_site / "layouts/baseof.html"),
+                       (pelican_site,
+                        pelican_site / "theme/templates/base.html")):
         text = base.read_text()
         # the banner div sits above the header, emitted only when an
         # announcement is configured; a URL source is fetched
         # client-side, anything else is the banner HTML itself
         assert 'class="announcement"' in text and "data-source" in text, base
         assert text.index('class="announcement"') < text.index("site-header"), base
-        assert "fetch(source)" in text, base
+        # the page itself carries only the half that has to run before
+        # the header is parsed: the last fetch's content, painted
+        # straight away, so navigating the site doesn't shift the
+        # layout when the banner arrives
+        assert 'localStorage.getItem("announcement-cache")' in text, base
+        assert "announcement-content" in text, base
+        assert text.index("announcement-cache") < text.index("site-header"), base
+        assert "fetch(" not in text, base
+        # a banner already dismissed is not painted again by either half
+        assert 'localStorage.getItem("announcement-dismissed")' in text, base
+        # everything after that first paint is in the shared bundle
+        js = script(site)
+        assert "fetch(source)" in js, site
+        assert 'localStorage.setItem("announcement-cache"' in js, site
+        assert js.index("announcement-cache") < js.index("fetch(source)"), site
         # dismissal is remembered keyed by the banner's content, so a
         # changed announcement clears it and shows again
-        assert 'localStorage.setItem("announcement-dismissed", html)' in text, base
-        assert 'localStorage.getItem("announcement-dismissed") === html' in text, base
-        # the last fetch's content is cached and rendered synchronously,
-        # so navigating the site doesn't shift the layout when the
-        # banner arrives
-        assert 'localStorage.setItem("announcement-cache"' in text, base
-        assert text.index("announcement-cache") < text.index("fetch(source)"), base
-    css = (hugo_site / "static/css/style.css").read_text()
+        assert 'localStorage.setItem("announcement-dismissed", html)' in js, site
+        assert 'localStorage.getItem("announcement-dismissed") === html' in js, site
+        # and a page with no banner at all leaves the script at once
+        assert "if (!banner) return;" in js, site
+    css = stylesheet(hugo_site)
     assert ".announcement" in css and ".announcement-close" in css
 
 
@@ -812,8 +918,9 @@ def test_newsletter_band(archive):
     assert 'hubspot_region = "na1"' in hugo_config
     pelican_config = (pelican_site / "pelicanconf.py").read_text()
     assert '"hubspot_form": "3a79d744-5260-4a98-b069-39defccc8f42"' in pelican_config
-    for base in (hugo_site / "layouts/baseof.html",
-                 pelican_site / "theme/templates/base.html"):
+    for site, base in ((hugo_site, hugo_site / "layouts/baseof.html"),
+                       (pelican_site,
+                        pelican_site / "theme/templates/base.html")):
         text = base.read_text()
         assert 'class="newsletter"' in text, base
         for attr in ("data-hs-portal", "data-hs-form", "data-hs-region"):
@@ -826,23 +933,26 @@ def test_newsletter_band(archive):
         # hidden markup, revealed only once the embed has loaded, so a
         # blocked script leaves no heading promising a form
         assert re.search(r'class="newsletter"[^>]*hidden', text), base
-        assert "band.hidden = false" in text, base
-        assert "js.hsforms.net" in text and "hbspt.forms.create" in text, base
+        # the band is markup in the page; the embed that fills it is in
+        # the shared bundle, like every other behaviour
+        js = script(site)
+        assert "band.hidden = false" in js, site
+        assert "js.hsforms.net" in js and "hbspt.forms.create" in js, site
         # the form renders in an iframe the page's CSS cannot reach, so
         # its look is passed to the embed -- with this site's accent on
         # the button, not the colour jupyter.org hard-codes
-        assert "--accent" in text and ".hs-button" in text, base
+        assert "--accent" in js and ".hs-button" in js, site
         # and jupyter.org's layout: the fields on one row, then the
         # consent copy, then the button, each of the last two on a
         # full-width basis so the order holds at any field count
-        assert '".hs-richtext { flex: 1 0 100%;' in text, base
-        assert '".hs-submit { flex: 1 0 100%; }"' in text, base
+        assert '".hs-richtext { flex: 1 0 100%;' in js, site
+        assert '".hs-submit { flex: 1 0 100%; }"' in js, site
         # and neither the copy nor the heading is held to a measure of
         # its own: both run the width of the band
-        assert "max-width" not in text.split(".hs-richtext")[1][:200], base
-    css = (hugo_site / "static/css/style.css").read_text()
+        assert "max-width" not in js.split(".hs-richtext")[1][:200], site
+    css = stylesheet(hugo_site)
     assert ".newsletter " in css and ".newsletter h2" in css
-    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    assert css == stylesheet(pelican_site)
 
 
 def test_newsletter_band_absent_or_incomplete(archive, capsys):
@@ -894,8 +1004,7 @@ def test_footer_line(archive):
         assert render in text, base
         assert "site-footer" in text, base
     # the line is a paragraph of Markdown, so the footer spaces itself
-    assert ".site-footer p { margin: 0; }" in (
-        hugo_site / "static/css/style.css").read_text()
+    assert ".site-footer p { margin: 0; }" in stylesheet(hugo_site)
 
 
 def test_footer_falls_back_to_the_description(archive):
@@ -939,7 +1048,7 @@ def test_masthead_logo(archive):
         assert "aria-label" in text, base
     # the palettes pick between the two, like every other value that
     # differs between them
-    css = (hugo_site / "static/css/style.css").read_text()
+    css = stylesheet(hugo_site)
     assert "--logo-light: block" in css and "--logo-dark: block" in css
     assert "display: var(--logo-light)" in css
 
@@ -1000,13 +1109,11 @@ def test_nav_current_highlight(archive):
     # aria-current, which the stylesheet paints in the accent
     hugo_site = hugo.build_site(archive)
     pelican_site = pelican.build_site(archive)
-    for base in (hugo_site / "layouts/baseof.html",
-                 pelican_site / "theme/templates/base.html"):
-        text = base.read_text()
-        assert 'setAttribute("aria-current", "page")' in text, base
-        # the script follows the nav it marks
-        assert text.index("</header>") < text.index("aria-current"), base
-    assert 'a[aria-current="page"]' in (hugo_site / "static/css/style.css").read_text()
+    for site in (hugo_site, pelican_site):
+        # the mark is set from the shared bundle, which runs once the
+        # nav it reads has been parsed
+        assert 'setAttribute("aria-current", "page")' in script(site), site
+    assert 'a[aria-current="page"]' in stylesheet(hugo_site)
 
 
 def test_nav_wraps_without_overlapping_itself(archive):
@@ -1017,7 +1124,7 @@ def test_nav_wraps_without_overlapping_itself(archive):
     # row was laid that .9375rem short and the row above printed its
     # accent bar through the words below it. The rows are flex rows
     # now, and the row-gap gives that space back with room to spare.
-    css = (hugo.build_site(archive) / "static/css/style.css").read_text()
+    css = stylesheet(hugo.build_site(archive))
     nav = css[css.index(".site-header nav {"):]
     nav = nav[:nav.index("}")]
     assert "flex-wrap: wrap" in nav and "row-gap: 1.25rem" in nav
@@ -1043,9 +1150,9 @@ def test_term_sort_control(archive):
         text = (pelican_site / "theme/templates" / page).read_text()
         assert f"{{% set terms, terms_title = {terms}," in text
         assert '{% include "terms.html" %}' in text
-    css = (hugo_site / "static/css/style.css").read_text()
+    css = stylesheet(hugo_site)
     assert ".term-sort" in css
-    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    assert css == stylesheet(pelican_site)
 
 
 SITE_URL = "https://blog.example.org"
@@ -1143,25 +1250,32 @@ def test_image_zoom(archive):
     for page in (hugo_site / "layouts/page.html",
                  pelican_site / "theme/templates/article.html"):
         text = page.read_text()
+        # only a post page carries the dialog, and it follows the
+        # article whose images it zooms
         assert '<dialog class="zoom-dialog"' in text, page
-        # the dialog follows the article whose images it zooms
         assert text.index("</article>") < text.index("zoom-dialog"), page
+    for site in (hugo_site, pelican_site):
+        # the behaviour is in the shared bundle every page loads, so it
+        # opens by looking for an article and leaves where there is none
+        js = script(site)
+        assert 'var article = document.querySelector(".post");' in js, site
+        assert "if (!article || !dialog" in js, site
         # zoom to the src attribute, never currentSrc: src is the
         # full-size original, currentSrc the smaller srcset variant
-        assert "full.src = img.src" in text, page
-        assert "currentSrc" not in text, page
+        assert "full.src = img.src" in js, site
+        assert "currentSrc" not in js, site
         # only images holding more detail than the column shows are
         # marked, and the width attribute -- not naturalWidth, which
         # srcset density-corrects -- is what the original measures
-        assert 'parseInt(img.getAttribute("width"), 10)' in text, page
+        assert 'parseInt(img.getAttribute("width"), 10)' in js, site
         # keyboard reachable, and a linked image keeps its link
-        assert 'img.closest("a")' in text, page
-        assert "img.tabIndex = 0" in text, page
-    css = (hugo_site / "static/css/style.css").read_text()
+        assert 'img.closest("a")' in js, site
+        assert "img.tabIndex = 0" in js, site
+    css = stylesheet(hugo_site)
     assert "img.zoomable { cursor: zoom-in; }" in css
     assert ".zoom-dialog::backdrop" in css
     assert "prefers-reduced-motion" in css
-    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    assert css == stylesheet(pelican_site)
 
 
 def test_code_copy(archive):
@@ -1171,31 +1285,38 @@ def test_code_copy(archive):
     for page in (hugo_site / "layouts/page.html",
                  pelican_site / "theme/templates/article.html"):
         text = page.read_text()
+        # the button's markup is a template on the post page, following
+        # the article whose blocks it serves, with the live region a
+        # screen reader hears the copy through beside it
         assert '<template class="code-copy-template">' in text, page
-        # the button follows the article whose blocks it serves, and is
-        # added only where the clipboard API can honour it
         assert text.index("</article>") < text.index("code-copy-template"), page
-        assert "navigator.clipboard.writeText" in text, page
+        assert 'role="status"' in text, page
+    for site in (hugo_site, pelican_site):
+        js = script(site)
+        # cloned per block by the bundled script, which leaves a page
+        # with no article, and adds no button the clipboard API cannot
+        # honour
+        assert 'var article = document.querySelector(".post");' in js, site
+        assert "if (!article || !template || !status" in js, site
+        assert "navigator.clipboard.writeText" in js, site
         # every pre in the article, whatever the engine wrapped it in,
         # gets a positioning box of its own and a cloned button
-        assert 'article.querySelectorAll("pre")' in text, page
-        assert 'block.className = "code-block"' in text, page
-        assert "template.content.firstElementChild.cloneNode(true)" in text, page
+        assert 'article.querySelectorAll("pre")' in js, site
+        assert 'block.className = "code-block"' in js, site
+        assert "template.content.firstElementChild.cloneNode(true)" in js, site
         # the icons swap by attribute: an SVG element has no `hidden`
         # property to set, so assigning one would change nothing
-        assert 'icon.toggleAttribute("hidden"' in text, page
-        assert "icon.hidden" not in text, page
+        assert 'icon.toggleAttribute("hidden"' in js, site
+        assert "icon.hidden" not in js, site
         # the copied text is the block's, without its trailing newline
-        assert 'pre.textContent.replace(/\\n$/, "")' in text, page
-        # a screen reader hears the copy through the live region
-        assert 'role="status"' in text, page
-        assert 'announce("Copied to clipboard")' in text, page
+        assert 'pre.textContent.replace(/\\n$/, "")' in js, site
+        assert 'announce("Copied to clipboard")' in js, site
     # hugo highlights by class, never Chroma's inlined Monokai, which
     # paints a dark block on the light page; the theme colours the
     # tokens on the class names Pygments and Chroma share, per palette
     config = (hugo_site / "hugo.toml").read_text()
     assert "[markup.highlight]\nnoClasses = false" in config
-    css = (hugo_site / "static/css/style.css").read_text()
+    css = stylesheet(hugo_site)
     assert css.count("--syn-keyword:") == 3      # light, and dark twice
     assert ".post .highlight .k," in css
     assert ".code-block { position: relative; }" in css
@@ -1205,7 +1326,7 @@ def test_code_copy(archive):
     # keyboard, and always shown where there is no hover
     assert ".code-block:hover .code-copy, .code-copy:focus-visible { opacity: 1; }" in css
     assert "@media (hover: none) { .code-copy { opacity: 1; } }" in css
-    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    assert css == stylesheet(pelican_site)
 
 
 def test_heading_anchor(archive):
@@ -1215,24 +1336,29 @@ def test_heading_anchor(archive):
     for page in (hugo_site / "layouts/page.html",
                  pelican_site / "theme/templates/article.html"):
         text = page.read_text()
+        # the mark's markup is a template on the post page, following
+        # the article whose headings it serves; an SVG is not a label,
+        # so the link carries its own
         assert '<template class="heading-anchor-template">' in text, page
-        # the mark follows the article whose headings it serves
         assert text.index("</article>") < text.index("heading-anchor-template"), page
+        assert 'aria-label="Link to this heading"' in text, page
+    for site in (hugo_site, pelican_site):
+        js = script(site)
         # every body heading that has an id gets one, cloned from the
         # template; the ids are the readers' own, so the script makes none
-        assert 'article.querySelectorAll(' in text, page
-        assert '"h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]"' in text, page
-        assert "template.content.firstElementChild.cloneNode(true)" in text, page
-        assert 'link.setAttribute("href", "#" + heading.id)' in text, page
-        # an SVG is not a label, so the link carries its own
-        assert 'aria-label="Link to this heading"' in text, page
+        assert 'var article = document.querySelector(".post");' in js, site
+        assert "if (!article || !template" in js, site
+        assert 'article.querySelectorAll(' in js, site
+        assert '"h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]"' in js, site
+        assert "template.content.firstElementChild.cloneNode(true)" in js, site
+        assert 'link.setAttribute("href", "#" + heading.id)' in js, site
     # a plain link, so the browser's own handling applies: the snippet
     # binds no click of its own, and sets no id the readers didn't give
-    snippet = sites.template_text("shared/heading-anchor.html")
+    snippet = sites.template_text("shared/heading-anchor.js")
     assert "addEventListener(\"click\"" not in snippet
     assert "preventDefault" not in snippet
     assert "heading.id =" not in snippet
-    css = (hugo_site / "static/css/style.css").read_text()
+    css = stylesheet(hugo_site)
     # hidden until its heading is hovered or the mark reached by
     # keyboard, and always shown where there is no hover; by opacity,
     # so revealing it never re-wraps the heading
@@ -1245,7 +1371,7 @@ def test_heading_anchor(archive):
     assert ".heading-anchor, .heading-anchor:hover { text-decoration-line: none; }" in css
     assert (".heading-anchor:hover, .heading-anchor:focus-visible"
             " { color: var(--accent); }") in css
-    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    assert css == stylesheet(pelican_site)
 
 
 def _contrast(a: str, b: str) -> float:
@@ -1337,7 +1463,7 @@ def test_post_share_links(archive):
     for name in ("enc_url", "enc_title", "enc_text"):
         assert lines[name].endswith('|urlencode|replace("/", "%2F") %}'), name
 
-    css = (hugo_site / "static/css/style.css").read_text()
+    css = stylesheet(hugo_site)
     assert ".share-sprite { display: none; }" in css
     assert ".share-icon { width: 1.05rem" in css
     # the marks are the networks' logos: a hover may deepen them, but
@@ -1349,7 +1475,7 @@ def test_post_share_links(archive):
                  if line.startswith(".share-link:hover"))
     colour = re.search(r"[{;]\s*color: ([^;]+);", hover).group(1)
     assert colour != "var(--accent)", hover
-    assert css == (pelican_site / "theme/static/css/style.css").read_text()
+    assert css == stylesheet(pelican_site)
 
 
 def test_share_targets_get_the_open_graph_tags_they_render_from(archive):

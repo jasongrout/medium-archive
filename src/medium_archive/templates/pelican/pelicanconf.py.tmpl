@@ -60,6 +60,17 @@ DIRECT_TEMPLATES = ["index", "tags", "authors", "archives"]
 TEMPLATE_PAGES = {"search.html": "search/index.html"}
 CATEGORY_URL = ""               # tags and authors classify posts;
 CATEGORY_SAVE_AS = ""           # the category axis stays unused
+# The site's look and its behaviour, one file each under the theme's
+# static dir, named by a hash of their own contents so a browser can
+# hold either as long as the host allows and never serve it against
+# markup it does not match (see sites.write_asset); base.html links
+# the first and defers the second. HEADERS is what says so to the
+# hosts that read a `_headers` file, which the plugin below writes to
+# the site root beside its robots.txt -- under every redirect setting,
+# since it is about the assets rather than about old links.
+STYLE_CSS = $style_css
+SITE_JS = $site_js
+HEADERS = $headers
 AVATAR = $avatar
 FAVICON = $favicon
 # a masthead logo that stands in for the site's name (site.json "logo"),

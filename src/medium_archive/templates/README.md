@@ -1,9 +1,9 @@
 # Site scaffolding
 
 The files the site exporters copy into each generated site: generator
-configs, themes, CSS, and the JS snippets shared between generators.
-Editing a file here changes what the exporter writes on its next run.
-The copies inside a generated `<out>/site-*` are disposable.
+configs, themes, CSS, and the JS shared between generators. Editing a
+file here changes what the exporter writes on its next run. The copies
+inside a generated `<out>/site-*` are disposable.
 
 Loading (`sites.template_text` and `sites.fill_template`):
 
@@ -12,6 +12,9 @@ Loading (`sites.template_text` and `sites.fill_template`):
   templates/-relative file: `<!-- @include shared/x.html -->` in HTML,
   `/* @include shared/x.css */` in CSS. This is how the hugo and pelican
   themes share the `shared/` snippets.
+- `shared/*.js` files are `@include`d nowhere: `sites.bundle_js`
+  concatenates them, in `sites.BUNDLE`'s order, into the one `site.js`
+  each exported site serves (see below).
 - `*.tmpl` files take config values through `string.Template`
   (`$title`, `$base_url`, ...); the exporter serializes each value
   before substitution. `$` placeholders cannot collide with the braces
@@ -20,32 +23,98 @@ Loading (`sites.template_text` and `sites.fill_template`):
 Files here carry no comments beyond what their formats can hide from
 the rendered output. Go-template and Jinja comments are fine. The
 shared HTML/JS snippets and the CSS are emitted verbatim, so their
-rationale lives below instead.
+rationale lives below instead. A bundled script's own comments are
+fetched once with it and are worth writing there; a snippet that stays
+inline sends its comments out with every page, so those stay here.
 
-## shared/, spliced into both card themes (hugo + pelican)
+## shared/, carried by both card themes (hugo + pelican)
 
-These embed verbatim in both engines' pages, so they must carry no
+These reach both engines' pages verbatim, so they must carry no
 `{{ }}` / `{% %}` template syntax. A test enforces this.
+
+A snippet's extension says how it gets there. A `.html` one is spliced
+into a page by an `@include`, and every copy of that page carries it. A
+`.js` one is included nowhere: the exporter concatenates it with the
+rest, in `sites.BUNDLE`'s order, into the single `site.js` that every
+page of the site loads with `defer`. The line between them is what a
+page has to carry: its own markup, and the scripts that must run before
+it is painted, are inline; behaviour is in the bundle.
+
+Behaviour left the pages because a page was a poor place to repeat it.
+Spliced into every one, the ten scripts came to 10.9 KB on a listing
+page and 15.9 KB on a post -- 3.5 and 4.7 KB gzipped, several times a
+median post's own body -- and went out again with every page a reader
+opened. What is left inline is 4.3 KB and 8.7 KB (1.2 and 3.0 KB
+gzipped), nearly all of it markup. The 18 KB bundle (5.3 KB gzipped) is
+fetched once; the browser's compiled copy of it is reused across pages
+too, which an inline block's never is. The cost is that first request,
+which `defer` keeps off the critical path -- it blocks neither the
+parse nor the paint -- and which a reader who opens a second page has
+already paid off. A reader who opens one page and leaves is the case
+this does least for: a little less HTML, one more connection.
+
+The stylesheet and the bundle are both named by a hash of their
+contents (`sites.write_asset`), so a rebuilt one arrives at an address
+no cache has seen and the copy a reader holds can be held as long as
+the host allows. `_headers`, written to the site root for the hosts
+that read a `_redirects` there (whatever site.json's `"redirects"`
+says, since this file is about the assets, not about old links), says
+a year; GitHub Pages,
+which serves everything at ten minutes and offers no way to say
+otherwise, ignores it and still never serves a stale one. A rebuild
+leaves the previous names behind in the generator's own output, which
+neither engine prunes -- no loss, since a page a reader is part way
+through loading still finds what it asked for.
+
+Three scripts stay inline because the bundle would reach them too late:
+`theme-init`, `font-init` and `link-init` pin the reader's stored
+choice on `<html>` before the stylesheet applies. Deferred, they would
+flash the wrong scheme, which is the thing they exist to prevent;
+blocking in the head, they would put a round trip in front of every
+cold load. 939 bytes in the page is the cheaper way to buy that.
+`announcement-init.html` is a fourth, and a judgement call rather than
+a rule -- see its entry below.
+
+Two things follow from a script running after the parse rather than
+where its markup sits, and both are handled where they arise: a script
+now finds its markup anywhere in the page, so each one opens by looking
+for it and leaves if a page has none (the bundle is the same file on
+every page, and most pages have no banner, no code blocks and no
+headings to mark); and a control hidden until its script unhides it now
+appears a moment later, so `card.css` keeps the header's theme button
+laid out while hidden -- where `theme-init.html` has said scripting is
+on to fill it -- rather than letting the nav reflow around its
+arrival.
 
 - `theme-init.html` runs before the stylesheet loads, so a stored
   choice cannot flash the wrong scheme. An explicit light/dark choice
   pins `data-theme` on `<html>`; no attribute means
-  `prefers-color-scheme` decides (see `card.css`).
-- `theme-picker.html` is the header's light/system/dark picker. It is
-  hidden until its script runs, since without JS a choice could not
-  apply anyway. Picking "system" clears the stored choice so
-  `prefers-color-scheme` rules again. The choice persists per browser.
+  `prefers-color-scheme` decides (see `card.css`). It also pins
+  `data-js` there, the page's one statement that scripting is on: the
+  stylesheet reads it to keep a box in the nav for the theme button,
+  which the deferred bundle fills after the parse, and to keep no such
+  box for a reader whose browser will never fill it.
+- `theme-picker.html` and `theme-picker.js` are the header's
+  light/system/dark picker: the button, and the behaviour behind it.
+  It is hidden until the script unhides it, since without JS a choice
+  could not apply anyway -- and since that script now runs from the
+  bundle, after the parse, `card.css` keeps the button's box laid out
+  while it waits, so the nav does not reflow when it appears. Picking
+  "system" clears the stored choice so `prefers-color-scheme` rules
+  again. The choice persists per browser.
 - `font-init.html` is the theme-init of the font experiment. It runs
   before the stylesheet loads so a stored choice cannot flash the
   default family first. A stored choice pins `data-font` on `<html>`;
   no attribute means Source Serif, the default (see `card.css`).
-- `font-picker.html` is the body-font switch: a `<select>`, not a
+- `font-picker.html` and `font-picker.js` are the body-font switch: a
+  `<select>`, not a
   button like the theme picker, since it offers nine choices, too many
   to cycle one click at a time. It floats fixed at the page's
   bottom-right corner instead of sitting beside the theme button in
   the header (`card.css`), so it stays reachable once a long article
-  has scrolled the header away; it is spliced in once, near the end of
-  the body, rather than into the nav. Each `<option>` carries the
+  has scrolled the header away; its markup is spliced in once, near the
+  end of the body, rather than into the nav. Being out of the flow, it
+  costs the page nothing by appearing when its script runs. Each `<option>` carries the
   family it offers as its own inline style, so the open list previews
   every choice in the face it names; the select's own font-family is
   set from script on every change, so the closed box previews the
@@ -75,8 +144,8 @@ These embed verbatim in both engines' pages, so they must carry no
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
   than another pass over the rules that use them.
-- `link-init.html` and `link-picker.html` are the same pair again for
-  link colour, and the picker sits directly above the font one in the
+- `link-init.html`, `link-picker.html` and `link-picker.js` are the
+  same set again for link colour, and the picker sits directly above the font one in the
   floating stack, since the two are the same kind of question. It
   exists for the same reason: to compare candidates on real posts
   before the blog settles on one. A stored choice pins `data-link` on
@@ -94,13 +163,14 @@ These embed verbatim in both engines' pages, so they must carry no
   candidate is one `:root[data-link=...]` block and no scheme rules of
   its own; it also carries the reasoning behind the numbers. The losing
   choices, and the picker with them, come out once the blog decides.
-- `term-sort.html` is the tag/author chip indexes' sort control: by
-  name (A-Z, the order the generators emit, so the no-JS page reads the
-  same) or by count, most posts first. Hidden until its script runs;
-  the choice persists per browser, like the theme picker's. The wiring
-  waits for DOMContentLoaded because the chip list follows the control
-  in the page.
-- `nav-current.html` marks the header nav link whose path is the
+- `term-sort.html` and `term-sort.js` are the tag/author chip indexes'
+  sort control: by name (A-Z, the order the generators emit, so the
+  no-JS page reads the same) or by count, most posts first. Hidden
+  until its script runs; the choice persists per browser, like the
+  theme picker's. The wiring waits for DOMContentLoaded, which the
+  deferred bundle has already reached by the time it runs -- the check
+  stays so the snippet does not depend on how its tag is written.
+- `nav-current.js` marks the header nav link whose path is the
   longest prefix of the current page's with `aria-current="page"`,
   which `card.css` paints in the accent, like jupyter.org's navbar. The
   home link catches post and pagination pages, `/tags/` catches every
@@ -112,10 +182,11 @@ These embed verbatim in both engines' pages, so they must carry no
   `.feed-icon`). Being a marker line, the `@include` sits on its own
   line inside the anchor. The whitespace that leaves is not a flex
   item, so the icon still centres.
-- `announcement.html` is the site-wide announcement banner. The base
-  templates emit the `.announcement` div (above the header, hidden)
-  only when site.json sets `"announcement"`. The script fills it from
-  the div's `data-source`: an http(s) URL is fetched client-side, so
+- `announcement.js` is the site-wide announcement banner, and
+  `announcement-init.html` is the one piece of it the bundle cannot
+  hold. The base templates emit the `.announcement` div (above the
+  header, hidden) only when site.json sets `"announcement"`. The
+  scripts fill it from the div's `data-source`: an http(s) URL is fetched client-side, so
   many sites can share one live banner file (how Jupyter projects use
   Sphinx's `announcement` option with jupyter.org/assets/banner.html;
   empty content keeps the banner hidden), and anything else is the
@@ -129,6 +200,21 @@ These embed verbatim in both engines' pages, so they must carry no
   its box holds the smaller measure the padding and the dismiss button
   are drawn in ems against, and the wrapper holds the announcement's
   own 18px, so the banner stands the same 43.8px tall as that one.
+
+  That synchronous first render is why the banner is split rather than
+  bundled whole. A deferred script paints it after the page, which is
+  a shift at the top of every page -- the exact thing the cached copy
+  was added to avoid -- and CSS cannot hold the space open, since only
+  `localStorage` knows whether a banner is coming. So the inline half
+  reads the cache and writes the content wrapper, which is all the
+  height needs, and the bundled half does everything after that: the
+  dismiss button (absolutely positioned, so adding it moves nothing),
+  the fetch, and the re-render of an announcement that changed. The
+  price is that both halves know what a rendered banner looks like.
+  It is a judgement call, worth revisiting once the split has been
+  lived with: the alternatives are to bundle the whole thing and
+  accept the shift, or to keep the whole snippet inline at 2.3 KB a
+  page and leave the bundle to the other nine scripts.
 - `share-icons.html` is the five share marks as one hidden `<symbol>`
   sprite the post pages `<use>`: LinkedIn's, Facebook's, Bluesky's and
   Mastodon's own logomarks (Simple Icons' reproductions, at their 24x24
@@ -148,9 +234,11 @@ These embed verbatim in both engines' pages, so they must carry no
   `card.css` keeps the marks monochrome on hover: deepening a logomark
   is within most of these networks' brand guidelines, recoloring it to
   the site accent is not.
-- `image-zoom.html` is click-to-zoom for body images, spliced into the
-  post templates rather than the base ones, since only article pages
-  have body images. An image is marked zoomable, and given the cursor,
+- `image-zoom.html` and `image-zoom.js` are click-to-zoom for body
+  images. The dialog markup is spliced into the post templates rather
+  than the base ones, since only article pages have body images; the
+  script rides in the bundle like the rest, and leaves at once on a
+  page carrying no article. An image is marked zoomable, and given the cursor,
   the button role and keyboard focus, only while the original holds
   detail the column is not already showing. The measure is the `width`
   attribute both exporters emit, since `naturalWidth` reports the
@@ -163,9 +251,10 @@ These embed verbatim in both engines' pages, so they must carry no
   image). Images inside a link are skipped, so a linked image still
   follows its link. It closes on a click anywhere, on Esc (the dialog's
   own) and on a page scroll, like Medium's, and re-measures on resize.
-- `code-copy.html` is the copy button in the corner of every code
-  block, spliced into the post templates beside `image-zoom.html`,
-  since only article pages have code blocks. Every `<pre>` in the
+- `code-copy.html` and `code-copy.js` are the copy button in the
+  corner of every code block. Its `<template>` is spliced into the post
+  templates beside `image-zoom.html`'s dialog, since only article pages
+  have code blocks; the script is in the bundle with the rest. Every `<pre>` in the
   article is one, whatever the engine wrapped it in (a fenced block
   from convert, a Goldmark or Pygments highlight div, an inlined
   gist or Carbon snippet inside a figure): the script wraps each in a
@@ -183,12 +272,12 @@ These embed verbatim in both engines' pages, so they must carry no
   through, since a changed button label is not read out. Without the
   async clipboard API (an insecure origin) no button is added, so the
   page never shows a button that cannot work.
-- `heading-anchor.html` is the link mark on every heading of an
-  article, the affordance jupyter.org's pages carry: hovering a heading
-  shows a chain link that addresses that heading, so a reader can send
-  someone to a section of a long post. It is spliced into the post
-  templates beside `code-copy.html`, since only article pages have body
-  headings. Both readers already give every body heading an id (hugo's
+- `heading-anchor.html` and `heading-anchor.js` are the link mark on
+  every heading of an article, the affordance jupyter.org's pages
+  carry: hovering a heading shows a chain link that addresses that
+  heading, so a reader can send someone to a section of a long post.
+  The mark's `<template>` is spliced into the post templates beside
+  `code-copy.html`'s, since only article pages have body headings. Both readers already give every body heading an id (hugo's
   goldmark, and the anchors plugin the pelican config's reader
   enables), so the script adds none: it links the ids that are there,
   which is also why the article's own `<h1>` title, written by the
@@ -218,7 +307,7 @@ These embed verbatim in both engines' pages, so they must carry no
   names Chroma (Hugo, with `noClasses` off in `hugo.toml.tmpl`) and
   Pygments (Pelican, through the fence rule in the generated config's
   reader, which names the same `highlight` class) share.
-- `newsletter.html` renders the signup band both base templates close
+- `newsletter.js` renders the signup band both base templates close
   a page with (site.json `"newsletter"`), the section jupyter.org ends
   its own pages on. The form is a HubSpot embed, which draws itself
   inside an iframe no stylesheet here can reach, so the band's own
@@ -248,7 +337,11 @@ up in -- `baseof.html`, `home.html`, `page.html`, `section.html`,
 section and a term's page share `section.html`, written to the site as
 `term.html` too), plus:
 
-- `hugo.toml.tmpl` is the generated site config. Its
+- `hugo.toml.tmpl` is the generated site config. `stylesheet` and
+  `script` in its params are the hashed names the exporter wrote the
+  stylesheet and the bundle under (`sites.write_asset`), which
+  `baseof.html` links and defers; they are set after the site's own
+  params, since neither is a setting anyone chooses. Its
   `[markup.highlight]` turns off Chroma's inline styles, whose default
   Monokai would paint a dark block on the light page; the tokens get
   classes instead and `card.css` colours them per palette.
@@ -316,7 +409,11 @@ section and a term's page share `section.html`, written to the site as
 
 ## pelican/
 
-- `pelicanconf.py.tmpl` is the generated config. Most of it is the
+- `pelicanconf.py.tmpl` is the generated config. `STYLE_CSS`,
+  `SITE_JS` and `HEADERS` in it are the hashed names the exporter
+  wrote the stylesheet and the bundle under and the `_headers` file
+  naming them immutable, which `base.html` links and the plugin
+  writes. Most of it is the
   CommonMark reader that replaces Pelican's python-markdown one
   (`pip install markdown-it-py mdit-py-plugins`), which is where
   everything this site needs from the Markdown layer hangs: heading
@@ -357,7 +454,11 @@ section and a term's page share `section.html`, written to the site as
   theme.
 - `site_plugin.py` is appended verbatim after the filled config. It
   gives Pelican the redirect stubs Hugo renders for aliases (and the
-  `_redirects` file both exporters write), the responsive body images
+  `_redirects` file both exporters write where site.json asks for one),
+  the `_headers` file marking the two hashed assets immutable
+  (`HEADERS` in the config, so both engines' copies come from one
+  function, and written beside robots.txt rather than with the
+  redirects, since it is about the assets), the responsive body images
   the hugo theme's render hook produces (with the first one eager, as
   there), the sitemap and robots.txt Hugo generates on its own, the
   "More posts" block Hugo's related content gives each post (scored

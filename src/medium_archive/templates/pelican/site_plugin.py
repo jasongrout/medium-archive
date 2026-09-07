@@ -82,6 +82,13 @@ def _write_crawl_files(pelican_obj):
     import os
     from xml.sax.saxutils import escape
     out = pelican_obj.output_path
+    # `_headers`, the file hosts that answer a `_redirects` read from
+    # the same root: the stylesheet and the script are named by their
+    # contents, so they are immutable -- a changed one arrives under a
+    # name of its own. Written whatever the redirect setting, since it
+    # is about the assets rather than about old links.
+    with open(os.path.join(out, "_headers"), "w", encoding="utf-8") as fh:
+        fh.write(HEADERS)
     with open(os.path.join(out, "robots.txt"), "w", encoding="utf-8") as fh:
         fh.write("User-agent: *\n")
         if NOINDEX:

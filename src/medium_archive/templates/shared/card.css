@@ -266,8 +266,22 @@ a:hover { text-decoration-line: underline; }
 .site-header nav a[aria-current="page"] { color: var(--ink); font-weight: 700;
                                           border-bottom-color: var(--accent); }
 
+/* The picker is hidden until shared/theme-picker.js unhides it, since
+   without JS a choice could not apply anyway. That script rides in the
+   deferred bundle, so it runs once the page is parsed rather than
+   where the markup sits, and the button keeps its box in the meantime
+   so the nav does not reflow around its arrival. Its box is the fixed
+   circle below whatever it holds, so the three icons the script has
+   yet to choose between cost it no width. The space is kept only where
+   scripting is on to fill it -- shared/theme-init.html says so on the
+   root element -- since a reader without it would otherwise be left
+   with a gap holding the nav off the edge for a button that is never
+   coming. The floating font and link pickers below need none of this:
+   they are out of the flow, so their arrival moves nothing. */
 .theme-picker { display: inline-flex; vertical-align: middle; }
 .theme-picker[hidden] { display: none; }
+:root[data-js] .theme-picker[hidden] { display: inline-flex;
+                                       visibility: hidden; }
 .theme-picker button {
                        display: inline-flex; align-items: center;
                        justify-content: center; width: 1.9rem; height: 1.9rem;
@@ -711,7 +725,7 @@ ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
    accent. The form is HubSpot's, rendered into .newsletter-form inside
    an iframe of its own, which no stylesheet here can reach: its look is
    read off these same tokens and passed to the embed as a string
-   (shared/newsletter.html), laid out the way jupyter.org reads down --
+   (shared/newsletter.js), laid out the way jupyter.org reads down --
    heading, the fields on one row, the consent copy under them, the
    button below that -- and that snippet is also where the band is
    unhidden, once there is a form to show. */

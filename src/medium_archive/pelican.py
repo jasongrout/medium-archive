@@ -89,18 +89,20 @@ import re
 import sys
 
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
-                    canonical_for, caption_text, clean_site,
+                    bundle_js, canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
-                    front_matter_yaml, image_size, load_site_inputs,
-                    masthead_link, newsletter_params, page_stems,
-                    quote_arg, redirect_mode, rewrite_figures,
+                    front_matter_yaml, headers_file, image_size,
+                    load_site_inputs, masthead_link, newsletter_params,
+                    page_stems, quote_arg, redirect_mode, rewrite_figures,
                     site_profiles, template_text, wants_redirect_stubs,
-                    wants_redirects_file, write_data_files,
+                    wants_redirects_file, write_asset, write_data_files,
                     write_redirects_csv, write_templates)
 
 # The theme's files: file in the site -> its templates/ source (see
-# templates/README.md). The stylesheet is the card look shared with the
-# hugo theme.
+# templates/README.md). The stylesheet and the script are not here:
+# they carry a hash of their own contents in their names, so the
+# exporter writes them itself (sites.write_asset) and tells the
+# config what it called them.
 TEMPLATES = {
     "theme/templates/base.html": "pelican/theme/templates/base.html",
     "theme/templates/jsonld.html": "pelican/theme/templates/jsonld.html",
@@ -117,7 +119,6 @@ TEMPLATES = {
     "theme/templates/authors.html": "pelican/theme/templates/authors.html",
     "theme/templates/archives.html": "pelican/theme/templates/archives.html",
     "theme/templates/search.html": "pelican/theme/templates/search.html",
-    "theme/static/css/style.css": "shared/card.css",
 }
 
 IMAGE_RE = re.compile(r"\]\((images/[^)\s]+)\)")
@@ -233,6 +234,14 @@ def build_site(out):
                             site / "theme" / "static" / "img", "share")
     share_size = (image_size(site / "theme" / "static" / "img" / share)
                   if share else None)
+    # the look and the behaviour, one file each for the whole site,
+    # under the theme's static dir (served from /theme/) and named by a
+    # hash of their contents; the config carries the names, base.html
+    # links the stylesheet and defers the script
+    static = site / "theme" / "static"
+    style_css = "css/" + write_asset(static / "css", "style.css",
+                                     template_text("shared/card.css"))
+    site_js = "js/" + write_asset(static / "js", "site.js", bundle_js())
     setting = lambda v: json.dumps(v) if v else "None"   # Python literals
     (site / "pelicanconf.py").write_text(fill_template(
         "pelican/pelicanconf.py.tmpl",
@@ -240,6 +249,10 @@ def build_site(out):
         description=json.dumps(config.get("description", ""),
                                ensure_ascii=False),
         base_url=json.dumps(config.get("base_url", "").rstrip("/")),
+        style_css=json.dumps(style_css),
+        site_js=json.dumps(site_js),
+        headers=json.dumps(headers_file(
+            f"theme/{a}" for a in (style_css, site_js))),
         avatar=setting(avatar and f"theme/img/{avatar}"),
         favicon=setting(favicon and f"theme/{favicon}"),
         logo=setting(logo and f"theme/img/{logo}"),

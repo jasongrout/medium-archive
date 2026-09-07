@@ -1,6 +1,9 @@
-<script>
 (function () {
+  // The banner is the base templates' own div, emitted only where
+  // site.json sets an announcement; every other page loads this
+  // script too, and leaves at the guard.
   var banner = document.querySelector(".announcement");
+  if (!banner) return;
   var source = banner.getAttribute("data-source");
   var shown = null;
   function dismissed(html) {
@@ -40,10 +43,13 @@
     shown = html;
   }
   if (/^https?:\/\//i.test(source)) {
-    // The last fetch's content renders synchronously (this script runs
-    // before the header is parsed), so navigating the site doesn't jerk
-    // the page when the banner arrives; the live fetch then corrects
-    // the rare case of an announcement that changed since.
+    // shared/announcement-init.html, inline in the head, has already
+    // painted this same content before the header was parsed, so
+    // navigating the site doesn't jerk the page when the banner
+    // arrives. Rendering it again here is what adds the dismiss
+    // button (absolutely positioned, so it shifts nothing) and gives
+    // the fetch below its `shown` to compare against; the fetch then
+    // corrects the rare announcement that changed since.
     var cached = null;
     try { cached = JSON.parse(localStorage.getItem("announcement-cache")); }
     catch (e) {}
@@ -60,4 +66,3 @@
     render(source);
   }
 })();
-</script>

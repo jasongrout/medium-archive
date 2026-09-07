@@ -65,21 +65,24 @@ section tunes the generated config: `locale`, `avatar` and `favicon`
 import json
 import sys
 
-from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
-                    caption_text, clean_site, copy_site_asset,
-                    export_content, fill_template, front_matter_yaml,
-                    load_site_inputs, masthead_link, newsletter_params,
-                    old_paths, page_stems, quote_arg,
-                    redirect_mode, redirect_rules, redirects_file,
-                    rewrite_figures, site_profiles, wants_redirect_stubs,
-                    wants_redirects_file, write_data_files,
+from .sites import (Covers, ImagePlacer, author_slug, bundle_js,
+                    canonical_for, caption_text, clean_site,
+                    copy_site_asset, export_content, fill_template,
+                    front_matter_yaml, headers_file, load_site_inputs,
+                    masthead_link, newsletter_params, old_paths,
+                    page_stems, quote_arg, redirect_mode, redirect_rules,
+                    redirects_file, rewrite_figures, site_profiles,
+                    template_text, wants_redirect_stubs,
+                    wants_redirects_file, write_asset, write_data_files,
                     write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
 # templates/README.md for the rationale behind the individual files).
-# The regular list and taxonomy pages share one layout; the stylesheet
-# is the card look shared with the pelican theme. The feed override and
-# the figure shortcode (with the image partial it and the render hook
+# The regular list and taxonomy pages share one layout. The stylesheet
+# and the script are not here: they carry a hash of their own contents
+# in their names, so the exporter writes them itself (sites.write_asset)
+# and tells the config what it called them. The feed override and the
+# figure shortcode (with the image partial it and the render hook
 # share) are content policy rather than styling: the pages' figure
 # calls resolve to that shortcode, which takes the caption as inner
 # content.
@@ -108,7 +111,6 @@ TEMPLATES = {
     "layouts/_shortcodes/figure.html": "hugo/layouts/_shortcodes/figure.html",
     "layouts/_partials/post-image.html":
         "hugo/layouts/_partials/post-image.html",
-    "static/css/style.css": "shared/card.css",
     # the term pages, from data/tags.json and data/authornames.json
     # (see sites.write_data_files)
     "content/tags/_content.gotmpl": "hugo/content/tags/_content.gotmpl",
@@ -320,6 +322,15 @@ def build_site(out):
     if share:
         params["share_image"] = f"img/{share}"
     params.update(hugo_config.get("params", {}))
+    # the look and the behaviour, one file each for the whole site,
+    # under static/ so Hugo serves them as written, and named by a hash
+    # of their contents; baseof.html links the stylesheet and defers the
+    # script. Set after the site's own params, since neither is a
+    # setting anyone chooses.
+    params["stylesheet"] = "css/" + write_asset(
+        site / "static" / "css", "style.css", template_text("shared/card.css"))
+    params["script"] = "js/" + write_asset(
+        site / "static" / "js", "site.js", bundle_js())
     (site / "hugo.toml").write_text(fill_template(
         "hugo/hugo.toml.tmpl",
         base_url=json.dumps(config.get("base_url", "https://example.org/")),
@@ -339,6 +350,13 @@ def build_site(out):
         (site / "static" / "_redirects").write_text(
             redirects_file(redirect_rules(manifest, stems, new_path)),
             encoding="utf-8")
+    # `_headers` at the same root, read by the same hosts: the two
+    # hashed assets never change under their names. Written whatever
+    # the redirect setting, since it is about the assets rather than
+    # about old links.
+    (site / "static" / "_headers").write_text(
+        headers_file((params["stylesheet"], params["script"])),
+        encoding="utf-8")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "
           "`pagefind --site public` for search)", file=sys.stderr)
