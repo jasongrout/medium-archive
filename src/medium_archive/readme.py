@@ -422,7 +422,18 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
   by `myst build`.
 * Each site's `redirects.csv` is the generator's own: it maps the old
   inbound paths of the archive's `redirects.csv` to the page URLs that
-  generator actually serves.
+  generator actually serves. It is written whatever `site.json`'s
+  `redirects` says, since it is the map any redirect rule set is built
+  from.
+* What the hugo and pelican sites *serve* those redirects as is
+  `site.json`'s `redirects`: `"stubs"` (a meta-refresh page at every
+  old path -- what GitHub Pages needs, since it does not read
+  `_redirects`), `"file"` (a `_redirects` file at the site root, which
+  Netlify and Cloudflare Pages answer with a real HTTP 301), `"both"`
+  (the default) or `"none"`. No host reads both, so on a chosen host
+  one of the two is inert; the medium-archive README has the details.
+  The stubs are the reason a built site's root carries a directory per
+  old post path.
 * The `data/*.json` files in `site-hugo/` and `site-pelican/` are
   derived from the archive like everything else in those directories,
   so an exporter run overwrites them. A tag or author name belongs in

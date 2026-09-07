@@ -17,12 +17,13 @@ sites.front_matter_yaml) -- the form Hugo's own documentation and
 themes are written in, and the one the pelican site writes, so a field
 is read and hand-edited the same way in either site. Tags and authors
 feed Hugo's taxonomies, which give the tag/author listing pages and
-per-term RSS feeds, and every old inbound path (Medium slug+id,
-/p/<id>, Ghost-era) becomes an alias, so Hugo emits redirect stubs for
-old links on any static host; the same map is written as a `_redirects`
-file for hosts that turn one into HTTP 301s. Hugo's own sitemap.xml
-(page lastmod from the post's updated date) is joined by a robots.txt
-naming it, and the theme's pages carry the metadata search engines and
+per-term RSS feeds. Every old inbound path (Medium slug+id, /p/<id>,
+Ghost-era) is carried by whichever redirect mechanism site.json's
+"redirects" asks for (see sites.REDIRECT_MODES): as an alias, which
+Hugo emits a redirect stub for and which works on any static host, as
+a `_redirects` file for the hosts that turn one into HTTP 301s, or as
+both. Hugo's own sitemap.xml (page lastmod from the post's updated
+date) is joined by a robots.txt naming it, and the theme's pages carry the metadata search engines and
 share targets read (see templates/README.md): the structured data's
 author and publisher profiles come from data/authors.json (the Medium
 profile of every byline) and site.json's "profiles"/"twitter", the
@@ -69,8 +70,9 @@ from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     export_content, fill_template, front_matter_yaml,
                     load_site_inputs, masthead_link, newsletter_params,
                     old_paths, page_stems, quote_arg,
-                    redirect_rules, redirects_file, rewrite_figures,
-                    site_profiles, write_data_files,
+                    redirect_mode, redirect_rules, redirects_file,
+                    rewrite_figures, site_profiles, wants_redirect_stubs,
+                    wants_redirects_file, write_data_files,
                     write_redirects_csv, write_templates)
 
 # The built-in theme: file in the site -> its templates/ source (see
@@ -142,7 +144,7 @@ def figure_shortcodes(markdown: str) -> str:
 
 
 def front_matter(url: str, post: dict, cover: str | None = None,
-                 canonical: str | None = None) -> str:
+                 canonical: str | None = None, aliases: bool = True) -> str:
     front = {"title": post["title"]}
     if post.get("date"):
         front["date"] = post["date"]
@@ -164,7 +166,8 @@ def front_matter(url: str, post: dict, cover: str | None = None,
         front["first_image"] = post["first_image"]
     if canonical:           # the page is a copy of this one, and says so
         front["canonical"] = canonical
-    front["aliases"] = [path for path, _ in old_paths(post, url)]
+    if aliases:     # Hugo renders a redirect stub at each (alias.html)
+        front["aliases"] = [path for path, _ in old_paths(post, url)]
     return front_matter_yaml(front)
 
 
@@ -193,6 +196,7 @@ def build_site(out):
     manifest, config = load_site_inputs(out)
     stems = page_stems(manifest)
     hugo_config = config.get("hugo", {})
+    mode = redirect_mode(config)        # site.json "redirects"
     site = out / "site-hugo"
     clean_site(site, keep=("public", "resources"))
 
@@ -222,7 +226,8 @@ def build_site(out):
     pages = export_content(
         out, site, manifest, stems,
         lambda url, p: front_matter(url, p, cover=covers.path(url),
-                                    canonical=canonical_for(p)),
+                                    canonical=canonical_for(p),
+                                    aliases=wants_redirect_stubs(mode)),
         placer=ImagePlacer(out, config), transform=figure_shortcodes,
         covers=covers)
     # Hugo makes content/posts/ a section and publishes a list page and
@@ -324,13 +329,16 @@ def build_site(out):
     ), encoding="utf-8")
     write_templates(site, TEMPLATES)
     new_path = lambda stem: f"/posts/{stem}/"
+    # the map itself, whichever mechanism serves it: what a redirect
+    # rule set built anywhere else is built from
     write_redirects_csv(site, manifest, stems, new_path)
     # the same map as a host-level `_redirects` file, copied to the site
-    # root from static/ (see sites.redirects_file)
-    (site / "static").mkdir(exist_ok=True)
-    (site / "static" / "_redirects").write_text(
-        redirects_file(redirect_rules(manifest, stems, new_path)),
-        encoding="utf-8")
+    # root from static/ (see sites.REDIRECT_MODES)
+    if wants_redirects_file(mode):
+        (site / "static").mkdir(exist_ok=True)
+        (site / "static" / "_redirects").write_text(
+            redirects_file(redirect_rules(manifest, stems, new_path)),
+            encoding="utf-8")
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "
           "`pagefind --site public` for search)", file=sys.stderr)

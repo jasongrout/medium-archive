@@ -269,10 +269,10 @@ with none stored, the system scheme decides. The theme provides:
   dates, and a `robots.txt` names it. The search page is kept out of
   both, and `"noindex": true` in `site.json` keeps a whole deployment
   out (a preview, which would otherwise be indexed as a copy of the
-  real site). The redirect map is also written as a `_redirects` file
-  at the site root, one `old new 301` rule per line, which Netlify,
-  Cloudflare Pages and their imitators answer with a real HTTP 301;
-  hosts that ignore it (GitHub Pages) serve the meta-refresh stubs.
+  real site). Old inbound links are carried
+  forward by the mechanism `site.json`'s `redirects` names -- stub
+  pages, a `_redirects` file, or both (see [Redirects and
+  feeds](#redirects-and-feeds)).
 - What WordPress's SEO plugins add on top, in both themes:
   - One schema.org graph on every page rather than a lone node: the
     `Organization` (publisher, with its logo and its profiles elsewhere
@@ -371,11 +371,52 @@ once into `<out>/.image-cache/` and hard-linked into every site.
 
 ### Redirects and feeds
 
-Both card-theme sites render every old inbound path (Medium slug+id,
-`/p/<id>`, Ghost-era) as a redirect stub that works on any static host.
-Hugo does it through `aliases` front matter. Pelican has no aliases
-feature, so a small plugin embedded in the generated config turns the
-exported `redirects.csv` into the same stub pages after each build.
+Both card-theme sites carry every old inbound path (Medium slug+id,
+`/p/<id>`, Ghost-era) forward to the page that replaces it. There are
+two ways a static host does that, and `site.json`'s `redirects` chooses
+between them, because **no host reads both**: on a host that reads one,
+the other is inert weight.
+
+| `redirects` | what the site carries | for |
+|---|---|---|
+| `"stubs"` | a meta-refresh page at every old path | GitHub Pages, which does not read `_redirects` at all; works on any static host |
+| `"file"` | a `_redirects` file at the site root, one `old new 301` rule per line | Netlify, Cloudflare Pages and their imitators, which answer it with a real HTTP 301 |
+| `"both"` | both of the above (the default) | a host not yet chosen: whichever mechanism it reads answers |
+| `"none"` | neither | a site whose redirects are configured elsewhere (a CDN rule set, an nginx map) |
+
+Hugo renders the stubs through `aliases` front matter. Pelican has no
+aliases feature, so a small plugin embedded in the generated config
+turns the exported `redirects.csv` into the same stub pages after each
+build, and writes the `_redirects` file. `redirects.csv` itself is
+written under every setting: it is the map any rule set kept elsewhere
+is built from.
+
+Two things to know before picking:
+
+- **A stub is not a 301.** Search engines treat a zero-delay meta
+  refresh as a redirect, and the stubs carry a `noindex` and a
+  canonical besides, but a `_redirects` rule is an actual HTTP 301,
+  which is credited to the new page without the round trip through a
+  rendered page.
+- **`"both"` is worse than either alone on Netlify.** Netlify serves a
+  static file in place of an unforced rule that matches the same path
+  ("file shadowing"), so with the stubs present the 301 never fires and
+  the stub answers instead. Cloudflare Pages goes the other way --
+  redirects are applied whether or not an asset matches -- so there the
+  `_redirects` rule wins and the stubs are the dead weight. `"both"` is
+  the default only because it is the one setting that redirects an old
+  link on a host nobody has chosen yet.
+
+Changing the setting changes what the *exporter* writes, not what a
+previous build left in `public/` or `output/`: those directories
+survive a re-export, so turning the stubs off means deleting the built
+site once before rebuilding it, or the old stubs stay there shadowing
+the rules.
+
+The stubs cost a file per old path, most of them directories at the
+site root (the Jupyter archive: 684 rules, of which 323 are top-level
+directories and 323 more under `/p/`), so a site that has settled on a
+`_redirects` host has a real reason to turn them off.
 
 Tag and author pages come with per-term feeds on both: RSS from hugo,
 Atom from pelican's own tag/author machinery. Each feed is linked from
@@ -436,6 +477,7 @@ publication rather than the tool. Every key is optional.
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
 | `newsletter` | the signup band at the foot of every page: `{"heading": ..., "hubspot_portal": ..., "hubspot_form": ..., "hubspot_region": ...}`. The heading and the first two ids are required (a partial entry is reported and the band left out); the region defaults to `"na1"` |
+| `redirects` | which mechanism carries old inbound links: `"stubs"` (a meta-refresh page at every old path -- any static host, and the only mechanism GitHub Pages has), `"file"` (a `_redirects` file at the site root -- Netlify, Cloudflare Pages and their imitators, a real HTTP 301, and nothing on GitHub Pages), `"both"` (the default, for a host not yet chosen) or `"none"` (redirects configured elsewhere). `redirects.csv` is written whichever it is. See [Redirects and feeds](#redirects-and-feeds) |
 | `noindex` | `true` keeps search engines off the whole deployment (a `noindex` robots tag on every page, a `robots.txt` that disallows all): for previews and staging, which would otherwise be indexed as a copy of the real site |
 | `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |

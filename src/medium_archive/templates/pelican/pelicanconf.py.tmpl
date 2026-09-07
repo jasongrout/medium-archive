@@ -87,6 +87,15 @@ _FOOTER_MD = $footer
 # keep search engines off this deployment (a preview): a noindex robots
 # tag on every page, and a robots.txt that disallows all
 NOINDEX = $noindex
+# what this site does about old inbound links (site.json "redirects"):
+# a meta-refresh stub page at every old path, which works on any static
+# host and is the only mechanism GitHub Pages has; and/or a
+# `_redirects` file at the site root, which Netlify, Cloudflare Pages
+# and their imitators answer with a real HTTP 301 and GitHub Pages
+# ignores. redirects.csv, the map both are rendered from, is written by
+# the exporter either way.
+REDIRECT_STUBS = $redirect_stubs
+REDIRECT_FILE = $redirect_file
 # the publication's @handle, credited on links shared to X/Twitter
 TWITTER = $twitter
 # the publication's addresses elsewhere (site.json "profiles", plus the
