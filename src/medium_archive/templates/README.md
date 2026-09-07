@@ -378,8 +378,17 @@ section and a term's page share `section.html`, written to the site as
   and share image are set; author profiles come from `AUTHOR_LINKS`
   (the config's reading of `data/authors.json`) and the publisher's
   from `PROFILES`, which site.json fills in directly.
-- `theme/templates/` is the Jinja theme. `author.html` is `tag.html`
-  with the `tag` variable swapped for `author`; keep them in step. Each
+- `theme/templates/` is the Jinja theme. A tag page and an author page
+  are the same page, and so are the two chip indexes, so each pair is
+  written once: `term.html` renders one term's posts and `terms.html` a
+  taxonomy's chips, and the four names Pelican looks a taxonomy page up
+  by (`tag.html`, `author.html`, `tags.html`, `authors.html`) are two
+  lines apiece -- the term (or the pairs and the heading) into the
+  shared template's variables, then the include. Pelican renders an
+  included template's own inheritance, so the shared file extends
+  `base.html` as an ordinary page does, and the context the include
+  passes on still carries `tag`/`author` themselves, which `base.html`
+  and `jsonld.html` read for the page's feed link and breadcrumb. Each
   template names its page in a `name` block; `base.html` composes the
   `<title>` and `og:title` from it, adding the page number of a
   paginated listing and the site name, and takes the page's own

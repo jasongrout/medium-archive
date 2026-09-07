@@ -1,0 +1,18 @@
+{# One term's posts -- a tag's or an author's -- from whichever of the
+   two tag.html and author.html handed over as `term`, with that
+   taxonomy's feed setting as `term_feed`. The two pages differ in
+   nothing else, so they are those two lines and this file; the hugo
+   theme serves both from one template too (section.html, written into
+   the site as term.html as well). #}
+{% extends "base.html" %}
+{% from "macros.html" import card with context %}
+{% block name %}{{ term }}{% endblock %}
+{% block content %}
+<h1 class="page-title">{{ term }}{% if term_feed %}<a class="feed-link" href="{{ SITEURL }}/{{ term_feed.format(slug=term.slug) }}" aria-label="RSS feed for {{ term }}" title="RSS feed for {{ term }}">
+<!-- @include shared/feed-icon.html -->
+</a>{% endif %}</h1>
+<div class="card-grid">
+{% for article in articles_page.object_list %}{{ card(article) }}{% endfor %}
+</div>
+{% include "pagination.html" %}
+{% endblock %}
