@@ -1,12 +1,17 @@
 # Fail loudly on posts that are missing content. Beyond the preview
-# build, this job reconverts the archive from raw/ + fixups/ on every
-# push and pull request and runs `medium-archive lint --embeds`, which
-# exits non-zero for every embed whose content the archive does not
-# carry: a video, tweet or gist still rendered as a bare [embed: url]
-# link, an embed the post's body source dropped while the page's
-# editor state carries it, and a gist placeholder. The job stays red
-# until each such post is fixed by hand (see todo.md, "Embeds without
-# content"); that is deliberate, so the list cannot be forgotten.
+# build, this job reconverts the archive from archive/raw/ +
+# archive/fixups/ on every push and pull request and runs
+# `medium-archive lint --embeds`, which exits non-zero for every embed
+# whose content the archive does not carry: a video, tweet or gist
+# still rendered as a bare [embed: url] link, an embed the post's body
+# source dropped while the page's editor state carries it, and a gist
+# placeholder. The job stays red until each such post is fixed by hand
+# (see todo.md, "Embeds without content"); that is deliberate, so the
+# list cannot be forgotten.
+#
+# The tool is installed from this checkout (`pip install -e .`), so a
+# pull request that changes the converter is linted against the real
+# archive before it lands, not after.
 
 name: Lint embeds
 
@@ -29,16 +34,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install medium-archive
-        run: pip install "medium-archive @ git+https://github.com/jasongrout/medium-archive"
+      - name: Install medium-archive from this checkout
+        run: pip install -e .
 
-      - name: Rebuild posts/ from raw/
-        run: medium-archive convert --out .
+      - name: Rebuild archive/posts/ from archive/raw/
+        run: medium-archive convert --out archive
 
       - name: Lint, including embeds without content
         run: |
           set -o pipefail
-          medium-archive lint --embeds --out . 2>&1 | tee lint.txt
+          medium-archive lint --embeds --out archive 2>&1 | tee lint.txt
 
       # The problem list, one line per embed, on the run's summary page
       # and as annotations on the checks tab, whether or not the lint
