@@ -734,7 +734,7 @@ def test_theme_picker_and_dark_scheme(project):
         text = base.read_text()
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
-        for choice in ("sans", "system", "inter", "source-sans",
+        for choice in ("sans", "system-ui", "inter", "source-sans",
                        "source-serif", "atkinson", "ibm-plex-sans",
                        "ibm-plex-serif"):
             assert f'<option value="{choice}"' in text, base

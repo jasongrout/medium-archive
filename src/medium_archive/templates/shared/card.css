@@ -42,7 +42,7 @@
    data-font on <html>, persisted like the theme choice): Source Serif,
    the superfamily Medium set the publication in and the default here
    with no attribute pinned, the jupyter.org Helvetica stack the site
-   launched with, the platform's own native sans, Inter, Atkinson
+   launched with, the reader's own platform UI font, Inter, Atkinson
    Hyperlegible as a standalone sans picked for its own look, and
    Source Sans and the IBM Plex superfamily, offered as both a sans
    and a serif face.
@@ -58,25 +58,11 @@
    points only the article's running text (further down) at the serif
    instead. --mono follows to whichever face the choice ships one
    under: the superfamilies' own mono, Atkinson Hyperlegible's own
-   mono, or, for a choice with no mono face of its own (Helvetica,
-   Inter, System), the platform's default --system-mono stack.
-
-   System is the conventional native sans stack -- the face the
-   reader's own OS sets its interface in, loading nothing. It names
-   the platform faces rather than leading with the system-ui keyword
-   the way Bootstrap, Tailwind and modern-normalize do, because
-   system-ui asks the OS for one UI face and a CJK-locale Windows
-   install answers with a CJK font whose Latin glyphs are its
-   weakest -- which here would be every paragraph, this archive
-   being English. Naming "Segoe UI" gets that reader the Latin face
-   instead; MDN warns off system-ui for running text on exactly this
-   ground. That is GitHub Primer's shape too, and the keyword still
-   rides along late, where no named face has matched and there is no
-   CJK default to fall foul of, so a Linux desktop keeps its own UI
-   font rather than dropping to Arial. */
+   mono, or, for System UI and any choice with no mono face of its own
+   (Helvetica, Inter), the platform's default --system-mono stack. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                  system-ui, "Helvetica Neue", Arial, sans-serif;
+        --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
+                     Helvetica, Arial, sans-serif;
         --system-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
                        monospace;
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -119,8 +105,8 @@
         --body-font: var(--source-sans);
         --mono: var(--source-code); }
 :root[data-font="sans"] { --body-font: var(--sans); --mono: var(--system-mono); }
-:root[data-font="system"] { --body-font: var(--system);
-                            --mono: var(--system-mono); }
+:root[data-font="system-ui"] { --body-font: var(--system-ui);
+                               --mono: var(--system-mono); }
 :root[data-font="inter"] { --body-font: var(--inter); --mono: var(--system-mono); }
 :root[data-font="source-sans"] { --body-font: var(--source-sans);
                                  --mono: var(--source-code); }

@@ -54,10 +54,10 @@ These embed verbatim in both engines' pages, so they must carry no
   to let reviewers compare candidate typography before the blog
   settles on one: Source Serif, the superfamily Medium set the
   publication in and this picker's default, the jupyter.org
-  Helvetica stack the site launched with, the platform's own native
-  sans, Inter, Atkinson Hyperlegible as a standalone sans picked for
-  its own look, and Source Sans and the IBM Plex superfamily as both
-  a sans and a serif face. Headings and chrome stay sans under
+  Helvetica stack the site launched with, the reader's own platform
+  UI font, Inter, Atkinson Hyperlegible as a standalone sans picked
+  for its own look, and Source Sans and the IBM Plex superfamily as
+  both a sans and a serif face. Headings and chrome stay sans under
   every choice: a superfamily's sans option ("Source Sans", "IBM Plex
   Sans") runs the whole page, article included, in its own sans and
   mono faces; its serif sibling (the default "Source Serif", "IBM Plex
@@ -65,21 +65,11 @@ These embed verbatim in both engines' pages, so they must carry no
   did, and points only the article's running text at the serif face
   instead, with the superfamily's own mono still under its code. A
   choice's code follows its own mono face wherever it has one (the
-  superfamilies', Atkinson Hyperlegible's own), and a choice with no
-  mono face of its own (Helvetica, Inter, System) falls back to the
-  platform's `ui-monospace` stack. "System" is the conventional
-  native sans stack, loading nothing and reading in whatever face the
-  OS sets its own interface in. It names the platform faces rather
-  than leading with the `system-ui` keyword the way Bootstrap,
-  Tailwind and modern-normalize do: `system-ui` asks the OS for one
-  UI face, which MDN warns against for running text, and which on a
-  CJK-locale Windows install is a CJK font whose Latin glyphs are its
-  weakest -- every paragraph of an English archive. Naming `"Segoe
-  UI"` gets that reader the Latin face instead. GitHub Primer's stack
-  has the same shape; the keyword still rides along late, past the
-  named faces, so a Linux desktop keeps its own UI font rather than
-  dropping to Arial. The article's reading size belongs to `.post`
-  rather than to any one choice, so the eight differ in family alone. The losing styles, and
+  superfamilies', Atkinson Hyperlegible's own); System UI's is the
+  platform's own ui-monospace stack, and a choice with no mono face of
+  its own (Helvetica, Inter) falls back to that same platform stack.
+  The article's reading size belongs to `.post` rather than to any one
+  choice, so the eight differ in family alone. The losing styles, and
   the picker with them, come out once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
