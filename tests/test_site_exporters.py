@@ -734,18 +734,12 @@ def test_theme_picker_and_dark_scheme(project):
         text = base.read_text()
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
-        for choice in ("sans", "browser", "inter", "source-sans",
+        for choice in ("sans", "system", "inter", "source-sans",
                        "source-serif", "atkinson", "ibm-plex-sans",
                        "ibm-plex-serif"):
             assert f'<option value="{choice}"' in text, base
         for choice in ("ink", "petrol-aaa", "link-blue", "browser"):
             assert f'<option value="{choice}"' in text, base
-        # both pickers carry a "browser" choice -- the reader's own
-        # default, colour in one and family in the other -- so the
-        # loops above cannot tell whose is whose. The font one is the
-        # option that previews itself in the generic it names.
-        assert '<option value="browser" style="font-family: sans-serif"' \
-            in text, base
         # the link picker rides above the font one, so it is spliced in
         # first (the stack grows upwards from the corner)
         assert text.index("link-picker") < text.index("font-picker"), base

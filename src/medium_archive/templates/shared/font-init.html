@@ -2,7 +2,7 @@
 (function () {
   try {
     var font = localStorage.getItem("font");
-    if (font === "sans" || font === "browser" || font === "inter" ||
+    if (font === "sans" || font === "system" || font === "inter" ||
         font === "source-sans" || font === "atkinson" ||
         font === "ibm-plex-sans" || font === "ibm-plex-serif")
       document.documentElement.setAttribute("data-font", font);
