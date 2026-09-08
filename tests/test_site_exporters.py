@@ -747,7 +747,7 @@ def test_theme_picker_and_dark_scheme(project):
         # platform's own is a webfont: unlinked, those choices degrade to
         # their fallbacks silently, looking like a styling bug rather than
         # a missing file
-        for family in ("Atkinson+Hyperlegible", "Atkinson+Hyperlegible+Mono",
+        for family in ("Atkinson+Hyperlegible+Next", "Atkinson+Hyperlegible+Mono",
                        "IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
                        "Inter", "Source+Serif+4", "Source+Sans+3",
                        "Source+Code+Pro"):

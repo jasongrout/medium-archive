@@ -55,17 +55,18 @@ These embed verbatim in both engines' pages, so they must carry no
   settles on one: Source Serif, the superfamily Medium set the
   publication in and this picker's default, the jupyter.org
   Helvetica stack the site launched with, the reader's own platform
-  UI font, Inter, Atkinson Hyperlegible as a standalone sans picked
-  for its own look, and Source Sans and the IBM Plex superfamily as
-  both a sans and a serif face. Headings and chrome stay sans under
-  every choice: a superfamily's sans option ("Source Sans", "IBM Plex
-  Sans") runs the whole page, article included, in its own sans and
-  mono faces; its serif sibling (the default "Source Serif", "IBM Plex
-  Serif") keeps headings and chrome on that same sans face, as Medium
-  did, and points only the article's running text at the serif face
-  instead, with the superfamily's own mono still under its code. A
+  UI font, Inter, Atkinson Hyperlegible Next as a standalone sans
+  picked for its own look, and Source Sans and the IBM Plex
+  superfamily as both a sans and a serif face. Headings and chrome
+  stay sans under every choice: a superfamily's sans option ("Source
+  Sans", "IBM Plex Sans") runs the whole page, article included, in
+  its own sans and mono faces; its serif sibling (the default "Source
+  Serif", "IBM Plex Serif") keeps headings and chrome on that same
+  sans face, as Medium did, and points only the article's running
+  text at the serif face instead, with the superfamily's own mono
+  still under its code. A
   choice's code follows its own mono face wherever it has one (the
-  superfamilies', Atkinson Hyperlegible's own); System UI's is the
+  superfamilies', Atkinson Hyperlegible Mono); System UI's is the
   platform's own ui-monospace stack, and a choice with no mono face of
   its own (Helvetica, Inter) falls back to that same platform stack.
   The article's reading size belongs to `.post` rather than to any one
