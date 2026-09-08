@@ -38,12 +38,12 @@ jobs:
         run: pip install -e .
 
       - name: Rebuild archive/posts/ from archive/raw/
-        run: medium-archive convert --out archive
+        run: medium-archive convert
 
       - name: Lint, including embeds without content
         run: |
           set -o pipefail
-          medium-archive lint --embeds --out archive 2>&1 | tee lint.txt
+          medium-archive lint --embeds 2>&1 | tee lint.txt
 
       # The problem list, one line per embed, on the run's summary page
       # and as annotations on the checks tab, whether or not the lint

@@ -5,9 +5,10 @@
 #
 # Everything is regenerated from archive/raw/ + archive/fixups/ on each
 # run: `convert` rebuilds archive/posts/, each site exporter rebuilds
-# its site directory with base_url pointed at this deployment's subpath
-# (archive/site.json is patched only in the runner's workspace), and
-# each generator builds its site. Nothing derived is committed.
+# its top-level site directory with base_url pointed at this
+# deployment's subpath (site/site.json is patched only in the runner's
+# workspace), and each generator builds its site. Nothing derived is
+# committed.
 #
 # Note on size: the exporters place capped display copies of the
 # images (originals stay in archive/raw/ and archive/posts/), which
@@ -74,56 +75,55 @@ jobs:
           hugo version && myst --version && pagefind --version
 
       # The exporters place resized display copies of oversized images,
-      # built once into archive/.image-cache/ (content-addressed, so a
-      # restored cache stays valid across checkouts). The big
-      # animated-gif re-encodes take ~15 min cold; cached, they cost
-      # nothing.
+      # built once into .image-cache/ (content-addressed, so a restored
+      # cache stays valid across checkouts). The big animated-gif
+      # re-encodes take ~15 min cold; cached, they cost nothing.
       - name: Restore the display-copy image cache
         uses: actions/cache@v4
         with:
-          path: archive/.image-cache
+          path: .image-cache
           key: image-cache-${{ hashFiles('archive/posts.json') }}
           restore-keys: image-cache-
 
       - name: Rebuild archive/posts/ from archive/raw/
-        run: medium-archive convert --out archive
+        run: medium-archive convert
 
       - name: Build the Hugo site
         run: |
-          python3 .github/scripts/set_base_url.py archive/site.json "${{ steps.pages.outputs.base_url }}/hugo"
-          medium-archive hugo --out archive
-          cd archive/site-hugo
+          python3 .github/scripts/set_base_url.py site/site.json "${{ steps.pages.outputs.base_url }}/hugo"
+          medium-archive hugo
+          cd site-hugo
           hugo
           pagefind --site public
 
       - name: Build the Pelican site
         run: |
-          python3 .github/scripts/set_base_url.py archive/site.json "${{ steps.pages.outputs.base_url }}/pelican"
-          medium-archive pelican --out archive
-          cd archive/site-pelican
+          python3 .github/scripts/set_base_url.py site/site.json "${{ steps.pages.outputs.base_url }}/pelican"
+          medium-archive pelican
+          cd site-pelican
           pelican
           pagefind --site output
 
       - name: Build the MyST site
         run: |
-          medium-archive myst --out archive
-          cd archive/site-myst
+          medium-archive myst
+          cd site-myst
           BASE_URL="${{ steps.pages.outputs.base_path }}/myst" myst build --html
 
       - name: Assemble the deployment
         run: |
           mkdir _site
-          mv archive/site-hugo/public      _site/hugo
-          mv archive/site-pelican/output   _site/pelican
-          mv archive/site-myst/_build/html _site/myst
+          mv site-hugo/public      _site/hugo
+          mv site-pelican/output   _site/pelican
+          mv site-myst/_build/html _site/myst
           cp .github/preview-index.html _site/index.html
-          cp archive/avatar.svg _site/
+          cp site/avatar.svg _site/
           du -sh _site/*
 
       # The artifact tar needs a few GB of scratch space; drop what the
       # deployment no longer references before it is created.
       - name: Free runner disk before the artifact step
-        run: rm -rf .git archive/raw archive/posts archive/site-myst archive/site-hugo archive/site-pelican
+        run: rm -rf .git archive/raw archive/posts site-myst site-hugo site-pelican
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
