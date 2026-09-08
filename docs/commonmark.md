@@ -353,7 +353,7 @@ which turns bare URLs into links and would change 2015-era posts.
    in place of the `_BodyImages` extension and the `MARKDOWN` setting.
    The measured result is the one this file predicts: 336 posts, six
    warnings, every non-article page identical, 73 article pages
-   differing. See `commonmark-plan.md` in that repository.
+   differing. See `commonmark-plan.md` beside this file.
 2. **(Partly done 2026-09.)** The extension set: strikethrough is on
    beside the tables, footnotes and definition lists (no post here uses
    `~~`, and every page is identical across the change), and the

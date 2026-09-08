@@ -7,8 +7,8 @@ it. This plan replaces the Pelican site's renderer with markdown-it-py,
 the CommonMark reference port for Python, so posts can be written
 against a specification with the optional extensions Goldmark offers.
 
-The measurements behind it, taken against the reference archive
-(336 posts, 1211 pages), are in that archive's `commonmark.md`:
+The measurements behind it, taken against the archive in `archive/`
+(336 posts, 1211 pages), are in `commonmark.md` beside this file:
 what the packaged reader plugins cost, what a reader written for this
 exporter costs, and every page whose rendering changes.
 
