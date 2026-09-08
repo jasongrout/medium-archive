@@ -139,10 +139,23 @@ a { color: var(--link); text-decoration-line: underline;
 .tag, .share-link, .chip, ul.pagination .page-link,
 .archives a { text-decoration-line: none; color: currentColor; }
 a:hover { text-decoration-line: underline; }
-/* The choices that colour the link. Both are the accent's complement
-   in OKLCH -- its hue is 48deg, so 228deg -- and a step round towards
-   a conventional link blue: "petrol-aaa" at the 7:1 the body grays
-   hold, "link-blue" at 5.5:1 on the card, which is 3.1:1 against the
+/* "ink-accent" is the default link with one thing added: the rule
+   turns the accent under the pointer. At rest it is the plain ink
+   link, letter for letter and rule for rule, so the page reads the
+   same; the orange appears only on hover, where it names the link the
+   pointer is on rather than marking links in the running text. The
+   accent's 2.83:1 rules it out as link text but not as a rule under
+   one: a hover rule carries no letterforms and no meaning of its own
+   -- the link is already a link, underlined, in ink that clears AAA --
+   so it is a non-text indicator on top of one that stands without it,
+   and the same orange the rest of the chrome hovers in. It holds in
+   both palettes: --accent is one value across the two, and the rule's
+   weight and position stay the browser's, as the default's are. */
+:root[data-link="ink-accent"] a:hover { text-decoration-color: var(--accent); }
+/* The choices that colour the word as well as its rule. Both are the
+   accent's complement in OKLCH -- its hue is 48deg, so 228deg -- and a
+   step round towards a conventional link blue: "petrol-aaa" at the 7:1
+   the body grays hold, "link-blue" at 5.5:1 on the card, 3.1:1 against the
    body ink where the AAA one is 2.4:1 -- the separation that decides
    whether a link reads as a link or as dark text. The dark values sit
    at ~7:1 on the dark cards. Both tune the rule, where the default
