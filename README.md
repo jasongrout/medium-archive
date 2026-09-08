@@ -7,6 +7,51 @@ The tool runs as independent steps. Only `fetch` (and `all`) touches the
 network. Every other step works offline from the archive, so the
 conversion can be tuned and re-run without hitting Medium again.
 
+## This repository
+
+Two things live here: the tool, and the archive it was written for.
+
+```
+src/medium_archive/   the tool; `medium-archive` on the command line
+tests/                its offline test suite (`uv run pytest`)
+archive/              an archive of https://blog.jupyter.org, made with it
+docs/                 the analysis behind the project's open decisions
+todo.md               one work list, in a tool part and an archive part
+```
+
+`archive/` is a full working archive of the Jupyter blog -- 340 posts,
+their images, and the embed content Medium's pages do not carry -- and
+it is the tool's reference corpus. Every step below takes `--out DIR`,
+so from a checkout it is addressed as `--out archive`:
+
+```sh
+uv run medium-archive convert --out archive     # rebuild archive/posts/
+uv run medium-archive lint --embeds --out archive
+uv run medium-archive pelican --out archive     # then: cd archive/site-pelican && pelican
+```
+
+CI runs both halves against each other: `Tests` runs the test suite on
+3.10 through 3.13, and `Lint embeds` reconverts all 340 posts with the
+tool as the pull request leaves it. A converter change is measured
+against a real publication before it lands, which is why the two are
+in one repository.
+
+The archive's `raw/` is ~835 MB, and the history that carries it is
+about as large again. To work on the tool alone, skip the blobs and
+check out only what you need:
+
+```sh
+git clone --filter=blob:none https://github.com/jasongrout/medium-archive
+cd medium-archive
+git sparse-checkout set src tests docs
+```
+
+The archive was developed in its own repository,
+[jasongrout/blog_export](https://github.com/jasongrout/blog_export),
+until 2026-09; that repository is archived read-only, and
+`docs/blog_export-commit-map.txt` maps its commit hashes onto the ones
+here.
+
 ## Steps
 
 **`fetch`** pulls raw material from Medium into `<out>/raw/`: each post's
@@ -507,7 +552,7 @@ uv run medium-archive --help
 Or install it with pip:
 
 ```sh
-pip install .
+pip install .            # or `pip install -e .`, as both workflows do
 medium-archive --help
 ```
 
@@ -793,4 +838,9 @@ src/medium_archive/
                  posts/README.md and SITES.md
 tests/           offline tests (canned HTTP responses, no network);
                  run with `uv run pytest`
+archive/         the Jupyter blog archive this tool is exercised against;
+                 its own layout is documented in archive/README.md
+docs/            compare.md, commonmark.md, commonmark-plan.md: the
+                 analysis behind the renderer and generator decisions,
+                 and the blog_export commit map
 ```
