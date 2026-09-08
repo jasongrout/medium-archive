@@ -10,6 +10,7 @@ from _fakes import FakeResp, FakeSession
 from medium_archive import compare as comparemod
 from medium_archive import convert as convertmod
 from medium_archive import ghost as ghostmod
+from medium_archive.paths import archive_dir
 from medium_archive.pages import ghost_body, ghost_metadata, is_ghost_page
 
 BASE = "http://blog.example.com/"
@@ -139,7 +140,8 @@ MIGRATED_URL = "http://blog.example.com/migrated-post-abcdef123456"
 OLD_SLUG_URL = "http://blog.example.com/old-slug-abcdefabcdef"
 
 
-def seed_index(out):
+def seed_index(root):
+    out = archive_dir(root)
     (out / "raw").mkdir(parents=True)
     (out / "raw" / "index.json").write_text(json.dumps({
         MIGRATED_URL: {"medium_id": "abcdef123456", "title": "Migrated Post"},
@@ -153,7 +155,7 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     seed_index(tmp_path)
     session = run_import(tmp_path, monkeypatch)
 
-    index = json.loads((tmp_path / "raw" / "index.json").read_text())
+    index = json.loads((archive_dir(tmp_path) / "raw" / "index.json").read_text())
     url = "http://blog.example.com/2015/03/04/hello-world"
 
     # a post with no archived counterpart becomes a post of its own
@@ -163,7 +165,7 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     assert entry["published"] == "2015-03-04T10:00:00.000Z"
     assert entry["wayback_url"] == f"https://web.archive.org/web/20150401000000/{url}"
     assert entry["images"] == 1
-    raw = tmp_path / "raw" / "ghost-hello-world"
+    raw = archive_dir(tmp_path) / "raw" / "ghost-hello-world"
     assert "Ghost 0.5" in (raw / "page.html").read_text()
     assert json.loads((raw / "ghost.json").read_text())["generator"] == "Ghost 0.5"
     img_map = json.loads((raw / "images.json").read_text())
@@ -178,7 +180,7 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
         assert ghost_url not in index
         twin = index[medium_url]
         assert twin["in_ghost"] is True and twin["ghost_url"] == ghost_url
-        twin_raw = tmp_path / "raw" / twin["medium_id"]
+        twin_raw = archive_dir(tmp_path) / "raw" / twin["medium_id"]
         assert "Ghost 0.5" in (twin_raw / "ghost.html").read_text()
         assert json.loads((twin_raw / "ghost.json").read_text())["original_url"] == ghost_url
 
@@ -193,7 +195,8 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
                                            prefer_ghost=False, only=[url],
                                            clean=False, base=None))
-    md = (tmp_path / "posts" / "2015-03-04-hello-world" / "index.md").read_text()
+    posts = archive_dir(tmp_path) / "posts"
+    md = (posts / "2015-03-04-hello-world" / "index.md").read_text()
     assert "Body text" in md and f"images/{fname}" in md
     assert '"body_source": "ghost"' in md
     assert '"ghost_url": null' in md    # original_url IS the ghost URL
@@ -202,7 +205,7 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
                                            prefer_ghost=False, only=[MIGRATED_URL],
                                            clean=False, base=None))
-    md = (tmp_path / "posts" / "2015-05-05-migrated-post" / "index.md").read_text()
+    md = (posts / "2015-05-05-migrated-post" / "index.md").read_text()
     assert "Mangled Medium body" in md and '"body_source": "page"' in md
     assert '"ghost_url": "http://blog.example.com/2015/05/05/migrated"' in md
 
@@ -210,11 +213,11 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
                                            prefer_ghost=True, only=[MIGRATED_URL],
                                            clean=False, base=None))
-    md = (tmp_path / "posts" / "2015-05-05-migrated-post" / "index.md").read_text()
+    md = (posts / "2015-05-05-migrated-post" / "index.md").read_text()
     assert "Original Ghost body" in md and '"body_source": "ghost"' in md
 
     # redirects.csv carries a second row for the Ghost path
-    redirects = (tmp_path / "redirects.csv").read_text()
+    redirects = (archive_dir(tmp_path) / "redirects.csv").read_text()
     assert "/2015/05/05/migrated,abcdef123456," in redirects
     assert "/migrated-post-abcdef123456,abcdef123456," in redirects
 
@@ -255,7 +258,7 @@ def test_ghost_comparable_blocks_normalizes_migration_noise():
 def test_import_ghost_rerun_is_idempotent(tmp_path, monkeypatch):
     seed_index(tmp_path)
     run_import(tmp_path, monkeypatch)
-    before = (tmp_path / "raw" / "index.json").read_text()
+    before = (archive_dir(tmp_path) / "raw" / "index.json").read_text()
     session = run_import(tmp_path, monkeypatch)
-    assert (tmp_path / "raw" / "index.json").read_text() == before
+    assert (archive_dir(tmp_path) / "raw" / "index.json").read_text() == before
     assert not any("id_/" in c for c in session.calls)   # nothing re-fetched

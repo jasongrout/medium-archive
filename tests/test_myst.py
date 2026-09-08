@@ -1,10 +1,11 @@
-"""The myst step: posts/ + posts.json -> a MyST site in site-myst/."""
+"""The myst step: archive/posts/ + posts.json -> a MyST site in site-myst/."""
 
 import json
 from pathlib import Path
 
 import pytest
 
+from medium_archive.paths import archive_dir, site_config
 from medium_archive.myst import (LinkMap, build_site, escape_prose,
                                  myst_figures, myst_slug, page_paths,
                                  page_stems, rewrite_body)
@@ -12,7 +13,7 @@ from medium_archive.myst import (LinkMap, build_site, escape_prose,
 BASE = "https://blog.example.com"
 
 
-def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
+def make_post(root: Path, manifest: dict, slug: str, mid: str, date: str,
               body: str, **extra) -> str:
     url = f"{BASE}/{slug}-{mid}"
     d = f"posts/{date[:10]}-{slug}"
@@ -24,7 +25,7 @@ def make_post(out: Path, manifest: dict, slug: str, mid: str, date: str,
             "tags": ["example"], "images": [], "body_source": "page",
             "dir": d, **extra}
     manifest[url] = post
-    post_dir = out / d
+    post_dir = archive_dir(root) / d
     post_dir.mkdir(parents=True)
     (post_dir / "index.md").write_text(
         "---\n" + json.dumps({k: v for k, v in post.items() if k != "dir"})
@@ -38,14 +39,14 @@ def archive(tmp_path):
     make_post(tmp_path, manifest, "first-post", "aaa111aaa111",
               "2020-01-05T10:00:00Z",
               f"Hello. See [the sequel]({BASE}/second-post-bbb222bbb222).\n")
-    second = tmp_path / "posts/2021-03-01-second-post"
+    second = archive_dir(tmp_path) / "posts/2021-03-01-second-post"
     make_post(tmp_path, manifest, "second-post", "bbb222bbb222",
               "2021-03-01T10:00:00Z",
               "An image:\n\n![pic](images/001-pic.png)\n",
               images=["images/001-pic.png"])
     (second / "images").mkdir()
     (second / "images" / "001-pic.png").write_bytes(b"PNG")
-    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (archive_dir(tmp_path) / "posts.json").write_text(json.dumps(manifest))
     return tmp_path, manifest
 
 
@@ -155,7 +156,8 @@ def test_rewrite_leaves_fences_and_autolinks_external(archive):
 
 def test_redirects_and_site_json(archive):
     out, _ = archive
-    (out / "site.json").write_text(json.dumps(
+    site_config(out).parent.mkdir(exist_ok=True)
+    site_config(out).write_text(json.dumps(
         {"title": "Example Blog", "description": "An example.",
          "intro": "Welcome to the archive."}))
     site = build_site(out)
@@ -221,7 +223,7 @@ def test_mononym_author_is_literal(tmp_path):
     make_post(tmp_path, manifest, "solo", "abc123abc123",
               "2020-01-01T00:00:00Z", "Hi.\n",
               authors=[{"name": "yuvipanda", "url": None}])
-    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (archive_dir(tmp_path) / "posts.json").write_text(json.dumps(manifest))
     site = build_site(tmp_path)
     text = (site / "posts/2020-01-01-solo/solo.md").read_text()
     assert 'authors:\n  - name:\n      literal: "yuvipanda"\n' in text
@@ -267,7 +269,7 @@ def test_redirects_use_served_urls(tmp_path):
     slug = "announcing-jupyter-builder-a-standalone-build-system"
     make_post(tmp_path, manifest, slug, "aaa111aaa111",
               "2026-06-19T00:00:00Z", "Hi.\n")
-    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (archive_dir(tmp_path) / "posts.json").write_text(json.dumps(manifest))
     site = build_site(tmp_path)
     rows = (site / "redirects.csv").read_text()
     # the page file keeps the full slug; the redirect target is the
@@ -285,7 +287,7 @@ def test_tags_carry_their_display_names(archive):
     """MyST has no tag pages, so nothing derives a URL from a tag and the
     front matter carries the name a reader would see."""
     out, manifest = archive
-    (out / "tags.json").write_text(json.dumps(
+    (archive_dir(out) / "tags.json").write_text(json.dumps(
         {"display": {"example": "Example Tag"}}), encoding="utf-8")
     site = build_site(out)
     text = (site / "posts/2021-03-01-second-post/second-post.md").read_text()
@@ -297,7 +299,7 @@ def test_multiple_authors(tmp_path):
     make_post(tmp_path, manifest, "duet", "abc123abc123", "2020-01-01T00:00:00Z",
               "Hi.\n", authors=[{"name": "Ada Lovelace", "url": "https://medium.com/@ada"},
                                 {"name": "yuvipanda", "url": None}])
-    (tmp_path / "posts.json").write_text(json.dumps(manifest))
+    (archive_dir(tmp_path) / "posts.json").write_text(json.dumps(manifest))
     site = build_site(tmp_path)
     text = (site / "posts/2020-01-01-duet/duet.md").read_text()
     assert ('authors:\n  - name: "Ada Lovelace"\n    url: "https://medium.com/@ada"\n'

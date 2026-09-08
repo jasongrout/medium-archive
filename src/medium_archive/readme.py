@@ -3,14 +3,15 @@
 Three generated documents, split by what each describes and by how often
 that changes:
 
-* ``README.md``, in the archive root, covers the archive proper: ``raw/``,
-  the hand-written files beside it, and the two small derived files worth
+* ``archive/README.md`` covers the archive proper: ``raw/``, the
+  hand-written files beside it, and the two small derived files worth
   committing with them. ``fetch``, ``import-ghost`` and ``convert`` write it.
-* ``posts/README.md`` covers the converted posts, and lives inside the
-  tree it describes.
-* ``SITES.md`` covers the generated site directories.
+* ``archive/posts/README.md`` covers the converted posts, and lives inside
+  the tree it describes.
+* ``SITES.md``, in the project root, covers the generated site
+  directories beside the archive.
 
-An archive in version control commits the first and ignores the trees the
+A project in version control commits the first and ignores the trees the
 other two describe, along with those two files. Keeping the converted
 posts and the sites out of the archive README is what lets a change in
 how a post converts, or in what a site exporter writes, leave the one
@@ -52,10 +53,11 @@ support migrating the blog off Medium.
 
 This file covers the archive itself: the downloaded sources, the
 hand-written files that belong with them, and the two small derived
-files worth keeping beside them. The bulky generated trees are
-documented where they are generated -- `posts/README.md` for the
-converted posts, `SITES.md` for the generated sites -- so a change in
-how a post converts or how a site is built leaves this file alone.
+files worth keeping beside them. Everything a site is built *into* sits
+beside this directory, in the project root, and is documented where it
+is generated -- `posts/README.md` for the converted posts, `../SITES.md`
+for the generated sites -- so a change in how a post converts or how a
+site is built leaves this file alone.
 
 * `raw/` is the **source of truth**: material downloaded from Medium,
   unmodified. `medium-archive fetch` produces it. Back it up. It is the
@@ -67,15 +69,17 @@ how a post converts or how a site is built leaves this file alone.
   version control, commit these two anyway: they are small and diffable,
   so a change to `fixups/` or `tags.json` shows its effect on every post
   in their diff, and `redirects.csv` is the contract the new site's
-  redirects are built from. The bulky derived trees (`posts/` and the
-  site directories) are better ignored and regenerated, together with
-  the READMEs written inside them.
-* `site.json` is **hand-written** and belongs with the archive. It
-  holds the site-wide text every exporter reads (title, description,
-  landing-page intro), the optional extras a site can carry, and
-  `base_url`, the domain the site is served from. Every absolute URL a
-  generated site bakes in comes from `base_url`, so set it before
-  deploying and re-run the exporter (see `SITES.md`).
+  redirects are built from. The bulky derived trees (`posts/` here, and
+  the site directories in the project root) are better ignored and
+  regenerated, together with the READMEs written inside them.
+* `../site/site.json` is **hand-written**, and is the one input the
+  exporters read that is not part of the archive: it holds the
+  site-wide text every exporter reads (title, description, landing-page
+  intro), the optional extras a site can carry, and `base_url`, the
+  domain the site is served from. Every absolute URL a generated site
+  bakes in comes from `base_url`, so set it before deploying and re-run
+  the exporter (see `../SITES.md`). The images it names -- the avatar,
+  the logo, the tab icon -- sit beside it.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files. Defects
   authored into the sources themselves, such as a broken href, a typo
@@ -176,20 +180,26 @@ tags.json                     optional hand-written tag cleanup ("drop",
                                 "rename", "imply", "add", "remove") plus the
                                 names tags display under ("display"), applied
                                 by convert to front matter
-site.json                     optional hand-written site settings read by
-                                every site exporter: title, description,
-                                intro (landing page), footer, base_url,
-                                avatar, logo, logo_link, favicon,
-                                announcement, newsletter, image caps, hugo
 posts.json                    converted posts, keyed by Medium URL; same
                                 fields as each post's front matter plus `dir`
 redirects.csv                 original_path, medium_id, original_url,
                                 new_dir, date, title -- one row per post
 posts/                        the converted posts, generated by convert;
                                 described by posts/README.md
-site-myst/,                   the generated sites, built from posts/ by the
-site-hugo/,                     site exporters; described by SITES.md
-site-pelican/
+```
+
+The rest of the project sits beside this directory:
+
+```
+../site/site.json             hand-written site settings read by every site
+                                exporter: title, description, intro (landing
+                                page), footer, base_url, avatar, logo,
+                                logo_link, favicon, announcement, newsletter,
+                                image caps, hugo
+../site/*.svg                 the images site.json names, beside it
+../site-myst/,                the generated sites, built from posts/ by the
+../site-hugo/,                  site exporters; described by ../SITES.md
+../site-pelican/
 ```
 
 ## Post fields (`posts.json`)
@@ -242,13 +252,15 @@ Medium era keep working too.
 
 ## Regenerating
 
-    medium-archive fetch {base} --out .   # incremental; add new posts
-    medium-archive compare --out .          # verify page vs export conversion
-    medium-archive convert --clean --out .  # rebuild posts/ from raw/
-    medium-archive lint --out .             # check for conversion defects
-    medium-archive stats --out .            # summarize the archive
+From the project root, the directory above this one:
 
-Building the generated sites is documented in `SITES.md`.
+    medium-archive fetch {base}       # incremental; add new posts
+    medium-archive compare            # verify page vs export conversion
+    medium-archive convert --clean    # rebuild posts/ from raw/
+    medium-archive lint               # check for conversion defects
+    medium-archive stats              # summarize the archive
+
+Building the generated sites is documented in `../SITES.md`.
 """
 
 POSTS_README_TEMPLATE = """\
@@ -346,10 +358,10 @@ The front matter block between `---` lines is JSON, which is valid YAML.
 
 ## Regenerating
 
-From the archive root:
+From the project root:
 
-    medium-archive convert --clean --out .  # rebuild posts/ from raw/
-    medium-archive lint --out .             # check for conversion defects
+    medium-archive convert --clean    # rebuild posts/ from raw/
+    medium-archive lint               # check for conversion defects
 """
 
 SITES_README = """\
@@ -358,30 +370,32 @@ SITES_README = """\
 Generated by `medium-archive` and rewritten by every `convert` run, so
 corrections to it belong in the tool rather than in this file. It covers
 the site directories built from the converted posts; the archive they
-are built from is documented in `README.md`, and the posts themselves in
-`posts/README.md`.
+are built from is documented in `archive/README.md`, and the posts
+themselves in `archive/posts/README.md`.
 
 `site-myst/`, `site-hugo/` and `site-pelican/` are built by
-`medium-archive myst`, `hugo` and `pelican` from `posts/` and
-`posts.json`. They are disposable output rather than archive: delete and
-rebuild them at will, and leave them out of version control, together
-with this file. All three give the posts the same page URLs, rewrite
-links between posts of the publication to those pages, and write their
-own `redirects.csv` mapping every old inbound path to the page that
-generator actually serves. The hugo and pelican sites are the preferred
-targets and share one theme; the myst site is a simpler alternate. What
-the sites contain and how they look belongs to the tool and is
-documented in the medium-archive README, so this file does not go stale
-when a theme gains a feature.
+`medium-archive myst`, `hugo` and `pelican` from `archive/posts/` and
+`archive/posts.json`. They sit in the project root, beside the archive
+rather than inside it, because they are disposable output rather than
+archive: delete and rebuild them at will, and leave them out of version
+control, together with this file. All three give the posts the same
+page URLs, rewrite links between posts of the publication to those
+pages, and write their own `redirects.csv` mapping every old inbound
+path to the page that generator actually serves. The hugo and pelican
+sites are the preferred targets and share one theme; the myst site is a
+simpler alternate. What the sites contain and how they look belongs to
+the tool and is documented in the medium-archive README, so this file
+does not go stale when a theme gains a feature.
 
-The site-wide text and settings all three read come from the archive's
-hand-written `site.json` (see `README.md`).
+The site-wide text and settings all three read come from the
+hand-written `site/site.json`, the one exporter input that is not part
+of the archive (see `archive/README.md`).
 
 ## Layout
 
 ```
 site-myst/                    optional MyST site built by `medium-archive
-                                myst` from posts/ + posts.json:
+                                myst` from archive/posts/ + posts.json:
   myst.yml                    project config, plugins, and year-grouped toc
   index.md                    landing page: intro + cover-image post gallery
   archive.md                  chronological post list, grouped by year
@@ -391,7 +405,7 @@ site-myst/                    optional MyST site built by `medium-archive
     <page>.md                 the post, MyST front matter + rewritten body;
                                 the page's URL slug is the filename, capped
                                 by mystmd at 50 characters
-    images/<filename>         display copies of the images in posts/ (see
+    images/<filename>         display copies of the archive's images (see
                                 the medium-archive README), plus the baked
                                 cover.jpg gallery thumbnail
   redirects.csv               old inbound path -> the page URL mystmd serves
@@ -412,21 +426,23 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
 
 ## Conventions and caveats
 
-* The images beside each page are display copies, capped per `site.json`
-  (the full-resolution originals stay in `raw/` and `posts/`). A copy
-  written in another format carries the extension its bytes call for.
+* The images beside each page are display copies, capped per
+  `site/site.json` (the full-resolution originals stay in
+  `archive/raw/` and `archive/posts/`), built once into the project's
+  `.image-cache/` and shared by all three exporters. A copy written in
+  another format carries the extension its bytes call for.
 * In `site-myst/` pages, `@handle` mentions and `$` signs are
   backslash-escaped so MyST does not parse them as citations or math.
   Links to in-page anchors that never survived the Medium conversion
-  (old footnote anchors) stay as they are in `posts/` and are reported
-  by `myst build`.
+  (old footnote anchors) stay as they are in `archive/posts/` and are
+  reported by `myst build`.
 * Each site's `redirects.csv` is the generator's own: it maps the old
-  inbound paths of the archive's `redirects.csv` to the page URLs that
-  generator actually serves. It is written whatever `site.json`'s
+  inbound paths of `archive/redirects.csv` to the page URLs that
+  generator actually serves. It is written whatever `site/site.json`'s
   `redirects` says, since it is the map any redirect rule set is built
   from.
 * What the hugo and pelican sites *serve* those redirects as is
-  `site.json`'s `redirects`: `"stubs"` (a meta-refresh page at every
+  `site/site.json`'s `redirects`: `"stubs"` (a meta-refresh page at every
   old path -- what GitHub Pages needs, since it does not read
   `_redirects`), `"file"` (a `_redirects` file at the site root, which
   Netlify and Cloudflare Pages answer with a real HTTP 301), `"both"`
@@ -437,8 +453,8 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
 * The `data/*.json` files in `site-hugo/` and `site-pelican/` are
   derived from the archive like everything else in those directories,
   so an exporter run overwrites them. A tag or author name belongs in
-  the archive's `tags.json` or in the post's byline; editing the data
-  file directly is for a site kept as a checked-in project of its own.
+  `archive/tags.json` or in the post's byline; editing the data file
+  directly is for a site kept as a checked-in project of its own.
 
 ## Building the sites
 
@@ -450,14 +466,16 @@ files through `hugo.Data`; validated with 0.165),
 and optionally gifsicle (without it, animated-gif display copies keep
 their full size).
 
-Before deploying, set `base_url` in `site.json` to the site's real
+Before deploying, set `base_url` in `site/site.json` to the site's real
 domain (e.g. `"base_url": "https://blog.example.com"`) and re-run the
 exporter step. Every absolute URL a generated site bakes in is built
 from it.
 
+From the project root:
+
 hugo (preferred):
 
-    medium-archive hugo --out .
+    medium-archive hugo
     cd site-hugo
     hugo
     pagefind --site public
@@ -465,7 +483,7 @@ hugo (preferred):
 
 pelican (preferred):
 
-    medium-archive pelican --out .
+    medium-archive pelican
     cd site-pelican
     pelican
     pagefind --site output
@@ -473,7 +491,7 @@ pelican (preferred):
 
 myst:
 
-    medium-archive myst --out .
+    medium-archive myst
     cd site-myst
     myst start
 """
@@ -492,28 +510,29 @@ def write_if_changed(path: Path, text: str):
     path.write_bytes(data)
 
 
-def write_readme(out: Path, base: str):
+def write_readme(archive: Path, base: str):
     """The archive README: the committed layer, and nothing else."""
-    # The commands are written to run from the archive root, not with
+    # The commands are written to run from the project root, not with
     # the --out path of whichever run wrote this file: a path that moved
     # with the caller's working directory would churn the archive's diff
     # from one run to the next. The generation date is left out for the
     # same reason -- it changed the file on every run without saying
     # anything a re-run had changed.
-    write_if_changed(out / "README.md", README_TEMPLATE.format(
+    write_if_changed(archive / "README.md", README_TEMPLATE.format(
         base=base.rstrip("/"),
         fields=FIELDS_TABLE,
     ))
 
 
-def write_posts_readme(out: Path):
+def write_posts_readme(archive: Path):
     """The README of the converted posts, inside the tree it describes."""
-    write_if_changed(out / "posts" / "README.md",
+    write_if_changed(archive / "posts" / "README.md",
                      POSTS_README_TEMPLATE.format(fields=FIELDS_TABLE))
 
 
-def write_sites_readme(out: Path):
-    """The README of the generated sites. One file for the three of
-    them: they share their inputs, their page URLs and their theme, and
-    a reader choosing between them wants them side by side."""
-    write_if_changed(out / "SITES.md", SITES_README)
+def write_sites_readme(root: Path):
+    """The README of the generated sites, in the project root beside
+    them. One file for the three: they share their inputs, their page
+    URLs and their theme, and a reader choosing between them wants them
+    side by side."""
+    write_if_changed(root / "SITES.md", SITES_README)

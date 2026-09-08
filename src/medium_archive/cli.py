@@ -3,18 +3,18 @@
     fetch          pull raw material from Medium: page HTML, RSS feed item,
                    full-resolution images, and the content behind embeds
                    (gist files, tweets, Carbon snippets, Giphy files),
-                   unmodified, into <out>/raw/
-    import-export  merge a Medium account export into <out>/raw/
+                   unmodified, into archive/raw/
+    import-export  merge a Medium account export into archive/raw/
     import-ghost   recover a Ghost blog's posts from the Wayback Machine
-                   into <out>/raw/; posts also archived from Medium get the
+                   into archive/raw/; posts also archived from Medium get the
                    capture attached alongside the Medium page instead
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
-                   images in <out>/posts/, plus posts.json and redirects.csv
-    myst           build a MyST (mystmd) site in <out>/site-myst/ from the
+                   images in archive/posts/, plus posts.json and redirects.csv
+    myst           build a MyST (mystmd) site in site-myst/ from the
                    converted posts, ready for `myst start` / `myst build`
-    hugo           build a Hugo site in <out>/site-hugo/
-    pelican        build a Pelican site in <out>/site-pelican/
+    hugo           build a Hugo site in site-hugo/
+    pelican        build a Pelican site in site-pelican/
     lint           scan converted posts for conversion-defect signatures
                    (--embeds: embeds whose content the archive lacks;
                    --seo: SEO page analysis)
@@ -83,7 +83,7 @@ Notes:
     players, Giphy embeds become the fetched gif or clip, other iframes
     become links.
   * Medium rate-limits and may serve a bot wall; fetch is resumable.
-  * Fixups: files in <out>/fixups/ are applied to the in-memory raw
+  * Fixups: files in archive/fixups/ are applied to the in-memory raw
     sources by convert and compare, so authored defects -- a broken href
     in a capture, a typo, a mangled paragraph in an export -- can be
     corrected reproducibly without editing the archived bytes. *.sub
@@ -92,7 +92,7 @@ Notes:
     comments); *.patch files hold unified patches for structural edits
     (targets named <medium_id>/<file>). A substitution or hunk that no
     longer applies aborts the run rather than being skipped.
-  * Tags: an optional hand-written <out>/tags.json cleans up the Medium
+  * Tags: an optional hand-written archive/tags.json cleans up the Medium
     tags as convert writes each post's front matter -- "drop" lists tags
     that only made sense on medium.com (the publication's own topic on
     every post, SEO reach tags), "rename" maps variants to a common tag
@@ -106,7 +106,7 @@ Notes:
     Stale entries (changing no post) abort a full convert run; `stats
     --tags` lists every tag with its post count as the worklist for
     curating the file.
-  * The archive layout is documented in the README.md written into <out>/.
+  * The archive layout is documented in the README.md written into archive/.
 Progress is written to stderr.
 """
 
@@ -173,8 +173,8 @@ def add_fetch_args(p):
                         "count); 0 = no limit (default: 0)")
     p.add_argument("--existing", action="append", metavar="DIR",
                    help="earlier archive whose posts should be skipped (raw/index.json, "
-                        "posts.json, or *.md with original_url); repeatable; the --out "
-                        "archive itself is always checked")
+                        "posts.json, or *.md with original_url); repeatable; this "
+                        "project's own archive is always checked")
     p.add_argument("--force", action="store_true",
                    help="re-fetch posts already in the raw archive")
     p.add_argument("--delay", type=float, default=1.5, metavar="SECONDS",
@@ -202,24 +202,27 @@ def add_convert_args(p):
     p.add_argument("--only", action="append", metavar="URL",
                    help="convert just this post (repeatable; default: all)")
     p.add_argument("--clean", action="store_true",
-                   help="delete <out>/posts/ before converting")
+                   help="delete archive/posts/ before converting")
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--out", default="medium_export", type=Path, metavar="DIR",
-                        help="archive root (default: medium_export)")
+    common.add_argument("--out", default=Path("."), type=Path, metavar="DIR",
+                        help="project root: the archive lives in <DIR>/archive/, "
+                             "the hand-written site inputs in <DIR>/site/, and "
+                             "each generated site in <DIR>/site-<generator>/ "
+                             "(default: the working directory)")
     ap.set_defaults(base=None)   # only fetch and all take the URL
     sub = ap.add_subparsers(dest="command", required=True)
 
     def parser(name, **kw):
         return sub.add_parser(name, parents=[common], **kw)
 
-    add_fetch_args(parser("fetch", help="download raw material into <out>/raw/"))
+    add_fetch_args(parser("fetch", help="download raw material into archive/raw/"))
     imp = parser("import-export",
-                 help="merge a Medium account export into <out>/raw/")
+                 help="merge a Medium account export into archive/raw/")
     imp.add_argument("export_path", type=Path, metavar="ZIP_OR_DIR",
                      help="the export zip from medium.com Settings -> Download your "
                           "information, a zip of just its posts/ folder, or an "
@@ -232,7 +235,7 @@ def main():
                      help="also import draft_*.html files (default: skip drafts)")
     ghost = parser("import-ghost",
                    help="recover a Ghost blog's posts from the Wayback "
-                        "Machine into <out>/raw/")
+                        "Machine into archive/raw/")
     ghost.add_argument("base", type=publication_url, metavar="URL",
                        help="the Ghost blog's root URL (often the publication's "
                             "own domain); every page the Wayback Machine ever "
@@ -251,8 +254,8 @@ def main():
     ghost.add_argument("--no-images", action="store_true",
                        help="skip image downloads (convert will keep the "
                             "original, likely dead, URLs)")
-    add_convert_args(parser("convert", help="convert <out>/raw/ into <out>/posts/"))
-    parser("myst", help="build a MyST (mystmd) site in <out>/site-myst/ "
+    add_convert_args(parser("convert", help="convert archive/raw/ into archive/posts/"))
+    parser("myst", help="build a MyST (mystmd) site in site-myst/ "
                         "from the converted posts: one page per post, a "
                         "chronological "
                         "landing page, a year-grouped table of contents, "
@@ -260,10 +263,10 @@ def main():
                         "redirect map from old inbound paths to page URLs. "
                         "Rebuilt from scratch each run; site-wide text (title, "
                         "description, landing-page intro) comes from an "
-                        "optional hand-written <out>/site.json. Render with "
-                        "`myst start` or `myst build --html` inside <out>/site-myst/ "
+                        "optional hand-written site/site.json. Render with "
+                        "`myst start` or `myst build --html` inside site-myst/ "
                         "(https://mystmd.org)")
-    parser("hugo", help="build a Hugo site in <out>/site-hugo/ from the "
+    parser("hugo", help="build a Hugo site in site-hugo/ from the "
                         "converted posts: a self-contained card-grid blog "
                         "theme (cover-image cards, paginated home, "
                         "tag/author card listings with per-term RSS), old "
@@ -273,9 +276,9 @@ def main():
                         "to Pagefind (run `pagefind --site public` after "
                         "`hugo` for full-text search with highlighted "
                         "in-context excerpts), and a redirect map. Render with "
-                        "`hugo server` inside <out>/site-hugo/ "
+                        "`hugo server` inside site-hugo/ "
                         "(https://gohugo.io)")
-    parser("pelican", help="build a Pelican site in <out>/site-pelican/ "
+    parser("pelican", help="build a Pelican site in site-pelican/ "
                            "from the converted posts, with the same "
                            "card-grid theme as the hugo step: cover-image "
                            "cards (640x360 thumbnails when pillow is "
@@ -290,7 +293,7 @@ def main():
                            "(a plugin embedded in the generated config "
                            "renders redirects.csv into the same stub pages "
                            "Hugo emits for aliases). Render with `pelican -l` "
-                           "inside <out>/site-pelican/ "
+                           "inside site-pelican/ "
                            "(https://getpelican.com; `pip install pelican "
                            "markdown-it-py mdit-py-plugins pyyaml pillow`)")
     cmp_p = parser("compare",
@@ -312,7 +315,7 @@ def main():
                             "image renames, line wrapping) normalized away. "
                             "Informational (exit 0) -- what it reports is dropped "
                             "or edited content, to guide convert --prefer-ghost")
-    lint_p = parser("lint", help="scan <out>/posts/ for conversion-defect "
+    lint_p = parser("lint", help="scan archive/posts/ for conversion-defect "
                                  "signatures (leftover Medium chrome, unclosed "
                                  "code fences, missing image files, remote CDN "
                                  "images); exits non-zero if any are found")
@@ -336,7 +339,7 @@ def main():
     stats_p.add_argument("--tags", action="store_true",
                          help="list every tag with its post count instead of "
                               "the top N -- the worklist for curating "
-                              "<out>/tags.json (see convert)")
+                              "archive/tags.json (see convert)")
     both = parser("all", help="fetch then convert")
     add_fetch_args(both)
     add_convert_args(both)

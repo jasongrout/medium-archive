@@ -1,5 +1,5 @@
 """The import-ghost step: recover a Ghost blog's posts from the Wayback
-Machine into <out>/raw/.
+Machine into archive/raw/.
 
 A separate import path from `fetch`: fetch handles Medium URLs (hex-id
 slugs) from the live site, while this step handles Ghost URLs -- often a
@@ -32,6 +32,7 @@ from .fetch import read_index, write_index
 from .images import image_source, safe_filename
 from .net import fetch, make_session
 from .pages import ghost_body, ghost_metadata, is_ghost_page, meta
+from .paths import archive_dir
 from .readme import write_readme
 from .urls import POST_ID_RE, canonical_url, norm_key, slug_of
 
@@ -267,7 +268,8 @@ def import_standalone(session, raw_dir, index, url: str, ts: str, html: str,
 
 
 def cmd_import_ghost(args):
-    raw_dir = args.out / "raw"
+    archive = archive_dir(args.out)
+    raw_dir = archive / "raw"
     session = make_session()
     index = read_index(raw_dir)
 
@@ -326,6 +328,6 @@ def cmd_import_ghost(args):
             imported += 1
         time.sleep(args.delay)
 
-    write_readme(args.out, args.base)
+    write_readme(archive, args.base)
     print(f"import-ghost done: {imported} new posts, {attached} attached to "
           f"archived posts, {len(index)} total in {raw_dir}", file=sys.stderr)

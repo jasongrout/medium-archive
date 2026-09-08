@@ -1,4 +1,4 @@
-"""The fetch step: pull raw material from Medium into <out>/raw/.
+"""The fetch step: pull raw material from Medium into archive/raw/.
 
 Incremental and resumable; the raw archive is the source of truth that
 convert works from.
@@ -25,6 +25,7 @@ from .state import (state_embed_targets, state_image_urls,
                     state_media_resources)
 from .net import fetch, make_session
 from .pages import extract_metadata
+from .paths import archive_dir
 from .readme import write_readme
 from .urls import (canonical_url, carbon_id, medium_id, norm_key, slug_of,
                    tweet_id)
@@ -452,7 +453,8 @@ def resolve_post_ref(line: str, out: Path, index: dict) -> str:
 
 
 def cmd_fetch(args):
-    raw_dir = args.out / "raw"
+    archive = archive_dir(args.out)
+    raw_dir = archive / "raw"
     start = args.start or datetime.now(timezone.utc)
     end = args.end
     if end is not None and end > start:
@@ -465,7 +467,7 @@ def cmd_fetch(args):
         # a line may name an archived post instead of a URL (its Medium
         # id, or the posts/ directory name lint prints)
         known = read_index(raw_dir)
-        entries = [(canonical_url(resolve_post_ref(l, args.out, known)), None, "file")
+        entries = [(canonical_url(resolve_post_ref(l, archive, known)), None, "file")
                    for l in lines if l and not l.startswith("#")]
         try:
             feed = fetch_feed(session, args.base, raw_dir)
@@ -606,7 +608,7 @@ def cmd_fetch(args):
                 print(f"  FAILED {url}: {e}", file=sys.stderr)
             shutil.rmtree(tmp, ignore_errors=True)
         time.sleep(args.delay)
-    write_readme(args.out, args.base)
+    write_readme(archive, args.base)
     summary = f"fetch done: {fetched} new, {len(index)} total in {raw_dir}"
     if media_files:
         summary += f"; {media_files} embed media file(s) archived"

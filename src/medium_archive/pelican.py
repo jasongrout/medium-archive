@@ -1,7 +1,7 @@
-"""The pelican step: build a Pelican site in <out>/site-pelican/ from
+"""The pelican step: build a Pelican site in site-pelican/ from
 the converted archive. Same reproducibility contract as the myst step
 (see sites.py); render with `pelican -l` (serve) or `pelican` (build)
-inside <out>/site-pelican/ (https://getpelican.com, `pip install
+inside site-pelican/ (https://getpelican.com, `pip install
 pelican markdown-it-py mdit-py-plugins pyyaml`).
 
 The site reads CommonMark rather than the python-markdown dialect
@@ -88,6 +88,7 @@ import json
 import re
 import sys
 
+from .paths import archive_dir, site_dir, site_inputs
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     canonical_for, caption_text, clean_site,
                     copy_site_asset, export_content, fill_template,
@@ -170,14 +171,16 @@ def _one_line(value: str) -> str:
     return " ".join(value.split())    # front matter holds no newlines
 
 
-def build_site(out):
-    manifest, config = load_site_inputs(out)
+def build_site(root):
+    archive = archive_dir(root)
+    inputs = site_inputs(root)
+    manifest, config = load_site_inputs(root)
     stems = page_stems(manifest)
     mode = redirect_mode(config)        # site.json "redirects"
-    site = out / "site-pelican"
+    site = site_dir(root, "pelican")
     clean_site(site, keep=("output",))
     (site / "content").mkdir(parents=True)
-    covers = Covers(out, manifest)
+    covers = Covers(archive, manifest)
 
     def front_matter(url, post):
         fields = {"title": _one_line(post["title"] or url)}
@@ -208,28 +211,28 @@ def build_site(out):
             fields["canonical"] = canonical_for(post)
         return front_matter_yaml(fields)
 
-    pages = export_content(out, site, manifest, stems, front_matter,
+    pages = export_content(archive, site, manifest, stems, front_matter,
                            escape=attach_images,
-                           placer=ImagePlacer(out, config),
+                           placer=ImagePlacer(root, config),
                            transform=figure_directives, covers=covers)
 
     # the header logo and the tab icon, shipped through the theme's
     # static dir
-    avatar = copy_site_asset(out, config.get("avatar"),
+    avatar = copy_site_asset(inputs, config.get("avatar"),
                              site / "theme" / "static" / "img", "avatar")
-    favicon = copy_site_asset(out, config.get("favicon"),
+    favicon = copy_site_asset(inputs, config.get("favicon"),
                               site / "theme" / "static", "favicon")
     # a masthead logo that stands in for the site's name -- a wordmark,
     # the way jupyter.org's navbar carries its rectangle logo -- and the
     # same mark drawn for the dark palette
-    logo = copy_site_asset(out, config.get("logo"),
+    logo = copy_site_asset(inputs, config.get("logo"),
                            site / "theme" / "static" / "img", "logo")
-    logo_dark = (copy_site_asset(out, config.get("logo_dark"),
+    logo_dark = (copy_site_asset(inputs, config.get("logo_dark"),
                                  site / "theme" / "static" / "img",
                                  "logo-dark") if logo else None)
     # the og:image of every page without a cover of its own, with its
     # dimensions read here (the theme has no image pipeline)
-    share = copy_site_asset(out, config.get("share_image"),
+    share = copy_site_asset(inputs, config.get("share_image"),
                             site / "theme" / "static" / "img", "share")
     share_size = (image_size(site / "theme" / "static" / "img" / share)
                   if share else None)
@@ -280,7 +283,7 @@ def build_site(out):
     # of a generated config; they are the same three files, with the
     # same contents, the hugo site reads through hugo.Data (see
     # sites.write_data_files).
-    write_data_files(site, manifest, out)
+    write_data_files(site, manifest, archive)
     write_templates(site, TEMPLATES)
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
     print(f"pelican done: {pages}/{len(manifest)} pages -> {site}",

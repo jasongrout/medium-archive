@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from medium_archive.paths import archive_dir
 from medium_archive.convert import cmd_convert, convert_post
 from medium_archive.sites import tag_names
 from medium_archive.tags import default_display, display_name, load_tag_map
@@ -14,18 +15,20 @@ URL = "https://blog.example.com/my-post-0123456789ab"
 
 
 def write_config(tmp_path, config):
-    (tmp_path / "tags.json").write_text(json.dumps(config), encoding="utf-8")
-    return tmp_path
+    out = archive_dir(tmp_path)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "tags.json").write_text(json.dumps(config), encoding="utf-8")
+    return out
 
 
 def write_raw_post(out, tags):
-    raw = out / "raw" / "0123456789ab"
+    raw = archive_dir(out) / "raw" / "0123456789ab"
     raw.mkdir(parents=True)
     (raw / "feed_item.json").write_text(json.dumps({
         "title": "My post", "author": "Ann",
         "date": "2020-01-01T00:00:00Z", "tags": list(tags),
         "content_html": "<p>A body of prose long enough to be a post.</p>"}))
-    (out / "raw" / "index.json").write_text(json.dumps(
+    (raw.parent / "index.json").write_text(json.dumps(
         {URL: {"medium_id": "0123456789ab"}}))
     return raw
 
@@ -110,15 +113,16 @@ def test_unused_entries_are_tracked(tmp_path):
     ({"display": {"a": "X", "b": "X"}}, "would both show as"),
 ])
 def test_malformed_config_aborts(tmp_path, config, message):
-    write_config(tmp_path, config)
+    out = write_config(tmp_path, config)
     with pytest.raises(SystemExit, match=message):
-        load_tag_map(tmp_path)
+        load_tag_map(out)
 
 
 def test_invalid_json_aborts(tmp_path):
-    (tmp_path / "tags.json").write_text("{not json", encoding="utf-8")
+    out = write_config(tmp_path, {})
+    (out / "tags.json").write_text("{not json", encoding="utf-8")
     with pytest.raises(SystemExit, match="not valid JSON"):
-        load_tag_map(tmp_path)
+        load_tag_map(out)
 
 
 def test_convert_post_writes_cleaned_tags(tmp_path):
@@ -182,7 +186,7 @@ def test_full_convert_aborts_on_stale_entry(tmp_path):
                        match="entries changed no post: no-such-tag"):
         cmd_convert(convert_args(tmp_path))
     # the converted output itself is fine; only the config is stale
-    manifest = json.loads((tmp_path / "posts.json").read_text())
+    manifest = json.loads((archive_dir(tmp_path) / "posts.json").read_text())
     assert manifest[URL]["tags"] == []
 
 
@@ -204,7 +208,7 @@ def test_only_run_skips_the_stale_check(tmp_path):
     write_raw_post(tmp_path, ["python"])
     write_config(tmp_path, {"drop": ["no-such-tag"]})
     cmd_convert(convert_args(tmp_path, only=[URL]))    # must not raise
-    manifest = json.loads((tmp_path / "posts.json").read_text())
+    manifest = json.loads((archive_dir(tmp_path) / "posts.json").read_text())
     assert manifest[URL]["tags"] == ["python"]
 
 
@@ -321,7 +325,7 @@ def test_tag_names_covers_every_tag_in_the_archive(tmp_path):
     write_config(tmp_path, {"display": {"cpp": "C++"}})
     manifest = {"a": {"tags": ["cpp", "open-science"]}, "b": {"tags": []},
                 "c": {}}
-    assert tag_names(manifest, tmp_path) == {"cpp": "C++",
+    assert tag_names(manifest, archive_dir(tmp_path)) == {"cpp": "C++",
                                              "open-science": "open science"}
 
 

@@ -5,7 +5,7 @@ or comparison, so a broken href in a Ghost capture or a mangled paragraph
 in an account export can be corrected without ever editing the archived
 bytes:
 
-* <out>/fixups/*.sub -- substitutions, the format of choice: raw HTML
+* archive/fixups/*.sub -- substitutions, the format of choice: raw HTML
   files are often a single enormous line, so a unified diff of even a
   one-character fix embeds the whole line twice and cannot be reviewed.
   A substitution shows exactly what changes. '#' lines are comments:
@@ -22,7 +22,7 @@ bytes:
   template); `count:` (optional, default 1) is the exact number of
   occurrences expected -- applying to more or fewer aborts the run.
 
-* <out>/fixups/*.patch -- unified patches, for structural edits that
+* archive/fixups/*.patch -- unified patches, for structural edits that
   substitutions cannot express. Each file diff's target path is matched
   by its last two components (<medium_id>/<name>), so patches generated
   with any a/ b/ prefix convention work.
@@ -130,7 +130,7 @@ def _parse_subs(path: Path, fixups: dict):
 
 
 def load_fixups(out_dir: Path) -> dict:
-    """Parse every <out>/fixups/*.patch and *.sub into
+    """Parse every archive/fixups/*.patch and *.sub into
     {'<medium_id>/<name>': [op, ...]}, in fixup-file-name order."""
     fixups = {}
     fix_dir = out_dir / "fixups"

@@ -37,8 +37,8 @@ literal, 18 posts -- is what Goldmark does too, and belongs in
 ## How this was measured
 
 ```sh
-medium-archive convert --clean --out .    # 336/336 posts
-medium-archive pelican --out .
+medium-archive convert --clean    # 336/336 posts
+medium-archive pelican
 cd site-pelican && pelican                # once per renderer, output/ cleaned between
 ```
 
@@ -258,7 +258,7 @@ The reader above borrows python-markdown's `slugify` so heading ids stay
 byte-identical with today's site; standalone it is six lines
 (`unicodedata.normalize`, strip non-word characters, lowercase, join on
 hyphens), after which python-markdown is gone entirely -- the config's
-one other use of it, rendering `site.json`'s landing-page intro, is the
+one other use of it, rendering `site/site.json`'s landing-page intro, is the
 same one-line call on either library.
 
 ## What has to change in the posts

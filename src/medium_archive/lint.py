@@ -32,6 +32,8 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote
 
+from .paths import archive_dir
+
 # the CommonMark emphasis rules live with the conversion that has to
 # satisfy them; this is the only thing lint borrows from it
 from .convert import unparsed_emphasis
@@ -278,7 +280,8 @@ def duplicate_titles(titles: dict) -> list:
 
 
 def cmd_lint(args):
-    posts_root = args.out / "posts"
+    archive = archive_dir(args.out)
+    posts_root = archive / "posts"
     dirs = sorted(d for d in posts_root.iterdir() if (d / "index.md").is_file()) \
         if posts_root.is_dir() else []
     if not dirs:
@@ -289,7 +292,7 @@ def cmd_lint(args):
     titles = {}
     for d in dirs:
         errors, warnings = lint_post(d, seo=seo, embeds=embeds,
-                                     raw_root=args.out / "raw")
+                                     raw_root=archive / "raw")
         for msg in errors:
             print(f"{d.name}: {msg}")
         for msg in warnings:

@@ -533,10 +533,11 @@ def convert_archive(tmp_path):
     from types import SimpleNamespace
 
     from medium_archive.convert import cmd_convert
-    raw = tmp_path / "raw" / "0123456789ab"
+    from medium_archive.paths import archive_dir
+    raw = archive_dir(tmp_path) / "raw" / "0123456789ab"
     raw.mkdir(parents=True)
     (raw / "page.html").write_text(medium_page())
-    (tmp_path / "raw" / "index.json").write_text(json.dumps(
+    (raw.parent / "index.json").write_text(json.dumps(
         {URL: {"medium_id": "0123456789ab"}}))
     args = SimpleNamespace(out=tmp_path, prefer_page=False, prefer_ghost=False,
                            only=None, clean=False, base=None)
@@ -548,7 +549,7 @@ def test_convert_rewrites_the_archive_readme(tmp_path):
     # the README documents the layout convert writes, so a stale one is
     # a wrong one; it is generated output, like posts.json
     args, cmd_convert = convert_archive(tmp_path)
-    readme = tmp_path / "README.md"
+    readme = tmp_path / "archive" / "README.md"
     assert "# Medium archive of https://blog.example.com" in readme.read_text()
 
     readme.write_text("stale\n")
@@ -561,8 +562,8 @@ def test_convert_documents_posts_and_sites_outside_the_archive_readme(tmp_path):
     # only describes the ignored trees lives with those trees instead:
     # a conversion or theme change must not churn the committed file
     convert_archive(tmp_path)
-    archive = (tmp_path / "README.md").read_text()
-    posts = (tmp_path / "posts" / "README.md").read_text()
+    archive = (tmp_path / "archive" / "README.md").read_text()
+    posts = (tmp_path / "archive" / "posts" / "README.md").read_text()
     sites = (tmp_path / "SITES.md").read_text()
 
     assert "## Front matter" in posts and "body source preference" in posts.lower()
@@ -578,7 +579,7 @@ def test_convert_leaves_unchanged_readmes_untouched(tmp_path):
     # own: git looks at the mtime before the content, and so does every
     # build and sync downstream of a committed README
     args, cmd_convert = convert_archive(tmp_path)
-    names = ("README.md", "posts/README.md", "SITES.md")
+    names = ("archive/README.md", "archive/posts/README.md", "SITES.md")
     for name in names:
         os.utime(tmp_path / name, (0, 0))
 
@@ -591,7 +592,7 @@ def test_convert_readmes_carry_no_generation_date(tmp_path):
     # a date rewritten on every run is churn in a committed file, and
     # says nothing the git history does not
     convert_archive(tmp_path)
-    for name in ("README.md", "posts/README.md", "SITES.md"):
+    for name in ("archive/README.md", "archive/posts/README.md", "SITES.md"):
         text = (tmp_path / name).read_text()
         assert not re.search(r"\d{4}-\d{2}-\d{2}", text), name
 

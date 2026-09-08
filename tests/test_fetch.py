@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import requests
 
 from _fakes import FakeResp, FakeSession
+from medium_archive.paths import archive_dir
 from medium_archive import fetch as fetchmod
 
 BASE = "https://blog.example.com/"
@@ -39,7 +40,7 @@ def run_fetch(out, gone_now, monkeypatch):
 
 def test_gone_posts_flagged_then_unflagged(tmp_path, monkeypatch):
     run_fetch(tmp_path, gone_now=True, monkeypatch=monkeypatch)
-    missing = json.loads((tmp_path / "raw" / "missing.json").read_text())
+    missing = json.loads((archive_dir(tmp_path) / "raw" / "missing.json").read_text())
     assert set(missing) == {GONE, SOFT}
     assert missing[GONE]["status"] == 404
     assert missing[GONE]["medium_id"] == "0123456789ab"
@@ -47,16 +48,16 @@ def test_gone_posts_flagged_then_unflagged(tmp_path, monkeypatch):
     assert missing[GONE]["wayback_url"] == \
         f"https://web.archive.org/web/20180501000000/{GONE}"
     assert missing[SOFT]["status"] == "soft-404"
-    index = json.loads((tmp_path / "raw" / "index.json").read_text())
+    index = json.loads((archive_dir(tmp_path) / "raw" / "index.json").read_text())
     assert index[GOOD]["found_via"] == "sitemap"
     assert GONE not in index and SOFT not in index
 
     # the 404 post reappears on a later run: unflagged and archived; the
     # soft-404 one is still gone and stays flagged
     run_fetch(tmp_path, gone_now=False, monkeypatch=monkeypatch)
-    missing = json.loads((tmp_path / "raw" / "missing.json").read_text())
+    missing = json.loads((archive_dir(tmp_path) / "raw" / "missing.json").read_text())
     assert set(missing) == {SOFT}
-    index = json.loads((tmp_path / "raw" / "index.json").read_text())
+    index = json.loads((archive_dir(tmp_path) / "raw" / "index.json").read_text())
     assert index[GONE]["found_via"] == "wayback"
 
 
@@ -110,7 +111,7 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
     # just the media, without re-fetching the post
     run_fetch(tmp_path, gone_now=True, monkeypatch=monkeypatch)
     pid = "111122223333"
-    (tmp_path / "raw" / pid / "page.html").write_text(gist_page(pid))
+    (archive_dir(tmp_path) / "raw" / pid / "page.html").write_text(gist_page(pid))
 
     monkeypatch.setattr(fetchmod, "discover",
                         lambda session, base, raw_dir, wayback=True: (
@@ -126,8 +127,8 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
         out=tmp_path, base=BASE, urls=None, no_wayback=False, start=None,
         end=None, oldest_first=False, limit=0, existing=None, force=False,
         delay=0, no_images=True))
-    assert (tmp_path / "raw" / pid / "media" / "cafe01.json").exists()
-    assert (tmp_path / "raw" / pid / "media" / "cafe01.gist.json").exists()
+    assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.json").exists()
+    assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.gist.json").exists()
 
 
 GIPHY = "https://media.giphy.com/media/fWgAW7WZtPMBjmpa3V/giphy.gif"
