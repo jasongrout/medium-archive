@@ -735,8 +735,8 @@ def test_theme_picker_and_dark_scheme(project):
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
         for choice in ("sans", "system-ui", "inter", "source-sans",
-                       "source-serif", "atkinson", "nunito-sans",
-                       "ibm-plex-sans", "ibm-plex-serif"):
+                       "source-serif", "atkinson", "ibm-plex-sans",
+                       "ibm-plex-serif"):
             assert f'<option value="{choice}"' in text, base
         for choice in ("ink", "petrol-aaa", "link-blue", "browser"):
             assert f'<option value="{choice}"' in text, base
@@ -749,8 +749,8 @@ def test_theme_picker_and_dark_scheme(project):
         # a missing file
         for family in ("Atkinson+Hyperlegible", "Atkinson+Hyperlegible+Mono",
                        "IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
-                       "Inter", "Nunito+Sans", "Source+Serif+4",
-                       "Source+Sans+3", "Source+Code+Pro"):
+                       "Inter", "Source+Serif+4", "Source+Sans+3",
+                       "Source+Code+Pro"):
             assert f"family={family}" in text, (base, family)
         # the stored choices apply before the stylesheet loads, so a
         # page cannot flash the wrong scheme or font

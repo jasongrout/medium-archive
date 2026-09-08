@@ -42,10 +42,10 @@
    data-font on <html>, persisted like the theme choice): Source Serif,
    the superfamily Medium set the publication in and the default here
    with no attribute pinned, the jupyter.org Helvetica stack the site
-   launched with, the reader's own platform UI font, Inter, two
-   standalone sans faces picked for their own look (Atkinson
-   Hyperlegible, Nunito Sans), and Source Sans and the IBM Plex
-   superfamily, offered as both a sans and a serif face.
+   launched with, the reader's own platform UI font, Inter, Atkinson
+   Hyperlegible as a standalone sans picked for its own look, and
+   Source Sans and the IBM Plex superfamily, offered as both a sans
+   and a serif face.
 
    --body-font is what the page is set in and --mono what its code
    is, so a choice swaps both by redefining them; the rules downstream
@@ -59,8 +59,7 @@
    instead. --mono follows to whichever face the choice ships one
    under: the superfamilies' own mono, Atkinson Hyperlegible's own
    mono, or, for System UI and any choice with no mono face of its own
-   (Helvetica, Inter, Nunito Sans), the platform's default
-   --system-mono stack. */
+   (Helvetica, Inter), the platform's default --system-mono stack. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
                      Helvetica, Arial, sans-serif;
@@ -95,8 +94,6 @@
                     Arial, sans-serif;
         --atkinson-mono: "Atkinson Hyperlegible Mono", ui-monospace,
                          SFMono-Regular, Menlo, Consolas, monospace;
-        --nunito-sans: "Nunito Sans", "Helvetica Neue", Helvetica, Arial,
-                       sans-serif;
         --ibm-plex-sans: "IBM Plex Sans", "Helvetica Neue", Helvetica,
                          Arial, sans-serif;
         --ibm-plex-serif: "IBM Plex Serif", Georgia, Cambria,
@@ -115,8 +112,6 @@
                                  --mono: var(--source-code); }
 :root[data-font="atkinson"] { --body-font: var(--atkinson);
                               --mono: var(--atkinson-mono); }
-:root[data-font="nunito-sans"] { --body-font: var(--nunito-sans);
-                                 --mono: var(--system-mono); }
 :root[data-font="ibm-plex-sans"] { --body-font: var(--ibm-plex-sans);
                                    --mono: var(--ibm-plex-mono); }
 :root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
@@ -291,7 +286,7 @@ a:hover { text-decoration-line: underline; }
 .font-picker[hidden], .link-picker[hidden] { display: none; }
 /* The select names the choice it is on and sets that name in the
    family it names, so it both says and shows what you are reading: a
-   dropdown, not the theme button's cycling pill, since nine choices
+   dropdown, not the theme button's cycling pill, since eight choices
    are too many to cycle one click at a time. Each <option> carries
    the family it offers as its own inline style, so the open list
    previews every choice; the select's own font-family is set from
