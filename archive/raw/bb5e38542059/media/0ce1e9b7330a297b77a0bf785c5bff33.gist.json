@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/456c2da665746fc6c15c6b3c18fa8c28",
+  "forks_url": "https://api.github.com/gists/456c2da665746fc6c15c6b3c18fa8c28/forks",
+  "commits_url": "https://api.github.com/gists/456c2da665746fc6c15c6b3c18fa8c28/commits",
+  "id": "456c2da665746fc6c15c6b3c18fa8c28",
+  "node_id": "MDQ6R2lzdDQ1NmMyZGE2NjU3NDZmYzZjMTVjNmIzYzE4ZmE4YzI4",
+  "git_pull_url": "https://gist.github.com/456c2da665746fc6c15c6b3c18fa8c28.git",
+  "git_push_url": "https://gist.github.com/456c2da665746fc6c15c6b3c18fa8c28.git",
+  "html_url": "https://gist.github.com/henchc/456c2da665746fc6c15c6b3c18fa8c28",
+  "files": {
+    "henchbot_blogpost_11.py": {
+      "filename": "henchbot_blogpost_11.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/henchc/456c2da665746fc6c15c6b3c18fa8c28/raw/2158d2717bd4c326821f48c25dcc2bfa5dc8b0dd/henchbot_blogpost_11.py",
+      "size": 497,
+      "truncated": false,
+      "content": "        elif repo == 'binderhub':\n            with open('mybinder/requirements.yaml', 'r') as f:\n                requirements_yaml = f.read()\n            updated_yaml = requirements_yaml.replace(\n                           \"version: 0.2.0-{}\".format(commit_info[upgrade]['live']),\n                           \"version: 0.2.0-{}\".format(commit_info[upgrade]['latest']))   \n            fname = 'mybinder/requirements.yaml'\n            with open(fname, 'w') as f:\n                f.write(updated_yaml)",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-07-14T21:07:44Z",
+  "updated_at": "2019-07-14T21:07:44Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/456c2da665746fc6c15c6b3c18fa8c28/comments",
+  "owner": {
+    "login": "henchc",
+    "id": 14077472,
+    "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/henchc",
+    "html_url": "https://github.com/henchc",
+    "followers_url": "https://api.github.com/users/henchc/followers",
+    "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+    "organizations_url": "https://api.github.com/users/henchc/orgs",
+    "repos_url": "https://api.github.com/users/henchc/repos",
+    "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/henchc/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "ec75ffd9c5a90ed43d077e6698222e1e89102a08",
+      "committed_at": "2019-07-14T21:07:44Z",
+      "change_status": {
+        "total": 9,
+        "additions": 9,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/456c2da665746fc6c15c6b3c18fa8c28/ec75ffd9c5a90ed43d077e6698222e1e89102a08"
+    }
+  ],
+  "truncated": false
+}

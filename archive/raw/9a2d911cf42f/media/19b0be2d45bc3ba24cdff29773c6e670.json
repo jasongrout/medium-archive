@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "19b0be2d45bc3ba24cdff29773c6e670",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/krassowski/f4e4e08c907583ab563dd6f97c17c48c",
+      "domain": "gist.github.com",
+      "title": "Other themes",
+      "description": "Other themes. GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fassets%2Fgist-og-image-54fd7dc0713e.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "krassowski",
+      "gist": {
+        "gistId": "f4e4e08c907583ab563dd6f97c17c48c",
+        "githubUsername": "krassowski",
+        "gistScriptUrl": "https://gist.github.com/krassowski/f4e4e08c907583ab563dd6f97c17c48c.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260825-2012-root"
+}

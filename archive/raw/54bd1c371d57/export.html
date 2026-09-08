@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>The Continued Existence of the Emacs IPython Notebook</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">The Continued Existence of the Emacs IPython Notebook</h1>
+</header>
+<section data-field="body" class="e-content">
+<section name="51c0" class="section section--body section--first"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="dd79" id="dd79" class="graf graf--h3 graf--leading graf--title">The Continued Existence of the Emacs IPython Notebook</h3><p name="adc9" id="adc9" class="graf graf--p graf-after--h3 graf--trailing">This is a guest post by John, who initially sent it to <a href="https://groups.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/jupyter/TEbi0N4WTJo/I5MuImn-CgAJ" data-href="https://groups.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/jupyter/TEbi0N4WTJo/I5MuImn-CgAJ" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">our mailing list</a>; we believe that it’s an interesting story, so we wanted to share it on here on the blog.</p></div></div></section><section name="67b5" class="section section--body section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><p name="bb91" id="bb91" class="graf graf--p graf--leading">All,</p><p name="6409" id="6409" class="graf graf--p graf-after--p">After the recent, exciting announcement of the eminent <a href="https://conferences.oreilly.com/jupyter/jup-ny" data-href="https://conferences.oreilly.com/jupyter/jup-ny" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterCon</a>, I was somewhat saddened to see no mention of the EIN, or the Emacs IPython Notebook, as an available client to the Jupyter notebook server. Drama queen that I am, I quickly wrote a note to Fernando, who patiently and kindly explained that not many were aware that this project still existed and that perhaps an announcement or note to the main Jupyter list might be warranted. Hence the following, brief history. I also promise to try to not be a drama queen.</p><p name="53df" id="53df" class="graf graf--p graf-after--p">Some of you may remember, from back when the Jupyter project was still known as the <a href="http://ipython.org/ipython-doc/rel-0.12/interactive/htmlnotebook.html" data-href="http://ipython.org/ipython-doc/rel-0.12/interactive/htmlnotebook.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">IPython notebook</a>, a talented and prolific coder of the name Takafumi Arakaki, or <a href="https://github.com/tkf" data-href="https://github.com/tkf" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">tkf</a>, who created an alternative client to the notebook server’s default web browser interface.</p><p name="48d7" id="48d7" class="graf graf--p graf-after--p">This client, which he called the Emacs IPython Notebook (you can still find his project <a href="https://github.com/tkf/emacs-ipython-notebook" data-href="https://github.com/tkf/emacs-ipython-notebook" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">on GitHub</a>), or EIN, provided a complete IPython notebook experience in the venerable Emacs editor. Not only was EIN nearly <a href="https://github.com/tkf/emacs-ipython-notebook/wiki/Screenshots" data-href="https://github.com/tkf/emacs-ipython-notebook/wiki/Screenshots" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">feature complete</a> when compared to the browser interface it also provided some useful features for the Python programmer, like allowing one to <a href="https://github.com/tkf/emacs-ipython-notebook/wiki/Screenshots#connected-buffer" data-href="https://github.com/tkf/emacs-ipython-notebook/wiki/Screenshots#connected-buffer" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">connect</a> Python buffers to a notebook and using <a href="https://jedi.readthedocs.io/" data-href="https://jedi.readthedocs.io/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">jedi</a> for autocompletion in the notebook buffer.</p><p name="951c" id="951c" class="graf graf--p graf-after--p">Around March/April of 2014, just as IPython was advancing towards 1.0 and making big changes in the notebook/contents API and the kernel communication protocol, tkf mysteriously stopped pushing commits to his github repository.</p><p name="821f" id="821f" class="graf graf--p graf-after--p">I did not know tkf other than from a couple brief conversations. I sincerely hope tkf’s story has a happy end (he does appear to still push the occasional <a href="https://github.com/tkf/comparatist" data-href="https://github.com/tkf/comparatist" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">commit</a>); he is clearly a talented programmer and without him this impressive piece of software would not exist.</p><p name="ccf9" id="ccf9" class="graf graf--p graf-after--p">This is the point where yours truly enters the story. I had discovered the IPython notebook the previous year and had found it an exteremly useful for analyzing the performance of catalytic process units in the refining industry and for working with Python in general, but being a long-time Emacs user I had somewhat bounced of the web interface. Discovering EIN was a godsend, and it quickly became a mainstay in my set of analytic tools.</p><p name="8dc2" id="8dc2" class="graf graf--p graf-after--p">Unfortunately the changes in going to v1.0 of the IPython notebook broke EIN, and with tkf apparently out of the picture there did not seem much hope in EIN staying compatible. Considering that I am a father of two with a full-time job that has absolutely nothing to do with programming (and yet I am a long-time Emacs user — it’s complicated, don’t ask), I can only describe what happened next as an act of complete insanity: I decided to fork tkf’s code, dig in and try to keep up with the changes in ipython.</p><p name="0f34" id="0f34" class="graf graf--p graf-after--p">Truthfully, no one was more surprised than I when I was actually able to keep ein working with versions 1.0 and, soon after, 2.0 of IPython. In fact that compatibility, in theory, is still in the code. One, again in theory, should be able to fire up a 1.x or 2.x version of the IPython notebook and connect to it using my fork of EIN. I say in theory, though, as I haven’t touched that part of the code in some time and it undoubtedly has suffered some bit rot in the intervening years.</p><p name="a46c" id="a46c" class="graf graf--p graf-after--p">The rest of the story is less interesting. Eventually I managed to convince GitHub and MELPA to treat my repository as the official version of ein. There was some short-lived talk of renaming my fork to ‘zwei’, but the consensus was that things were confusing enough with the change in ownership and to keep the name as ein.</p><p name="41d6" id="41d6" class="graf graf--p graf-after--p">Currently one can download ein through either <a href="http://melpa.org/#/ein" data-href="http://melpa.org/#/ein" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">MELPA</a> or <a href="https://github.com/dimitri/el-get" data-href="https://github.com/dimitri/el-get" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">el-get</a>, and someone has even been kind enough to create a spacemacs <a href="http://spacemacs.org/layers/+lang/ipython-notebook/README.html" data-href="http://spacemacs.org/layers/+lang/ipython-notebook/README.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">layer</a> with convenient VIM keybindings for the heathens.</p><p name="7f73" id="7f73" class="graf graf--p graf-after--p">At the moment EIN supports the recent incarnations of Jupyter notebook, v4.3.1, token authentication, _xsrf cookies and all. By the time you read this I may even have pushed some commits that allow one to start and automatically log in to a jupyter notebook server all from Emacs without having to drop into the terminal.</p><p name="a31d" id="a31d" class="graf graf--p graf-after--p">In all, EIN continues to be a viable alternative to the web browser client. It is not 100% feature complete, though, as it notably does not support widgets and quite possibly never will.</p><p name="b9d0" id="b9d0" class="graf graf--p graf-after--p">I haven’t kept close track of who is using EIN, but as of this writing it has 341 stars on github and 28,175 downloads from MELPA. I know EIN is being used in at least a couple businesses and from what I have heard it tends to be more popular among those with a programming background — scientists and engineers tend to prefer the web client which is not surprising since Emacs is not so much a text editor as it is a Way of (Un)Life.</p><p name="4e01" id="4e01" class="graf graf--p graf-after--p">I encourage anyone who is interested in trying out ein to install it via MELPA or from the Spacemacs ipython-notebook layer. For slightly more information see the <a href="http://millejoh.github.io/emacs-ipython-notebook/#quick-try" data-href="http://millejoh.github.io/emacs-ipython-notebook/#quick-try" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Quick Try</a> and <a href="http://millejoh.github.io/emacs-ipython-notebook/#usage" data-href="http://millejoh.github.io/emacs-ipython-notebook/#usage" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Usage</a> sections in the <a href="http://millejoh.github.io/emacs-ipython-notebook/" data-href="http://millejoh.github.io/emacs-ipython-notebook/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">documentation</a>. The information there is not perfect but it is hopefully good enough to get you started with the tool. If you run into trouble do not hesitate to open an <a href="https://github.com/millejoh/emacs-ipython-notebook/issues" data-href="https://github.com/millejoh/emacs-ipython-notebook/issues" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">issue</a> on GitHub; this is a hobby project but I get a lot of joy working with this code and will do my best to support it.</p><p name="6d7a" id="6d7a" class="graf graf--p graf-after--p">If you have made it this far then my sincere thanks for staying patient through my ramblings. As a parting thought I want to express my sincere thanks to Takafumi Arakaki, wherever he may be, and to the <a href="http://jupyter.org/about.html" data-href="http://jupyter.org/about.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Jupyter</a> team for their fantastic work in creating this amazing piece of software.</p><p name="7fc9" id="7fc9" class="graf graf--p graf-after--p graf--trailing">John Miller</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@ProjectJupyter" class="p-author h-card">Project Jupyter</a> on <a href="https://medium.com/p/54bd1c371d57"><time class="dt-published" datetime="2017-02-23T22:26:23.000Z">February 23, 2017</time></a>.</p><p><a href="https://medium.com/@ProjectJupyter/the-continued-existence-of-the-emacs-ipython-notebook-54bd1c371d57" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 22, 2026.</p></footer></article></body></html>

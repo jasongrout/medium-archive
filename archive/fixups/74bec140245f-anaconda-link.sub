@@ -1,0 +1,16 @@
+# The Ghost original's href starts with a stray '(' -- pasted
+# markdown-style parens. The Ghost side gets the paren dropped;
+# Medium copied the same defect as literal '[Anaconda to z/OS]((' 
+# text plus an autolinked bare URL (in both the account export and
+# the rendered page), which is rebuilt into the intended anchor.
+file: 74bec140245f/ghost.html
+old: to bring <a href="(http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/">
+new: to bring <a href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/">
+
+file: 74bec140245f/export.html
+old: [Anaconda to z/OS]((<a href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/" data-href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/</a>)
+new: <a href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/" data-href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Anaconda to z/OS</a>
+
+file: 74bec140245f/page.html
+old: [Anaconda to z/OS]((<a class="bx oo" href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/" rel="noopener ugc nofollow" target="_blank">http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/</a>)
+new: <a class="bx oo" href="http://mainframeinsights.com/data-science-technologies-python-programmers-access-zos-data/" rel="noopener ugc nofollow" target="_blank">Anaconda to z/OS</a>

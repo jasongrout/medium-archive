@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/3ef5dd024860476204a3e254d7894b52",
+  "forks_url": "https://api.github.com/gists/3ef5dd024860476204a3e254d7894b52/forks",
+  "commits_url": "https://api.github.com/gists/3ef5dd024860476204a3e254d7894b52/commits",
+  "id": "3ef5dd024860476204a3e254d7894b52",
+  "node_id": "MDQ6R2lzdDNlZjVkZDAyNDg2MDQ3NjIwNGEzZTI1NGQ3ODk0YjUy",
+  "git_pull_url": "https://gist.github.com/3ef5dd024860476204a3e254d7894b52.git",
+  "git_push_url": "https://gist.github.com/3ef5dd024860476204a3e254d7894b52.git",
+  "html_url": "https://gist.github.com/henchc/3ef5dd024860476204a3e254d7894b52",
+  "files": {
+    "henchbot_blogpost_6.py": {
+      "filename": "henchbot_blogpost_6.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/henchc/3ef5dd024860476204a3e254d7894b52/raw/83d5e012834cc336cd71c526e8d01252b074244c/henchbot_blogpost_6.py",
+      "size": 331,
+      "truncated": false,
+      "content": "# add to commit_info dictionary\ncommit_info['repo2docker']['latest'] = r2d_master\nprint('repo2docker', commit_info['repo2docker']['live'], commit_info['repo2docker']['latest'])\ncommit_info['binderhub']['latest'] = bh_master\nprint('binderhub', commit_info['binderhub']['live'], commit_info['binderhub']['latest'])\nprint(commit_info)",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-07-14T21:00:08Z",
+  "updated_at": "2019-07-14T21:00:08Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/3ef5dd024860476204a3e254d7894b52/comments",
+  "owner": {
+    "login": "henchc",
+    "id": 14077472,
+    "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/henchc",
+    "html_url": "https://github.com/henchc",
+    "followers_url": "https://api.github.com/users/henchc/followers",
+    "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+    "organizations_url": "https://api.github.com/users/henchc/orgs",
+    "repos_url": "https://api.github.com/users/henchc/repos",
+    "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/henchc/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "henchc",
+        "id": 14077472,
+        "node_id": "MDQ6VXNlcjE0MDc3NDcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14077472?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/henchc",
+        "html_url": "https://github.com/henchc",
+        "followers_url": "https://api.github.com/users/henchc/followers",
+        "following_url": "https://api.github.com/users/henchc/following{/other_user}",
+        "gists_url": "https://api.github.com/users/henchc/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/henchc/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/henchc/subscriptions",
+        "organizations_url": "https://api.github.com/users/henchc/orgs",
+        "repos_url": "https://api.github.com/users/henchc/repos",
+        "events_url": "https://api.github.com/users/henchc/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/henchc/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "3e7edc579349aae5a0441edf022a68c5ce157454",
+      "committed_at": "2019-07-14T21:00:07Z",
+      "change_status": {
+        "total": 6,
+        "additions": 6,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/3ef5dd024860476204a3e254d7894b52/3e7edc579349aae5a0441edf022a68c5ce157454"
+    }
+  ],
+  "truncated": false
+}

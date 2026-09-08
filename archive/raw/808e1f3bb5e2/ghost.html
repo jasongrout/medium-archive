@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Security release: Jupyter Notebook 4.3.1</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/cdn-cgi/apps/head/MuIIl4I_IVFkxldaVu1mdWee9as.js"></script><link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=09db7f30e7" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="canonical" href="http://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    
+    <meta property="og:site_name" content="Project Jupyter" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Security release: Jupyter Notebook 4.3.1" />
+    <meta property="og:description" content="We have just released Jupyter Notebook 4.3.0 and 4.3.1 with some important security fixes. You can check out the changelog for more details on the many fixes and improvements. I&#x27;m going to focus on the security changes in this post. 4.3.0: Token authentication The" />
+    <meta property="og:url" content="http://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1/" />
+    <meta property="article:published_time" content="2016-12-21T21:25:40.000Z" />
+    <meta property="article:modified_time" content="2017-01-27T22:57:11.000Z" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Security release: Jupyter Notebook 4.3.1" />
+    <meta name="twitter:description" content="We have just released Jupyter Notebook 4.3.0 and 4.3.1 with some important security fixes. You can check out the changelog for more details on the many fixes and improvements. I&#x27;m going to focus on the security changes in this post. 4.3.0: Token authentication The" />
+    <meta name="twitter:url" content="http://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1/" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Min RK" />
+    <meta name="twitter:site" content="@ProjectJupyter" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Project Jupyter",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://blog.jupyter.org/content/images/2015/02/jupyter-sq-text.png",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Min RK",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/d5b897c37001627c2e3ad3c1e8a7e6fb?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "http://blog.jupyter.org/author/min/",
+        "sameAs": []
+    },
+    "headline": "Security release: Jupyter Notebook 4.3.1",
+    "url": "http://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1/",
+    "datePublished": "2016-12-21T21:25:40.000Z",
+    "dateModified": "2017-01-27T22:57:11.000Z",
+    "description": "We have just released Jupyter Notebook 4.3.0 and 4.3.1 with some important security fixes. You can check out the changelog for more details on the many fixes and improvements. I&#x27;m going to focus on the security changes in this post. 4.3.0: Token authentication The",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://blog.jupyter.org/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 1.7" />
+    <link rel="alternate" type="application/rss+xml" title="Project Jupyter" href="http://blog.jupyter.org/rss/" />
+    <style type="text/css">
+.hljs {
+    background: transparent;
+}
+
+p code {
+  background: transparent;
+  padding: 0px;
+  font-size: inherit;
+  vertical-align: inherit;
+}
+.site-header {
+    background-color: #ccc;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"/>
+
+</head>
+<body class="post-template">
+
+    <div class="site-wrapper">
+
+        
+
+<header class="site-header outer">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+                <a class="site-nav-logo" href="http://blog.jupyter.org"><img src="/content/images/2015/02/jupyter-sq-text.png" alt="Project Jupyter" /></a>
+            <ul class="nav">
+    <li class="nav-home" role="presentation"><a href="http://blog.jupyter.org/">Home</a></li>
+</ul>
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+                <a class="social-link social-link-tw" href="https://twitter.com/ProjectJupyter" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+</a>
+        </div>
+            <a class="rss-button" href="http://cloud.feedly.com/#subscription/feed/http://blog.jupyter.org/rss/" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+</a>
+    </div>
+</nav>
+    </div>
+</header>
+
+
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+
+        <article class="post-full post no-image">
+
+            <header class="post-full-header">
+                <section class="post-full-meta">
+                    <time class="post-full-meta-date" datetime="2016-12-21">21 December 2016</time>
+                </section>
+                <h1 class="post-full-title">Security release: Jupyter Notebook 4.3.1</h1>
+            </header>
+
+
+            <section class="post-full-content">
+                <div class="kg-card-markdown"><p>We have just released Jupyter Notebook 4.3.0 and 4.3.1 with some important security fixes.</p>
+<p>You can check out <a href="https://jupyter-notebook.readthedocs.io/en/stable/changelog.html#release-4-3-1">the changelog</a> for more details on the many fixes and improvements. I'm going to focus on the security changes in this post.</p>
+<h2 id="430tokenauthentication">4.3.0: Token authentication</h2>
+<p>The biggest change in 4.3 is the addition of token-based authentication, which is <strong>enabled by default</strong>. Several of the security issues the notebook has had over the years would have been avoided if the notebook ran with authentication by default. We did not do this for a long time, because the process of enabling and entering a password on a localhost-only web application was deemed too cumbersome, and the risks too small, given that it listened only on localhost. With automatic token authentication, I think we have a solution that should be convenient enough for most users that we can now switch to enabling authentication by default.</p>
+<p>If you use Jupyter in its default configuration, which is to open your browser automatically when you type <code>jupyter notebook</code>, this shouldn't have much impact on your daily work. In this case, a one-time token is generated, and your browser opens with this in the URL. That token is immediately consumed, and your browser will be authenticated, storing the information in a cookie for future requests.</p>
+<p>If you access the notebook without authentication, you will see this page:</p>
+<p><img src="/content/images/2016/12/Screen-Shot-2016-12-20-at-16-13-37.png" alt="login-form"></p>
+<p>This may happen if you switch browsers, or use the notebook with the <code>--no-browser</code> option, in which you will need to enter the token manually the first time you connect to a server with a given browser. This can be done at the login page above, or via a URL containing the token. The notebook server logs this URL when it starts, so you can paste the URL into your browser:</p>
+<pre><code class="language-ini">[C 16:11:17.581 NotebookApp]
+    Copy/paste this URL into your browser when you connect for the first time,
+    to login with a token:
+        http://localhost:8888/?token=20abd368...
+</code></pre>
+<p>After you have logged in with this token just once, a cookie is set and used thereafter, even across restarts of the notebook server. So you shouldn't need to deal with the token after the first time you have used the notebook on a given machine, until/unless you switch browsers or launch new notebook servers <em>on different ports</em>. This does mean that cookies are required for authenticated access to notebooks, and clearing cookies means needing to login again.</p>
+<p>At any time, you can see all of your current notebook servers with their token-authenticated URLs by running the <code>jupyter notebook list</code> command:</p>
+<pre><code class="language-ini">$ jupyter notebook list
+Currently running servers:
+http://localhost:8888/?token=1234... :: /Users/you/notebooks
+</code></pre>
+<p>We didn't communicate the information about token authentication very well in 4.3.0, and I apologize for that. 4.3.1 should make the token behavior much clearer, with more information in both the login form and the notebook log output about how to use the tokens and when you need them. You can see <a href="http://jupyter-notebook.readthedocs.io/en/latest/security.html">the docs</a> for more details. We're always open to improvements, so please <a href="https://github.com/jupyter/notebook/issues">open an Issue</a>  if you are having trouble.</p>
+<h2 id="431">4.3.1</h2>
+<p>4.3.1 follows shortly after 4.3.0, with a fix for a CSRF vulnerability (<strong>CVE-2016-9971</strong>), affecting users of the Firefox or Microsoft (IE, Edge) browsers, and any other browsers that do not set the Origin header on cross-site forms. WebKit and Blink based browsers like Safari and Chrome are not affected. The effect of this vulnerability is the ability of forms on malicious websites visited by the user to spawn new kernels and create empty, untitled files on the user's notebook server. CORS protections already in place prevent further access to these kernels and editing the content of any files.</p>
+<p>Summary:</p>
+<ul>
+<li>CVE-2016-9971</li>
+<li><strong>Affected notebook versions:</strong> all notebook releases &lt; 4.3.1</li>
+<li><strong>Affected users:</strong> Users of Firefox or Microsoft browsers, or other browsers that do not set the Origin header on forms.</li>
+<li><strong>Results:</strong> Visiting malicious pages with these browsers could result in unauthorized launch of new kernels or creation of empty, untitled files on the user's notebook server</li>
+<li><strong>Fix:</strong> Upgrade to notebook-4.3.1, which uses an <code>xsrf</code> token via cookies to validate the origin of forms. See <a href="http://www.tornadoweb.org/en/stable/guide/security.html#cross-site-request-forgery-protection">tornado docs</a> for details.</li>
+</ul>
+<h4 id="updatepracticaleffectsofxsrfforextensions">Update: practical effects of xsrf for extensions</h4>
+<p>This note was omitted when first posted.</p>
+<p>The use of the xsrf token affects existing extensions / etc. that work directly with the notebook server via REST API. To make requests to the rest API, the <code>_xsrf</code> cookie must be sent back to the server in the <code>X-XSRF-Token</code> header of API requests, for example:</p>
+<pre><code class="language-javascript">function _get_cookie(name) {
+  // from tornado docs: http://www.tornadoweb.org/en/stable/guide/security.html
+  var r = document.cookie.match(&quot;\\b&quot; + name + &quot;=([^;]*)\\b&quot;);
+  return r ? r[1] : undefined;
+}
+
+function _add_xsrf_token(settings) {
+  // Adds xsrf token header to jquery ajax settings
+  settings = settings || {};
+  var xsrf_token = _get_cookie('_xsrf');
+  if (xsrf_token) {
+    if (!settings.headers) {
+      settings.headers = {};
+    }
+    settings.headers['X-XSRFToken'] = xsrf_token;
+  }
+  return settings;
+}
+function ajax(url, settings) {
+  // like $.ajax, but ensure xsrf token is added to headers
+  settings = _add_xsrf_token(settings);
+  return $.ajax(url, settings);
+};
+</code></pre>
+<p>This code will also work for any previous version of the notebook, where the xsrf cookie will be undefined and ignored.</p>
+<p>If you're using <code>fetch</code>, you'll need to set <code>credentials: true</code> as well so that the <code>Cookie</code> header is set.</p>
+<pre><code class="language-javascript">var xsrfToken = _get_cookie('_xsrf')  
+fetch(&quot;http://127.0.0.1:8888/api/contents/&quot;,
+  {
+    method: &quot;POST&quot;,
+    credentials: &quot;include&quot;,
+    headers: {
+      &quot;X-XSRFToken&quot;: xsrfToken,
+      &quot;Content-Type&quot;: &quot;application/json&quot;,
+    },
+    body: { name: &quot;Test.py&quot; }
+  }
+)
+</code></pre>
+</div>
+            </section>
+
+
+            <footer class="post-full-footer">
+
+                <section class="author-card">
+                        <img class="author-profile-image" src="//www.gravatar.com/avatar/d5b897c37001627c2e3ad3c1e8a7e6fb?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Min RK" />
+                    <section class="author-card-content">
+                        <h4 class="author-card-name"><a href="/author/min/">Min RK</a></h4>
+                            <p>Read <a href="/author/min/">more posts</a> by this author.</p>
+                    </section>
+                </section>
+                <div class="post-full-footer-right">
+                    <a class="author-card-button" href="/author/min/">Read More</a>
+                </div>
+
+            </footer>
+
+
+        </article>
+
+    </div>
+</main>
+
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+
+<script>console.error("The {{get}} helper is not available. The Public API flag must be enabled in labs if you wish to use the {{get}} helper. See https://help.ghost.org/hc/en-us/articles/115000301672-Public-API-Beta");</script>
+                <article class="post-card post">
+        <a class="post-card-image-link" href="/2017/01/26/jupytercon-2017/">
+            <div class="post-card-image" style="background-image: url(/content/images/2017/01/jupytercon-logo.jpg)"></div>
+        </a>
+    <div class="post-card-content">
+        <a class="post-card-content-link" href="/2017/01/26/jupytercon-2017/">
+            <header class="post-card-header">
+                <h2 class="post-card-title">JupyterCon NYC, August 2017</h2>
+            </header>
+            <section class="post-card-excerpt">
+                <p>Dear Jupyter Community, It is my pleasure to announce that this year, we'll be having our first Jupyter community conference, JupyterCon. It will take place in late August in the beautiful New York</p>
+            </section>
+        </a>
+        <footer class="post-card-meta">
+                <img class="author-profile-image" src="//www.gravatar.com/avatar/95198572b00e5fbcd97fb5315215bf7a?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Fernando Perez" />
+            <span class="post-card-author"><a href="/author/fernando/">Fernando Perez</a></span>
+        </footer>
+    </div>
+</article>
+
+                <article class="post-card post no-image">
+    <div class="post-card-content">
+        <a class="post-card-content-link" href="/2016/12/03/jupyterday-paris/">
+            <header class="post-card-header">
+                <h2 class="post-card-title">JupyterDay Paris</h2>
+            </header>
+            <section class="post-card-excerpt">
+                <p>Cross-posted from OpenDreamKit Sold out: the room is full for this event. See you next time! The LoOPS network, DevLog and OpenDreamKit are organising a day for the various tools available in the</p>
+            </section>
+        </a>
+        <footer class="post-card-meta">
+                <img class="author-profile-image" src="//www.gravatar.com/avatar/d5b897c37001627c2e3ad3c1e8a7e6fb?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Min RK" />
+            <span class="post-card-author"><a href="/author/min/">Min RK</a></span>
+        </footer>
+    </div>
+</article>
+
+        </div>
+    </div>
+</aside>
+
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="http://blog.jupyter.org">
+            <span>Project Jupyter</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">&mdash;</span>
+    <div class="floating-header-title">Security release: Jupyter Notebook 4.3.1</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
+</svg>
+</div>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=Security%20release%3A%20Jupyter%20Notebook%204.3.1&amp;url=http://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1/"
+            onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.jupyter.org/2016/12/21/jupyter-notebook-4-3-1/"
+            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+        </a>
+    </div>
+    <progress class="progress" value="0">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+
+
+
+
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="http://blog.jupyter.org">Project Jupyter</a> &copy; 2017</section>
+                <nav class="site-footer-nav">
+                    <a href="http://blog.jupyter.org">Latest Posts</a>
+                    
+                    <a href="https://twitter.com/ProjectJupyter" target="_blank">Twitter</a>
+                    <a href="https://ghost.org" target="_blank">Ghost</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=09db7f30e7"></script>
+
+
+    <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script>
+
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-python.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52617120-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>
+try {
+  document.onreadystatechange = function(){ 
+    (document.getElementsByClassName('blog-logo')[0]||{}).href = 'https://jupyter.org';
+  }
+} catch (e) {
+  console.log('error changing the logo link to jupyter homapage')
+}
+</script>
+
+</body>
+</html>

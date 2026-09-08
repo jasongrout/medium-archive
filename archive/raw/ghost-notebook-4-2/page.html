@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Notebook 4.2</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/cdn-cgi/apps/head/MuIIl4I_IVFkxldaVu1mdWee9as.js"></script><link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css?v=a12b9c2f30" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <link rel="canonical" href="http://blog.jupyter.org/2016/04/15/notebook-4-2/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="http://blog.jupyter.org/2016/04/15/notebook-4-2/amp/" />
+    
+    <meta property="og:site_name" content="Project Jupyter" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Notebook 4.2" />
+    <meta property="og:description" content="We have just released version 4.2 of the Jupyter Notebook. The Jupyter Notebook is a web application that allows you to create and share documents that contain live code, equations, visualizations and explanatory text (see the Jupyter project home page for more information). Version 4.2 of the notebook" />
+    <meta property="og:url" content="http://blog.jupyter.org/2016/04/15/notebook-4-2/" />
+    <meta property="article:published_time" content="2016-04-15T20:31:40.000Z" />
+    <meta property="article:modified_time" content="2016-04-16T05:03:22.000Z" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Notebook 4.2" />
+    <meta name="twitter:description" content="We have just released version 4.2 of the Jupyter Notebook. The Jupyter Notebook is a web application that allows you to create and share documents that contain live code, equations, visualizations and explanatory text (see the Jupyter project home page for more information). Version 4.2 of the notebook" />
+    <meta name="twitter:url" content="http://blog.jupyter.org/2016/04/15/notebook-4-2/" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Min RK" />
+    <meta name="twitter:site" content="@ProjectJupyter" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Project Jupyter",
+        "logo": "http://blog.jupyter.org/content/images/2015/02/jupyter-sq-text.png"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Min RK",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/d5b897c37001627c2e3ad3c1e8a7e6fb?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "http://blog.jupyter.org/author/min/",
+        "sameAs": []
+    },
+    "headline": "Notebook 4.2",
+    "url": "http://blog.jupyter.org/2016/04/15/notebook-4-2/",
+    "datePublished": "2016-04-15T20:31:40.000Z",
+    "dateModified": "2016-04-16T05:03:22.000Z",
+    "description": "We have just released version 4.2 of the Jupyter Notebook. The Jupyter Notebook is a web application that allows you to create and share documents that contain live code, equations, visualizations and explanatory text (see the Jupyter project home page for more information). Version 4.2 of the notebook",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://blog.jupyter.org"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11" />
+    <link rel="alternate" type="application/rss+xml" title="Project Jupyter" href="http://blog.jupyter.org/rss/" />
+    <style type="text/css">
+.hljs {
+    background: transparent;
+}
+
+p code {
+  background: transparent;
+  padding: 0px;
+  font-size: inherit;
+  vertical-align: inherit;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"/>
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://blog.jupyter.org/">Home</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://blog.jupyter.org/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="blog-logo" href="http://blog.jupyter.org"><img src="/content/images/2015/02/jupyter-sq-text.png" alt="Project Jupyter" /></a>
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Notebook 4.2</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-04-15">15 April 2016</time> 
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>We have just released version 4.2 of the <a href="http://jupyter.org/">Jupyter</a> Notebook. The Jupyter Notebook is a web application that allows you to create and share documents that contain live code, equations, visualizations and explanatory text (see the Jupyter project <a href="http://jupyter.org">home page</a> for more information).</p>
+
+<p>Version 4.2 of the notebook has many bugfixes and improvements.  You can see a summary of changes <a href="http://jupyter-notebook.readthedocs.org/en/latest/changelog.html#release-4-2-0">in the docs</a>, or see all the changes <a href="https://github.com/jupyter/notebook/pulls?q=is%3Apr+is%3Aclosed+milestone%3A4.2">on GitHub</a>.</p>
+
+<p>Altogether, 21 authors contributed to 53 pull requests to make this release.</p>
+
+<p>The notebook extension system was improved greatly in version 4.2. The notebook can be extended in two ways:</p>
+
+<ol>
+<li><em>nbextensions</em>, which are JavaScript extensions that run in your browser. These can modify the UI or behavior of the notebook, such as adding buttons to your toolbar, new keyboard shortcuts, etc.  </li>
+<li><em>serverextensions</em>, which modify the Python webserver. These can add new HTTP endpoints, register extra events to run when you save your notebook, etc.</li>
+</ol>
+
+<p>The improvements to the extension system are focused on making installing and enabling extensions easier, including:</p>
+
+<ol>
+<li>better symmetry between handling of serverextensions and nbextensions  </li>
+<li>allowing enabling nbextensions system-wide  </li>
+<li>working better with the Python <code>sys.prefix</code> for installing/enabling extensions using packages and environments, such as conda packages or python wheels  </li>
+<li>allowing installation via Python packages</li>
+</ol>
+
+<p>In general, installing and enabling extensions is a two-step process:</p>
+
+<ol>
+<li><p>install the extension: <br />
+<code>
+jupyter nbextension install /path/to/myextension
+</code></p></li>
+<li><p>enable the extension <br />
+<code>
+jupyter nbextension enable myextension/main
+</code></p></li>
+</ol>
+
+<p>Installation is system-wide by default, but you can specify an installation to be just for you with <code>--user</code>. Enabling an extension is per-user by default, but you can enable an extension system-wide with <code>--system</code>. You can install or enable an extension using the Python <code>sys.prefix</code> by using the <code>--sys-prefix</code> option available in either command. For example, to make a conda package that includes an extension, you should install the extension using <code>--sys-prefix</code> when building the package.</p>
+
+<p>Python packages can specify information about what nbextensions and serverextensions they provide. These can be installed with:</p>
+
+<pre><code class="language-python">jupyter nbextension install --py packagename  
+jupyter serverextension enable --py packagename  
+</code></pre>
+
+<p>For more information on installing extensions from Python packages, <a href="https://jupyter-notebook.readthedocs.org/en/stable/examples/Notebook/rstversions/Distributing%20Jupyter%20Extensions%20as%20Python%20Packages.html">see the docs</a>.</p>
+
+<p><em>Edit: updated to add a link to the main Jupyter webpage, based on feedback from <a href="https://news.ycombinator.com/item?id=11507454">HackerNews</a>. Thanks!</em></p>
+        </section>
+
+        <footer class="post-footer">
+
+
+            <figure class="author-image">
+                <a class="img" href="/author/min/" style="background-image: url(//www.gravatar.com/avatar/d5b897c37001627c2e3ad3c1e8a7e6fb?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x)"><span class="hidden">Min RK's Picture</span></a>
+            </figure>
+
+            <section class="author">
+                <h4><a href="/author/min/">Min RK</a></h4>
+
+                    <p>Read <a href="/author/min/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=Notebook%204.2&amp;url=http://blog.jupyter.org/2016/04/15/notebook-4-2/"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.jupyter.org/2016/04/15/notebook-4-2/"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://blog.jupyter.org/2016/04/15/notebook-4-2/"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story no-cover" href="/2016/04/22/ipywidgets5/">
+        <section class="post">
+            <h2>ipywidgets 5.0</h2>
+            <p>On April 19, 2016, we released ipywidgets 5.0. The ipywidgets package provides interactive HTML &amp; JavaScript widgets (such&hellip;</p>
+        </section>
+    </a>
+    <a class="read-next-story prev no-cover" href="/2016/03/09/jupyter-kernel-gateway/">
+        <section class="post">
+            <h2>Jupyter Kernel Gateway</h2>
+            <p>Last Friday, the Jupyter Steering Council voted to make the incubating Kernel Gateway project a top-level Jupyter project. I&hellip;</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://blog.jupyter.org">Project Jupyter</a> &copy; 2017</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-python.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52617120-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>
+try {
+  document.onreadystatechange = function(){ 
+    (document.getElementsByClassName('blog-logo')[0]||{}).href = 'https://jupyter.org';
+  }
+} catch (e) {
+  console.log('error changing the logo link to jupyter homapage')
+}
+</script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=a12b9c2f30"></script>
+    <script type="text/javascript" src="/assets/js/index.js?v=a12b9c2f30"></script>
+
+</body>
+</html>

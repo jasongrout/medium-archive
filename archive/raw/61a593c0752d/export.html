@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Introducing repo2docker</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Introducing repo2docker</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+The Binder Project’s repo2docker tool gives data scientists the benefits of containerization technology without needing to learn Docker…
+</section>
+<section data-field="body" class="e-content">
+<section name="8687" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="739c" id="739c" class="graf graf--h3 graf--leading graf--title">Introducing repo2docker</h3><figure name="1a59" id="1a59" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="1*mZMTfkZE6o94aIr6DG-hYA.png" data-width="298" data-height="292" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*mZMTfkZE6o94aIr6DG-hYA.png"></figure><p name="a5f6" id="a5f6" class="graf graf--p graf-after--figure">The Binder Project’s <a href="https://repo2docker.readthedocs.io/en/latest/" data-href="https://repo2docker.readthedocs.io/en/latest/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">repo2docker</a> tool gives data scientists the benefits of containerization technology without needing to learn Docker itself. To make your repository compatible with repo2docker, you only need to add text files that are already present in many repositories. This means that you get the benefits of containerization, a powerful and complex ecosystem, without having to change your workflow.</p><p name="d434" id="d434" class="graf graf--p graf-after--p">repo2docker is a lightweight command-line tool written in Python that takes a path or URL to a git repository and creates a suitable docker image for it. To achieve this it follows the steps that a human would take to do so. The steps are:</p><ol class="postList"><li name="9d32" id="9d32" class="graf graf--li graf-after--p">Inspect the repository for common “configuration” files (like <code class="markup--code markup--li-code">requirements.txt</code>),</li><li name="563c" id="563c" class="graf graf--li graf-after--li">From these well-known files infer the Docker commands to run; and</li><li name="f30f" id="f30f" class="graf graf--li graf-after--li">Build a Docker image.</li></ol><p name="b658" id="b658" class="graf graf--p graf-after--li">It has a few more tricks up its sleeve, such as automatically installing RStudio for you when it detects that you are using R. Once the image has been built, a Docker container is created and executed, giving you access to the environment in which the repository author wanted the code to be executed. To achieve this, one needs access to two things: repo2docker and a docker daemon (they do not necessarily have to have docker installed on their local computer).</p><p name="9261" id="9261" class="graf graf--p graf-after--p">The <a href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html#jupyterhub-team" data-href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html#jupyterhub-team" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterHub team</a> just released <a href="https://github.com/jupyter/repo2docker/blob/0.7.0/CHANGES.rst#version-070" data-href="https://github.com/jupyter/repo2docker/blob/0.7.0/CHANGES.rst#version-070" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">v0.7 of repo2docker</a>, so we decided to spend a bit of time explaining what it’s all about.</p><figure name="1829" id="1829" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*lPmCcgJois-PygoFXI6Bhw.gif" data-width="1300" data-height="523" src="https://cdn-images-1.medium.com/max/800/1*lPmCcgJois-PygoFXI6Bhw.gif"><figcaption class="imageCaption">An example repo2docker workflow. In this case, repo2docker is invoked locally. repo2docker is passed a URL to a git repository (<a href="https://github.com/norvig/pytudes" data-href="https://github.com/norvig/pytudes" class="markup--anchor markup--figure-anchor" rel="nofollow noopener" target="_blank">https://github.com/norvig/pytudes</a>). It then clones the repository, discovers configuration files in the repo (in this case, `requirements.txt`), builds a Docker image with this environment installed, and opens a local Jupyter server to explore and run the contents of the repo.</figcaption></figure><h3 name="ec1e" id="ec1e" class="graf graf--h3 graf-after--figure">The guiding principles behind repo2docker</h3><p name="0362" id="0362" class="graf graf--p graf-after--h3">repo2docker is meant to be as lightweight and common-sense as possible. The driving principles behind repo2docker are as follows:</p><ol class="postList"><li name="1ca8" id="1ca8" class="graf graf--li graf-after--p"><strong class="markup--strong markup--li-strong">Leverage pre-existing workflows</strong> in data science as much as possible. This means using standard configuration files (like <code class="markup--code markup--li-code">requirements.txt</code>) instead of requiring people to learn new configuration patterns.</li><li name="2626" id="2626" class="graf graf--li graf-after--li"><strong class="markup--strong markup--li-strong">The shareable unit is a repository</strong> or directory containing human-readable files. Not a single file (like a notebook) nor a binary blob (like a built docker image). This means that humans can inspect and extend other repositories meant for repo2docker, and that they can manually do what repo2docker does automatically. No black box.</li><li name="880b" id="880b" class="graf graf--li graf-after--li"><strong class="markup--strong markup--li-strong">Be workflow agnostic</strong>. repo2docker supports many languages and user interfaces, it can run arbitrary shell scripts that are baked into the image, or it can trigger a script to be run each time a person runs the Docker image.</li><li name="d539" id="d539" class="graf graf--li graf-after--li"><strong class="markup--strong markup--li-strong">Be extensible and composable</strong>. repo2docker should allow for multiple languages, tools, or workflows to be defined in a single GitHub repository. It should also be relatively easy to extend to support new use-cases.</li><li name="1d91" id="1d91" class="graf graf--li graf-after--li"><strong class="markup--strong markup--li-strong">Enable deterministic outputs</strong>. We want repo2docker to make it possible for authors to generate the exact same environment from their repository every time, provided that they follow best-practices in computational methods (like providing specific version numbers for packages). repo2docker can build a specific commit, tag, or branch of a repository, which allows for an image to be deterministically built.</li></ol><h3 name="4932" id="4932" class="graf graf--h3 graf-after--li">How can repo2docker be used?</h3><p name="ef21" id="ef21" class="graf graf--p graf-after--h3">Over the last 18 months, we have been using repo2docker in production to automatically generate images that run repositories for <a href="http://mybinder.org/" data-href="http://mybinder.org/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">mybinder.org</a>.<br>It is used to build around 1000 unique repositories every week. The core functionality has proven itself and is considered production ready.</p><p name="cc65" id="cc65" class="graf graf--p graf-after--p">Over the last year, we’ve seen a few major use-cases come out of repo2docker:</p><p name="480a" id="480a" class="graf graf--p graf-after--p">First, it can be used as a <strong class="markup--strong markup--p-strong">part of production systems</strong> like BinderHub. BinderHub automatically uses repo2docker to build images that run a user’s environment, and lets them share links that let others interact with the image.</p><p name="1a68" id="1a68" class="graf graf--p graf-after--p">Second, repo2docker can be used to <strong class="markup--strong markup--p-strong">build an image for use with a JupyterHub</strong>. For example, teachers have used repo2docker to convert their GitHub repository with course materials into a runnable Docker image that students access via a shared jupyterhub in the cloud.</p><p name="04e1" id="04e1" class="graf graf--p graf-after--p">Finally, repo2docker has been used by individuals who wish to <strong class="markup--strong markup--p-strong">build reproducible images from their local work</strong>. repo2docker can optionally run a Jupyter server from within the built image, which makes it possible to verify the results of analyses in an environment that was built solely from the configuration files present in the repository.</p><h3 name="dbe5" id="dbe5" class="graf graf--h3 graf-after--p">What next?</h3><p name="92d5" id="92d5" class="graf graf--p graf-after--h3">We think that repo2docker serves as a useful tool for the community and that it is an important part of the large reproducible scientific software stack. It gives data scientists the benefits of containerization technology without needing to learn a new tool like Docker. It achieves this by being a lightweight command-line tool written in Python that automates the creation of the environment in which the authors of a piece of software wanted it to be executed.</p><p name="ff60" id="ff60" class="graf graf--p graf-after--p">We’d love to see the repo2docker community grow, and for more<br>languages, interfaces, use-cases, and workflows to be supported<br>with <a href="https://repo2docker.readthedocs.io/en/latest/architecture.html?highlight=build%20pack#buildpack" data-href="https://repo2docker.readthedocs.io/en/latest/architecture.html?highlight=build pack#buildpack" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">repo2docker’s build pack system</a>. Let us know what you think!</p><p name="cc05" id="cc05" class="graf graf--p graf-after--p">repo2docker is primarily maintained by the <a href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html" data-href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterHub and Binder teams</a>. If you’d like to get involved with the community or want to learn<br>more about the tool, reach out! Check out these links for more information:</p><ul class="postList"><li name="e28e" id="e28e" class="graf graf--li graf-after--p"><a href="https://github.com/jupyter/repo2docker" data-href="https://github.com/jupyter/repo2docker" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">repo2docker repository</a></li><li name="247f" id="247f" class="graf graf--li graf-after--li"><a href="https://repo2docker.readthedocs.io" data-href="https://repo2docker.readthedocs.io" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">repo2docker documentation</a></li><li name="5f15" id="5f15" class="graf graf--li graf-after--li"><a href="http://discourse.jupyter.org" data-href="http://discourse.jupyter.org" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">JupyterHub community forum</a></li><li name="78e1" id="78e1" class="graf graf--li graf-after--li"><a href="https://gitter.im/jupyterhub/binder" data-href="https://gitter.im/jupyterhub/binder" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">Binder gitter channel</a></li></ul><p name="1c2d" id="1c2d" class="graf graf--p graf-after--li graf--trailing"><strong class="markup--strong markup--p-strong"><em class="markup--em markup--p-em">Note</em></strong><em class="markup--em markup--p-em">: some folks might be wondering why we developed repo2docker instead of contributing to a pre-existing containerization tool such as the excellent </em><a href="https://github.com/openshift/source-to-image" data-href="https://github.com/openshift/source-to-image" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank"><em class="markup--em markup--p-em">source2image project</em></a><em class="markup--em markup--p-em">. We take the decision to create new open-source tech very seriously, and wrote a blog post about our decision to do-so in this case: </em><a href="http://words.yuvi.in/post/why-not-s2i/" data-href="http://words.yuvi.in/post/why-not-s2i/" class="markup--anchor markup--p-anchor" rel="nofollow noopener noopener" target="_blank">http://words.yuvi.in/post/why-not-s2i/</a></p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@choldgraf" class="p-author h-card">Chris Holdgraf</a> on <a href="https://medium.com/p/61a593c0752d"><time class="dt-published" datetime="2018-12-14T18:24:13.342Z">December 14, 2018</time></a>.</p><p><a href="https://medium.com/@choldgraf/introducing-repo2docker-61a593c0752d" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 23, 2026.</p></footer></article></body></html>

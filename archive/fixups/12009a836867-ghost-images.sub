@@ -1,0 +1,7 @@
+# Medium's Ghost migration dropped the Lorenz-notebook screenshot
+# illustrating the real-time collaboration goal; re-add it from the
+# Ghost original (it sits after that bullet there).
+
+file: 12009a836867/export.html
+old: nk">with researchers at Google</a>.</li>
+new: nk">with researchers at Google</a>.</li><figure name="gfx26" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2015/07/ScreenShot-Lorenz.png"></figure>

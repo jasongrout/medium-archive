@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Release of IPython 8.0</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Release of IPython 8.0</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+IPython is a powerful Python REPL that gives you tab completion, better tracebacks, multiline editing, and several useful features on top…
+</section>
+<section data-field="body" class="e-content">
+<section name="858e" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="4465" id="4465" class="graf graf--h3 graf--leading graf--title">Release of IPython 8.0</h3><p name="9d2d" id="9d2d" class="graf graf--p graf-after--h3">IPython is a powerful Python REPL that gives you tab completion, better tracebacks, multiline editing, and several useful features on top of pure Python Scripts. It is also the library that powers the Jupyter Kernel via the IPykernel.</p><p name="bcb1" id="bcb1" class="graf graf--p graf-after--p">Today I am pleased to announce the release of IPython 8.0, which has been long in the making and arrived a bit over three years after the 7.0 release.</p><p name="e53f" id="e53f" class="graf graf--p graf-after--p">I also suggest to read the <a href="https://labs.quansight.org/blog/2022/01/ipython-8.0-lessons-learned-maintaining-software/" data-href="https://labs.quansight.org/blog/2022/01/ipython-8.0-lessons-learned-maintaining-software/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">companion blog post</a> on Quansight-Labs site that goes into some technical details on how we removed some old code.</p><p name="28e5" id="28e5" class="graf graf--p graf-after--p">EDIT: You can also ask questions/comments on the jupyter <a href="https://discourse.jupyter.org/t/ipython-8-0-0-out/12554" data-href="https://discourse.jupyter.org/t/ipython-8-0-0-out/12554" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">discourse</a>, or <a href="https://news.ycombinator.com/item?id=29906774" data-href="https://news.ycombinator.com/item?id=29906774" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">read the discussion on HN</a></p><p name="dc43" id="dc43" class="graf graf--p graf-after--p"><strong class="markup--strong markup--p-strong">Many new features</strong></p><p name="39a9" id="39a9" class="graf graf--p graf-after--p">This major release comes with many improvements to the existing codebase and several new features. These new features are code reformatting with Black in the CLI, ghost suggestions, and better tracebacks which highlight the error node, thus making complex expressions easier to debug (see below).</p><figure name="8374" id="8374" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*2_TYKwP_RInA4QVp9UhMhw.png" data-width="1076" data-height="1148" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*2_TYKwP_RInA4QVp9UhMhw.png"><figcaption class="imageCaption">Tracebacks now highlight in which AST node the error occurs. In complex code, this helps to quickly narrow down what causes an error. Here we also turn on `xmode verbose` to see values of local variables (xmode verbose is disabled by default for security reasons as it could leak secrets, but is highly recommended)</figcaption></figure><p name="eab5" id="eab5" class="graf graf--p graf-after--figure">But really, if you want to read about all the new features in-depth, we recommend you spend some time <a href="https://ipython.readthedocs.io/en/stable/whatsnew/version8.html#ipython-8-0" data-href="https://ipython.readthedocs.io/en/stable/whatsnew/version8.html#ipython-8-0" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">reading the what’s new</a> and the list of features in <code class="markup--code markup--p-code">7.x</code>.</p><h4 name="306e" id="306e" class="graf graf--h4 graf-after--p">Moving forward by shedding weight</h4><p name="a7a1" id="a7a1" class="graf graf--p graf-after--h4">While IPython 8.0 has many new features described in <a href="https://ipython.readthedocs.io/en/stable/whatsnew/version8.html#ipython-8-0" data-href="https://ipython.readthedocs.io/en/stable/whatsnew/version8.html#ipython-8-0" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">the what’s new section</a>, the majority of changes that demanded a bump in major version numbers are removals.</p><p name="06ce" id="06ce" class="graf graf--p graf-after--p">IPython was created more than two decades ago by Fernando Pérez while procrastinating on his graduation. Even if a few lines from this period remain, it was time to remove a large number of deprecated and unused code in the IPython code base and drop old dependencies (like nose) in favor of more recent ones (pytest).</p><p name="080c" id="080c" class="graf graf--p graf-after--p">Thanks to NumFOCUS <a href="https://numfocus.org/programs/small-development-grants" data-href="https://numfocus.org/programs/small-development-grants" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Small Developer Grant</a>, we hired <a href="https://github.com/Kojoley" data-href="https://github.com/Kojoley" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Nikita Kniazev (@Kojoley)</a> to help us with some of the heavy lifting. Nikita did a fantastic job updating our codebase, migrating to pytest, enhancing our coverage, and fixing numerous bugs. I highly recommend contacting them if you need help with C++ and Python projects.</p><p name="f0c6" id="f0c6" class="graf graf--p graf-after--p">Some of Nikita’s most notable contributions are:</p><ul class="postList"><li name="8af7" id="8af7" class="graf graf--li graf-after--p">IPython is no longer reliant on Nose, which has been unmaintained for many years.</li><li name="16a9" id="16a9" class="graf graf--li graf-after--li">Significantly increased IPython coverage.</li><li name="573d" id="573d" class="graf graf--li graf-after--li">Considerable refactor of areas that were calling into deprecated features.</li></ul><p name="f157" id="f157" class="graf graf--p graf-after--li">On top of this, IPython 8.0 also comes with the following capabilities:</p><ul class="postList"><li name="2113" id="2113" class="graf graf--li graf-after--p">Remove most of the deprecated functions and parameters that were marked as such between IPython 1.0 and 5.0</li><li name="f1f7" id="f1f7" class="graf graf--li graf-after--li">Bumped the minimal required Python version to 3.8 (following NEP 29). This means that we now use the native Python top-level async instead of crazy hacks. And we can start to use <code class="markup--code markup--li-code">def fun(a,/,b=None):</code> syntax for positional only arguments.</li></ul><p name="d374" id="d374" class="graf graf--p graf-after--li">Nikita also went well beyond the scope of work we gave them by suggesting more robust and often simpler code patterns.</p><p name="75b9" id="75b9" class="graf graf--p graf-after--p">In total, this allowed us, despite all the added features, added type annotations and added tests, to decrease the size of the codebase from 37 500 LOC across 348 files to 36 100 across 294 files. We hope that this reduction in the codebase size combined with work on speeding the startup of the CLI will make IPython easier to use and contribute to.</p><p name="17e9" id="17e9" class="graf graf--p graf-after--p">Some advice on how to do that same are on the <a href="https://labs.quansight.org/blog/2022/01/ipython-8.0-lessons-learned-maintaining-software/" data-href="https://labs.quansight.org/blog/2022/01/ipython-8.0-lessons-learned-maintaining-software/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">companion blog post</a> and the Quansight-Labs site.</p><h4 name="855e" id="855e" class="graf graf--h4 graf-after--p">Moving toward pyproject.toml</h4><p name="eff3" id="eff3" class="graf graf--p graf-after--h4">Another place in IPython that has seen many changes in the build process. We now use <code class="markup--code markup--p-code">pyproject.toml</code>to have a declarative build. We still require setuptools and have <code class="markup--code markup--p-code">setup.py</code> files right now, but we are working towards removing/simplifying them soon.</p><p name="53f3" id="53f3" class="graf graf--p graf-after--p">IPython’s wheels and sdist can now be built with `python -m build` instead of invoking <code class="markup--code markup--p-code">setup.py</code> directly.</p><p name="a3a6" id="a3a6" class="graf graf--p graf-after--p">Our process still needs manual setup of SOURCE_DATE_EPOCH and repacking of the <code class="markup--code markup--p-code">sdist</code> wheel to obtain <a href="https://reproducible-builds.org/" data-href="https://reproducible-builds.org/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">reproducible builds</a>. We encourage you to get the git repository, build it yourself, and get a byte-for-byte identical artifacts.</p><h4 name="0299" id="0299" class="graf graf--h4 graf-after--p">Monthly Release and following NEP 29</h4><p name="3306" id="3306" class="graf graf--p graf-after--h4">We strongly believe that predictability is key to adoption and trust in IPython. In particular, in business settings, it is critical to plan ahead while rapidly receiving bug fixes. This is why for IPython 8.0 we’ll continue to do minor monthly releases on the last Friday of each month as long at it’s reasonable and does not impact maintainers life too much.</p><p name="e66d" id="e66d" class="graf graf--p graf-after--p">We’ll still publish a few 7.x releases with critical bug fixes, but starting last Friday of this month, you will start to see stable releases of 8.x.<br>All releases are announced in <a href="https://discourse.jupyter.org/tags/c/meta/8/announcement" data-href="https://discourse.jupyter.org/tags/c/meta/8/announcement" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">this subcategory in discourse</a>, to which you can get subscribed to get notifications.</p><p name="23fe" id="23fe" class="graf graf--p graf-after--p">We also now follow <a href="https://numpy.org/neps/nep-0029-deprecation_policy.html" data-href="https://numpy.org/neps/nep-0029-deprecation_policy.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">NEP 29</a>, meaning that IPython 8.0 is not only compatible with NumPy 1.19+ and Python 3.8+. But our future Python support schedule is predictably aligned with all other libraries following NEP 29.<br>We believe the new NEP 29 is critical. It gives the core Scientific Python Ecosystem a clear schedule of available features and the removal of deprecated features.</p><h4 name="64fd" id="64fd" class="graf graf--h4 graf-after--p">Looking forward to your contributions</h4><p name="51da" id="51da" class="graf graf--p graf-after--h4">Don’t think IPython is too hard to contribute to or has no missing features. We try to keep a list of beginner-friendly issues, but we really want your feedback and your ideas. In the meantime, have fun with this new release that you can install with :</p><pre name="e373" id="e373" class="graf graf--pre graf-after--p">pip install ipython ipykernel --upgrade</pre><p name="d3ff" id="d3ff" class="graf graf--p graf-after--pre">or</p><pre name="fc4e" id="fc4e" class="graf graf--pre graf-after--p">conda update ipython ipykernel</pre><p name="a87a" id="a87a" class="graf graf--p graf-after--pre">(updating ipykernel may not be necessary for you, but we recommend it).</p><h4 name="cca5" id="cca5" class="graf graf--h4 graf-after--p">Thanks</h4><p name="7faa" id="7faa" class="graf graf--p graf-after--h4 graf--trailing">Thanks to Tania Allard and Eric Charles for review , Quansight Labs and <a href="https://www.quansight.com/" data-href="https://www.quansight.com/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Quansight</a> (my employer) for all the open-source work I can do. Of course, thanks to all the contributors to the IPython and Jupyter community, and in particular <a href="https://github.com/MrMino" data-href="https://github.com/MrMino" class="markup--anchor markup--p-anchor" rel="nofollow noopener" target="_blank">MrMino</a> who recently joined as an IPython core dev..</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@mbussonn" class="p-author h-card">M Bussonnier</a> on <a href="https://medium.com/p/6e034ff122ef"><time class="dt-published" datetime="2022-01-12T13:37:51.828Z">January 12, 2022</time></a>.</p><p><a href="https://medium.com/@mbussonn/release-of-ipython-8-0-6e034ff122ef" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 25, 2026.</p></footer></article></body></html>

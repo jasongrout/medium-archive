@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/cdn-cgi/apps/head/MuIIl4I_IVFkxldaVu1mdWee9as.js"></script><link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=09db7f30e7" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="canonical" href="http://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    
+    <meta property="og:site_name" content="Project Jupyter" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science" />
+    <meta property="og:description" content="Note: this is the full text of the grant proposal that was funded by the Helmsley Trust, the Gordon and Betty Moore Foundation and the Alfred P. Sloan Foundation on April 2015, as described on these two announcements from UC Berkeley and Cal Poly, and press releases from the Helmsley" />
+    <meta property="og:url" content="http://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science/" />
+    <meta property="article:published_time" content="2015-07-07T21:45:28.000Z" />
+    <meta property="article:modified_time" content="2015-07-07T21:53:49.000Z" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science" />
+    <meta name="twitter:description" content="Note: this is the full text of the grant proposal that was funded by the Helmsley Trust, the Gordon and Betty Moore Foundation and the Alfred P. Sloan Foundation on April 2015, as described on these two announcements from UC Berkeley and Cal Poly, and press releases from the Helmsley" />
+    <meta name="twitter:url" content="http://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science/" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Fernando Perez" />
+    <meta name="twitter:site" content="@ProjectJupyter" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Project Jupyter",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://blog.jupyter.org/content/images/2015/02/jupyter-sq-text.png",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Fernando Perez",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/95198572b00e5fbcd97fb5315215bf7a?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "http://blog.jupyter.org/author/fernando/",
+        "sameAs": []
+    },
+    "headline": "Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science",
+    "url": "http://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science/",
+    "datePublished": "2015-07-07T21:45:28.000Z",
+    "dateModified": "2015-07-07T21:53:49.000Z",
+    "description": "Note: this is the full text of the grant proposal that was funded by the Helmsley Trust, the Gordon and Betty Moore Foundation and the Alfred P. Sloan Foundation on April 2015, as described on these two announcements from UC Berkeley and Cal Poly, and press releases from the Helmsley",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://blog.jupyter.org/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 1.7" />
+    <link rel="alternate" type="application/rss+xml" title="Project Jupyter" href="http://blog.jupyter.org/rss/" />
+    <style type="text/css">
+.hljs {
+    background: transparent;
+}
+
+p code {
+  background: transparent;
+  padding: 0px;
+  font-size: inherit;
+  vertical-align: inherit;
+}
+.site-header {
+    background-color: #ccc;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"/>
+
+</head>
+<body class="post-template">
+
+    <div class="site-wrapper">
+
+        
+
+<header class="site-header outer">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+                <a class="site-nav-logo" href="http://blog.jupyter.org"><img src="/content/images/2015/02/jupyter-sq-text.png" alt="Project Jupyter" /></a>
+            <ul class="nav">
+    <li class="nav-home" role="presentation"><a href="http://blog.jupyter.org/">Home</a></li>
+</ul>
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+                <a class="social-link social-link-tw" href="https://twitter.com/ProjectJupyter" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+</a>
+        </div>
+            <a class="rss-button" href="http://cloud.feedly.com/#subscription/feed/http://blog.jupyter.org/rss/" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+</a>
+    </div>
+</nav>
+    </div>
+</header>
+
+
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+
+        <article class="post-full post no-image">
+
+            <header class="post-full-header">
+                <section class="post-full-meta">
+                    <time class="post-full-meta-date" datetime="2015-07-07">7 July 2015</time>
+                </section>
+                <h1 class="post-full-title">Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science</h1>
+            </header>
+
+
+            <section class="post-full-content">
+                <div class="kg-card-markdown"><p><em>Note:</em> this is the full text of the grant proposal that was funded by the Helmsley Trust, the Gordon and Betty Moore Foundation and the Alfred P. Sloan Foundation on April 2015, as described on these two announcements from <a href="http://news.berkeley.edu/2015/07/07/jupyter-project/">UC Berkeley</a> and <a href="http://www.calpolynews.calpoly.edu/news_releases/2015/July/jupyter.html">Cal Poly</a>, and press releases from the <a href="http://helmsleytrust.org/news/uc-berkeley-and-cal-poly-expand-and-enhance-open-source-software-scientific-computing-and-data">Helmsley Trust</a> and the <a href="https://www.moore.org/newsroom/press-releases/2015/07/07/$6m-for-uc-berkeley-and-cal-poly-to-expand-and-enhance-open-source-software-for-scientific-computing-and-data-science">Moore Foundation</a>. A PDF version of this document <a href="http://archive.ipython.org/JupyterGrantNarrative-2015.pdf">can be found here</a>.</p>
+<hr>
+<table width="75%" border="0">
+<tr>
+<td><b>Fernando Perez</b></td>
+<td><b>Brian E. Granger</b></td>
+</tr>
+<tr>
+<td>Lawrence Berkeley National Lab &</td>
+<td>Cal Poly San Luis Obispo</td>
+</tr>
+<tr>
+<td>
+UC Berkeley
+</td>
+<td>
+</td>
+</tr>
+</table>
+<hr>
+<h1 id="statementoftheproblemandaudience">Statement of the problem and audience</h1>
+<p>Computers are good at consuming, producing and processing data. Humans,<br>
+on the other hand, process the world through narratives. Thus, in order<br>
+for data, and the computations that process and visualize that data, to<br>
+be useful for humans, they must be embedded into a narrative - a<br>
+<em>computational narrative</em> - that tells a story for a particular audience<br>
+and context. There are three fundamental aspects of these computational<br>
+narratives that frame the problem we seek to address.</p>
+<p>First, a single computational narrative needs to span a wide range of<br>
+contexts and audiences. For example, a biomedical researcher might<br>
+originally perform statistical analyses and visualizations for a highly<br>
+technical paper to be published in an academic journal. Over time,<br>
+however, that same individual will give talks to other researchers, or<br>
+even non-technical audiences. Eventually, it may even be important to<br>
+enable non-coding lab scientists to perform that same statistical<br>
+analyses and visualizations on data from new samples using a simplified<br>
+graphical user interface. Across all of these different audiences and<br>
+contexts, core aspects of the computational narrative remain invariant.</p>
+<p>Second, these computational narratives need to be reproducible. That is,<br>
+other people - including the same scientist six months later - need to<br>
+be able to understand exactly what was done (code, data and narrative)<br>
+and be able to reliably reproduce the work in order to build new ideas<br>
+off it. Reproducibility has long been one of the foundations of the<br>
+scientific method, but the rise of data science brings new challenges to<br>
+scientific reproducibility, while simultaneously extending these<br>
+questions to other domains like policy making, government or journalism.</p>
+<p>Third, computational narratives are created in collaboration. Multiple<br>
+individuals need the ability to work together at the same time, on the<br>
+code, data and narrative. Collaboration is present in nearly all<br>
+contexts where computational narratives are created: between two<br>
+postdocs and a professor in the same research group; between the<br>
+writers, editors and visual designers of an online news site; between<br>
+the data scientists and business strategists at a large internet<br>
+company; or between a teacher and students in a university classroom.</p>
+<p>Given this background, the core problem we are trying to solve is <em>the<br>
+collaborative creation of reproducible computational narratives that can<br>
+be used across a wide range of audiences and contexts</em>. We propose to<br>
+accomplish this through Project Jupyter (formerly IPython), a set of<br>
+open-source software tools for interactive and exploratory computing.<br>
+These software projects support scientific computing and data science<br>
+across a wide range of programming languages (Python, Julia, R, etc.)<br>
+and already provide basic reproducibility and collaboration features.<br>
+This grant aims at making major progress atop this foundation. The main<br>
+application offered by Project Jupyter is the Jupyter Notebook, a<br>
+web-based interactive computing platform that allows users to author<br>
+computational narratives that combine live code, equations, narrative<br>
+text, interactive user interfaces and other rich media. These documents<br>
+provide a complete record of a computation that can be converted to a<br>
+number of formats (HTML, PDF, etc.) and shared with others through<br>
+email, Dropbox, GitHub, etc. They can also be published online thanks to<br>
+our Jupyter Notebook Viewer, a free service we operate that allows<br>
+anyone on the web to view a notebook as a regular web page.</p>
+<h1 id="relatedworkandcollaborations">Related work and collaborations</h1>
+<p>In this section, we describe related work in two areas: interactive<br>
+computing and online collaboration software. After that, we detail the<br>
+various organizations with which we have significant collaborations.</p>
+<p>There are a number of interactive computing environments that have<br>
+similarities to our work with Project Jupyter. The largest group of<br>
+products, by number of users, are the traditional commercial interactive<br>
+computing environments: Matlab<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>, Mathematica<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>, SAS<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>, SPSS<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup><br>
+and Microsoft Excel. While these products are extremely popular, their<br>
+proprietary nature and expensive licensing fees make them unattractive<br>
+for open and reproducible scientific research and data science.</p>
+<p>On the open source side, there are the popular Sage<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> and RStudio<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup><br>
+projects and the newer Spyder IDE<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>, Beaker Notebook<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> , Zeppelin<br>
+Project<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>, SageMathCloud<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup> and Wakari<sup class="footnote-ref"><a href="#fn11" id="fnref11">[11]</a></sup>(Wakari is a proprietary<br>
+project based on open-source tools). A number of these projects (Sage,<br>
+Spyder, Beaker, SageMathCloud and Wakari) rely on and provide<br>
+integration with the Jupyter/IPython architecture.</p>
+<p>In the area of online collaboration software, there are two gold<br>
+standards. First, Google Drive<sup class="footnote-ref"><a href="#fn12" id="fnref12">[12]</a></sup> has, quite literally, invented<br>
+modern online collaboration by offering a productive environment that<br>
+allows multiple, distributed users to simultaneously edit documents,<br>
+spreadsheets, and slide presentations. For many organizations, these<br>
+<em>real-time collaboration</em> capabilities of Google Drive have transformed<br>
+how distributed teams get work done together. Second, for code and data,<br>
+git<sup class="footnote-ref"><a href="#fn13" id="fnref13">[13]</a></sup> and GitHub<sup class="footnote-ref"><a href="#fn14" id="fnref14">[14]</a></sup> have played a similar transformative role in<br>
+distributed collaboration. The git project is an open source distributed<br>
+version control system that programmers use to track and share changes<br>
+in complex software. GitHub is a commercial (but free for public usage)<br>
+collaboration platform built around git that has become invaluable for<br>
+companies, open source projects and scientists alike. SageMathCloud and<br>
+Wakari expose the Jupyter Notebook online and provide some collaboration<br>
+features. While there are other online code and document collaboration<br>
+platforms (Bitbucket, Office 365, Hackpad, Etherpad, etc.) all of these<br>
+are largely inspired by Google Drive and git/GitHub.</p>
+<p>Over the past few years, we have spent significant amounts of time and<br>
+effort investing in relationships with other individuals and<br>
+organizations that have overlapping missions, impact areas, user groups<br>
+and technologies as Project Jupyter. In the area of <em>academic research<br>
+and education</em>, we have ongoing collaborations with individuals and<br>
+departments at Stanford, UW, NYU, MIT, Harvard, Bryn Mawr, U.<br>
+Southampton, U. Sheffield and Simula Research Lab (Norway). In the area<br>
+of <em>open science</em>, we coordinate efforts with the Center for Open<br>
+Science (Brian Nosek and Jeff Spies) and Software Carpentry (Greg<br>
+Wilson). In traditional <em>journalism</em>, we have relationships with staff<br>
+at 538, BuzzFeed and the New York Times focused around data-driven<br>
+journalism. In <em>open source software</em>, we collaborate closely with the<br>
+core developers of all the major scientific computing and data science<br>
+projects in Python (NumPy, SciPy, Pandas, Matplotlib, Scikit-Learn,<br>
+etc.), Julia (core developers) and R (rOpenSci).</p>
+<p>We also work closely with a number of companies that are building<br>
+products based on the Jupyter Notebook, contribute code and financial<br>
+resources to the project and serve as advisors on a wide range of<br>
+technical and strategic topics. Because these collaborations are so<br>
+important for the ongoing sustainability of Project Jupyter, we wish to<br>
+highlight a few of these.</p>
+<p><strong>GitHub</strong> is an online collaboration and hosting site for software<br>
+projects and code. For us, GitHub is significant because many users of<br>
+the Jupyter Notebook host and share their computational narratives, as<br>
+Jupyter Notebook documents, on GitHub. Our own Notebook Viewer service<br>
+renders notebooks stored on GitHub as static HTML pages, which can be<br>
+shared with anyone in the world without their installing anything. We<br>
+are currently working with Arfon Smith and Tim Clem of GitHub to explore<br>
+other integration points between GitHub and Project Jupyter.</p>
+<p><strong>Rackspace</strong> is a commercial cloud hosting company that supports a wide<br>
+range of open source projects, including Project Jupyter. For the last<br>
+year, Rackspace has provided significant hosting resources for our<br>
+popular Notebook Viewer service. This includes one of Rackspace’s<br>
+engineers, Kyle Kelley, building and maintaining this deployment and<br>
+making significant contributions to the Jupyter codebase. In the summer<br>
+of 2014, Kyle, with Rackspace’s explicit support, began a much more<br>
+ambitious effort to offer cloud-hosted Jupyter Notebooks where users<br>
+could instantly try a live Jupyter Notebook to run Python, R and Julia<br>
+code. Thanks to this work, we were able to embed a live demo of the<br>
+Jupyter Notebook in an article about the project that was published in<br>
+November of 2014 in Nature<sup class="footnote-ref"><a href="#fn15" id="fnref15">[15]</a></sup>.</p>
+<p><strong>Microsoft</strong> has been collaborating with the PIs of this grant since<br>
+2008, when Dr. Brian Granger added support for Microsoft’s job scheduler<br>
+to IPython’s parallel computing framework. Since then, Microsoft has<br>
+added IPython integration to the popular Python Tools for Visual Studio,<br>
+demonstrated the Jupyter Notebook running in the Microsoft cloud (Azure)<br>
+and donated $100,000 to the project through NumFOCUS. We are currently<br>
+working closely with Microsoft to identify future areas of<br>
+collaboration.</p>
+<p><strong>Bloomberg</strong> is one of the largest financial data and news companies in<br>
+the world. Two individuals at Bloomberg (Jason Grout and Sylvain Corlay)<br>
+have been approved to contribute to Project Jupyter in an official<br>
+capacity. Both are regular contributors and have been critical in the<br>
+design of the project’s interactive widget architecture. This<br>
+collaboration has led to our working with Chris Colbert and others at<br>
+Bloomberg to begin designing the next generation of web-based user<br>
+interfaces. We will use the open-source phosphor.js JavaScript library<br>
+developed at Bloomberg, needed for this grant’s deliverables. Bloomberg<br>
+also has an official open source program and policies, including hosting<br>
+of “Open Source Days” at their headquarters in NYC and London.</p>
+<p><strong>Google</strong> approached us in 2014 regarding a prototype of a project,<br>
+called coLaboratory, that integrates the Jupyter Notebook into Google<br>
+Drive. Most importantly, this prototype demonstrated that building<br>
+real-time collaboration into the Jupyter Notebook would be possible.<br>
+However, this prototype also revealed the incredible technical<br>
+challenges of doing so. In late 2014, Google donated $100,000 to<br>
+Fernando Perez at UC Berkeley to hire a postdoc (Matthias Bussonnier)<br>
+that would begin to extract the Google Drive integration from<br>
+coLaboratory into Project Jupyter itself. We want to emphasize two<br>
+aspects of this collaboration. First, the technical challenges in<br>
+building real-time collaboration into the Jupyter Notebook are so<br>
+significant that we could not do this without close collaboration with<br>
+Google. Second, the effort required to implement this in Project Jupyter<br>
+requires resources that extend <em>far</em> beyond those provided to us by<br>
+Google.</p>
+<p><strong>O’Reilly Media</strong> is a major publisher of technology focused books and<br>
+online content as well as the organizer of the most significant<br>
+conferences in the data science and open source spaces (Strata, Hadoop<br>
+World, OSCON, etc.). In 2014, we began working with the CTO of O’Reilly,<br>
+Andrew Odewahn, to explore ways of integrating the Jupyter architecture<br>
+into their publishing platform, to enable both authors and readers of<br>
+O’Reilly content to experience books as live, computational entities.<br>
+O’Reilly already has multiple books that include code examples as<br>
+Jupyter Notebooks.</p>
+<h1 id="organizationalbackground">Organizational background</h1>
+<h2 id="missionandbackground">Mission and Background</h2>
+<p>Project Jupyter’s mission is to create open source tools for interactive<br>
+scientific computing and data science in research, education and<br>
+industry, with an emphasis on usability, collaboration and<br>
+reproducibility.</p>
+<p>Today’s Jupyter evolved from the IPython project, created in 2001 as an<br>
+interactive Python shell by Dr. Fernando Perez. Dr. Brian Granger joined<br>
+the IPython project in 2004, and the two of us have led the project<br>
+since then. The core development team has grown to roughly a dozen<br>
+active contributors and a “long tail” of community contributors<br>
+currently numbering over 400, who participate with various degrees of<br>
+regularity.</p>
+<p>For the first decade, IPython focused strictly on scientific and<br>
+interactive computing in the Python language, providing a rich<br>
+interactive shell well suited to the workflow of everyday research, as<br>
+well as tools for parallel computing. It was part of an organic<br>
+ecosystem of open-source projects for scientific computing in Python,<br>
+informally known as the “SciPy Stack”.</p>
+<p>Around 2010, IPython evolved from providing only a terminal-based<br>
+interactive shell into a generic architecture for interactive computing<br>
+and computational narratives in any programming language. This design<br>
+allowed us to build the web-based Notebook described in this proposal.<br>
+This expansion beyond Python led to a renaming of all the non-Python<br>
+specific parts to <em>Project Jupyter</em>. Today, this architecture supports<br>
+over 20 different programming languages, with most implementations<br>
+having been created by third-parties.</p>
+<h2 id="coreproblemsandconstituency">Core problems and constituency</h2>
+<p>While scientists have always used computers as a research tool, they use<br>
+them differently than industrial software engineers: in science, the<br>
+computer is a kind of “abstract microscope” that enables the scientist<br>
+to peek into data and models that represent or summarize the real world.<br>
+Software engineers tend to write programs to solve reasonably<br>
+well-defined and independently specified problems, and their deliverable<br>
+is a software artifact: a standalone application, library or system.</p>
+<p>While standalone software libraries exist in science (say the building<br>
+of a library to solve differential equations), we target a more common<br>
+scenario: the iterative exploration of a problem via computation and the<br>
+interactive study of intermediate results. In this kind of computational<br>
+work, scientists evolve their codes iteratively, executing small test<br>
+programs or fragments and using the results of each iteration as insight<br>
+that informs the next step. The computations inform their understanding<br>
+of their scientific questions, and those questions shape the process of<br>
+computing. The nature of this process means that, for scientists, an<br>
+interactive computing system is of paramount importance: the ability to<br>
+execute very small fragments of code (possibly a single line) and<br>
+immediately see the results is at the heart of their workflow.</p>
+<p>Furthermore, the purpose of computation in science is precisely to<br>
+advance science itself. In the famous words of R. Hamming, <em>“the purpose<br>
+of computing is insight, not numbers.”</em> For this reason, computation in<br>
+science is ultimately in service of a result that needs to be woven into<br>
+the bigger narrative of the questions under study: that result will be<br>
+part of a paper, will support or contest a theory, will advance our<br>
+understanding of a domain. And those insights are communicated in<br>
+papers, books and lectures: <em>narratives</em> of various formats.</p>
+<p>The problem the Jupyter project tackles is precisely this intersection:<br>
+creating tools to support in the best possible ways the computational<br>
+workflow of scientific inquiry, <em>and</em> providing the environment to<br>
+create the proper narrative around that central act of computation. We<br>
+refer to this as <em>Literate Computing</em>, in contrast to Knuth’s concept of<br>
+<em>Literate Programming</em>, where the emphasis is on narrating algorithms<br>
+and programs. In a Literate Computing environment, the author weaves<br>
+human language with live code and the results of the code, and it is the<br>
+combination of all that produces a computational narrative.</p>
+<p>We consider this problem while acknowledging that science is, by<br>
+definition, an open, collaborative enterprise founded on the principle<br>
+of independent validation of all knowledge. This means that <em>supporting<br>
+collaboration and reproducibility</em> are central guiding principles of the<br>
+project.</p>
+<p>Finally, while all the above has been cast in the context of scientific<br>
+research, the rise of ubiquitous data science means that these same<br>
+questions are now not only the purview of physicists or biologists.<br>
+Today policy makers, journalists, business analysts, financial model<br>
+builders, all work with the same tools and challenges: their data may<br>
+come from a population census or the stock market, and instead of an<br>
+academic paper they may be writing a blog post or a sales report for a<br>
+client, but ultimately the process is similar. They need to extract<br>
+insight from data using computational tools, and they need to<br>
+communicate that insight to an audience in the form of a narrative that<br>
+resonates with that audience.</p>
+<p>So today, Project Jupyter serves not only the academic and scientific<br>
+communities, but also a much broader constituency of data scientists in<br>
+research, education, industry and journalism. Given the importance of<br>
+computing across modern society, we see uses of our tools that range<br>
+from high school education in programming to the nation’s supercomputing<br>
+facilities and the leaders of the tech industry mentioned above.</p>
+<p>Basically, anyone who needs to execute code an interactive programming<br>
+environment can be legitimately considered as served by our project. As<br>
+computation and data analysis become pervasively woven into the fabric<br>
+of society, our constituency continues to broaden. The challenge for our<br>
+organization is to maintain a focused research agenda where we provide a<br>
+coherent vision of the future in interactive computation, a clean set of<br>
+abstractions and tools, and a sustainable community model. These things,<br>
+combined, should serve as the foundation on which others can then build<br>
+the solutions they need in their specific contexts. The purpose of this<br>
+proposal is to advance the state of the art in those core questions.</p>
+<h2 id="projectorganization">Project organization</h2>
+<p>Project Jupyter is organized around an open-source model that allows for<br>
+individual Contributors to join the effort based on their personal<br>
+interest, resources and availability. Along side this open community of<br>
+Contributors, the project has a thin layer of formal organizational<br>
+structure and governance. A summary of that structure and governance<br>
+follows<sup class="footnote-ref"><a href="#fn16" id="fnref16">[16]</a></sup>:</p>
+<ul>
+<li>
+<p>A large, public, open and inclusive community of <em>Contributors</em></p>
+<blockquote>
+<p>participate in the creation of Project Jupyter’s software. Some<br>
+contribute code, others documentation, ideas or bug fixes. Nearly<br>
+all technical decisions are made through the informal consensus of<br>
+this open community.</p>
+</blockquote>
+</li>
+<li>
+<p>Through a record of sustained activity, <em>Contributors</em> can be</p>
+<blockquote>
+<p>nominated to have more rights and responsibilities in the<br>
+development of specific parts of the project. This is done by<br>
+providing them with write privileges (known as “commit rights”) in<br>
+the code repositories of the organization, hosted on GitHub. We<br>
+currently have roughly 20 people in this capacity.</p>
+</blockquote>
+</li>
+<li>
+<p><em>Contributors</em> who demonstrate significant leadership and</p>
+<blockquote>
+<p>contributions for longer than 1 year can be nominated to the<br>
+Jupyter <em>Steering Committee</em>. The <em>Steering Committee</em> is the<br>
+formal governing body for the project and is ultimately<br>
+responsible its the technical, strategic and communal health. We<br>
+emphasize, however, that the <em>Steering Committee</em> delegates<br>
+essentially all technical decisions to the open community.</p>
+</blockquote>
+</li>
+<li>
+<p>From a legal perspective, Project Jupyter is part of the NumFOCUS</p>
+<blockquote>
+<p>Foundation, a 501(c)3 organization dedicated to support research,<br>
+development and education in open source scientific computing and<br>
+data science. NumFOCUS provides legal structure and fiscal<br>
+sponsorship for small amounts of community-focused project funds.</p>
+</blockquote>
+</li>
+<li>
+<p>The project also has <em>Institutional Partners</em>: companies,</p>
+<blockquote>
+<p>universities and other legal entities who have at least one<br>
+employee on the <em>Steering Committee</em>. By raising money (donations,<br>
+grants, for-profit business models) and employing project<br>
+<em>Contributors</em> and <em>Steering Committee</em> members these<br>
+<em>Institutional Partners</em> are the main source of financial support<br>
+for the project.</p>
+</blockquote>
+</li>
+<li>
+<p>We emphasize, however, that <em>Contributor</em> or <em>Steering Committee</em></p>
+<blockquote>
+<p>status is always based on the technical participation of<br>
+individuals, rather than the financial weight of the<br>
+<em>Institutional Partners</em>; it is impossible to “buy your way” onto<br>
+the <em>Steering Committee</em>. The current <em>Institutional Partners</em> are<br>
+UC Berkeley, Cal Poly, Rackspace and Continuum Analytics.</p>
+</blockquote>
+</li>
+<li>
+<p>The PIs on this grant are project <em>Contributors</em>, <em>Steering Council</em></p>
+<blockquote>
+<p>members and employees of the UC Berkeley (Fernando Perez) and Cal<br>
+Poly (Brian Granger) Institutional Partners. Through their<br>
+seniority and long time (14 and 10 years respectively) commitment,<br>
+leadership and contributions, they effectively lead the Steering<br>
+Council and project.</p>
+</blockquote>
+</li>
+<li>
+<p>Project Jupyter deliberately has no full time employees through</p>
+<blockquote>
+<p>NumFOCUS; all full time staff positions are handled through<br>
+Institutional Partners. UC Berkeley currently has 1 full time<br>
+software engineer and two postdocs (in addition to F. Perez). Cal<br>
+Poly currently has one full time software engineer, who is<br>
+currently paid as an independent contractor through funds from<br>
+Microsoft/NumFOCUS (in addition to B. Granger). Other Steering<br>
+Council members are employed by Rackspace (Kyle Kelley) and<br>
+Continuum Analytics (Damian Avila).</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="projectactivitiesandhighlights">Project activities and highlights</h2>
+<p>The main project activities, supported by a combination of open source<br>
+volunteers, funded researchers and industry partners, are:</p>
+<ul>
+<li>
+<p>The creation of open source software, hosted on the Github site</p>
+<blockquote>
+<p>under the <em>ipython</em> and <em>jupyter</em> organizations. We currently host<br>
+46 public repositories.</p>
+</blockquote>
+</li>
+<li>
+<p>Hosting online services powered by our software, currently supported</p>
+<blockquote>
+<p>by Rackspace:</p>
+</blockquote>
+<ul>
+<li>
+<p>The Notebook Viewer</p>
+<blockquote>
+<p>(<a href="http://www.mathworks.com/products/matlab"><em>http://nbviewer.ipython.org</em></a>):<br>
+renders the URL of any notebook as a static web page, enabling<br>
+effortless sharing of notebooks. This service gets currently<br>
+~ 800,000 page views per month, from ~ 200,000 visitors.</p>
+</blockquote>
+</li>
+<li>
+<p>TryJupyter/tmpnb</p>
+<blockquote>
+<p>(<a href="http://www.wolfram.com/mathematica"><em>http://try.jupyter.org</em></a>):<br>
+an ephemeral, anonymous live Jupyter Notebook. This lets<br>
+anyone log into a Notebook server and experiment with the<br>
+provided example notebooks or type their own code.</p>
+</blockquote>
+</li>
+<li>
+<p>A live demo for the Nature Journal: since November 2014, as a</p>
+<blockquote>
+<p>companion for an article about IPython published by Nature, we<br>
+have hosted an instance of the ephemeral notebook service that<br>
+lives in the <a href="http://Nature.com">Nature.com</a> domain. This has served over 20,000<br>
+live sessions and broke readership records for simultaneous<br>
+users on the Nature site.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>A public chat room</p>
+<blockquote>
+<p>(<a href="http://www.sas.com"><em>https://gitter.im/ipython/ipython/help</em></a>)<br>
+where our project developers help members of the public with<br>
+general questions.</p>
+</blockquote>
+</li>
+<li>
+<p>A public mailing list where more long-form discussions take place.</p>
+</li>
+<li>
+<p>Weekly development meetings publicly broadcast via Google+ Hangouts</p>
+<blockquote>
+<p>and archived on YouTube. This improves our community engagement<br>
+and the transparency of our process. Multiple other open source<br>
+projects have adopted this model since we introduced it in 2013.</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>Estimated user base</strong>. It is very hard to get accurate user counts for<br>
+an open source project that can be downloaded freely from multiple<br>
+sources. But <em>we estimate at least 2 million users for IPython</em>. This is<br>
+a rough number, but if anything, a conservative undercount. We justify<br>
+this number as follows:</p>
+<ul>
+<li>
+<p>Estimates of Linux users (not datacenter servers) range from 20M for</p>
+<blockquote>
+<p>Ubuntu to ~70M across Linux Distributions<sup class="footnote-ref"><a href="#fn17" id="fnref17">[17]</a></sup>.</p>
+</blockquote>
+</li>
+<li>
+<p>The Debian Linux distribution tracks package installations with the</p>
+<blockquote>
+<p>‘popcon’ tool. This shows IPython to be regularly installed in ~<br>
+5% of Debian systems<sup class="footnote-ref"><a href="#fn18" id="fnref18">[18]</a></sup>.</p>
+</blockquote>
+</li>
+<li>
+<p>If we use Debian as a baseline, and estimate total Linux user counts</p>
+<blockquote>
+<p>at ~50M (rough average of the above two numbers), we get about<br>
+2.5M installs of IPython on Linux.</p>
+</blockquote>
+</li>
+<li>
+<p>This doesn't count many other sources IPython can be installed from,</p>
+<blockquote>
+<p>such as Github, Python’s package repository, the Continuum<br>
+Anaconda distribution, Enthought Canopy, etc. Nor does it count<br>
+the increasing number of server-side hosted deployments we see<br>
+more and more of.</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>Other highlights</strong>. A few other relevant achievements of the project<br>
+over the last few years:</p>
+<ul>
+<li>
+<p>Very large user base.</p>
+</li>
+<li>
+<p>Three books have been published devoted to IPython <sup class="footnote-ref"><a href="#fn19" id="fnref19">[19]</a></sup> <sup class="footnote-ref"><a href="#fn20" id="fnref20">[20]</a></sup></p>
+<blockquote>
+<p><sup class="footnote-ref"><a href="#fn21" id="fnref21">[21]</a></sup>, and several more cover IPython in detail (one or more<br>
+chapters). Two books have also been written either entirely as<br>
+Notebooks or containing extensive Notebook collections<sup class="footnote-ref"><a href="#fn22" id="fnref22">[22]</a></sup> <sup class="footnote-ref"><a href="#fn23" id="fnref23">[23]</a></sup>,<br>
+and we know several more are being written.</p>
+</blockquote>
+</li>
+<li>
+<p>Courses at top universities in the US and abroad use Jupyter</p>
+<blockquote>
+<p>Notebooks as core educational technology. We know of over a dozen<br>
+at UC Berkeley, Cal Poly, U. Santa Clara, Harvard, Columbia, U.<br>
+Claude Bernard Lyon (France), and more.</p>
+</blockquote>
+</li>
+<li>
+<p>There have been 18 academic (peer-reviewed or preprints) articles</p>
+<blockquote>
+<p><sup class="footnote-ref"><a href="#fn24" id="fnref24">[24]</a></sup> that provide IPython Notebooks to support reproducibility.</p>
+</blockquote>
+</li>
+<li>
+<p>There are independent implementations of the Jupyter protocol that</p>
+<blockquote>
+<p>provide kernels in over 25 different programming languages.</p>
+</blockquote>
+</li>
+<li>
+<p>Google Research created and released the CoLaboratory system for</p>
+<blockquote>
+<p>integration of Notebooks with Google Drive as an app in the Chrome<br>
+web store. This effort led to a funded collaboration with our<br>
+team.</p>
+</blockquote>
+</li>
+<li>
+<p>Professors Lorena Barba (George Washington U), Ian Hawke (U.</p>
+<blockquote>
+<p>Southampton) and Carlos Jerez (U. Pontificia Católica de Chile)<br>
+taught in 2014 a MOOC on numerical computing whose teaching<br>
+materials consist entirely of IPython Notebooks<sup class="footnote-ref"><a href="#fn25" id="fnref25">[25]</a></sup>.</p>
+</blockquote>
+</li>
+</ul>
+<p>There are many more teaching materials, conference talks, blog posts and<br>
+projects using our architecture and tools, that we can not fit in this<br>
+space. We refer the reader to the Notebook Gallery and list of Projects<br>
+using IPython in our wiki for a comprehensive list<br>
+(<a href="http://www-01.ibm.com/software/analytics/spss"><em>https://github.com/ipython/ipython/wiki</em></a>).</p>
+<h1 id="approachandstrategy">Approach and strategy</h1>
+<p>This project is structured in a “3+1” format, with three main focus<br>
+areas of research and development and one extra topic of ongoing work.<br>
+The three focus areas are <em>Interactive Computing</em>, <em>Computational<br>
+Narratives</em> and <em>Collaboration</em>. The problem of <em>Sustainability</em> will<br>
+require ongoing attention but is conceptually distinct from the first<br>
+three, as it doesn’t focus on specific research questions or<br>
+deliverables.</p>
+<h2 id="interactivecomputing">Interactive Computing</h2>
+<p>At the heart of the entire Jupyter architecture lies the idea of<br>
+<em>interactive computing</em>: humans executing small pieces of code in<br>
+various programming languages, and immediately seeing the results of<br>
+their computation. Interactive computing is central to data science<br>
+because scientific problems benefit from an exploratory process where<br>
+the results of each computation inform the next step and guide the<br>
+formation of insights about the problem at hand. In this <em>Interactive<br>
+Computing</em> focus area, we will create new tools and abstractions that<br>
+improve the reproducibility of interactive computations and widen their<br>
+usage in different contexts and audiences.</p>
+<h3 id="notebooksasinteractiveapplications">Notebooks as interactive applications</h3>
+<p>The Jupyter Notebook has an architecture for interactive widgets that<br>
+bind data and code in the backend (Python, Julia, R, etc.) to<br>
+interactive user interfaces running in the browser. This enables users<br>
+to quickly explore code and data by manipulating user interface controls<br>
+(buttons, sliders, etc.). This architecture is being used to create<br>
+custom user interfaces in the notebook using powerful JavaScript<br>
+libraries such as d3.js. These widgets open the door for non-technical<br>
+“consumers” of notebooks to explore data in a notebook, without coding.<br>
+We will extend the widget architecture into a full-blown application<br>
+framework.</p>
+<p>First, we will enhance our widgets to handle more complex hierarchies of<br>
+objects with events, parent/child relationships, etc. Second, we will<br>
+enable these widgets to be deployed in contexts outside the traditional<br>
+notebook, where a live computational kernel is not running, such as<br>
+nbviewer or a static HTML page. Third, we will create a system that<br>
+allows users to bundle, share and deploy sets of widgets as independent<br>
+“apps.” This will allow users and developers to leverage the notebook<br>
+for highly customized, but still data and code driven, user interfaces<br>
+that can be used with non-technical audiences.</p>
+<h3 id="modularreusableuiux">Modular, reusable UI/UX</h3>
+<p>The Notebook user interface (UI) is the main way that users interface<br>
+with our project on a daily basis. In order to create a more humane and<br>
+productive environment for users, we will invest significant effort on<br>
+improving the UI and user experience (UX).</p>
+<p>First, we will create a more modular set of UI components to enable<br>
+users and third party developers to build purpose specific UIs with<br>
+custom components, such as file browsers, debuggers, variable<br>
+inspectors, documentation panes, etc. This work will be done in<br>
+collaboration with Bloomberg (see above for the details of this<br>
+collaboration). Second, by hiring a full time UI/UX person, we will<br>
+begin to perform studies of the usability of our various UIs. This will<br>
+include qualitative user testing and quantitative A/B testing. Third, we<br>
+will add a set of richer actions that can be performed on single or<br>
+multiple notebook documents. These include multicell operations<br>
+(cut/copy/paste), structural operations that allow different sections<br>
+and subsections to be collapsed/expanded and moved atomically, and an<br>
+improved dashboard for working with directories of files and notebooks.</p>
+<h3 id="softwareengineeringwithnotebooks">Software engineering with notebooks</h3>
+<p>The Jupyter Notebook emerged out of a need to capture otherwise<br>
+transient interactive computations in a form that could be reproduced<br>
+and shared with others. However, as single notebooks grow in size and<br>
+complexity, they become difficult to work with from the software<br>
+engineering perspective (testing, documentation, reuse, modularity,<br>
+etc.). In this grant we will improve the software engineering aspects of<br>
+notebook based workflows.</p>
+<p>First, we will improve the ability of users to transition from a single<br>
+large notebook, to a smaller notebook that calls code contained in<br>
+external modules that can be tested and documented separately. Second,<br>
+we will work to enable notebooks themselves to be treated as importable<br>
+Python packages. This will enable code in one notebook to be used in<br>
+other notebooks or projects more easily. Third, we will build tools that<br>
+allow notebooks to be tested in similar ways as traditional software<br>
+projects are. Fourth, we will build tools that can verify that a<br>
+notebook is reproducible; that it gives the same results when run again.<br>
+This verification will be performed by rerunning the original notebook,<br>
+comparing the output of the rerun notebook with that of the original,<br>
+and then creating a human readable “reproducibility report” that<br>
+summarizes the differences, if any. This will also enable us to develop<br>
+quantitative metrics that measure the degree of reproducibility.</p>
+<h3 id="capstone">Capstone</h3>
+<p>As a capstone to the <em>Interactive Computing</em> focus area, we will create<br>
+a prototype of a spreadsheet app/widget that is integrated with the<br>
+notebook architecture. This prototype will validate our improvements to<br>
+widgets, our UI/UX modularization work and our work towards<br>
+“application” oriented usages of our architecture.</p>
+<h2 id="computationalnarratives">Computational Narratives</h2>
+<p>Jupyter Notebooks enable users to create and share code and data driven<br>
+narratives. These narratives end up being used in a wide variety of<br>
+<em>contexts</em>: academic publications, blog posts, books, traditional<br>
+journalism articles, technical documentation, government reports, grant<br>
+applications, industry research and commercial products. Furthermore, a<br>
+<em>single</em> notebook could be communicated in a number of different<br>
+<em>formats</em> (PDF, live demo, web page, slideshow) to different<br>
+<em>audiences</em>. Today, users encounter significant pain along this path. In<br>
+this <em>Computational Narratives</em> focus area, we will build tools to<br>
+enable the notebook to be used more easily across different contexts,<br>
+formats and audiences.</p>
+<h3 id="nbconvert">nbconvert</h3>
+<p>nbconvert is the command line tool that Jupyter offers for converting<br>
+notebooks to different formats (currently LaTeX/PDF, HTML, Markdown and<br>
+reveal.js). We will target the following areas of work on nbconvert in<br>
+this grant.</p>
+<p>First, we will create an EPUB exporter for nbconvert. Because EPUB is<br>
+based on HTML/CSS/JavaScript, it is a much better format than LaTeX/PDF<br>
+for representing the rich content found in notebooks. Most importantly,<br>
+EPUB is an ideal format for interfacing with publishers in the academic<br>
+and technical spaces. EPUB support will help our ongoing collaborations<br>
+with O’Reilly Media and Nature. Second, the nbconvert software needs<br>
+significant refactoring and improvements to its command line and<br>
+programming APIs to enable users and developers to customize it more<br>
+easily. This includes improved documentation and examples. Third, we<br>
+will explore the feasibility of exporting notebooks to Microsoft Word.<br>
+This will be done through our ongoing collaboration with the data,<br>
+development and machine learning teams at Microsoft, which is described<br>
+above.</p>
+<h3 id="elementfiltering">Element filtering</h3>
+<p>Notebooks contain code (source code and output) and markdown (narrative)<br>
+cells. When a notebook is used across different contexts and audiences,<br>
+it is useful to filter what types of content is visible. For example,<br>
+when a notebook is read by non-technical users, it is helpful to hide<br>
+all of the source code, but show the narrative text, visualizations and<br>
+widgets. To address these needs, we will create a system that allows the<br>
+notebook content to be selectively filtered, based on the intended<br>
+context and audience.</p>
+<p>First, we will enable cells to be tagged with user selected labels<br>
+(“homework”, “testing”, etc.). Users will add labels to cells using an<br>
+appropriate user interface and the labels will be stored in the notebook<br>
+metadata. Second, we will create an interactive query syntax that allows<br>
+content to be selectively hidden and shown based on the cell type, cell<br>
+labels, widgets, input/output, etc. This query syntax will be integrated<br>
+into the live notebook, nbconvert and nbviewer.</p>
+<h3 id="documentation">Documentation</h3>
+<p>Documentation is one of the primary ways that users interact with open<br>
+source software. Existing documentation for Jupyter and other open<br>
+source projects is written as static web pages generated by markup<br>
+languages such as Markdown. Developers are forced to manually copy and<br>
+paste code samples into this format. This leads to documentation that<br>
+easily falls out of dates and cannot be tested. For users, these static<br>
+web pages are not integrated with the notebook, can’t be searched and<br>
+most importantly, can’t be run as live code. Furthermore, all of the<br>
+documentation for each open source project is hosted on different places<br>
+on the web.</p>
+<p>To address these issues, we will create a notebook based documentation<br>
+system for our own and other open source software projects. This<br>
+documentation system will allow developers to write documentation as<br>
+notebooks and package them with their own project as live code. Upon<br>
+installation of these packages, users will be able to browse and search<br>
+all of the documentation from within the notebook. Most importantly,<br>
+users will be able to run the documentation as live code. To test this<br>
+approach, we will write our own documentation using this system.</p>
+<h3 id="capstone">Capstone</h3>
+<p>As a capstone to this <em>Computational Narratives</em> focus, we will test our<br>
+deliverables in the context of collaborations with publishers, both<br>
+traditional and web-oriented. These publishers include O’Reilly, Nature,<br>
+GitHub, BuzzFeed and 538.</p>
+<h2 id="collaboration">Collaboration</h2>
+<p>Since the Jupyter Notebook was released in 2011, better support for<br>
+collaborative workflows has been our users’ most common request. This is<br>
+for good reason. In our modern, web-enabled companies, universities,<br>
+research labs and non-profits, data science and scientific computing are<br>
+carried out by distributed teams whose work and contributions are<br>
+tightly coupled. For static content, this is enabled by technologies<br>
+such as email, video chat, online comment/review systems, GitHub and<br>
+Google Docs. Today, the Jupyter notebook has almost no support or these<br>
+types for synchronous and asynchronous collaborations, which limits the<br>
+impact and usefulness of the notebook in collaboration rich contexts<br>
+such as education and scientific research.</p>
+<h3 id="realtimecollaboration">Real time collaboration</h3>
+<p>In this grant, we will add real-time collaboration capabilities to the<br>
+notebook that are modelled on the abstractions and architecture of<br>
+Google Drive/Docs. This will allow multiple users to share notebooks<br>
+with each other online, and edit those notebooks together in real time.<br>
+To this collaborative editing system we will add user presence,<br>
+commenting and cloud based document storage.</p>
+<p>As described above, this work is extremely technical and will require<br>
+major rewrites of significant portions of our architecture. Furthermore,<br>
+there are significant security issues to work through. Because of the<br>
+difficulty and scope of this work, we are working directly with Google<br>
+Research to help us design the underlying architectures and implement<br>
+them in our software (see above for the details of this collaboration).<br>
+The initial implementation of these features will rely on open Google<br>
+APIs (Drive API, Real Time API), however, we plan on building<br>
+abstractions and APIs that will allow us to plug into a number of<br>
+different collaborative backends (Firebase, etc.).</p>
+<h3 id="jupyterhub">JupyterHub</h3>
+<p>The basic Jupyter Notebook is a single user web application that most<br>
+users install and run on their own laptop or desktop. JupyterHub is a<br>
+multiuser version of the notebook server than can be run on a central<br>
+server(s) or in the cloud. JupyterHub eases the installation and<br>
+deployment of the notebook to large numbers of users and opens the door<br>
+for novel collaboration possibilities, However, the version of<br>
+JupyterHub that exists today has very limited sharing capabilities. In<br>
+this grant we will improve the collaboration capabilities of JupyterHub<br>
+in the following ways.</p>
+<p>First, we will define richer and finer grained sharing semantics that<br>
+allow users to share notebooks with other individuals or groups. This<br>
+will include user interfaces that make this easy to do across different<br>
+storage and deployment backends. Second, we will work to create tools<br>
+that ease the deployment of JupyterHub in different contexts. Third, we<br>
+will allow users of JupyterHub to “publish” notebook to other users of<br>
+JupyterHub or the public.</p>
+<h3 id="capstone">Capstone</h3>
+<p>The individual tasks in this <em>Collaboration</em> focus area involve creating<br>
+new, but semi-separate, collaboration capabilities for the different<br>
+sub-projects (Jupyter Notebook, JupyterHub). As a capstone, we will<br>
+begin to integrate these different collaboration approaches to create an<br>
+integrated, ubiquitous system for notebook based collaboration.</p>
+<h2 id="sustainability">Sustainability</h2>
+<p>As the scale of Jupyter’s usage and development expands, it is important<br>
+to create for us to create a sustainable technical project, community<br>
+and organization. This focus area is conceptually different from the<br>
+above described 3 main technical areas and will involve an ongoing set<br>
+of activities throughout the project period.</p>
+<h3 id="people">People</h3>
+<p>People are the backbone of our sustainability plan. While the project<br>
+has had over 400 contributors, most of the major work has been done by a<br>
+few key individuals. Thus, our first goal is to expand the set of these<br>
+key contributors.</p>
+<p>First, we will set up a robust training program that leverages senior<br>
+project staff to manage and train new undergraduates, graduate students<br>
+and postdocs to work on the project at Cal Poly and UC Berkeley. New<br>
+data science programs at both of these universities will be used as the<br>
+needed source of initial human capital for these efforts. We have an<br>
+excellent track record of training students; two of our most senior<br>
+Contributors and Steering Council members were previously undergraduate<br>
+students of Brian Granger.</p>
+<p>Second, we will send these newly trained individuals out into academia<br>
+and industry where they can expand our network of collaborators,<br>
+contributors and Institutional Partners even further. We know of<br>
+multiple companies that are currently interested in hiring project newly<br>
+trained Contributors and Steering Council members. To initiate this<br>
+“sending out” this grant will fund two of our current Steering Council<br>
+members (Min Ragan-Kelley and Thomas Kluyver) to move from UC Berkeley<br>
+to institutions in Norway and the UK. We plan on working with them to<br>
+build their own, independent, European based funding sources in the<br>
+future. Their move will also create two new Institutional Partners:<br>
+Simula Research Lab and the University of Southampton or Sheffield<br>
+(which of these two will join is being determined, but one of them<br>
+will).</p>
+<p>Finally, a key concern of the project, inscribed in a larger societal<br>
+discussion of the problem, is improving the diversity of our community.<br>
+We address it in detail in the required Appendix.</p>
+<h3 id="events">Events</h3>
+<p>Jupyter related events will enable us to build a more sustainable<br>
+community of users, developers and collaborators.</p>
+<p>First, we will continue to have week long developer meetings twice per<br>
+year. These meetings bring together 5-15 core developers and designers<br>
+to review the project’s progress, discuss major technical and<br>
+architectural issues and plan the future roadmap of the project. Because<br>
+our core developers are geographically distributed, these in person<br>
+meetings are critically important for us to build a cohesive developer<br>
+community and project.</p>
+<p>Second, for the first time, we plan on organizing JupyterCon, an annual<br>
+conference to bring together all of Jupyter’s developers, users,<br>
+collaborators and Institutional Partners. This conference will be a 2-3<br>
+day event in the Bay Area or New York that has time for talks, coding<br>
+sprints, brainstorming, etc. As the project grows in size, JupyterCon<br>
+will be an important way for us to bring our community together in a<br>
+focused event. JupyterCon will also enable Institutional Partners to<br>
+provide input to the project; eventually we forsee Insitutional Partners<br>
+as becoming an advisory board for the project that works alongside the<br>
+Steering Council. This centralized conference will also be used to seed<br>
+other, smaller community organized outreach event in cities throughout<br>
+the world (JupyterDays).</p>
+<p>Third, we will continue to disseminate the results of our work to an<br>
+ever wider range of communities in academia and industry. This will<br>
+include talks at academic and industry focused conferences and workshops<br>
+and the publication of articles about our work in academic journals.</p>
+<h1 id="yearbyyearoutput">Year by year output</h1>
+<h2 id="ourapproachtobuildingsoftware">Our approach to building software</h2>
+<p>We want to clarify our approach to building software and describe how<br>
+that relates to the deliverables of this grant. The approach described<br>
+here has emerged from our own experience in building open source<br>
+software over the last 14 years as well as a careful study and<br>
+application of the methods described by Eric Ries in his book, the <em>The<br>
+Lean Startup</em>, as well as the books and courses of Steve Blank.</p>
+<p>First, for each deliverable, we always begin by creating an Minimum<br>
+Viable Product (<strong>MVP</strong>). The MVP is an initial implementation of that<br>
+deliverable that provides the absolute minimal set of features we<br>
+hypothesize will be useful to our users. The MVP always has a very<br>
+limited scope and lacks features present in the final version.</p>
+<p>Second, we immediately release the MVP to our users and begin watching<br>
+how they respond. Our goal in this phase is to collect as much<br>
+information as possible to <strong>validate</strong> our hypotheses about the<br>
+deliverable. During this stage, we also identify the individuals and<br>
+organizations who are stakeholders and collaborators in building that<br>
+particular deliverable.</p>
+<p>Third, we then incorporate the information gathered through validation<br>
+to build the final version of the deliverable that has the exact set of<br>
+features required by users. The final version typically has much larger<br>
+scope than the MVP and is built with the collaborators identified in the<br>
+validation stage.</p>
+<p>Given this background, <em>we expect the funding provided in this grant<br>
+will be sufficient for us to complete the MVP and validation stages of<br>
+each deliverable</em>. For some of the smaller deliverables, we also expect<br>
+to start building the final versions. However, we expect the final<br>
+versions of all deliverables to be out of scope of this grant for two<br>
+reasons. First, the validation stage is completely unpredictable.<br>
+Features are used in unexpected ways, new groups of users emerge, other<br>
+developers extend and reuse our work in innovative ways, and new<br>
+collaborators and stakeholders emerge. Second, the validation phase<br>
+typically expands the scope of the deliverable far beyond our original<br>
+plans and budget.</p>
+<p>However, we want to emphasize that the validated MVPs produced through<br>
+this grant’s activities will be highly functional and have a deep impact<br>
+on our users. To set the scale appropriately, we consider most of our<br>
+current software, including the Jupyter Notebook, to be at the validated<br>
+MVP stage.</p>
+<h2 id="yearbyyearplanofdeliverables">Year-by-year plan of deliverables</h2>
+<p>The following table details our year-by-year plan of deliverables in the<br>
+core focus areas of <em>Interactive Computing</em>, <em>Computational Narratives</em><br>
+and <em>Collaboration</em>. The numbers in the table represent the number of<br>
+full time staff technical staff working on that deliverable at UC<br>
+Berkeley, Cal Poly, Simula Research Lab and the University of<br>
+Southampton. This table only includes our eight software engineers and<br>
+postdocs, as well as ½ FTE on Y1 for a technical writing consultant. We<br>
+expect the UI/UX designer, Project Manager and 2 PIs to work across all<br>
+deliverables each year.</p>
+<p>Deliverable           Year 1   Year 2   Year 3</p>
+<hr>
+<p>NB as Apps ⟂          0.5      1        1<br>
+UI/UX ⟂               1.5      2        2<br>
+NB Software Eng. ∥    1<br>
+nbconvert ∥                    1        1<br>
+Element Filtering ⟂   1        0.5      0.5<br>
+Documentation ∥       1.5      1<br>
+Real Time Collab ⟂    2        2.5      2.5<br>
+JupyterHub ⟂          1                 1</p>
+<h2 id="measuringeffectiveness">Measuring effectiveness</h2>
+<p>We will measure the effectiveness of our work through the following<br>
+metrics. All target numbers are three year totals unless otherwise<br>
+specified.</p>
+<ul>
+<li>
+<p>Number of talks given at conferences and workshops we have never<br>
+attended before (target=10).</p>
+</li>
+<li>
+<p>Ethnic and gender diversity of active Jupyter developers in our<br>
+broader community (target=3 from currently underrepresented groups.<br>
+This would be a very significant increase, given our core<br>
+development team has roughly a dozen regularly active members).</p>
+</li>
+<li>
+<p>Traffic on project web site and web services (nbviewer and tmpnb)<br>
+(target=4x current traffic).</p>
+</li>
+<li>
+<p>Number of deployments of JupyterHub by 3rd parties in research,<br>
+education, industry (target=direct knowledge of 25).</p>
+</li>
+<li>
+<p>The number of universities, companies and research labs that adopt<br>
+the Jupyter Notebook and related technologies at an institutional<br>
+level (target=6).</p>
+</li>
+<li>
+<p>Institutions and projects that use our building blocks as<br>
+infrastructure to create other software and products (target=12).</p>
+</li>
+<li>
+<p>The number of books, academic publications, education course<br>
+materials, journalism articles that use the notebook as a primary or<br>
+secondary mechanism to deliver content (target=100).</p>
+</li>
+<li>
+<p>The number of new collaborations with large companies in the data<br>
+science space (target=6).</p>
+</li>
+<li>
+<p>The number of companies providing funding for the project (target=12<br>
+companies).</p>
+</li>
+<li>
+<p>The number of new Institutional Partners of the project (target=4)</p>
+</li>
+<li>
+<p>The number of undergraduate, graduate and postdoc students that are<br>
+trained through the grant activities and placed in related jobs<br>
+(target=12).</p>
+</li>
+<li>
+<p>Number of deliverables for which the MVP and validation stages are<br>
+completed (target=all).</p>
+</li>
+<li>
+<p>The MVP and validation stages increase the impact, scope and reached<br>
+users of our deliverables so significantly that we have to do<br>
+additional fundraising to complete final versions.</p>
+</li>
+</ul>
+<h1 id="budgetjustification">Budget justification</h1>
+<p>The main expenses for this grant are for the salaries, travel and<br>
+supplies for full time project staff who will work at UC Berkeley, Cal<br>
+Poly, Simula Research Lab and the University of Southampton or<br>
+Sheffield. Because of this, our budget justification is organized around<br>
+these staff positions. The amounts allocated for travel are based on our<br>
+actual travel numbers over the past two years. For project PIs, this<br>
+amounts to approximately 10 week long trips per year and for other<br>
+project staff this amounts to 1-3 week long trips per year. First year<br>
+supplies are higher to enable us to purchase computers and monitors for<br>
+staff.</p>
+<p><strong>Project PIs</strong> (Dr. Fernando Perez and Dr. Brian Granger). Core<br>
+activities of the project PIs include managing and training staff,<br>
+creating the strategic direction of the project, building relationships<br>
+with Institutional Partners and key collaborators, giving talks at<br>
+conferences and workshops, fundraising, community building, hiring<br>
+project staff, etc. To enable both PIs to focus on Project Jupyter, the<br>
+budget funds significant fractions of the PIs’ time. Dr. Perez will lead<br>
+the UC Berkeley team and bridge the project with related activities in<br>
+data science at the Berkeley Institute for Data Science and Lawrence<br>
+Berkeley National Laboratory, where he holds a Staff Scientist<br>
+appointment. Dr. Brian Granger will lead the team at Cal Poly, where he<br>
+is an Associate Professor of Physics and Data Science. This position<br>
+gives him access to highly motivated and talented students that can be<br>
+hired and trained to work on the project.</p>
+<p><strong>Existing full time staff</strong> (Dr. Min Ragan-Kelley, Dr. Thomas Kluyver,<br>
+Dr. Matthias Bussonnier and Jon Frederic). These individuals are core<br>
+Contributors and Steering Council members who form the technical<br>
+backbone of the project; without their full time work on the project,<br>
+technical activity would completely grind to a halt. Dr. Ragan-Kelley<br>
+will be working as a postdoc at Simula Research Lab. Dr. Kluyver will be<br>
+working as a postdoc at the University of Southampton. Dr. Bussonnier<br>
+will be a postdoc at UC Berkeley. Mr. Frederic will be a senior software<br>
+engineer at Cal Poly.</p>
+<p><strong>Project Manager.</strong> This grant will scale our full time project staff<br>
+from 6 to 14. We feel it is critical for us to hire a new full time<br>
+Project Manager (at UC Berkeley) to help the PIs manage the increased<br>
+project scope and technical staff. This role will enable us to segment<br>
+the deliverables into smaller pieces that can be tackled in parallel by<br>
+more independent teams, while still keeping the project wide vision and<br>
+approach consistent.</p>
+<p><strong>UX/UI Designer.</strong> Significant amounts of our current and proposed work<br>
+involves visual and interactive design, as well as frontend web<br>
+development. We currently have no designers on the team; this has<br>
+created a significant bottleneck for us, even with our current scope. To<br>
+enable us to tackle the ambitious user interface work of this grant, we<br>
+propose to hire a new full time user interface/experience (UI/UX)<br>
+designer who will work with the different teams to design, build and<br>
+test these user interfaces.</p>
+<p><strong>Software engineering.</strong> The deliverables of this grant will expand the<br>
+scope, complexity and effort of the project significantly. The<br>
+popularity of the project has also put incredible pressure on our<br>
+existing developers to give talks at conferences and support users<br>
+online. To enable us to tackle these challenges, we propose to hire four<br>
+new full time software engineers: two postdocs at UC Berkeley and two<br>
+software engineers at Cal Poly.</p>
+<p><strong>Administrative help.</strong> Currently the project PIs have to do all<br>
+project administration: filing reimbursements, managing the budget,<br>
+travel and event planning, etc. To handle the increased budget and<br>
+activities of this grant we propose to hire two new project<br>
+administrators (full time at Cal Poly and ½ time at UC Berkeley). These<br>
+administrators will free the PIs, Project Manager and technical staff to<br>
+focus on the deliverable of the grant. The full time administrator at<br>
+Cal Poly will also be the lead on planning various project events: core<br>
+developer meetings, JupyterCon and JupyterDays.</p>
+<p><strong>Consultants.</strong> During the first year we will hire two consultants.<br>
+First, we will hire a web/design firm to overhaul our entire web<br>
+presence, which has seen nearly zero development in years, is a poor<br>
+representation of the project and lacks key usability aspects. Second,<br>
+we will hire a technical writer to go over our entire body of<br>
+documentation and help us triage, rewrite, clarify and organize it.<br>
+Beyond the first year, our full time technical staff will take over the<br>
+maintenance of these resources, however, their current state is so bad<br>
+that we need extra help catching up.</p>
+<p><strong>Students.</strong> This grant will fund 4 summer undergraduate students each<br>
+year at Cal Poly. These students are a critical part of our long term<br>
+sustainability plan. Our goal is to train these students to work on<br>
+Project Jupyter in different capacities (software engineering, technical<br>
+writing, design, etc.) and then send them out to jobs at current and<br>
+future Institutional Partners. Dr. Granger’s position at Cal Poly gives<br>
+him access to talented students in the new Data Science and Computer<br>
+Science degree programs.</p>
+<p><strong>JupyterCon/Days.</strong> We plan on organizing a new Jupyter focused<br>
+conference each year (JupyterCon). This will be a 2-3 day event that<br>
+will bring together contributors, steering council members,<br>
+institutional partners, third party developers and users. Over the long<br>
+term, we plan on this conference becoming self supporting through<br>
+industry sponsorship and registration fees. The grant budget includes<br>
+seed money we know will be required to get this conference off the<br>
+ground. Some of this seed money will also be used to seed single day<br>
+Jupyter events that are organized by the larger community (JupyterDays).</p>
+<p><strong>Core Developer Workshops.</strong> Over the past two years, we have bought<br>
+our core project Contributors together twice a year for a week long in<br>
+person meeting. During these meetings, we review the project’s progress<br>
+and set a roadmap for the following six months. Given the distributed<br>
+nature of our project, these in person meetings are absolutely critical<br>
+in building our team and setting the strategic vision of the project.<br>
+The grant budget includes funding for our core Contributors to attend<br>
+these events.</p>
+<h1 id="othersourcesofsupport">Other sources of support</h1>
+<p>Through NumFOCUS, Project Jupyter currently has funding from Microsoft,<br>
+which donated $100,000 in 2013 to NumFOCUS for general project work.<br>
+This money has been used to hire Steering Council member (Jonathan<br>
+Frederic) as an independent contractor working at Cal Poly with PI Brian<br>
+Granger.</p>
+<p>The Institutional Partner, Rackspace, is donating significant cloud<br>
+hosting resources and the time of Kyle Kelley, a Rackspace employee and<br>
+Steering Council member.</p>
+<p>The PIs of this grant, through the Institutional Partners UC Berkeley<br>
+and Cal Poly have the following Jupyter related funding:</p>
+<ul>
+<li>
+<p>A $1.15M grant from the Alfred P. Sloan Foundation during 2013 and</p>
+<blockquote>
+<p>2014 for the creation of nbconvert, interactive widgets and a<br>
+prototype of JupyterHub. We expect this grant’s funds to run out<br>
+in March 2015.</p>
+</blockquote>
+</li>
+<li>
+<p>A $100,000 grant from Google in the fall of 2014 to UC Berkeley to</p>
+<blockquote>
+<p>hire Steering Council member (Matthias Bussonnier) as a postdoc to<br>
+begin integrating the Jupyter Notebook and Google Drive.</p>
+</blockquote>
+</li>
+<li>
+<p>A $100,000 grant from the Simons Foundation to F. Perez at UC</p>
+<blockquote>
+<p>Berkeley, that supports the integration of the Jupyter Notebook<br>
+into a system for data sharing in neuroimaging. This grant is in<br>
+collaboration with the Stanford Center for Cognitive and<br>
+Neurobiological Imaging, led by prof. Brian Wandell.</p>
+</blockquote>
+</li>
+</ul>
+<p>We also plan to raise additional funding through UC Berkeley and Cal<br>
+Poly in the coming years. This additional funding will be used primarily<br>
+to fund new work not funded by this grant. Examples include:</p>
+<ul>
+<li>A replacement or extension to Markdown syntax that handles the full
+<blockquote>
+<p>complexity of academic and book publishing.</p>
+</blockquote>
+</li>
+</ul>
+<!-- -->
+<ul>
+<li>
+<p>Features found in traditional Interactive Development Environments</p>
+<blockquote>
+<p>(IDEs) (IntelliJ, Microsoft Visual Studio and Eclipse) such as an<br>
+interactive debugger, variable inspector, refactoring tools, etc.</p>
+</blockquote>
+</li>
+<li>
+<p>Technologies that enable the Jupyter Notebook and JupyterHub to</p>
+<blockquote>
+<p>scale to internet sized user groups.</p>
+</blockquote>
+</li>
+<li>
+<p>Developing tmpnb and nbviewer into full blown platforms for sharing,</p>
+<blockquote>
+<p>indexing, reviewing/commenting and searching notebook based<br>
+content.</p>
+</blockquote>
+</li>
+<li>
+<p>Robust security for the Jupyter Notebook that addresses deployments</p>
+<blockquote>
+<p>on the open internet and in highly secure settings.</p>
+</blockquote>
+</li>
+<li>
+<p>A federated architecture for live Jupyter Notebooks in the cloud</p>
+<blockquote>
+<p>that spans multiple cloud vendors (Amazon, Microsoft, Rackspace)<br>
+and geographic regions.</p>
+</blockquote>
+</li>
+<li>
+<p>Internationalization of the Jupyter Notebook, JupyterHub and</p>
+<blockquote>
+<p>Documentation.</p>
+</blockquote>
+</li>
+<li>
+<p>Accessibility support across all our software.</p>
+</li>
+<li>
+<p>Improvements to our parallel computing framework. There is</p>
+<blockquote>
+<p>significant interest in this area from federal agencies (NIH, NSF<br>
+and DOE) in this area. Problems such as the use of our tools in<br>
+High Performance Computing (parallel supercomputers) environments,<br>
+or in domain-specific contexts like genome sequence analysis,<br>
+present challenges that go far beyond the scope of the current<br>
+proposal. We have already been approached by multiple scientists<br>
+interested in pushing forward with ideas based on our architecture<br>
+in directions like these and others.</p>
+</blockquote>
+</li>
+<li>
+<p>Implementations of interactive widgets for languages other than</p>
+<blockquote>
+<p>Python, such as R.</p>
+</blockquote>
+</li>
+</ul>
+<p>We have already received preliminary interest from the following<br>
+companies in funding these and other initiatives: Google, Microsoft,<br>
+Bloomberg, Continuum, Quantopian, West Health, IBM. In the coming 3<br>
+years, much of the time and effort of the project leaders and PIs of<br>
+this grant (Fernando Perez and Brian Granger) will focus on this<br>
+fundraising work. Some of the industry money that we raise will also be<br>
+used to build final versions of the deliverables of this grant that end<br>
+up with a larger scope than currently envisioned.</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Matlab, MathWorks, 2014<br>
+&lt;<a href="http://www.mathworks.com/products/matlab"><em>http://www.mathworks.com/products/matlab</em></a>&gt; <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Mathematica, Wolfram, 2014<br>
+&lt;<a href="http://www.wolfram.com/mathematica"><em>http://www.wolfram.com/mathematica</em></a>&gt; <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>SAS, 2014 &lt;<a href="http://www.sas.com"><em>http://www.sas.com</em></a>&gt; <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p>SPSS, IBM, 2014<br>
+&lt;<a href="http://www-01.ibm.com/software/analytics/spss"><em>http://www-01.ibm.com/software/analytics/spss</em></a>&gt; <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn5" class="footnote-item"><p>Sage Math Project, 2014<br>
+&lt;<a href="http://www.sagemath.org"><em>http://www.sagemath.org</em></a>&gt; <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn6" class="footnote-item"><p>RStudio, 2014<br>
+&lt;<a href="http://www.rstudio.com"><em>http://www.rstudio.com</em></a>&gt; <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn7" class="footnote-item"><p>Spyder IDE, 2014<br>
+&lt;<a href="https://code.google.com/p/spyderlib"><em>https://code.google.com/p/spyderlib</em></a>&gt; <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn8" class="footnote-item"><p>Beaker Notebook, 2014<br>
+&lt;<a href="http://beakernotebook.com"><em>http://beakernotebook.com</em></a>&gt; <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn9" class="footnote-item"><p>Zeppelin Project, 2014<br>
+&lt;<a href="http://zeppelin-project.org"><em>http://zeppelin-project.org</em></a>&gt; <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn10" class="footnote-item"><p>&quot;Account - SageMathCloud.&quot; 2013. 30 Jan. 2015<br>
+&lt;<a href="https://cloud.sagemath.com/"><em>https://cloud.sagemath.com/</em></a>&gt; <a href="#fnref10" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn11" class="footnote-item"><p>&quot;Wakari - Web-based Python Data Analysis.&quot; 2012. 30 Jan. 2015<br>
+&lt;<a href="https://wakari.io/"><em>https://wakari.io/</em></a>&gt; <a href="#fnref11" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn12" class="footnote-item"><p>Google Drive, Google, 2014<br>
+&lt;<a href="https://www.google.com/drive"><em>https://www.google.com/drive</em></a>&gt; <a href="#fnref12" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn13" class="footnote-item"><p>The git Project, 2014<br>
+&lt;<a href="http://git-scm.com"><em>http://git-scm.com</em></a>&gt; <a href="#fnref13" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn14" class="footnote-item"><p>GitHub, 2014 &lt;<a href="https://github.com"><em>https://github.com</em></a>&gt; <a href="#fnref14" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn15" class="footnote-item"><p>&quot;IPython interactive demo : Nature News &amp; Comment.&quot; 2014. 30 Jan.<br>
+2015<br>
+&lt;<a href="http://www.nature.com/news/ipython-interactive-demo-7.21492"><em>http://www.nature.com/news/ipython-interactive-demo-7.21492</em></a>&gt; <a href="#fnref15" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn16" class="footnote-item"><p>Our detailed governance policies are publicly available here:<br>
+<a href="https://github.com/ipython/ipython/wiki/IPEP-29:-Project-Governance"><em>https://github.com/ipython/ipython/wiki/IPEP-29:-Project-Governance</em></a>. <a href="#fnref16" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn17" class="footnote-item"><p><a href="http://en.wikipedia.org/wiki/Ubuntu_(operating_system)#Installed_base"><em>http://en.wikipedia.org/wiki/Ubuntu_(operating_system)#Installed_base</em></a></p>
+<p><a href="http://en.wikipedia.org/wiki/Linux_adoption#Measuring_desktop_adoption"><em>http://en.wikipedia.org/wiki/Linux_adoption#Measuring_desktop_adoption</em></a> <a href="#fnref17" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn18" class="footnote-item"><p><a href="https://qa.debian.org/popcon.php?package=ipython"><em>https://qa.debian.org/popcon.php?package=ipython</em></a> <a href="#fnref18" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn19" class="footnote-item"><p>&quot;Learning IPython for Interactive Computing and Data ...&quot; 2014.<br>
+30 Jan. 2015<br>
+&lt;<a href="https://www.packtpub.com/big-data-and-business-intelligence/learning-ipython-interactive-computing-and-data-visualization"><em>https://www.packtpub.com/big-data-and-business-intelligence/learning-ipython-interactive-computing-and-data-visualization</em></a>&gt;, <a href="#fnref19" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn20" class="footnote-item"><p>&quot;IPython Notebook Essentials | Packt.&quot; 2014. 30 Jan. 2015<br>
+&lt;<a href="https://www.packtpub.com/application-development/ipython-notebook-essentials"><em>https://www.packtpub.com/application-development/ipython-notebook-essentials</em></a>&gt; <a href="#fnref20" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn21" class="footnote-item"><p>Rossant, Cyrille. <em>IPython Interactive Computing and<br>
+Visualization Cookbook</em>. Packt Publishing Ltd, 2014. <a href="#fnref21" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn22" class="footnote-item"><p>&quot;Python for Signal Processing - Featuring IPython Notebooks.&quot;<br>
+2013. 30 Jan. 2015<br>
+&lt;<a href="http://www.springer.com/engineering/signals/book/978-3-319-01341-1"><em>http://www.springer.com/engineering/signals/book/978-3-319-01341-1</em></a>&gt; <a href="#fnref22" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn23" class="footnote-item"><p>&quot;Mining the Social Web, 2nd Edition - O'Reilly Media.&quot; 2013. 30<br>
+Jan. 2015<br>
+&lt;<a href="http://shop.oreilly.com/product/0636920030195.do"><em>http://shop.oreilly.com/product/0636920030195.do</em></a>&gt; <a href="#fnref23" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn24" class="footnote-item"><p>&quot;A gallery of interesting IPython Notebooks · ipython ... -<br>
+GitHub.&quot; 2013. 30 Jan. 2015<br>
+&lt;<a href="https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks"><em>https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks</em></a>&gt; <a href="#fnref24" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn25" class="footnote-item"><p>&quot;Practical Numerical Methods with Python | GW Open edX.&quot; 2014. 30<br>
+Jan. 2015<br>
+&lt;<a href="http://openedx.seas.gwu.edu/courses/GW/MAE6286/2014_fall/about"><em>http://openedx.seas.gwu.edu/courses/GW/MAE6286/2014_fall/about</em></a>&gt; <a href="#fnref25" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+</div>
+            </section>
+
+
+            <footer class="post-full-footer">
+
+                <section class="author-card">
+                        <img class="author-profile-image" src="//www.gravatar.com/avatar/95198572b00e5fbcd97fb5315215bf7a?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Fernando Perez" />
+                    <section class="author-card-content">
+                        <h4 class="author-card-name"><a href="/author/fernando/">Fernando Perez</a></h4>
+                            <p>Read <a href="/author/fernando/">more posts</a> by this author.</p>
+                    </section>
+                </section>
+                <div class="post-full-footer-right">
+                    <a class="author-card-button" href="/author/fernando/">Read More</a>
+                </div>
+
+            </footer>
+
+
+        </article>
+
+    </div>
+</main>
+
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+
+<script>console.error("The {{get}} helper is not available. The Public API flag must be enabled in labs if you wish to use the {{get}} helper. See https://help.ghost.org/hc/en-us/articles/115000301672-Public-API-Beta");</script>
+                <article class="post-card post tag-jupyter tag-funding tag-2015 tag-helmsley tag-moore tag-sloan">
+        <a class="post-card-image-link" href="/2015/07/07/jupyter-funding-2015/">
+            <div class="post-card-image" style="background-image: url(/content/images/2015/07/HSM.png)"></div>
+        </a>
+    <div class="post-card-content">
+        <a class="post-card-content-link" href="/2015/07/07/jupyter-funding-2015/">
+            <header class="post-card-header">
+                    <span class="post-card-tags">jupyter</span>
+                <h2 class="post-card-title">New funding for Jupyter</h2>
+            </header>
+            <section class="post-card-excerpt">
+                <p>We are pleased to announce that the Jupyter/IPython project has received $6M in funding from three organisations: The Leona M. and Harry B. Helmsley Charitable Trust The Gordon and Betty Moore Foundation</p>
+            </section>
+        </a>
+        <footer class="post-card-meta">
+                <img class="author-profile-image" src="//www.gravatar.com/avatar/95198572b00e5fbcd97fb5315215bf7a?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Fernando Perez" />
+            <span class="post-card-author"><a href="/author/fernando/">Fernando Perez</a></span>
+        </footer>
+    </div>
+</article>
+
+                <article class="post-card post no-image">
+    <div class="post-card-content">
+        <a class="post-card-content-link" href="/2015/06/22/ipython-3-2-release-security-update/">
+            <header class="post-card-header">
+                <h2 class="post-card-title">IPython 3.2 released</h2>
+            </header>
+            <section class="post-card-excerpt">
+                <p>Hello Jovyans, We just release a few hours a ago a new minor version of IPython. Please upgrade your IPython notebook installation to 3.2 as soon as possible. There are important security</p>
+            </section>
+        </a>
+        <footer class="post-card-meta">
+                <img class="author-profile-image" src="//www.gravatar.com/avatar/e76c7ebc9d2e8a4b840f13cd01946437?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x" alt="Kyle Kelley" />
+            <span class="post-card-author"><a href="/author/kyle/">Kyle Kelley</a></span>
+        </footer>
+    </div>
+</article>
+
+        </div>
+    </div>
+</aside>
+
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="http://blog.jupyter.org">
+            <span>Project Jupyter</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">&mdash;</span>
+    <div class="floating-header-title">Project Jupyter: Computational Narratives as the Engine of Collaborative Data Science</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
+</svg>
+</div>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=Project%20Jupyter%3A%20Computational%20Narratives%20as%20the%20Engine%20of%20Collaborative%20Data%20Science&amp;url=http://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science/"
+            onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.jupyter.org/2015/07/07/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science/"
+            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+        </a>
+    </div>
+    <progress class="progress" value="0">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+
+
+
+
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="http://blog.jupyter.org">Project Jupyter</a> &copy; 2017</section>
+                <nav class="site-footer-nav">
+                    <a href="http://blog.jupyter.org">Latest Posts</a>
+                    
+                    <a href="https://twitter.com/ProjectJupyter" target="_blank">Twitter</a>
+                    <a href="https://ghost.org" target="_blank">Ghost</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=09db7f30e7"></script>
+
+
+    <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script>
+
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-python.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52617120-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>
+try {
+  document.onreadystatechange = function(){ 
+    (document.getElementsByClassName('blog-logo')[0]||{}).href = 'https://jupyter.org';
+  }
+} catch (e) {
+  console.log('error changing the logo link to jupyter homapage')
+}
+</script>
+
+</body>
+</html>

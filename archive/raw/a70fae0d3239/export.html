@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>CVE-2021–32797 and CVE-2021–32798 Remote Code execution in JupyterLab and Jupyter Notebook</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">CVE-2021–32797 and CVE-2021–32798 Remote Code execution in JupyterLab and Jupyter Notebook</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+TL:DR; All recent JupyterLab and Notebook versions are susceptible to a attack where a maliciously crafted notebook can trigger arbitrary…
+</section>
+<section data-field="body" class="e-content">
+<section name="b3e8" class="section section--body section--first"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="8d3d" id="8d3d" class="graf graf--h3 graf--leading graf--title">CVE-2021–32797 and CVE-2021–32798 Remote Code execution in JupyterLab and Jupyter Notebook</h3><p name="e05b" id="e05b" class="graf graf--p graf-after--h3">TL:DR; All recent JupyterLab and Notebook versions are susceptible to a attack where a maliciously crafted notebook can trigger arbitrary code execution when a user views these malicious files.</p><p name="d7ee" id="d7ee" class="graf graf--p graf-after--p">We strongly advise all users to deploy the new version of JupyterLab and Jupyter Notebook.</p><p name="f705" id="f705" class="graf graf--p graf-after--p">Jupyter Notebook 6.4.1 or above, 5.7.11 or above.</p><p name="b310" id="b310" class="graf graf--p graf-after--p">Jupyter Lab 3.1.4 or above, 3.0.17 or above, 2.3.2 or above, 2.2.10 or above , 1.2.21 or above</p><p name="0222" id="0222" class="graf graf--p graf-after--p graf--trailing"><strong class="markup--strong markup--p-strong">This blog post will be updated with links to the various patches, exploit and disclosure later once the final links are available</strong>.</p></div></div></section><section name="e9ca" class="section section--body section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="4a63" id="4a63" class="graf graf--h3 graf--leading">Jupyter Security Model</h3><p name="845e" id="845e" class="graf graf--p graf-after--h3">Jupyter Notebook act as a REPL (Read Eval Print Loop) in a browser, our main goal is to expose as many functionalities to our users, with the least restrictions. We also want users to be able to share their results with other, and let everyone be capable of reproducing the result.</p><p name="f5ec" id="f5ec" class="graf graf--p graf-after--p">When receiving an untrusted notebook from a potentially malicious source we still want users to be able to inspect a notebook without risks, our approach is that an untrusted notebook has restrictive capabilities until all cells have been manually inspected and explicitly run by a user, or the notebook is explicitly marked as trusted. If one finds a way to bypass this trust mechanism, a notebook might be able to execute code in the browser at at a time where a user is not expecting execution to occur.</p><p name="50d2" id="50d2" class="graf graf--p graf-after--p">This is what happen in these particular CVEs, where some content of a notebook were improperly handled.</p><p name="6fa3" id="6fa3" class="graf graf--p graf-after--p"><strong class="markup--strong markup--p-strong">[This part of the blog post will be updated with links to actual reports, and proof of concept once the patched version have reached enough package repositories]</strong></p><h3 name="6af6" id="6af6" class="graf graf--h3 graf-after--p"><strong class="markup--strong markup--h3-strong">CVE Timeline</strong></h3><p name="f977" id="f977" class="graf graf--p graf-after--h3">We want to thanks Guillaume Jeanne (Google), and Timo Schmid (Google) for the vulnerability report and helping us through the fixing process.</p><ul class="postList"><li name="7c0b" id="7c0b" class="graf graf--li graf-after--p">Thursday, 15 Jul 2021 07:11:13 -0700 (PDT): Initial question about security issue disclosure on security@ipython.org (no specific on the vulnerability)</li><li name="8753" id="8753" class="graf graf--li graf-after--li">Tuesday, 20 Jul 2021 05:52:09 -0700 (PDT): Actual Vulnerability Report.</li><li name="ca6c" id="ca6c" class="graf graf--li graf-after--li">Tuesday, 20 Jul 2021 : Open relevant GitHub security advisory on <a href="https://github.com/jupyter/notebook/security/advisories/GHSA-hwvq-6gjx-j797" data-href="https://github.com/jupyter/notebook/security/advisories/GHSA-hwvq-6gjx-j797" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">Notebook</a> and <a href="https://github.com/jupyterlab/jupyterlab/security/advisories/GHSA-4952-p58q-6crx" data-href="https://github.com/jupyterlab/jupyterlab/security/advisories/GHSA-4952-p58q-6crx" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">JupyterLab</a> Repositories</li><li name="dd94" id="dd94" class="graf graf--li graf-after--li">Thursday, 5 August 2021 : First releases with patched version on PyPI.</li><li name="f59b" id="f59b" class="graf graf--li graf-after--li">Monday, 9 August : publication of this blog post and publish security advisory on GitHub.</li><li name="63d0" id="63d0" class="graf graf--li graf-after--li">[Further item may be added to list publication by downstream repositories, like conda, conda-forge, debian…, contact us to add an item]</li></ul><h3 name="8274" id="8274" class="graf graf--h3 graf-after--li"><strong class="markup--strong markup--h3-strong">What we learned</strong></h3><p name="5cff" id="5cff" class="graf graf--p graf-after--h3">Dealing with Security vulnerability in Jupyter and more generally in Open-Source is far from easy. We initially thought about treating the Notebook and Lab CVE separately but they are/were too similar and the cross discussion too revealing to treat both independently.</p><p name="a5fe" id="a5fe" class="graf graf--p graf-after--p">As Jupyter is mostly a volunteer based organisation, there is often no contributor responsible to replying to security issues, and when someone steps up they might not be a expert, nor available all the time. I want to give special thanks to <a href="https://github.com/blink1073" data-href="https://github.com/blink1073" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Steve Silvester</a> (Apple) , <a href="https://github.com/afshin" data-href="https://github.com/afshin" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Afshin Darian</a> (Two Sigma), and <a href="https://github.com/Zsailer" data-href="https://github.com/Zsailer" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Zach Sailer</a> (Apple), and <a href="https://github.com/Carreau" data-href="https://github.com/Carreau" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Matthias Bussonnier</a> (Quansight) for writing the fixes, planning through the release and notifying stakeholders.</p><p name="f45e" id="f45e" class="graf graf--p graf-after--p">Advance notice to stakeholder is complicated, we know of a few large deployment and have personal connections to a couple organisation, and were able to reached out to let them know critical release would be published. There is an inherent tension between publicly warning our user base that security release would be published, which might push malicious actor to closely survey the codebase changes and re-derive the attack vectors, and publishing the release first, with the details later. Especially since we are trying to be transparent in our communication, security fixes are the opposite of our normal communication workflow.</p><p name="3e04" id="3e04" class="graf graf--p graf-after--p">Our communication process is imperfect. We have 2 mailing list for security-related discussion. The first one – security@ipython.org – has only a couple of members all core contributors and can receive email from the outside, it is used for triage. It receive a high number of spam as this is public email. As it has only a few members and we are all busy, mail can slip through. The second mailing list is slightly larger, and used for internal announcement for stakeholder. It has a fairly open membership model, (ask a Jupyter developer if you can be on it, and the reason why and we’ll likely add you), though it’s content seem to be ignored (it even lands on my spam folder, not sure why).</p><p name="5a71" id="5a71" class="graf graf--p graf-after--p"><strong class="markup--strong markup--p-strong">What we’ll do better</strong></p><p name="0125" id="0125" class="graf graf--p graf-after--p graf--trailing">In order to attempt to better react and be proactive with respect to security we <a href="https://github.com/jupyter/governance/issues/111" data-href="https://github.com/jupyter/governance/issues/111" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">are</a> attempting <a href="https://discourse.jupyter.org/t/project-jupyter-security-subproject/10175/6" data-href="https://discourse.jupyter.org/t/project-jupyter-security-subproject/10175/6" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">to form</a> and new <a href="https://github.com/jupyter/security" data-href="https://github.com/jupyter/security" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">security-focused</a> subproject/workgroup to educate and have procedure for everything security related. We welcome your involvement and feedback in how to improve Jupyter security and how to better involve the community.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@mbussonn" class="p-author h-card">M Bussonnier</a> on <a href="https://medium.com/p/a70fae0d3239"><time class="dt-published" datetime="2021-08-09T20:05:49.573Z">August 9, 2021</time></a>.</p><p><a href="https://medium.com/@mbussonn/cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyter-notebook-a70fae0d3239" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 25, 2026.</p></footer></article></body></html>

@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "61bca9cca082ed28e2d3dea48cb87261",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/manzt/e5a2f4c0a98f8383b236e3ae47aaa804",
+      "domain": "gist.github.com",
+      "title": "anywidget blog: cell 1",
+      "description": "anywidget blog: cell 1. GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Fgists%2Fgist-og-image.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "manzt",
+      "gist": {
+        "gistId": "e5a2f4c0a98f8383b236e3ae47aaa804",
+        "githubUsername": "manzt",
+        "gistScriptUrl": "https://gist.github.com/manzt/e5a2f4c0a98f8383b236e3ae47aaa804.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

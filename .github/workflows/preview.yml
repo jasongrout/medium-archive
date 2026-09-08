@@ -1,0 +1,142 @@
+# Build previews of the archive's three generated sites and publish them
+# to GitHub Pages under /hugo/, /pelican/ and /myst/, with a landing
+# page linking the three -- so the generators can be compared on
+# identical content before one is chosen.
+#
+# Everything is regenerated from archive/raw/ + archive/fixups/ on each
+# run: `convert` rebuilds archive/posts/, each site exporter rebuilds
+# its site directory with base_url pointed at this deployment's subpath
+# (archive/site.json is patched only in the runner's workspace), and
+# each generator builds its site. Nothing derived is committed.
+#
+# Note on size: the exporters place capped display copies of the
+# images (originals stay in archive/raw/ and archive/posts/), which
+# puts each built site around 0.7 GB and the three previews together
+# around 2.0 GB. That is above GitHub Pages' documented 1 GB site limit
+# -- observed to deploy fine (the hard limit is the 10 GB artifact) --
+# and the eventual single-site deployment fits comfortably within it.
+#
+# One-time setup: the configure-pages step below enables Pages for the
+# repository (source: GitHub Actions) if it is not enabled yet.
+
+name: Preview sites
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Previews: the latest run wins.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  # Hugo extended >= 0.158 (webp encoding); the other pins are the
+  # versions the archive was last validated against (see todo.md).
+  HUGO_VERSION: "0.158.0"
+  MYSTMD_VERSION: "1.10.1"
+  PAGEFIND_VERSION: "1.5.2"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install medium-archive from this checkout, and Pelican
+        run: pip install -e ".[covers]" pelican markdown mdit_py_plugins
+
+      - name: Install Hugo (extended), MyST, Pagefind and gifsicle
+        run: |
+          sudo apt-get install -y gifsicle
+          curl -sSL "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz" | sudo tar -xz -C /usr/local/bin hugo
+          npm install -g "mystmd@${MYSTMD_VERSION}" "pagefind@${PAGEFIND_VERSION}"
+          hugo version && myst --version && pagefind --version
+
+      # The exporters place resized display copies of oversized images,
+      # built once into archive/.image-cache/ (content-addressed, so a
+      # restored cache stays valid across checkouts). The big
+      # animated-gif re-encodes take ~15 min cold; cached, they cost
+      # nothing.
+      - name: Restore the display-copy image cache
+        uses: actions/cache@v4
+        with:
+          path: archive/.image-cache
+          key: image-cache-${{ hashFiles('archive/posts.json') }}
+          restore-keys: image-cache-
+
+      - name: Rebuild archive/posts/ from archive/raw/
+        run: medium-archive convert --out archive
+
+      - name: Build the Hugo site
+        run: |
+          python3 .github/scripts/set_base_url.py archive/site.json "${{ steps.pages.outputs.base_url }}/hugo"
+          medium-archive hugo --out archive
+          cd archive/site-hugo
+          hugo
+          pagefind --site public
+
+      - name: Build the Pelican site
+        run: |
+          python3 .github/scripts/set_base_url.py archive/site.json "${{ steps.pages.outputs.base_url }}/pelican"
+          medium-archive pelican --out archive
+          cd archive/site-pelican
+          pelican
+          pagefind --site output
+
+      - name: Build the MyST site
+        run: |
+          medium-archive myst --out archive
+          cd archive/site-myst
+          BASE_URL="${{ steps.pages.outputs.base_path }}/myst" myst build --html
+
+      - name: Assemble the deployment
+        run: |
+          mkdir _site
+          mv archive/site-hugo/public      _site/hugo
+          mv archive/site-pelican/output   _site/pelican
+          mv archive/site-myst/_build/html _site/myst
+          cp .github/preview-index.html _site/index.html
+          cp archive/avatar.svg _site/
+          du -sh _site/*
+
+      # The artifact tar needs a few GB of scratch space; drop what the
+      # deployment no longer references before it is created.
+      - name: Free runner disk before the artifact step
+        run: rm -rf .git archive/raw archive/posts archive/site-myst archive/site-hugo archive/site-pelican
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

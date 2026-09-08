@@ -1,0 +1,36 @@
+# The tool's own test suite: offline, canned HTTP responses, no
+# network. It ran only on contributors' machines while the tool lived
+# in its own repository; it runs here on every push and pull request,
+# across the Python versions pyproject.toml claims to support.
+#
+# `Lint embeds` covers the other half -- the converter against the real
+# archive -- so between them a pull request is checked against both the
+# fixtures and the 340 archived posts.
+
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Run the tests
+        run: uv run --python ${{ matrix.python-version }} pytest -q

@@ -1,0 +1,10 @@
+{
+  "userId": "pMTzMjtJ0FhiZ6jLnRCsqojQRX12",
+  "createdAt": 1627625663,
+  "language": "python",
+  "code": "class ExampleWidget(DOMWidget):\n    ...\n    # Your widget state goes here. Make sure to update the corresponding\n    # JavaScript widget state (defaultModelProperties) in widget.ts\n    value = Unicode('Jupyter').tag(sync=True)\n    color = Unicode('Jupyter').tag(sync=True)",
+  "backgroundColor": "rgba(252,252,252,1)",
+  "dropShadow": false,
+  "updatedAt": 1627625684,
+  "id": "PaDDn2ZszZUVmuhvRP52"
+}

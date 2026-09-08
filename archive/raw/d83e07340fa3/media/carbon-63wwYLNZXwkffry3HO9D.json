@@ -1,0 +1,9 @@
+{
+  "code": "import React from 'react';\nimport { HexColorPicker } from 'react-colorful';\nimport { useModelState } from './hooks/widget-model';\n\nexport default function ColorPicker() {\n  const [color, setColor] = useModelState('color');\n\n  return <HexColorPicker color={color} onChange={setColor} />;\n}\n",
+  "userId": "pMTzMjtJ0FhiZ6jLnRCsqojQRX12",
+  "createdAt": 1627625527,
+  "backgroundColor": "rgba(255,255,255,1)",
+  "dropShadow": false,
+  "updatedAt": 1627625535,
+  "id": "63wwYLNZXwkffry3HO9D"
+}

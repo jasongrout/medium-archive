@@ -1,0 +1,168 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 366,
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2023-09-21T21:57:58.000Z",
+  "display_text_range": [
+    0,
+    53
+  ],
+  "entities": {
+    "media": [
+      {
+        "display_url": "pic.x.com/uJAv9odW6y",
+        "expanded_url": "https://x.com/deno_land/status/1704978299615957200/photo/1",
+        "indices": [
+          53,
+          76
+        ],
+        "url": "https://t.co/uJAv9odW6y"
+      }
+    ]
+  },
+  "id_str": "1704978299615957200",
+  "text": "using modern JS, TS, and npm in jupyter notebooks\n\n👇 https://t.co/uJAv9odW6y",
+  "user": {
+    "id_str": "1108769816230293504",
+    "name": "Deno",
+    "screen_name": "deno_land",
+    "is_blue_verified": true,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1844040231697121280/LOml3yw9_normal.jpg"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "1704978299615957200"
+    ],
+    "editable_until_msecs": "1695337078000",
+    "edits_remaining": "5",
+    "is_edit_eligible": false
+  },
+  "mediaDetails": [
+    {
+      "display_url": "pic.x.com/uJAv9odW6y",
+      "expanded_url": "https://x.com/deno_land/status/1704978299615957200/photo/1",
+      "ext_alt_text": "using typescript in jupyter notebooks",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        53,
+        76
+      ],
+      "media_url_https": "https://pbs.twimg.com/media/F6k0IzXbQAA1afQ.jpg",
+      "original_info": {
+        "focus_rects": [
+          {
+            "h": 700,
+            "w": 1250,
+            "x": 0,
+            "y": 190
+          },
+          {
+            "h": 890,
+            "w": 890,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 890,
+            "w": 781,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 890,
+            "w": 445,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 890,
+            "w": 1250,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "height": 890,
+        "width": 1250
+      },
+      "sizes": {
+        "large": {
+          "h": 890,
+          "resize": "fit",
+          "w": 1250
+        },
+        "medium": {
+          "h": 854,
+          "resize": "fit",
+          "w": 1200
+        },
+        "small": {
+          "h": 484,
+          "resize": "fit",
+          "w": 680
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "photo",
+      "url": "https://t.co/uJAv9odW6y"
+    }
+  ],
+  "photos": [
+    {
+      "accessibilityLabel": "using typescript in jupyter notebooks",
+      "backgroundColor": {
+        "red": 204,
+        "green": 214,
+        "blue": 221
+      },
+      "cropCandidates": [
+        {
+          "h": 700,
+          "w": 1250,
+          "x": 0,
+          "y": 190
+        },
+        {
+          "h": 890,
+          "w": 890,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 890,
+          "w": 781,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 890,
+          "w": 445,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 890,
+          "w": 1250,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "expandedUrl": "https://x.com/deno_land/status/1704978299615957200/photo/1",
+      "url": "https://pbs.twimg.com/media/F6k0IzXbQAA1afQ.jpg",
+      "width": 1250,
+      "height": 890
+    }
+  ],
+  "conversation_count": 9,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}
