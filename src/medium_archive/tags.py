@@ -4,7 +4,7 @@ Medium tags are chosen for discovery on medium.com, so an archived
 publication inherits tags that are meaningless on a standalone site (a
 Jupyter blog where two-thirds of the posts are tagged "jupyter") and
 fragmented variants of one concept ("notebook" / "notebooks" /
-"jupyter-notebook"). An optional hand-written <out>/tags.json cleans
+"jupyter-notebook"). An optional hand-written archive/tags.json cleans
 them up reproducibly -- like fixups and site.json, it is an input that
 survives regeneration, while raw/ keeps the original tags untouched:
 
@@ -195,7 +195,7 @@ def _per_slug(path: Path, config: dict, key: str, rename: dict) -> dict:
 
 
 def load_tag_map(out: Path) -> TagMap | None:
-    """The parsed <out>/tags.json, or None when the archive has none.
+    """The parsed archive/tags.json, or None when the archive has none.
     Malformed or self-contradictory config aborts: a config error that
     silently no-opped would defeat the point of keeping the cleanup
     reproducible."""
@@ -316,7 +316,7 @@ def load_tag_map(out: Path) -> TagMap | None:
 
 
 def load_tag_display(out: Path) -> dict:
-    """<out>/tags.json's `display` map alone, for the site exporters: the
+    """archive/tags.json's `display` map alone, for the site exporters: the
     tags in posts.json are already final, so a site needs nothing from
     the file but each tag's name."""
     tag_map = load_tag_map(out)

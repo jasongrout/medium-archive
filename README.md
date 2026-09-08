@@ -10,24 +10,32 @@ conversion can be tuned and re-run without hitting Medium again.
 ## This repository
 
 Two things live here: the tool, and the archive it was written for.
+The sites are built from the archive, so they are generated output and
+are not committed.
 
 ```
 src/medium_archive/   the tool; `medium-archive` on the command line
 tests/                its offline test suite (`uv run pytest`)
 archive/              an archive of https://blog.jupyter.org, made with it
+site/                 site.json and the images it names: what the built
+                        sites say about the publication
 docs/                 the analysis behind the project's open decisions
 todo.md               one work list, in a tool part and an archive part
+site-hugo/,           the sites built from the archive, generated and
+site-pelican/,          git-ignored: `medium-archive hugo` and friends
+site-myst/              write them, the generators render them
 ```
 
 `archive/` is a full working archive of the Jupyter blog -- 340 posts,
 their images, and the embed content Medium's pages do not carry -- and
-it is the tool's reference corpus. Every step below takes `--out DIR`,
-so from a checkout it is addressed as `--out archive`:
+it is the tool's reference corpus. Every step takes `--out DIR`, the
+project root, which defaults to the working directory: from a checkout
+the steps need no arguments at all.
 
 ```sh
-uv run medium-archive convert --out archive     # rebuild archive/posts/
-uv run medium-archive lint --embeds --out archive
-uv run medium-archive pelican --out archive     # then: cd archive/site-pelican && pelican
+uv run medium-archive convert           # rebuild archive/posts/
+uv run medium-archive lint --embeds
+uv run medium-archive pelican           # then: cd site-pelican && pelican
 ```
 
 CI runs both halves against each other: `Tests` runs the test suite on
@@ -54,7 +62,7 @@ here.
 
 ## Steps
 
-**`fetch`** pulls raw material from Medium into `<out>/raw/`: each post's
+**`fetch`** pulls raw material from Medium into `archive/raw/`: each post's
 page HTML, its RSS feed item, full-resolution images, and the content
 behind its embeds that Medium's page does not carry: a gist's files
 (via medium.com/media and the GitHub gists API), a tweet's text and
@@ -66,7 +74,7 @@ posts archived before it was collected; `--urls` names posts to
 backfill by Medium id or directory name.
 
 **`import-export`** (optional) merges a Medium account export into
-`<out>/raw/`. The export is the zip from medium.com → Settings →
+`archive/raw/`. The export is the zip from medium.com → Settings →
 Download your information, or a zip of just its `posts/` folder. Files
 are matched to fetched posts by Medium id. An export holds everything
 its author ever wrote, so by default only posts already in the archive
@@ -101,15 +109,15 @@ conversion bug. It exits non-zero when posts differ, so it can gate
 scripts.
 
 **`convert`** turns the raw archive into Markdown files with front matter
-and local images in `<out>/posts/`, plus a `posts.json` manifest and a
+and local images in `archive/posts/`, plus a `posts.json` manifest and a
 `redirects.csv` mapping old Medium URLs to the new post directories. It
-never touches the network. An optional hand-written `<out>/tags.json`
+never touches the network. An optional hand-written `archive/tags.json`
 cleans up the Medium tags on the way into front matter; see
 [Tag cleanup](#tag-cleanup-tagsjson).
 
 **`myst`**, **`hugo`** and **`pelican`** (optional) each build a
-ready-to-render site from the converted posts, in `<out>/site-myst/`,
-`<out>/site-hugo/` and `<out>/site-pelican/`. All three give the posts
+ready-to-render site from the converted posts, in `site-myst/`,
+`site-hugo/` and `site-pelican/` beside the archive. All three give the posts
 the same page URLs, rewrite links between posts of the publication to
 those pages, read the same `site.json`, and write a `redirects.csv`
 into the site, so the generators can be compared on identical content.
@@ -176,7 +184,7 @@ archive downstream to regenerate its READMEs.
 ## Tag cleanup (`tags.json`)
 
 Medium tags arrive as slugs, and many only made sense on medium.com. An
-optional hand-written `<out>/tags.json` cleans them up as `convert`
+optional hand-written `archive/tags.json` cleans them up as `convert`
 writes each post's front matter, reproducibly, while `raw/` keeps the
 originals. Its sections:
 
@@ -383,7 +391,7 @@ and `hugo.Data` for its data files -- so it wants Hugo extended
 
 All three sites carry display copies of the images, not the archival
 originals. `raw/` and `posts/` keep full resolution. Copies are built
-once into `<out>/.image-cache/` and hard-linked into every site.
+once into `.image-cache/` and hard-linked into every site.
 
 - Card covers are 640×360 thumbnails baked at export time through
   Pillow (`pip install pillow`, or the `covers` extra). The source is
@@ -499,14 +507,17 @@ math.
 Like `convert`, the step never touches the network, so the whole site
 reproduces from `raw/` plus `fixups/`. mystmd downloads the pinned
 listing plugin at build time, like the site theme itself. Render with
-`myst start` or `myst build --html` inside `<out>/site-myst/`
+`myst start` or `myst build --html` inside `site-myst/`
 (`npm install -g mystmd`).
 
 ## `site.json`
 
-Hand-written, versioned with the archive, and read by all three
-exporters. It holds everything about a built site that belongs to the
-publication rather than the tool. Every key is optional.
+`site/site.json`: hand-written, versioned beside the archive, and read
+by all three exporters. It holds everything about a built site that
+belongs to the publication rather than the tool -- which is why it sits
+in its own directory rather than in the archive, together with the
+images it names. Every key is optional, and every image path is
+relative to `site/`.
 
 | key | what it does |
 |-----|--------------|
@@ -515,8 +526,8 @@ publication rather than the tool. Every key is optional.
 | `intro` | landing-page blurb (Markdown), rendered by every landing page |
 | `footer` | the line under every page (Markdown), `{year}` standing for the year the site is built; unset, the footer carries `description` |
 | `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter. Unset, the exporters warn and fall back to a placeholder, so share links and social previews point at a domain you do not own |
-| `avatar` | archive-relative image path for the header logo |
-| `logo` | archive-relative image path for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
+| `avatar` | image beside `site.json` for the header logo |
+| `logo` | image beside `site.json` for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
 | `logo_dark` | the same mark drawn for the dark palette, which the palettes switch between; only read when `logo` is set |
 | `logo_link` | where the masthead links, for a mark that stands for something larger than the blog (`"https://jupyter.org"` under the Jupyter blog's Jupyter mark); unset, it links to the site's own home. The link is labelled with the address's host rather than the site's title; only read when `logo` is set |
 | `favicon` | archive-relative image path for the browser-tab icon |
@@ -565,7 +576,7 @@ medium-archive fetch https://blog.example.com/ --start 2024-12-31 --end 2024-01-
 medium-archive import-export medium-export.zip
 medium-archive import-ghost https://blog.example.com/       # Ghost-era captures
 medium-archive compare                                      # page vs export check
-medium-archive convert                                      # raw -> posts/
+medium-archive convert                                      # raw/ -> posts/
 medium-archive myst                                         # posts/ -> site-myst/
 medium-archive hugo                                         # posts/ -> site-hugo/
 medium-archive pelican                                      # posts/ -> site-pelican/
@@ -576,11 +587,12 @@ medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
 Only `fetch` and `all` need the publication root URL; `/sitemap/sitemap.xml`
 and `/feed` must resolve under it. The other steps work offline from the
-archive alone. `--out DIR` (default: `medium_export`) sets the archive root
-on every step. See `medium-archive fetch --help` and
-`medium-archive convert --help` for the per-step options: date windows,
-limits, fetch delays, skipping posts already in earlier archives, converting
-a single post, and more.
+archive alone. `--out DIR` (default: the working directory) sets the
+project root on every step: the archive is `<DIR>/archive/`, the site
+inputs `<DIR>/site/`, and each built site `<DIR>/site-<generator>/`.
+See `medium-archive fetch --help` and `medium-archive convert --help`
+for the per-step options: date windows, limits, fetch delays, skipping
+posts already in earlier archives, converting a single post, and more.
 
 ## Recommended workflow
 
@@ -810,13 +822,14 @@ no longer lists, work through the steps in order:
 ```
 src/medium_archive/
   cli.py         argument parsing and the entry point
-  fetch.py       the fetch step: download posts into <out>/raw/
+  fetch.py       the fetch step: download posts into archive/raw/
   export.py      Medium account exports: parsing and the import-export step
   ghost.py       the import-ghost step: recover Ghost posts from the Wayback Machine
-  convert.py     the convert step: <out>/raw/ -> Markdown in <out>/posts/
-  myst.py        the myst step: <out>/posts/ -> a MyST site in <out>/site-myst/
-  hugo.py        the hugo step: <out>/posts/ -> a Hugo site in <out>/site-hugo/
-  pelican.py     the pelican step: <out>/posts/ -> a Pelican site in <out>/site-pelican/
+  convert.py     the convert step: archive/raw/ -> Markdown in archive/posts/
+  myst.py        the myst step: archive/posts/ -> a MyST site in site-myst/
+  hugo.py        the hugo step: archive/posts/ -> a Hugo site in site-hugo/
+  pelican.py     the pelican step: archive/posts/ -> a Pelican site in site-pelican/
+  paths.py       where a project keeps its archive, site inputs and sites
   sites.py       machinery shared by the site exporters: page slugs, the
                  in-publication link map, image placement, covers,
                  redirect maps, site.json
@@ -833,13 +846,14 @@ src/medium_archive/
   net.py         HTTP session and retrying GET
   dates.py       date parsing and the --start/--end window check
   urls.py        Medium URL and post-identifier helpers
-  tags.py        hand-curated tag cleanup (<out>/tags.json), applied by convert
-  readme.py      the READMEs written into each archive: README.md,
-                 posts/README.md and SITES.md
+  tags.py        hand-curated tag cleanup (archive/tags.json), applied by convert
+  readme.py      the generated READMEs: archive/README.md,
+                 archive/posts/README.md and SITES.md
 tests/           offline tests (canned HTTP responses, no network);
                  run with `uv run pytest`
 archive/         the Jupyter blog archive this tool is exercised against;
                  its own layout is documented in archive/README.md
+site/            site.json and the images it names, read by the exporters
 docs/            compare.md, commonmark.md, commonmark-plan.md: the
                  analysis behind the renderer and generator decisions,
                  and the blog_export commit map

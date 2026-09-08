@@ -23,6 +23,7 @@ from .convert import load_media, to_markdown
 from .export import export_body, parse_export
 from .fetch import read_index
 from .fixup import load_fixups, read_raw
+from .paths import archive_dir
 from .pages import extract_metadata, ghost_body, page_body
 from .state import apollo_post_state, state_body
 from .urls import canonical_url
@@ -147,12 +148,13 @@ def compare_ghost(args):
     difference is authored content: an image or paragraph Medium dropped
     (worth converting with --prefer-ghost) or an edit made after the
     migration (worth keeping on the Medium side). Nothing is gated."""
-    raw_dir = args.out / "raw"
+    archive = archive_dir(args.out)
+    raw_dir = archive / "raw"
     index = read_index(raw_dir)
     if not index:
         sys.exit(f"nothing to compare: {raw_dir}/index.json missing or empty")
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
-    fixups = load_fixups(args.out)
+    fixups = load_fixups(archive)
 
     identical, differing, skipped = 0, 0, 0
     for url in targets:
@@ -206,12 +208,13 @@ def compare_ghost(args):
 def cmd_compare(args):
     if getattr(args, "ghost", False):
         return compare_ghost(args)
-    raw_dir = args.out / "raw"
+    archive = archive_dir(args.out)
+    raw_dir = archive / "raw"
     index = read_index(raw_dir)
     if not index:
         sys.exit(f"nothing to compare: {raw_dir}/index.json missing or empty")
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
-    fixups = load_fixups(args.out)
+    fixups = load_fixups(archive)
 
     use_state = getattr(args, "state", False)
     identical, differing, no_export, no_page, no_state, missing = 0, [], 0, 0, 0, 0

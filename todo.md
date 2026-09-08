@@ -197,8 +197,8 @@ and the offline test suite.
   remains for structural edits. Fixups should not patch a page's
   embedded editor-state copy: its markup offsets index into the stored
   text, so editing it would skew them.
-- **`myst` subcommand.** Builds a MyST (mystmd) site in
-  `<out>/site-myst/` from the converted posts, so a browsable blog
+- **`myst` subcommand.** Builds a MyST (mystmd) site in `site-myst/`
+  from the converted posts, so a browsable blog
   reproduces offline from `raw/` plus `fixups/`. One page per post, with
   the filename as the URL slug (date-prefixed only when several posts
   share a slug). mystmd caps served slugs at 50 characters, so
@@ -213,7 +213,7 @@ and the offline test suite.
   local files. In-publication links are rewritten to site pages, and
   prose MyST would misparse is escaped (`@handle` reads as a citation,
   paired `$` as math). Site-wide text comes from a hand-written
-  `<out>/site.json`. Validated with a full `myst build --html` over the
+  `site/site.json`. Validated with a full `myst build --html` over the
   real archive: 336/336 pages (334 posts plus landing and archive), 334
   gallery cards (255 with covers), every redirect target resolving to a
   built page, and no warnings beyond pre-existing dead in-page anchors
@@ -368,7 +368,7 @@ Image handling:
   for no further gain, and without `--no-conserve-memory` huge gifs trip
   a low-memory mode that turned a 60 s resize into 5+ minutes (peak RSS
   measured about 1.1 GB on an 851-frame 22.6 MB gif). Display copies are
-  built once into `<out>/.image-cache/<caps>/`, warmed in parallel up
+  built once into `.image-cache/<caps>/`, warmed in parallel up
   front since encodes hold no GIL, and hard-linked into every site.
   `raw/` and `posts/` stay at full resolution, unreadable or exotic
   files pass through unchanged, and a missing tool degrades to full-size
@@ -721,10 +721,11 @@ reached, so it was a fourth build to keep green for a target nobody
 would ship. `site-zola/`, if one was ever built here, is stale output
 and can be deleted.
 
-`medium-archive myst|hugo|pelican --out .` builds a browsable site in
-`site-myst/`, `site-hugo/` or `site-pelican/`. All three are gitignored,
-like `posts/`; everything regenerates from `raw/` plus `fixups/`.
-`site.json` holds the hand-written site title, description,
+`medium-archive myst|hugo|pelican` builds a browsable site in
+`site-myst/`, `site-hugo/` or `site-pelican/`, in the repository root
+beside `archive/`. All three are gitignored, like `archive/posts/`;
+everything regenerates from `archive/raw/` plus `archive/fixups/`.
+`site/site.json` holds the hand-written site title, description,
 landing-page intro, and the `base_url` baked into absolute links and
 redirect stubs. The three exporters share page URLs and link rewriting,
 so the generators can be compared on identical content.
@@ -733,7 +734,7 @@ so the generators can be compared on identical content.
 three sites from `raw/` on every push to main, or on demand, and
 publishes them to GitHub Pages under `/hugo/`, `/pelican/` and `/myst/`,
 behind a landing page (`.github/preview-index.html`) linking the three.
-Each exporter runs with `site.json`'s `base_url` pointed at its subpath
+Each exporter runs with `site/site.json`'s `base_url` pointed at its subpath
 and `noindex` set, patched only in the runner's workspace, so baked-in
 absolute links land in the right place and search engines do not index
 the previews as copies of the eventual site. The sites carry capped display copies of the images
@@ -1069,8 +1070,8 @@ so, and it went. 56 tags.
 
 ### 4. Share image (site.json `share_image`), not yet chosen
 
-medium-archive's card themes take an optional `"share_image"`: an
-archive-relative raster used as the `og:image` of every page that has
+medium-archive's card themes take an optional `"share_image"`: a raster
+beside `site.json` used as the `og:image` of every page that has
 no cover of its own. That is the listings, the tag and author pages,
 and 73 posts (70 with no image at all, 3 whose only images are svg or
 oversized). Those pages currently share as text-only cards: Facebook
@@ -1121,8 +1122,8 @@ file, so any size works technically.
    Facebook shows nothing where the picture would be; LinkedIn a grey
    placeholder. Honest, and the least work.
 
-Whichever card is made should go in `archive/` as `share.png` with
-`"share_image": "share.png"` in `site.json`. The related `"profiles"`
+Whichever card is made should go in `site/` as `share.png` with
+`"share_image": "share.png"` in `site/site.json`. The related `"profiles"`
 key (the publication's addresses elsewhere, for the `Organization`'s
 `sameAs`) is also unset; the values would be the GitHub organization
 and the Mastodon account, alongside the X handle already in
@@ -1149,8 +1150,8 @@ whenever a post has an embed without content. To run it locally:
 
 ```sh
 pip install "medium-archive @ git+https://github.com/jasongrout/medium-archive"
-medium-archive convert --out .          # rebuild posts/ from raw/ + fixups/
-medium-archive lint --embeds --out .    # one line per embed missing content
+medium-archive convert          # rebuild archive/posts/ from raw/ + fixups/
+medium-archive lint --embeds    # one line per embed missing content
 ```
 
 As of 2026-09-03 the run reports 0 problems. Fourteen tweets are
@@ -1184,7 +1185,7 @@ code blocks instead of the screenshot iframes. To backfill:
 
 ```sh
 echo 2021-07-30-build-a-jupyter-widget-with-react-and-typescript > /tmp/carbon.txt
-medium-archive fetch https://blog.jupyter.org/ --out . --urls /tmp/carbon.txt
+medium-archive fetch https://blog.jupyter.org/ --urls /tmp/carbon.txt
 ```
 
 Plain `lint` is at 0 problems.

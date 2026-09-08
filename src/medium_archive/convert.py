@@ -1,4 +1,4 @@
-"""The convert step: turn <out>/raw/ into Markdown posts in <out>/posts/,
+"""The convert step: turn archive/raw/ into Markdown posts in archive/posts/,
 plus posts.json and redirects.csv.
 
 Never touches the network, so it can be re-run freely while tuning the
@@ -30,6 +30,7 @@ from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     untruncated_summary)
 from .state import (apollo_post_state, gist_blocks, gist_code_blocks,
                     state_body, state_metadata, state_title)
+from .paths import archive_dir
 from .readme import write_posts_readme, write_readme, write_sites_readme
 from .tags import load_tag_map
 from .urls import (canonical_url, carbon_id, medium_id, resolve_canonical,
@@ -1012,22 +1013,23 @@ def write_redirects(manifest: dict, out: Path):
 
 
 def cmd_convert(args):
-    raw_dir = args.out / "raw"
+    archive = archive_dir(args.out)
+    raw_dir = archive / "raw"
     index = read_index(raw_dir)
     if not index:
         sys.exit(f"nothing to convert: {raw_dir}/index.json missing or empty (run fetch first)")
-    posts_root = args.out / "posts"
+    posts_root = archive / "posts"
     if args.clean:
         shutil.rmtree(posts_root, ignore_errors=True)
-    manifest_path = args.out / "posts.json"
+    manifest_path = archive / "posts.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() and not args.clean else {}
 
     targets = [canonical_url(u) for u in args.only] if args.only else list(index)
-    fixups = load_fixups(args.out)
+    fixups = load_fixups(archive)
     if fixups:
         print(f"fixups: patching {len(fixups)} raw file(s) in memory "
-              f"from {args.out / 'fixups'}", file=sys.stderr)
-    tag_map = load_tag_map(args.out)
+              f"from {archive / 'fixups'}", file=sys.stderr)
+    tag_map = load_tag_map(archive)
     if tag_map:
         print(f"tags: dropping {len(tag_map.drop)}, renaming "
               f"{len(tag_map.rename)}, implying from {len(tag_map.imply)}, "
@@ -1052,16 +1054,16 @@ def cmd_convert(args):
             print(f"  FAILED: {e}", file=sys.stderr)
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     if manifest:
-        write_redirects(manifest, args.out)
+        write_redirects(manifest, archive)
     # The READMEs describe the layout convert itself writes, so they are
     # brought up to date on every run rather than only when missing: an
     # archive kept in version control would otherwise carry a README
     # describing an older tool. They are generated, not hand-written --
     # corrections belong in readme.py. A run with nothing new to say
     # leaves them, and their mtimes, untouched (see write_if_changed).
-    write_readme(args.out, args.base or archive_base(args.out)
+    write_readme(archive, args.base or archive_base(archive)
                  or "(unknown publication)")
-    write_posts_readme(args.out)
+    write_posts_readme(archive)
     write_sites_readme(args.out)
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
     # A tags.json entry that changed no post is stale config -- fail

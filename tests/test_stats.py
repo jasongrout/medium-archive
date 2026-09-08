@@ -4,6 +4,7 @@ source, posts gone from Medium)."""
 import json
 from types import SimpleNamespace
 
+from medium_archive.paths import archive_dir
 from medium_archive import stats as statsmod
 
 A = "https://blog.example.com/alpha-111122223333"
@@ -19,7 +20,9 @@ def write_post(out, rel, front):
         "---\n" + json.dumps(front) + "\n---\n\nSome body text.\n", encoding="utf-8")
 
 
-def build_archive(out):
+def build_archive(root):
+    out = archive_dir(root)
+    out.mkdir(parents=True)
     manifest = {
         A: {"dir": "posts/2020-01-01-alpha", "title": "Alpha", "authors": [{"name": "Ann", "url": None}],
             "date": "2020-01-01T00:00:00Z", "tags": ["t"], "images": [],
@@ -71,8 +74,9 @@ def test_provenance_without_raw_index(tmp_path, capsys):
     # stats still works on a posts/ tree copied without raw/ -- only the
     # body-source line remains
     build_archive(tmp_path)
-    (tmp_path / "raw" / "index.json").unlink()
-    (tmp_path / "raw" / "missing.json").unlink()
+    raw = archive_dir(tmp_path) / "raw"
+    (raw / "index.json").unlink()
+    (raw / "missing.json").unlink()
     text = run_stats(tmp_path, capsys)
     assert "body converted from: export: 1, page: 1, ghost: 1" in text
     assert "discovered via" not in text

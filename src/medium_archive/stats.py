@@ -1,6 +1,6 @@
 """The stats step: summarize the converted archive.
 
-Works from posts.json and the converted bodies in <out>/posts/, so run
+Works from posts.json and the converted bodies in archive/posts/, so run
 convert first; raw/index.json and raw/missing.json, when present, add
 provenance detail (how each post was discovered, which sources were
 recovered). Everything is offline.
@@ -13,7 +13,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from .paths import archive_dir
 from .fetch import archive_base, read_index, read_missing
+from .paths import archive_dir
 
 FRONT_RE = re.compile(r"\A---\n.*?\n---\n", re.S)
 MD_NOISE_RE = re.compile(r"!\[[^\]]*\]\([^)]*\)|\[([^\]]*)\]\([^)]*\)|[#>*`|-]")
@@ -75,7 +77,8 @@ def print_provenance(out: Path, manifest: dict, sources: Counter):
 
 
 def cmd_stats(args):
-    manifest_path = args.out / "posts.json"
+    archive = archive_dir(args.out)
+    manifest_path = archive / "posts.json"
     if not manifest_path.exists():
         sys.exit(f"no stats to report: {manifest_path} missing (run convert first)")
     manifest = json.loads(manifest_path.read_text())
@@ -88,7 +91,7 @@ def cmd_stats(args):
     words, missing_bodies = [], 0
     by_words = []
     for p in posts:
-        md = args.out / p["dir"] / "index.md"   # dir is relative to <out>
+        md = archive / p["dir"] / "index.md"   # dir is relative to the archive
         if md.exists():
             w = word_count(md)
             words.append(w)
@@ -104,13 +107,13 @@ def cmd_stats(args):
     sources = Counter(p.get("body_source") or "?" for p in posts)
     image_counts = [len(p.get("images") or []) for p in posts]
 
-    print(f"Archive: {args.base or archive_base(args.out) or args.out}")
+    print(f"Archive: {args.base or archive_base(archive) or archive}")
     print(f"\nPosts: {n}")
     if dates:
         print(f"  first {dates[0][:10]}, latest {dates[-1][:10]}")
         print("  per year: " + ", ".join(f"{y}: {c}" for y, c in sorted(years.items())))
 
-    print_provenance(args.out, manifest, sources)
+    print_provenance(archive, manifest, sources)
 
     print(f"\nAuthors: {len(authors)}")
     print(top(authors, args.top, n))

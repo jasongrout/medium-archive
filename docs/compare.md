@@ -14,9 +14,9 @@ rests on which one this blog can grow into.
 ## How this was measured
 
 ```sh
-medium-archive convert --clean --out .   # 336/336 posts, lint: 0 problems
-medium-archive hugo --out .              # base_url http://localhost:1313
-medium-archive pelican --out .           # base_url http://localhost:1314
+medium-archive convert --clean   # 336/336 posts, lint: 0 problems
+medium-archive hugo              # base_url http://localhost:1313
+medium-archive pelican           # base_url http://localhost:1314
 cd site-hugo    && hugo    && pagefind --site public
 cd site-pelican && pelican && pagefind --site output
 ```
@@ -26,7 +26,7 @@ markdown 3.10.3, pillow 12.3.0, pagefind 1.5.2, gifsicle 1.94.
 
 `base_url` is pointed at a localhost port per engine so absolute links,
 share URLs and Open Graph tags resolve while both sites are served and
-driven in headless Chromium. `site.json` is restored afterwards; only
+driven in headless Chromium. `site/site.json` is restored afterwards; only
 this file is committed.
 
 ## What the two sites have in common

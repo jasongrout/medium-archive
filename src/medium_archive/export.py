@@ -1,6 +1,6 @@
 """Medium account export (medium.com -> Settings -> Download your
 information) support: parse the export's posts/*.html files and file them
-into <out>/raw/ so convert can use them.
+into archive/raw/ so convert can use them.
 
 Export files are the editor's own HTML wrapped in an h-entry microformat --
 far cleaner than the rendered page -- with the exact publish timestamp and
@@ -16,6 +16,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
+from .paths import archive_dir
 from .pages import mark_subtitle
 from .urls import canonical_url, medium_id
 
@@ -94,7 +95,7 @@ def post_id(meta: dict, filename: str) -> str | None:
 def cmd_import_export(args):
     from .fetch import read_index, write_index   # avoid import cycle
 
-    raw_dir = args.out / "raw"
+    raw_dir = archive_dir(args.out) / "raw"
     index = read_index(raw_dir)
     by_id = {e.get("medium_id"): url for url, e in index.items()}
     imported = drafts = unmatched = skipped = 0

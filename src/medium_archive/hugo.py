@@ -1,6 +1,6 @@
-"""The hugo step: build a Hugo site in <out>/site-hugo/ from the
+"""The hugo step: build a Hugo site in site-hugo/ from the
 converted archive. Same reproducibility contract as the myst step (see
-sites.py); render with `hugo` or `hugo server` inside <out>/site-hugo/
+sites.py); render with `hugo` or `hugo server` inside site-hugo/
 (https://gohugo.io).
 
 Each post becomes a Hugo leaf bundle, content/posts/<stem>/index.md with
@@ -65,6 +65,7 @@ section tunes the generated config: `locale`, `avatar` and `favicon`
 import json
 import sys
 
+from .paths import archive_dir, site_dir, site_inputs
 from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, front_matter_yaml,
@@ -192,12 +193,14 @@ def _toml_params(params: dict) -> str:
     return "\n\n".join(["[params]\n" + "\n".join(flat)] + tables)
 
 
-def build_site(out):
-    manifest, config = load_site_inputs(out)
+def build_site(root):
+    archive = archive_dir(root)
+    inputs = site_inputs(root)
+    manifest, config = load_site_inputs(root)
     stems = page_stems(manifest)
     hugo_config = config.get("hugo", {})
     mode = redirect_mode(config)        # site.json "redirects"
-    site = out / "site-hugo"
+    site = site_dir(root, "hugo")
     clean_site(site, keep=("public", "resources"))
 
     (site / "content").mkdir(parents=True)
@@ -222,13 +225,13 @@ def build_site(out):
         (site / "content" / plural).mkdir(exist_ok=True)
         (site / "content" / plural / "_index.md").write_text(
             front_matter_yaml({"title": title}), encoding="utf-8")
-    covers = Covers(out, manifest)
+    covers = Covers(archive, manifest)
     pages = export_content(
-        out, site, manifest, stems,
+        archive, site, manifest, stems,
         lambda url, p: front_matter(url, p, cover=covers.path(url),
                                     canonical=canonical_for(p),
                                     aliases=wants_redirect_stubs(mode)),
-        placer=ImagePlacer(out, config), transform=figure_shortcodes,
+        placer=ImagePlacer(root, config), transform=figure_shortcodes,
         covers=covers)
     # Hugo makes content/posts/ a section and publishes a list page and
     # a feed for it unasked: /posts/ is the home listing again, its 14
@@ -249,7 +252,7 @@ def build_site(out):
     # names as each author's sameAs. Hugo reads them through hugo.Data;
     # the pelican site is given the same three files (see
     # sites.write_data_files).
-    write_data_files(site, manifest, out)
+    write_data_files(site, manifest, archive)
 
     params = {"description": config.get("description", "")}
     # "footer": the line under every page, Markdown, with `{year}` the
@@ -262,12 +265,12 @@ def build_site(out):
     # site root so browsers that ask for /favicon.ico by convention are
     # covered when it is an .ico
     avatar = copy_site_asset(
-        out, hugo_config.get("avatar") or config.get("avatar"),
+        inputs, hugo_config.get("avatar") or config.get("avatar"),
         site / "static" / "img", "avatar")
     if avatar:
         params["avatar"] = f"img/{avatar}"
     favicon = copy_site_asset(
-        out, hugo_config.get("favicon") or config.get("favicon"),
+        inputs, hugo_config.get("favicon") or config.get("favicon"),
         site / "static", "favicon")
     if favicon:
         params["favicon"] = favicon
@@ -276,12 +279,12 @@ def build_site(out):
     # jupyter.org's navbar carries its rectangle logo -- with
     # "logo_dark" the same mark drawn for the dark palette
     logo = copy_site_asset(
-        out, hugo_config.get("logo") or config.get("logo"),
+        inputs, hugo_config.get("logo") or config.get("logo"),
         site / "static" / "img", "logo")
     if logo:
         params["logo"] = f"img/{logo}"
         logo_dark = copy_site_asset(
-            out, hugo_config.get("logo_dark") or config.get("logo_dark"),
+            inputs, hugo_config.get("logo_dark") or config.get("logo_dark"),
             site / "static" / "img", "logo-dark")
         if logo_dark:
             params["logo_dark"] = f"img/{logo_dark}"
@@ -315,7 +318,7 @@ def build_site(out):
     # "share_image": the og:image of every page without a cover of its
     # own (listings, posts with no usable image), under assets/ so the
     # theme can read its dimensions
-    share = copy_site_asset(out, config.get("share_image"),
+    share = copy_site_asset(inputs, config.get("share_image"),
                             site / "assets" / "img", "share")
     if share:
         params["share_image"] = f"img/{share}"

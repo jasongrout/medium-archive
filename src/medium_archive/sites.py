@@ -1,8 +1,8 @@
 """Machinery shared by the site exporters (myst, hugo, pelican).
 
 Each exporter derives a ready-to-render site from the converted archive --
-posts.json and <out>/posts/ -- so every site is as reproducible as the
-posts are: raw/ + fixups/ -> convert -> posts/ -> exporter -> site dir.
+archive/posts.json and archive/posts/ -- so every site is as reproducible
+as the posts are: raw/ + fixups/ -> convert -> posts/ -> exporter -> site dir.
 None of them touch the network; rendering is the site generator's job.
 
 Common to all of them: page URL slugs chosen from the Medium slug
@@ -10,11 +10,11 @@ Common to all of them: page URL slugs chosen from the Medium slug
 the publication rewritten from Medium URLs to site pages, images placed
 from posts/ (hard-linked as they are when nothing is to be gained,
 else display copies -- see ImagePlacer), a redirect map from every old
-inbound path to its page URL, tag names from <out>/tags.json's `display`
-map (the tags themselves stay slugs -- spaces and capitals are a display
-concern, so nothing a URL is built from moves), and site-wide text
-(title, description, landing-page intro, optional base_url) from a
-hand-written <out>/site.json.
+inbound path to its page URL, tag names from the archive's tags.json
+`display` map (the tags themselves stay slugs -- spaces and capitals are
+a display concern, so nothing a URL is built from moves), and site-wide
+text (title, description, landing-page intro, optional base_url) from the
+hand-written site/site.json.
 """
 
 import hashlib
@@ -35,6 +35,7 @@ from urllib.parse import unquote, urlsplit
 import yaml
 
 from .lint import split_post
+from .paths import archive_dir, image_cache, site_config
 from .pages import markdown_text
 from .tags import display_name, load_tag_display
 from .urls import medium_id
@@ -71,14 +72,15 @@ def write_templates(site: Path, templates: dict):
         path.write_text(template_text(src), encoding="utf-8")
 
 
-def copy_site_asset(out: Path, rel, dst_dir: Path, stem: str):
-    """An archive-relative image site.json names (the header avatar,
-    the tab icon) copied into the site as dst_dir/<stem><its
-    extension>, so the site stays self-contained; the file name written,
-    or None when rel is unset or the file is missing (noted)."""
+def copy_site_asset(inputs: Path, rel, dst_dir: Path, stem: str):
+    """An image site.json names (the header avatar, the tab icon),
+    resolved beside site.json itself so the site inputs move as one
+    directory, copied into the site as dst_dir/<stem><its extension> so
+    the site stays self-contained; the file name written, or None when
+    rel is unset or the file is missing (noted)."""
     if not rel:
         return None
-    src = out / rel
+    src = inputs / rel
     if not src.is_file():
         print(f"{stem} not found, skipped: {src}", file=sys.stderr)
         return None
@@ -126,26 +128,25 @@ LINK_RE = re.compile(r"\]\((https?://[^)\s]+)\)")  # inline [text](url)
 AUTOLINK_RE = re.compile(r"<(https?://[^>\s]+)>")  # autolink <url>
 
 
-def load_site_inputs(out: Path):
+def load_site_inputs(root: Path):
     """(manifest, site.json config) for an exporter, or exit."""
-    manifest_path = out / "posts.json"
+    manifest_path = archive_dir(root) / "posts.json"
     if not manifest_path.exists():
         sys.exit(f"nothing to build: {manifest_path} missing (run convert first)")
     manifest = json.loads(manifest_path.read_text())
     if not manifest:
         sys.exit("nothing to build: posts.json is empty (run convert first)")
     config = {"title": "Blog archive", "description": "", "intro": ""}
-    if (out / "site.json").exists():
-        config.update(json.loads((out / "site.json").read_text()))
+    if site_config(root).exists():
+        config.update(json.loads(site_config(root).read_text()))
     # Optional keys both card themes read: "noindex" (true keeps search
     # engines off the whole site -- a preview deployment, which would
     # otherwise be indexed as a copy of the real one -- through a
     # robots meta tag on every page and a robots.txt that disallows
     # all), "twitter" (the publication's @handle, for twitter:site),
     # "profiles" (its addresses elsewhere, for the Organization's
-    # sameAs -- see site_profiles) and "share_image" (an
-    # archive-relative raster, the og:image of every page without a
-    # cover of its own).
+    # sameAs -- see site_profiles) and "share_image" (a raster beside
+    # site.json, the og:image of every page without a cover of its own).
     # Absolute links -- feed URLs, redirect stubs, the Open Graph tags
     # and the share links a reader hands to LinkedIn or Facebook -- are
     # built from base_url. Without it each exporter falls back to a
@@ -160,12 +161,12 @@ def load_site_inputs(out: Path):
     return manifest, config
 
 
-def tag_names(manifest: dict, out: Path) -> dict:
+def tag_names(manifest: dict, archive: Path) -> dict:
     """Every tag the archive uses -> the name a site shows it under.
     Tags stay slugs through posts.json and into each site's tag URLs;
     tags.json's `display` map is what gives them their spaces and
     capitals at the point they are rendered."""
-    display = load_tag_display(out)
+    display = load_tag_display(archive)
     return {tag: display_name(tag, display) for p in manifest.values()
             for tag in p.get("tags") or []}
 
@@ -408,8 +409,8 @@ class Covers:
     first frame); without it (noted once) the card uses the full-size
     image under its own name, an animated gif included."""
 
-    def __init__(self, out: Path, manifest: dict, shown_as="card covers"):
-        self.out, self.manifest = out, manifest
+    def __init__(self, archive: Path, manifest: dict, shown_as="card covers"):
+        self.archive, self.manifest = archive, manifest
         try:
             from PIL import Image                      # noqa: F401
             self.pillow = True
@@ -419,7 +420,7 @@ class Covers:
                   "(`pip install pillow` and re-run for 640x360 thumbnails)",
                   file=sys.stderr)
         self.picked = {url: cover for url, p in manifest.items()
-                       if (cover := pick_cover(p, out / p["dir"]))}
+                       if (cover := pick_cover(p, archive / p["dir"]))}
 
     def path(self, url: str) -> str | None:
         """The page-relative cover path a post's front matter carries."""
@@ -434,7 +435,7 @@ class Covers:
         unchanged -- the extension is cosmetic."""
         if not (self.pillow and url in self.picked):
             return
-        src = self.out / self.manifest[url]["dir"] / self.picked[url]
+        src = self.archive / self.manifest[url]["dir"] / self.picked[url]
         dst = page_dir / "images" / "cover.jpg"
         dst.parent.mkdir(exist_ok=True)
         if not make_cover_thumbnail(src, dst):
@@ -522,7 +523,7 @@ class ImagePlacer:
     place a display copy. Line-art PNGs become full-resolution lossless
     webp, photographs are capped and encoded lossily (JPEG, or webp when
     they carry alpha), animated gifs go through gifsicle. Copies are
-    built once into <out>/.image-cache/<scheme-caps>/ and hard-linked
+    built once into the project's .image-cache/<scheme-caps>/ and hard-linked
     into every site that wants them, so the three exporters (and re-runs)
     share the work. Stills need Pillow and animated gifs need gifsicle;
     when either is missing the affected images are placed unchanged,
@@ -532,11 +533,11 @@ class ImagePlacer:
     extension when the copy changed format -- the exporters rewrite
     their pages' image references from it."""
 
-    def __init__(self, out: Path, config: dict):
+    def __init__(self, root: Path, config: dict):
         images = config.get("images", {})
         self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
         self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
-        self.cache = (out / ".image-cache"
+        self.cache = (image_cache(root)
                       / f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}")
         self.gifsicle = shutil.which("gifsicle")
         try:
@@ -567,7 +568,7 @@ class ImagePlacer:
         link_or_copy(copy, dst)
         return dst
 
-    def warm(self, out: Path, manifest: dict):
+    def warm(self, archive: Path, manifest: dict):
         """Build the display copies for every post image up front, in
         parallel -- gifsicle runs and Pillow encodes hold no GIL, and
         the big animated gifs take tens of seconds each, so this is
@@ -575,7 +576,7 @@ class ImagePlacer:
         just hard-links the results."""
         from concurrent.futures import ThreadPoolExecutor
         paths = [img for p in manifest.values()
-                 if (d := out / p["dir"] / "images").is_dir()
+                 if (d := archive / p["dir"] / "images").is_dir()
                  for img in d.iterdir()]
         with ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as pool:
             for _ in pool.map(self._display_copy, paths):
@@ -956,7 +957,7 @@ def author_links(manifest: dict) -> dict:
     return dict(sorted(links.items()))
 
 
-def site_data(manifest: dict, out: Path) -> dict:
+def site_data(manifest: dict, archive: Path) -> dict:
     """File name -> the map it holds, for the data files both the hugo
     and the pelican site are built with. They hold what a site is
     rendered from that is neither the posts nor the hand-written
@@ -976,15 +977,15 @@ def site_data(manifest: dict, out: Path) -> dict:
     carry the spaces, capitals, accents and punctuation that only the
     rendered name needs. The author profiles are keyed by that rendered
     name, which is what a byline reads as in the structured data."""
-    return {"tags.json": tag_names(manifest, out),
+    return {"tags.json": tag_names(manifest, archive),
             "authornames.json": author_names(manifest),
             "authors.json": author_links(manifest)}
 
 
-def write_data_files(site: Path, manifest: dict, out: Path) -> dict:
+def write_data_files(site: Path, manifest: dict, archive: Path) -> dict:
     """Write site_data's maps as <site>/data/*.json, sorted so a diff
     between two builds shows only what the archive changed."""
-    data = site_data(manifest, out)
+    data = site_data(manifest, archive)
     (site / "data").mkdir(parents=True, exist_ok=True)
     for name, mapping in data.items():
         (site / "data" / name).write_text(
@@ -1132,13 +1133,13 @@ def read_post_body(src: Path):
     return body
 
 
-def place_images(out: Path, post: dict, page_dir: Path, placer=None) -> dict:
+def place_images(archive: Path, post: dict, page_dir: Path, placer=None) -> dict:
     """The post's images beside its page, under page_dir/images/ --
     through placer when given (see ImagePlacer), else as they are.
     Returns the names that changed on the way (a display copy in a new
     format), for retarget_images to point the page at."""
     renames = {}
-    images = out / post["dir"] / "images"
+    images = archive / post["dir"] / "images"
     if not images.is_dir():
         return renames
     (page_dir / "images").mkdir()
@@ -1153,7 +1154,7 @@ def place_images(out: Path, post: dict, page_dir: Path, placer=None) -> dict:
     return renames
 
 
-def export_content(out: Path, site: Path, manifest: dict, stems: dict,
+def export_content(archive: Path, site: Path, manifest: dict, stems: dict,
                    front_matter, escape=None, placer=None,
                    transform=None, covers=None) -> int:
     """The shared page loop for the /posts/<stem>/ exporters (hugo,
@@ -1166,7 +1167,7 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
     (covers, when given -- see Covers). Returns the page count."""
     links = LinkMap(manifest, stems)
     if placer:
-        placer.warm(out, manifest)
+        placer.warm(archive, manifest)
 
     def target_for(url):
         hit = links.page_for(url)
@@ -1177,7 +1178,7 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
 
     pages = 0
     for url, p in manifest.items():
-        body = read_post_body(out / p["dir"])
+        body = read_post_body(archive / p["dir"])
         if body is None:
             continue
         body = rewrite_body(body, target_for, escape)
@@ -1196,7 +1197,7 @@ def export_content(out: Path, site: Path, manifest: dict, stems: dict,
         page_dir.mkdir(parents=True)
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed
-        renames = place_images(out, p, page_dir, placer)
+        renames = place_images(archive, p, page_dir, placer)
         (page_dir / "index.md").write_text(
             retarget_images(front_matter(url, p) + body, renames),
             encoding="utf-8")
