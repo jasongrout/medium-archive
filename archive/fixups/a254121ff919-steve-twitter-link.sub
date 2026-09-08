@@ -1,0 +1,10 @@
+# The "Steven" credit at the end of "A diagram editor for JupyterLab"
+# links a bare Twitter handle: href "http://@steve_silvester" with a
+# trailing space and right-to-left mark, authored that way on Medium.
+# Hugo's URL parser rejects the percent-encoded result outright. Point
+# it at the real profile. (The href lives in the page's embedded editor
+# state; replacing an href value is safe -- markup offsets index the
+# paragraph text, which is untouched.)
+file: a254121ff919/page.html
+old-regex: "href":"http:\\u002F\\u002F@steve_silvester [^"]*"
+new: "href":"https://twitter.com/steve_silvester"

@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/4f16aeb0f8b38733d333a5180d9fc54d",
+  "forks_url": "https://api.github.com/gists/4f16aeb0f8b38733d333a5180d9fc54d/forks",
+  "commits_url": "https://api.github.com/gists/4f16aeb0f8b38733d333a5180d9fc54d/commits",
+  "id": "4f16aeb0f8b38733d333a5180d9fc54d",
+  "node_id": "G_kwDOAXRfEtoAIDRmMTZhZWIwZjhiMzg3MzNkMzMzYTUxODBkOWZjNTRk",
+  "git_pull_url": "https://gist.github.com/4f16aeb0f8b38733d333a5180d9fc54d.git",
+  "git_push_url": "https://gist.github.com/4f16aeb0f8b38733d333a5180d9fc54d.git",
+  "html_url": "https://gist.github.com/manzt/4f16aeb0f8b38733d333a5180d9fc54d",
+  "files": {
+    "example_widget.py": {
+      "filename": "example_widget.py",
+      "type": "application/x-python",
+      "language": "Python",
+      "raw_url": "https://gist.githubusercontent.com/manzt/4f16aeb0f8b38733d333a5180d9fc54d/raw/5dfc514efca9f8c3f546dc983a0e53eeb2727520/example_widget.py",
+      "size": 552,
+      "truncated": false,
+      "content": "import anywidget\nimport traitlets\n\nclass ExampleWidget(anywidget.AnyWidget):\n    _esm = \"\"\"\n    export function render({ model, el }) {\n        el.classList.add(\"custom-widget\");\n        function valueChanged() {\n            el.textContent = model.get(\"value\");\n        }\n        valueChanged();\n        model.on(\"change:value\", valueChanged);\n    }\n    \"\"\"\n    _css = \"\"\"\n    .custom-widget {\n        background-color: lightseagreen;\n        padding: 0px 2px;\n    }\n    \"\"\"\n    value = traitlets.Unicode(\"Hello World\").tag(sync=True)\n\nExampleWidget()\n",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2023-07-10T00:33:05Z",
+  "updated_at": "2023-07-10T00:33:05Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/4f16aeb0f8b38733d333a5180d9fc54d/comments",
+  "owner": {
+    "login": "manzt",
+    "id": 24403730,
+    "node_id": "MDQ6VXNlcjI0NDAzNzMw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24403730?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/manzt",
+    "html_url": "https://github.com/manzt",
+    "followers_url": "https://api.github.com/users/manzt/followers",
+    "following_url": "https://api.github.com/users/manzt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/manzt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/manzt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/manzt/subscriptions",
+    "organizations_url": "https://api.github.com/users/manzt/orgs",
+    "repos_url": "https://api.github.com/users/manzt/repos",
+    "events_url": "https://api.github.com/users/manzt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/manzt/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "manzt",
+        "id": 24403730,
+        "node_id": "MDQ6VXNlcjI0NDAzNzMw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/24403730?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/manzt",
+        "html_url": "https://github.com/manzt",
+        "followers_url": "https://api.github.com/users/manzt/followers",
+        "following_url": "https://api.github.com/users/manzt/following{/other_user}",
+        "gists_url": "https://api.github.com/users/manzt/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/manzt/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/manzt/subscriptions",
+        "organizations_url": "https://api.github.com/users/manzt/orgs",
+        "repos_url": "https://api.github.com/users/manzt/repos",
+        "events_url": "https://api.github.com/users/manzt/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/manzt/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "cfe3b015e55e9bb4379243a87acb90855347d938",
+      "committed_at": "2023-07-10T00:33:05Z",
+      "change_status": {
+        "total": 23,
+        "additions": 23,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/4f16aeb0f8b38733d333a5180d9fc54d/cfe3b015e55e9bb4379243a87acb90855347d938"
+    }
+  ],
+  "truncated": false
+}

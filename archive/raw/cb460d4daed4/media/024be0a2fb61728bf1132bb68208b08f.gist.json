@@ -1,0 +1,181 @@
+{
+  "url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2",
+  "forks_url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/forks",
+  "commits_url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/commits",
+  "id": "db10581c190128903169333ac208b8c2",
+  "node_id": "G_kwDOAGcRttoAIGRiMTA1ODFjMTkwMTI4OTAzMTY5MzMzYWMyMDhiOGMy",
+  "git_pull_url": "https://gist.github.com/db10581c190128903169333ac208b8c2.git",
+  "git_push_url": "https://gist.github.com/db10581c190128903169333ac208b8c2.git",
+  "html_url": "https://gist.github.com/JohanMabille/db10581c190128903169333ac208b8c2",
+  "files": {
+    "kernel.diff": {
+      "filename": "kernel.diff",
+      "type": "text/plain",
+      "language": "Diff",
+      "raw_url": "https://gist.githubusercontent.com/JohanMabille/db10581c190128903169333ac208b8c2/raw/85f6b3b1fb9d519db3fd384968171de311614c3c/kernel.diff",
+      "size": 996,
+      "truncated": false,
+      "content": " 25 diff --git a/example/src/main.cpp b/example/src/main.cpp\n 26 index 29de437..eb8fdba 100644\n 27 --- a/example/src/main.cpp\n 28 +++ b/example/src/main.cpp\n 29 @@ -21,12 +21,14 @@ int main(int argc, char* argv[])\n 30      std::string file_name = (argc == 1) ? \"connection.json\" : argv[2];\n 31      xeus::xconfiguration config = xeus::load_configuration(file_name);\n 32 \n 33 +    auto context = xeus::make_context<zmq::context_t>();\n 34 +\n 35      // Create interpreter instance\n 36      using interpreter_ptr = std::unique_ptr<custom::custom_interpreter>;\n 37      interpreter_ptr interpreter = interpreter_ptr(new custom::custom_interpreter());\n 38 \n 39      // Create kernel instance and start it\n 40 -    xeus::xkernel kernel(config, xeus::get_user_name(), std::move(interpreter), xeus::make_xs    erver_zmq);\n 41 +    xeus::xkernel kernel(config, xeus::get_user_name(), std::move(context), std::move(interpr    eter), xeus::make_xserver_zmq);\n 42      kernel.start();\n 43 \n 44      return 0;",
+      "encoding": "utf-8"
+    }
+  },
+  "public": false,
+  "created_at": "2021-09-27T09:26:47Z",
+  "updated_at": "2021-09-27T09:34:32Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/comments",
+  "owner": {
+    "login": "JohanMabille",
+    "id": 6754742,
+    "node_id": "MDQ6VXNlcjY3NTQ3NDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6754742?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JohanMabille",
+    "html_url": "https://github.com/JohanMabille",
+    "followers_url": "https://api.github.com/users/JohanMabille/followers",
+    "following_url": "https://api.github.com/users/JohanMabille/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JohanMabille/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JohanMabille/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JohanMabille/subscriptions",
+    "organizations_url": "https://api.github.com/users/JohanMabille/orgs",
+    "repos_url": "https://api.github.com/users/JohanMabille/repos",
+    "events_url": "https://api.github.com/users/JohanMabille/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JohanMabille/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "JohanMabille",
+        "id": 6754742,
+        "node_id": "MDQ6VXNlcjY3NTQ3NDI=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/6754742?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/JohanMabille",
+        "html_url": "https://github.com/JohanMabille",
+        "followers_url": "https://api.github.com/users/JohanMabille/followers",
+        "following_url": "https://api.github.com/users/JohanMabille/following{/other_user}",
+        "gists_url": "https://api.github.com/users/JohanMabille/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/JohanMabille/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/JohanMabille/subscriptions",
+        "organizations_url": "https://api.github.com/users/JohanMabille/orgs",
+        "repos_url": "https://api.github.com/users/JohanMabille/repos",
+        "events_url": "https://api.github.com/users/JohanMabille/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/JohanMabille/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "dff1b4f45dd52837ab61939ae3489fea06b00d14",
+      "committed_at": "2021-09-27T09:34:32Z",
+      "change_status": {
+        "total": 25,
+        "additions": 2,
+        "deletions": 23
+      },
+      "url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/dff1b4f45dd52837ab61939ae3489fea06b00d14"
+    },
+    {
+      "user": {
+        "login": "JohanMabille",
+        "id": 6754742,
+        "node_id": "MDQ6VXNlcjY3NTQ3NDI=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/6754742?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/JohanMabille",
+        "html_url": "https://github.com/JohanMabille",
+        "followers_url": "https://api.github.com/users/JohanMabille/followers",
+        "following_url": "https://api.github.com/users/JohanMabille/following{/other_user}",
+        "gists_url": "https://api.github.com/users/JohanMabille/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/JohanMabille/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/JohanMabille/subscriptions",
+        "organizations_url": "https://api.github.com/users/JohanMabille/orgs",
+        "repos_url": "https://api.github.com/users/JohanMabille/repos",
+        "events_url": "https://api.github.com/users/JohanMabille/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/JohanMabille/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "0fba5efa36b69a2ebb43aad63cbc1ea5bfbe4be3",
+      "committed_at": "2021-09-27T09:34:08Z",
+      "change_status": {
+        "total": 23,
+        "additions": 23,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/0fba5efa36b69a2ebb43aad63cbc1ea5bfbe4be3"
+    },
+    {
+      "user": {
+        "login": "JohanMabille",
+        "id": 6754742,
+        "node_id": "MDQ6VXNlcjY3NTQ3NDI=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/6754742?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/JohanMabille",
+        "html_url": "https://github.com/JohanMabille",
+        "followers_url": "https://api.github.com/users/JohanMabille/followers",
+        "following_url": "https://api.github.com/users/JohanMabille/following{/other_user}",
+        "gists_url": "https://api.github.com/users/JohanMabille/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/JohanMabille/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/JohanMabille/subscriptions",
+        "organizations_url": "https://api.github.com/users/JohanMabille/orgs",
+        "repos_url": "https://api.github.com/users/JohanMabille/repos",
+        "events_url": "https://api.github.com/users/JohanMabille/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/JohanMabille/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "d50d1fa7d6f6321081f3e00a30eb09da433f1254",
+      "committed_at": "2021-09-27T09:32:15Z",
+      "change_status": {
+        "total": 4,
+        "additions": 2,
+        "deletions": 2
+      },
+      "url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/d50d1fa7d6f6321081f3e00a30eb09da433f1254"
+    },
+    {
+      "user": {
+        "login": "JohanMabille",
+        "id": 6754742,
+        "node_id": "MDQ6VXNlcjY3NTQ3NDI=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/6754742?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/JohanMabille",
+        "html_url": "https://github.com/JohanMabille",
+        "followers_url": "https://api.github.com/users/JohanMabille/followers",
+        "following_url": "https://api.github.com/users/JohanMabille/following{/other_user}",
+        "gists_url": "https://api.github.com/users/JohanMabille/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/JohanMabille/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/JohanMabille/subscriptions",
+        "organizations_url": "https://api.github.com/users/JohanMabille/orgs",
+        "repos_url": "https://api.github.com/users/JohanMabille/repos",
+        "events_url": "https://api.github.com/users/JohanMabille/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/JohanMabille/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "533b05901baf8bebfae62556def7a07c253ce819",
+      "committed_at": "2021-09-27T09:26:47Z",
+      "change_status": {
+        "total": 18,
+        "additions": 18,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/db10581c190128903169333ac208b8c2/533b05901baf8bebfae62556def7a07c253ce819"
+    }
+  ],
+  "truncated": false
+}

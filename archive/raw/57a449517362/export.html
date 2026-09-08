@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>A 2019 retrospective from the Binder Project</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">A 2019 retrospective from the Binder Project</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+2019 was a busy year for the Binder and JupyterHub projects — each saw growth in both their community and technology. Now that the year…
+</section>
+<section data-field="body" class="e-content">
+<section name="b9f7" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="bf9d" id="bf9d" class="graf graf--h3 graf--leading graf--title">A 2019 retrospective from the Binder Project</h3><p name="5b4f" id="5b4f" class="graf graf--p graf-after--h3">2019 was a busy year for the Binder and JupyterHub projects — each saw growth in both their community and technology. Now that the year has wrapped up, it is a good time to reflect on some of the highlights from the year.</p><figure name="4a78" id="4a78" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*ZeTyAGGLPlXs0UlQfKsr6g.png" data-width="974" data-height="231" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*ZeTyAGGLPlXs0UlQfKsr6g.png"></figure><p name="414d" id="414d" class="graf graf--p graf-after--figure">Overall, 2019 was about improving the robustness, stability, and team dynamics around the JupyterHub and Binder projects, as well as connecting these projects with other tools and services in the open source community. Here are a few things that we are most-excited about.</p><h3 name="9d35" id="9d35" class="graf graf--h3 graf-after--p">More people are using mybinder.org</h3><p name="af32" id="af32" class="graf graf--p graf-after--h3">The Binder Federation is a collection of BinderHubs accessible from mybinder.org. This deployment is run as a public service and a demonstration of BinderHub, the underlying technology of the Binder project. This deployment is run on a volunteer basis by Binder community members, and is supported through grants and donations in infrastructure from project stakeholders. In 2019, the user base of mybinder.org grew from around 70,000 users per week to around 100,000 users (a growth of nearly 40%). mybinder.org is being used for teaching classes, sharing reproducible analyses, creating interactive documentation and narratives, and much more. We’re astonished at the rapid growth of Binder-ready repositories, and we’re excited to see what the community creates next.</p><figure name="4a7f" id="4a7f" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*0_V6rIgF_oAW5VS-.png" data-width="1363" data-height="276" src="https://cdn-images-1.medium.com/max/800/0*0_V6rIgF_oAW5VS-.png"><figcaption class="imageCaption">Weekly user sessions at mybinder.org. Here you can see a typical pattern of activity over the course of a year. There are dips in activity over the summer and winter months, reflecting reduced activity from academic institutions.</figcaption></figure><h3 name="75a9" id="75a9" class="graf graf--h3 graf-after--figure">JupyterHub reaches 1.0</h3><p name="1f55" id="1f55" class="graf graf--p graf-after--h3">JupyterHub, the underlying technology that provides interactive computing sessions to multiple users, <a href="https://blog.jupyter.org/announcing-jupyterhub-1-0-8fff78acad7f?source=collection_archive---------4-----------------------" data-href="https://blog.jupyter.org/announcing-jupyterhub-1-0-8fff78acad7f?source=collection_archive---------4-----------------------" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">is now at 1.0 status</a>. The JupyterHub Python application was written several years ago, and reaching 1.0 reflects the work of dozens of open source contributors over time. JupyterHub is now a robust and stable application, having been used at smaller scales (think 5–10 people running on a single VM) as well as much larger scales (think 5,000 students running Jupyter sessions for a class).</p><figure name="914d" id="914d" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*m2PN2PR-a6X_J3M602tgog.png" data-width="342" data-height="147" src="https://cdn-images-1.medium.com/max/800/1*m2PN2PR-a6X_J3M602tgog.png"><figcaption class="imageCaption">The JupyterHub logo</figcaption></figure><h3 name="5adc" id="5adc" class="graf graf--h3 graf-after--figure">BinderHub is out of beta</h3><p name="4f3a" id="4f3a" class="graf graf--p graf-after--h3">BinderHub, the kubernetes-based technology that powers mybinder.org, also came out of Beta this year. This reflects the fact that BinderHub is a battle-hardened application that can provide a stable service over time. mybinder.org runs nearly 100,000 sessions a week, and requires minimal maintenance time from the Binder’s projects team of volunteer operators.</p><h3 name="bed0" id="bed0" class="graf graf--h3 graf-after--p">The BinderHub federation is launched</h3><p name="195f" id="195f" class="graf graf--p graf-after--h3">The Binder Project envisions a world in which technology can be used in vendor-agnostic and decentralized ways. BinderHub runs on Kubernetes, which can be deployed on a variety of cloud and local infrastructure. While the Binder team runs one BinderHub deployment at mybinder.org, our goal has always been to see <em class="markup--em markup--p-em">other </em>organizations running their own BinderHubs. This year, we went one step beyond this by <a href="https://blog.jupyter.org/the-international-binder-federation-4f6235c1537e" data-href="https://blog.jupyter.org/the-international-binder-federation-4f6235c1537e" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">launching the <strong class="markup--strong markup--p-strong">BinderHub Federation</strong></a>. This is a collection of research and technology organizations that combine their expertise and computational resources to power mybinder.org. When users visit mybinder.org, they are now directed to one of several BinderHub instances. This makes mybinder.org more robust, and grows the number of organizations that utilize the project’s technology for their communities. A BIG THANKS goes out to Google, OVH, GESIS, and the Turing Institute for supporting the Binder Federation.</p><figure name="8919" id="8919" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*KU35naJhl1LSDxKY8gog4g.png" data-width="833" data-height="548" src="https://cdn-images-1.medium.com/max/800/1*KU35naJhl1LSDxKY8gog4g.png"><figcaption class="imageCaption">The (rough) location of each BinderHub deployment in the mybinder.org federation</figcaption></figure><h3 name="35d8" id="35d8" class="graf graf--h3 graf-after--figure">Binder connects with open science services</h3><p name="c30a" id="c30a" class="graf graf--p graf-after--h3">Another goal of Binder is to be a <em class="markup--em markup--p-em">part </em>of the solution to more transparent, sharable, reproducible computational work. This means <a href="https://blog.jupyter.org/binder-with-zenodo-af68ed6648a6" data-href="https://blog.jupyter.org/binder-with-zenodo-af68ed6648a6" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">plugging in to other ecosystems and projects</a> in order to leverage the broader open science community. This year we saw a number of new connections with other services. BinderHub now supports links that point directly to Zenodo and Dataverse repositores, and we are working on a few other integrations in the coming months. This means that projects utilizing these resources will be able to share reproducible and interactive links to their work out-of-the-box.</p><figure name="5d6b" id="5d6b" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*WVSV4_bwWlGWnT0k8xrlWg.png" data-width="2569" data-height="672" src="https://cdn-images-1.medium.com/max/800/1*WVSV4_bwWlGWnT0k8xrlWg.png"><figcaption class="imageCaption">Binder now works with Zenodo repositories!</figcaption></figure><h3 name="40f9" id="40f9" class="graf graf--h3 graf-after--figure">The Binder community grows</h3><p name="85e3" id="85e3" class="graf graf--p graf-after--h3">The Binder project’s most important asset is its people — this is a collection of volunteers spread across the world and from a variety of organizations. Binder community members do a variety of things — from working on technology, to teaching others how to make their work more reproducible, to participating in community discussions, to maintaining and debugging Binder tech. There is also a “core team” of Binder members that dedicates a significant part of their time to supporting the project. In 2019, we saw several new members join the core team, as well as a general growth in the Binder community. Welcome to all of our new team members! You can find a <a href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html" data-href="https://jupyterhub-team-compass.readthedocs.io/en/latest/team.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">list of our current team members here</a>.</p><h3 name="0ac5" id="0ac5" class="graf graf--h3 graf-after--p">We welcome our first Contributor in Residence</h3><p name="63a4" id="63a4" class="graf graf--p graf-after--h3">One challenge with running large, open projects is that resources tend to be scarce. The Binder Project has no formal project funding, and must find ways to both grow its technology as well as run mybinder.org on resources that are donated from its community. One thing that often suffers as a result is the maintenance and general improvement of our open source technology. This work is often under-appreciated, difficult, and unlikely to happen with purely volunteer labor.</p><p name="ae56" id="ae56" class="graf graf--p graf-after--p">For this reason, the Binder project decided to <a href="https://blog.jupyter.org/the-jupyterhub-and-binder-contributor-in-residence-56708d1e3069" data-href="https://blog.jupyter.org/the-jupyterhub-and-binder-contributor-in-residence-56708d1e3069" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">apply for the CZI Essential Open Source grant series</a>. We proposed the creation of the “Binder Contributor in Residence” position — an annual contractor position that pays a member of the Binder community to do many of the daily things that are crucial for the project’s growth. We are excited to have <a href="https://github.com/GeorgianaElena" data-href="https://github.com/GeorgianaElena" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Georgiana Dolocan</a> as our first contributor in residence, and look forward to where this project will go in 2020.</p><figure name="867f" id="867f" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*pzbKC79Svh5Xrtev.png" data-width="880" data-height="384" src="https://cdn-images-1.medium.com/max/800/0*pzbKC79Svh5Xrtev.png"><figcaption class="imageCaption">Many thanks to CZI for their support of the Binder and JupyterHub projects in 2020!</figcaption></figure><h3 name="551a" id="551a" class="graf graf--h3 graf-after--figure">There are more BinderHub deployments</h3><p name="ec7d" id="ec7d" class="graf graf--p graf-after--h3">The Binder Project aims to create technology that is deployable anywhere so that other organizations can support their communities with Binder infrastructure. In 2019 we ran a number of training sessions for how other groups can run their own BinderHub. In particular, the Turing Institute ran several workshops that had attendees up-and-running with their own functioning BinderHubs.</p><h3 name="8c28" id="8c28" class="graf graf--h3 graf-after--p">Thanks to our community</h3><p name="ee5e" id="ee5e" class="graf graf--p graf-after--h3 graf--trailing">As you can see, 2019 was a busy and exciting year for the Binder community. As a final note, we want to say thanks to all of you who have supported Binder in one form or another over the years. Binder is a project run by the community, for the community. It wouldn’t be possible without all of your hard work and friendly faces, thanks! We look forward to what’s coming next in 2020!</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@choldgraf" class="p-author h-card">Chris Holdgraf</a> on <a href="https://medium.com/p/57a449517362"><time class="dt-published" datetime="2020-01-15T17:48:07.051Z">January 15, 2020</time></a>.</p><p><a href="https://medium.com/@choldgraf/a-2019-retrospective-from-the-binder-project-57a449517362" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 23, 2026.</p></footer></article></body></html>

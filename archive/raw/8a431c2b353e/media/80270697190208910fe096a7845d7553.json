@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "80270697190208910fe096a7845d7553",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/btel/20abbd0d2ed1e63414f20d0cbc979170",
+      "domain": "gist.github.com",
+      "title": "cell_meta_data",
+      "description": "You can't perform that action at this time. You signed in with another tab or window. You signed out in another tab or window. Reload to refresh your session. Reload to refresh your session.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Fgists%2Fgist-og-image.png&key=4fce0568f2ce49e8b54624ef71a8a5bd",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "btel",
+      "gist": {
+        "gistId": "20abbd0d2ed1e63414f20d0cbc979170",
+        "githubUsername": "btel",
+        "gistScriptUrl": "https://gist.github.com/btel/20abbd0d2ed1e63414f20d0cbc979170.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

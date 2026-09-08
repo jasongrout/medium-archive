@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>JupyterLab: the next generation of the Jupyter Notebook</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">JupyterLab: the next generation of the Jupyter Notebook</h1>
+</header>
+<section data-field="body" class="e-content">
+<section name="099e" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="18f8" id="18f8" class="graf graf--h3 graf--leading graf--title">JupyterLab: the next generation of the Jupyter Notebook</h3><h4 name="187b" id="187b" class="graf graf--h4 graf-after--h3 graf--subtitle">Learning the lessons of the Jupyter Notebook</h4><p name="6489" id="6489" class="graf graf--p graf-after--h4">It’s been a long time in the making, but today we want to start engaging our community with an early (pre-alpha) release of the next generation of the Jupyter Notebook application, which we are calling <a href="https://github.com/jupyter/jupyterlab" data-href="https://github.com/jupyter/jupyterlab" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterLab</a>.</p><p name="cc4c" id="cc4c" class="graf graf--p graf-after--p">At the <a href="http://scipy2016.scipy.org" data-href="http://scipy2016.scipy.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">SciPy 2016 conference</a>, Brian Granger and Jason Grout presented (<a href="http://archive.ipython.org/media/SciPy2016JupyterLab.pdf" data-href="http://archive.ipython.org/media/SciPy2016JupyterLab.pdf" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">PDF of talk slides</a> and <a href="https://www.youtube.com/watch?v=Ejh0ftSjk6g&amp;list=PLYx7XA2nY5Gf37zYZMw6OqGFRPjB1jCy6&amp;index=58" data-href="https://www.youtube.com/watch?v=Ejh0ftSjk6g&amp;list=PLYx7XA2nY5Gf37zYZMw6OqGFRPjB1jCy6&amp;index=58" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">video</a>) the overall vision of the system and gave a demo of its current capabilities, which are rapidly evolving and improving:</p><figure name="d460" id="d460" class="graf graf--figure graf--iframe graf-after--p"><blockquote class="twitter-tweet"><a href="https://twitter.com/choldgraf/status/753714190599151616"></a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></figure><p name="34db" id="34db" class="graf graf--p graf-after--figure">JupyterLab captures a lot of what we have learned from the usage patterns of the Notebook application over the last 5 years and seeks to build a clean and robust foundation that will let us not only offer an improved user interface and experience, but also a flexible and extensible environment for interactive computing.</p><p name="e0bf" id="e0bf" class="graf graf--p graf-after--p">In reality, even today’s “Jupyter Notebook” is a bit of a misnomer: the Notebook application includes not only support for Notebooks but also a file manager, a text editor, a terminal emulator, a monitor for running Jupyter processes, an IPython cluster manager and a pager to display help. And that is just what ships “out of the box”, without counting the many third-party extensions for it. This rich toolset evolved organically, driven by the needs of our users and developers, even if we kept the increasingly ill-fitting “Notebook” name for the whole thing.</p><p name="ba89" id="ba89" class="graf graf--p graf-after--p">But the underlying code was showing its age: it wasn’t the cleanest to extend and many APIs that were somewhat experimental and incomplete had become “official” by virtue of being used in the wild. Providing a more responsive and flexible UI atop the current codebase was difficult. So, in a collaborative effort between the Jupyter team, <a href="http://techatbloomberg.com" data-href="http://techatbloomberg.com" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Tech at Bloomberg</a> and <a href="https://www.continuum.io" data-href="https://www.continuum.io" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Continuum Analytics</a>, we set out to build a next-generation architecture to support all of the above tools, but with a flexible and responsive UI, offering user-controlled layout that could tie together our tools under a single roof.</p><p name="2a67" id="2a67" class="graf graf--p graf-after--p">A detailed account of this collaboration between our teams is available <a href="http://techatbloomberg.com/blog/inside-the-collaboration-that-built-the-open-source-jupyterlab-project" data-href="http://techatbloomberg.com/blog/inside-the-collaboration-that-built-the-open-source-jupyterlab-project" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">at the Tech at Bloomberg Blog</a>.</p><h4 name="4789" id="4789" class="graf graf--h4 graf-after--p">A glimpse of JupyterLab</h4><p name="b193" id="b193" class="graf graf--p graf-after--h4">While the system is still in alpha state and many features are missing, we can already see the kinds of user experiences it enables. Here we see how you can arrange a notebook next to a graphical console (a web-based version of our standalone QtConsole) atop a terminal that is monitoring the system, while keeping the file manager on the left:</p><p name="9f4d" id="9f4d" class="graf graf--p graf-after--p">With a few clicks, you can reorganize the workspace to expose the Command Palette to access all JupyterLab functions, keeping the graphical console side-by-side with a text editor containing a Python script that you then <code class="markup--code markup--p-code">%run</code> from the console, producing inline figures:</p><p name="45d2" id="45d2" class="graf graf--p graf-after--p">These examples illustrate how the new system, based on <a href="http://phosphorjs.github.io" data-href="http://phosphorjs.github.io" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Continuum’s flexible PhosphorJS framework</a>, gives us the foundation for a richer, cleaner UI. JupyterLab adapts easily to multiple workflow needs, letting you move from a Notebook/narrative focus to a script/console one. It exposes the Jupyter tools we all use daily and will let both the core team and the entire community develop many new ones that take advantage of the Jupyter architecture. The entire JupyterLab is built as a collection of plugins that talk to kernels for code execution and that can communicate with one another. We hope the community will develop many more plugins for new use cases that go far beyond the basic system.</p><p name="8069" id="8069" class="graf graf--p graf-after--p">Even in its current alpha state we are very excited about the possibilities. If you are willing to play with very early code, you can <a href="https://github.com/jupyter/jupyterlab" data-href="https://github.com/jupyter/jupyterlab" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">follow the instructions on the repo</a> and join us in helping test and refine the system.</p><p name="6fd3" id="6fd3" class="graf graf--p graf-after--p">This effort is the fruit of an <a href="http://techatbloomberg.com/blog/inside-the-collaboration-that-built-the-open-source-jupyterlab-project" data-href="http://techatbloomberg.com/blog/inside-the-collaboration-that-built-the-open-source-jupyterlab-project" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">open collaboration</a> between our industry partners at Bloomberg and Continuum and the Jupyter Team anchored at <a href="http://bids.berkeley.edu" data-href="http://bids.berkeley.edu" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">UC Berkeley</a>/LBNL and CalPoly, funded by the <a href="http://helmsleytrust.org" data-href="http://helmsleytrust.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Helmsley Trust</a>, the <a href="https://www.moore.org" data-href="https://www.moore.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Gordon and Betty Moore Foundation</a> and the <a href="http://www.sloan.org" data-href="http://www.sloan.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Alfred P. Sloan Foundation</a>. We are extremely grateful for this support, and we hope to see in the future many more examples of similar partnerships between academia, philantrophic funders and industry.</p><p name="9256" id="9256" class="graf graf--p graf-after--p">To see it in action, you can watch Brian and Jason’s SciPy’16 presentation here:</p><figure name="fd44" id="fd44" class="graf graf--figure graf--iframe graf-after--p graf--trailing"><iframe src="https://www.youtube.com/embed/Ejh0ftSjk6g?feature=oembed" width="700" height="393" frameborder="0" scrolling="no"></iframe></figure></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@ProjectJupyter" class="p-author h-card">Project Jupyter</a> on <a href="https://medium.com/p/5c949dabea3"><time class="dt-published" datetime="2016-07-15T03:47:08.000Z">July 15, 2016</time></a>.</p><p><a href="https://medium.com/@ProjectJupyter/jupyterlab-the-next-generation-of-the-jupyter-notebook-5c949dabea3" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 22, 2026.</p></footer></article></body></html>

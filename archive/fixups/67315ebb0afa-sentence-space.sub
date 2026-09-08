@@ -1,0 +1,7 @@
+# Authored typo (Jupyter Events update): missing space after the
+# sentence-ending period. Present in both copies inside page.html --
+# the rendered DOM and Medium's stored paragraph text -- hence count: 2.
+file: 67315ebb0afa/page.html
+count: 2
+old: Amazon Web Services.The committee
+new: Amazon Web Services. The committee

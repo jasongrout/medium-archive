@@ -1,0 +1,904 @@
+{
+  "drop": [
+    "2015",
+    "3d-modeling",
+    "accomplice",
+    "announcements",
+    "apache-arrow",
+    "apache-spark",
+    "asyncio",
+    "big-data",
+    "box2d",
+    "builders",
+    "button",
+    "canada",
+    "code-linters",
+    "code-snippet",
+    "codemirror",
+    "conda",
+    "cosmosdb",
+    "css",
+    "cuda",
+    "data-analysis",
+    "data-engineering",
+    "data-science",
+    "dataframes",
+    "debian",
+    "decision-making",
+    "deployment",
+    "desktop",
+    "desktop-application",
+    "document-version-control",
+    "emacs",
+    "game-development",
+    "github-copilot",
+    "gitlab",
+    "google-colab",
+    "gpu",
+    "graduation",
+    "hawaii",
+    "human-in-the-loop",
+    "interactive",
+    "itk",
+    "jupyter",
+    "jupyter-community",
+    "jupyter-notebook",
+    "kubespray",
+    "latam",
+    "leaflet",
+    "learning-python",
+    "linux-foundation",
+    "llvm",
+    "mamba",
+    "mysql",
+    "new-features",
+    "new-york",
+    "notebook",
+    "notebooks",
+    "numfocus",
+    "observability",
+    "open-source",
+    "open-source-communities",
+    "open-source-software",
+    "opensource",
+    "openstack",
+    "oracle",
+    "oreilly",
+    "ovhcloud",
+    "packaging",
+    "pandas",
+    "pangeo",
+    "parallel-computing",
+    "performance",
+    "platform",
+    "positron",
+    "postgres",
+    "programming",
+    "project-jupyter",
+    "proxy",
+    "python",
+    "python-programming",
+    "racism",
+    "react",
+    "reactive-programming",
+    "recruitment",
+    "repl",
+    "report",
+    "robot-framework",
+    "rpa-tools",
+    "rspack",
+    "rstudio",
+    "rust",
+    "science-platform",
+    "scientific-computing",
+    "slides",
+    "software-development",
+    "sphinx",
+    "spyder",
+    "sqlite",
+    "startup",
+    "stencila",
+    "story-maps",
+    "storytelling",
+    "tabular-data",
+    "team-collaboration",
+    "technical-computing",
+    "technology",
+    "traefik",
+    "trusted-ci",
+    "tutorial",
+    "updates",
+    "version-control",
+    "visual-programming",
+    "vscode",
+    "vtk",
+    "web-development",
+    "writing",
+    "youtube",
+    "zulip"
+  ],
+  "rename": {
+    "jupyter-lab-3": "jupyterlab",
+    "jupyterenterprisegateway": "jupyter-enterprise-gateway",
+    "cplusplus": "cpp",
+    "c-plus-plus-language": "cpp",
+    "data-visualization": "visualization",
+    "data-vizualisation": "visualization",
+    "dashboard": "dashboards",
+    "dashboarding": "dashboards",
+    "release": "releases",
+    "voilà": "voila",
+    "kernel": "kernels",
+    "jupyter-kernel": "kernels",
+    "jupyter-kernels": "kernels",
+    "widget": "widgets",
+    "jupyter-widget": "widgets",
+    "interactive-widgets": "widgets",
+    "ipycytoscape": "widgets",
+    "virtual-events": "events",
+    "conference": "events",
+    "conférence": "events",
+    "cfp": "events",
+    "workshop": "workshops",
+    "community-workshop": "workshops",
+    "binderhub": "binder",
+    "mybinder": "binder",
+    "reproducible-research": "reproducibility",
+    "diversity-in-tech": "diversity",
+    "diversity-and-inclusion": "diversity",
+    "inclusion": "diversity",
+    "artificial-intelligence": "ai",
+    "generative-ai-tools": "ai",
+    "agentic-ai": "ai",
+    "ml": "machine-learning",
+    "deep-learning": "machine-learning",
+    "robot-operating-system": "robotics",
+    "ros": "robotics",
+    "cloud-robotics": "robotics",
+    "fundraising": "funding",
+    "open-education": "education",
+    "geospatial-data": "geoscience",
+    "gnu-octave": "kernels",
+    "myst-markdown": "mystmd",
+    "extension": "extensions",
+    "jupyter-extension": "extensions",
+    "plugin-development": "extensions",
+    "accessibility-testing": "accessibility",
+    "authoring": "publishing",
+    "awards": "community",
+    "helmsley": "funding",
+    "moore": "funding",
+    "european-commission": "funding",
+    "emscripten": "webassembly",
+    "pyodide": "webassembly",
+    "mathematics": "science",
+    "bug-bounty": "security",
+    "chaosdb": "security",
+    "cve": "security",
+    "mfa": "security",
+    "astronomy": "science",
+    "physics": "science",
+    "genomics": "science",
+    "medical-imaging": "science",
+    "research": "science",
+    "politics": "science",
+    "elections": "science",
+    "open-data": "open-science",
+    "open-scholarship": "open-science",
+    "zenodo": "open-science",
+    "chat": "community",
+    "leadership": "community",
+    "surveys": "community",
+    "governance": "community",
+    "governance-and-tech": "community",
+    "community-engagement": "community",
+    "community-outreach": "community",
+    "internships": "outreachy",
+    "automation": "devops",
+    "automation-tools": "devops",
+    "bots": "devops",
+    "continuous-deployment": "devops",
+    "continuous-integration": "devops",
+    "github-actions": "devops",
+    "grafana": "devops",
+    "prometheus": "devops",
+    "metrics": "devops",
+    "outage": "devops",
+    "postmortem": "devops",
+    "helm": "kubernetes",
+    "cloud": "cloud-computing",
+    "calculator": "kernels",
+    "debugger": "kernels",
+    "julialang": "kernels",
+    "lua": "kernels",
+    "octave": "kernels",
+    "r": "kernels",
+    "sql": "kernels",
+    "deno": "javascript",
+    "typescript": "javascript",
+    "eslint-plugin": "javascript",
+    "asyncawait": "ipython",
+    "3d": "visualization",
+    "3dslicer": "visualization",
+    "itkwidgets": "visualization",
+    "diagrams": "visualization",
+    "graph": "visualization",
+    "cytoscape": "visualization",
+    "vega-lite": "visualization",
+    "datatables": "widgets",
+    "atlanta": "events",
+    "boston": "events",
+    "south-america": "workshops",
+    "musculoskeletal": "workshops",
+    "blockly": "extensions",
+    "themes": "extensions",
+    "end-of-maintenance": "releases",
+    "pdf": "publishing",
+    "publication": "publishing",
+    "slideshow": "voila",
+    "university-of-edinburgh": "education",
+    "collaborative-editing": "collaboration",
+    "cad": "jupytercad",
+    "canvas": "widgets",
+    "gis": "geoscience"
+  },
+  "imply": {
+    "jupytercon": [
+      "events"
+    ],
+    "workshops": [
+      "events"
+    ]
+  },
+  "add": {
+    "2026-jupyter-community-call-for-funding-proposals": [
+      "jupyter-foundation"
+    ],
+    "a-2019-retrospective-from-the-binder-project": [
+      "binder"
+    ],
+    "a-c-backend-for-vega-lite": [
+      "cpp"
+    ],
+    "a-curiously-recurring-widget-library": [
+      "widgets"
+    ],
+    "a-jupyter-workshop-demystifying-myst-markdown-in-education": [
+      "mystmd"
+    ],
+    "a-new-python-kernel-for-jupyter": [
+      "kernels"
+    ],
+    "a-theme-editor-for-jupyterlab": [
+      "jupyterlab"
+    ],
+    "a-visual-debugger-for-jupyter": [
+      "jupyterlab",
+      "kernels"
+    ],
+    "abracadabra-bringing-the-magics-to-xeus-python": [
+      "xeus"
+    ],
+    "and-voilà": [
+      "voila"
+    ],
+    "announcing-jupyter-notebook-7": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "announcing-our-first-jupyter-community-funded-proposals": [
+      "jupyter-foundation"
+    ],
+    "announcing-the-new-jupyter-book": [
+      "jupyter-book"
+    ],
+    "anywidget-jupyter-widgets-made-easy": [
+      "anywidget",
+      "widgets"
+    ],
+    "becoming-the-new-jupyterhub-and-jupyter-book-community-manager": [
+      "jupyter-book",
+      "jupyterhub"
+    ],
+    "better-sharing-ux-with-nbgitpuller-and-contextual-error-handling": [
+      "jupyterhub"
+    ],
+    "binder-2-0-a-tech-guide-2017": [
+      "binder"
+    ],
+    "binder-with-zenodo": [
+      "binder"
+    ],
+    "binderhub-is-out-of-beta": [
+      "binder",
+      "releases"
+    ],
+    "collaborative-cad-in-jupyterlab": [
+      "jupyterlab"
+    ],
+    "community-building-report-project-jupyter": [
+      "community"
+    ],
+    "community-note": [
+      "community"
+    ],
+    "community-workshop-jupyterlite": [
+      "jupyterlite",
+      "workshops"
+    ],
+    "congratulations-distinguished-contributors": [
+      "community"
+    ],
+    "continuum-analytics-gift": [
+      "funding"
+    ],
+    "cve-2021-32797-and-cve-2021-32798-remote-code-execution-in-jupyterlab-and-jupyte": [
+      "jupyter-notebook",
+      "jupyterlab"
+    ],
+    "deadline-extension-jupyter-community-workshops": [
+      "workshops"
+    ],
+    "desktop-gis-software-in-the-cloud-with-jupyterhub": [
+      "jupyterhub",
+      "science",
+      "workshops"
+    ],
+    "disc-sprint-nyc-2018": [
+      "diversity",
+      "events"
+    ],
+    "enabling-the-jupyterlab-debugger-with-ipykernel": [
+      "jupyterlab"
+    ],
+    "expanding-geospatial-workflows-in-jupytergis-stac-browsing-and-story-maps": [
+      "jupytergis",
+      "science"
+    ],
+    "exploring-open-access-art-using-the-deno-jupyter-kernel": [
+      "kernels"
+    ],
+    "field-report-on-the-kernel-community-workshop": [
+      "workshops"
+    ],
+    "hiring-project-manager": [
+      "community"
+    ],
+    "how-we-made-jupyter-notebooks-collaborative-with-yjs": [
+      "collaboration"
+    ],
+    "i-python-you-r-we-julia": [
+      "kernels"
+    ],
+    "ibm-brings-jupyter-and-spark-to-the-mainframe": [
+      "community"
+    ],
+    "inspector-jupyterlab": [
+      "jupyterlab"
+    ],
+    "interactive-gis-in-jupyter-with-ipyleaflet": [
+      "science"
+    ],
+    "interactive-mapping-with-ipyopenlayers": [
+      "science"
+    ],
+    "interpreted-c-for-gis-with-jupyter": [
+      "science"
+    ],
+    "introducing-learn-python-with-jupyter": [
+      "education"
+    ],
+    "introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes": [
+      "jupyterhub",
+      "kubernetes"
+    ],
+    "ipython-3-2-released": [
+      "ipython",
+      "releases"
+    ],
+    "ipython-7-0-async-repl": [
+      "releases"
+    ],
+    "ipywidget-security-release": [
+      "releases",
+      "security",
+      "widgets"
+    ],
+    "ipywidgets-5-0": [
+      "widgets"
+    ],
+    "ipywidgets-6-release": [
+      "releases",
+      "widgets"
+    ],
+    "jdboston16-speaker-announcement": [
+      "events"
+    ],
+    "jeremy-howard": [
+      "jupytercon"
+    ],
+    "join-us-for-the-jupyter-accessibility-workshops-part-1": [
+      "workshops"
+    ],
+    "join-us-for-the-jupyter-accessibility-workshops-part-2": [
+      "workshops"
+    ],
+    "jupyter-accessibility-workshops-wrap-up": [
+      "workshops"
+    ],
+    "jupyter-ascending": [
+      "ipython",
+      "releases"
+    ],
+    "jupyter-community-call-february-2025": [
+      "community"
+    ],
+    "jupyter-community-workshop-building-upon-the-jupyter-kernel-protocol": [
+      "kernels",
+      "workshops"
+    ],
+    "jupyter-community-workshop-dashboarding-with-project-jupyter": [
+      "dashboards",
+      "workshops"
+    ],
+    "jupyter-community-workshop-jupyter-for-scientific-user-facilities-and-high-perfo": [
+      "workshops"
+    ],
+    "jupyter-community-workshop-jupyter-server-design-and-roadmap-workshop": [
+      "workshops"
+    ],
+    "jupyter-community-workshop-the-future-of-jupyter-widgets": [
+      "widgets",
+      "workshops"
+    ],
+    "jupyter-community-workshop-the-notebook-file-format": [
+      "jupyter-notebook",
+      "workshops"
+    ],
+    "jupyter-community-workshops": [
+      "workshops"
+    ],
+    "jupyter-community-workshops-2019-year-in-review": [
+      "workshops"
+    ],
+    "jupyter-community-workshops-call-for-proposals": [
+      "workshops"
+    ],
+    "jupyter-community-workshops-call-for-proposals-for-jan-aug-2020": [
+      "workshops"
+    ],
+    "jupyter-community-workshops-early-2026": [
+      "workshops"
+    ],
+    "jupyter-games": [
+      "education",
+      "widgets"
+    ],
+    "jupyter-kernel-gateway": [
+      "kernels"
+    ],
+    "jupyter-media-strategy-social-media-update": [
+      "community"
+    ],
+    "jupyter-meets-the-earth": [
+      "science"
+    ],
+    "jupyter-meets-the-earth-earthcube-community-meeting": [
+      "science"
+    ],
+    "jupyter-notebook-5-0": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyter-notebook-5-1-0": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyter-notebook-5-2-0": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyter-notebook-5-3-0": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyter-notebook-5-5-0": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyter-notebook-6-5-0-release-candidate": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyter-notebook-format-workshop-outcomes": [
+      "jupyter-notebook"
+    ],
+    "jupyter-notebook-security-fixes": [
+      "jupyter-notebook"
+    ],
+    "jupyter-notebook-user-experience-survey": [
+      "community",
+      "jupyter-notebook"
+    ],
+    "jupyter-notebook-xssi-security-fix": [
+      "jupyter-notebook",
+      "security"
+    ],
+    "jupyter-qtconsole-4-4": [
+      "releases"
+    ],
+    "jupyter-server-2-0-is-released": [
+      "releases"
+    ],
+    "jupyter-user-survey": [
+      "jupyter-foundation"
+    ],
+    "jupytercon-2018-call-for-proposal": [
+      "jupytercon"
+    ],
+    "jupytercon-2018-nyc-august-21-25": [
+      "jupytercon"
+    ],
+    "jupytercon-2018-registration-open": [
+      "jupytercon"
+    ],
+    "jupytercon-2020-is-a-go": [
+      "jupytercon"
+    ],
+    "jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h": [
+      "jupytercon"
+    ],
+    "jupytercon-nyc-august-2017": [
+      "jupytercon"
+    ],
+    "jupytercon-online-more-than-a-conference": [
+      "jupytercon"
+    ],
+    "jupyterday-atlanta-2016": [
+      "events"
+    ],
+    "jupyterday-chicago-2016": [
+      "events"
+    ],
+    "jupyterday-hawaii-2016": [
+      "events"
+    ],
+    "jupyterday-in-the-triangle": [
+      "events"
+    ],
+    "jupyterday-nyc": [
+      "events"
+    ],
+    "jupyterday-paris": [
+      "events"
+    ],
+    "jupyterdays-boston-2016": [
+      "events"
+    ],
+    "jupytergis": [
+      "jupytergis",
+      "science"
+    ],
+    "jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more": [
+      "science"
+    ],
+    "jupyterlab-3-0-is-out": [
+      "releases"
+    ],
+    "jupyterlab-4-0-is-here": [
+      "releases"
+    ],
+    "jupyterlab-4-1-and-notebook-7-1-are-here": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyterlab-4-2-and-notebook-7-2-are-available": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyterlab-4-3-and-notebook-7-3-are-available": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyterlab-4-4-and-notebook-7-4-are-available": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyterlab-4-5-and-notebook-7-5-are-available": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyterlab-4-6-and-notebook-7-6-are-out": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "jupyterlab-the-next-generation-of-the-jupyter-notebook": [
+      "jupyterlab"
+    ],
+    "jupyterlite-0-6-0-is-released": [
+      "releases"
+    ],
+    "jupyterlite-0-7-is-released": [
+      "releases"
+    ],
+    "jupyterlite-0-8-is-released": [
+      "releases"
+    ],
+    "jupyterlite-jupyter-️-webassembly-️-python": [
+      "jupyterlite"
+    ],
+    "jupyterlite-officially-joins-project-jupyter": [
+      "jupyterlite"
+    ],
+    "mamba-meets-jupyterlite": [
+      "jupyterlite"
+    ],
+    "meet-xeus-r-a-future-proof-jupyter-kernel-for-r": [
+      "xeus"
+    ],
+    "mybinder-org-serves-two-million-launches": [
+      "binder"
+    ],
+    "mybinder-ovhcloud": [
+      "binder"
+    ],
+    "navigating-the-post-workshop-fog-a-path-to-myst": [
+      "mystmd"
+    ],
+    "nbterm-jupyter-notebooks-in-the-terminal": [
+      "jupyter-notebook"
+    ],
+    "nbviewer-and-githubs-rate-limit": [
+      "nbviewer"
+    ],
+    "nbviewer-has-a-new-host-ovhcloud": [
+      "nbviewer"
+    ],
+    "notebook-4-1-release": [
+      "jupyter-notebook"
+    ],
+    "notebook-4-2": [
+      "jupyter-notebook",
+      "releases"
+    ],
+    "november-2024-jupyter-community-call": [
+      "community"
+    ],
+    "open-redirect-vulnerability-in-jupyter-jupyterhub": [
+      "jupyter-notebook"
+    ],
+    "openness-diversity-and-dignity-a-foundation-for-global-collaboration": [
+      "diversity"
+    ],
+    "our-new-jupyter-foundation-community-manager": [
+      "community",
+      "jupyter-foundation"
+    ],
+    "outreachy-jupyter-supporting-diversity-in-open-communities": [
+      "outreachy"
+    ],
+    "packaging-for-jupyter-in-2022": [
+      "extensions"
+    ],
+    "post0": [
+      "community"
+    ],
+    "project-jupyter-computatio-nalnarratives-as-the-engine-of-collaborative-data-sci": [
+      "funding"
+    ],
+    "project-jupyter-is-hiring-two-postdoctoral-fellows-uc-berkeley": [
+      "community"
+    ],
+    "project-jupyter-joins-lf-charities": [
+      "community",
+      "jupyter-foundation"
+    ],
+    "project-jupyters-2025-executive-council-elections": [
+      "jupyter-foundation"
+    ],
+    "public-notebooks-and-security": [
+      "jupyter-notebook"
+    ],
+    "real-time-collaboration-and-collaborative-editing-for-gis-workflows-with-jupyter": [
+      "science"
+    ],
+    "release-of-ipython-5-0": [
+      "ipython",
+      "releases"
+    ],
+    "release-of-ipython-5-5-and-6-2": [
+      "releases"
+    ],
+    "report-on-the-jupyter-community-workshop-on-dashboarding": [
+      "workshops"
+    ],
+    "report-on-the-jupyterlite-community-workshop": [
+      "jupyterlite"
+    ],
+    "retrolab-a-jupyterlab-distribution-with-a-retro-look-and-feel": [
+      "jupyter-notebook"
+    ],
+    "security-fix-for-jupyter-notebook": [
+      "jupyter-notebook"
+    ],
+    "security-fix-for-jupyterhub-gitlab-oauthenticator": [
+      "jupyterhub"
+    ],
+    "security-fix-notebook-4-2-2": [
+      "jupyter-notebook",
+      "releases",
+      "security"
+    ],
+    "security-release-jupyter-notebook-4-3-1": [
+      "jupyter-notebook",
+      "releases",
+      "security"
+    ],
+    "simplifying-and-speeding-up-binder-builds-with-buildkit": [
+      "binder"
+    ],
+    "slicerjupyter-a-3d-slicer-kernel-for-interactive-publications": [
+      "kernels"
+    ],
+    "synopsis-jupytercon-2018-education-track": [
+      "jupytercon"
+    ],
+    "the-big-split": [
+      "ipython"
+    ],
+    "the-continued-existence-of-the-emacs-ipython-notebook": [
+      "jupyter-notebook"
+    ],
+    "the-future-of-jupytercon-2019-and-beyond": [
+      "jupytercon"
+    ],
+    "the-international-binder-federation": [
+      "binder"
+    ],
+    "the-jupyterhub-and-binder-contributor-in-residence": [
+      "binder",
+      "jupyterhub"
+    ],
+    "updating-defaults-on-mybinder-org": [
+      "binder"
+    ],
+    "voilà-is-now-an-official-jupyter-subproject": [
+      "voila"
+    ],
+    "what-you-told-us-results-from-the-2026-jupyter-user-experience-and-product-enhan": [
+      "community",
+      "jupyter-foundation"
+    ],
+    "xeus-is-now-a-jupyter-subproject": [
+      "xeus"
+    ],
+    "xeus-lite": [
+      "xeus"
+    ],
+    "your-ideas-our-support-jupyter-community-call-for-funding-proposals": [
+      "jupyter-foundation"
+    ],
+    "zero-to-jupyterhub-helm-chart-0-8": [
+      "jupyterhub"
+    ]
+  },
+  "remove": {
+    "abracadabra-bringing-the-magics-to-xeus-python": [
+      "jupyterlab"
+    ],
+    "announcing-a-new-jupyter-governance-model-and-our-first-executive-council": [
+      "ipython"
+    ],
+    "announcing-jupyter-day-atlanta-spring-2018": [
+      "science"
+    ],
+    "announcing-the-2023-jupyter-distinguished-contributor-award-recipients": [
+      "jupyterlab"
+    ],
+    "announcing-the-new-jupyter-book": [
+      "education"
+    ],
+    "berkeley-institute-for-data-science-bids-joins-the-mybinder-org-federation-with-": [
+      "jupyterhub"
+    ],
+    "community-building-report-project-jupyter": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "congratulations-distinguished-contributors": [
+      "jupyterlab"
+    ],
+    "https-blog-jupyter-org-university-of-edinburgh-jupyter-community-nbgrader-hackat": [
+      "jupyterhub"
+    ],
+    "jupyter-community-call-december-2025": [
+      "jupyterlab"
+    ],
+    "jupyter-community-call-february-2025": [
+      "jupyterlab"
+    ],
+    "jupyter-community-call-february-2026": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "jupyter-community-call-june-2025": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "jupyter-community-call-september-2025": [
+      "jupyterhub",
+      "jupyterlab"
+    ],
+    "jupyter-community-workshop-south-america": [
+      "jupyterlab"
+    ],
+    "jupyter-for-science-user-facilities-and-high-performance-computing": [
+      "jupyterlab"
+    ],
+    "jupyter-media-strategy-social-media-update": [
+      "jupyterlab"
+    ],
+    "jupyter-security-sprint-march-31st": [
+      "jupyterlab"
+    ],
+    "jupyter-server-2-0-is-released": [
+      "jupyterlab"
+    ],
+    "jupytercon-2020-is-a-go": [
+      "education"
+    ],
+    "jupytercon-2023-early-bird-passes-still-available-and-scholarship-applications-h": [
+      "science"
+    ],
+    "jupytergis": [
+      "jupyterlab"
+    ],
+    "jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more": [
+      "jupyterlab",
+      "jupyterlite"
+    ],
+    "jupyterlite-0-7-is-released": [
+      "jupyterlab"
+    ],
+    "jupyterlite-0-8-is-released": [
+      "jupyterlab"
+    ],
+    "mybinder-ovhcloud": [
+      "jupyterhub"
+    ],
+    "packaging-for-jupyter-in-2022": [
+      "jupyterlab"
+    ],
+    "project-jupyter-joins-lf-charities": [
+      "jupyterlab"
+    ]
+  },
+  "display": {
+    "jupyterlab": "JupyterLab",
+    "jupyterhub": "JupyterHub",
+    "jupyter-notebook": "Jupyter Notebook",
+    "jupyter-server": "Jupyter Server",
+    "jupyter-book": "Jupyter Book",
+    "jupyter-enterprise-gateway": "Jupyter Enterprise Gateway",
+    "jupyter-foundation": "Jupyter Foundation",
+    "jupytercon": "JupyterCon",
+    "jupyterlite": "JupyterLite",
+    "jupytercad": "JupyterCAD",
+    "jupytergis": "JupyterGIS",
+    "tljh": "TLJH",
+    "ipython": "IPython",
+    "voila": "Voil\u00e0",
+    "mystmd": "MyST",
+    "binder": "Binder",
+    "elyra": "Elyra",
+    "github": "GitHub",
+    "docker": "Docker",
+    "kubernetes": "Kubernetes",
+    "javascript": "JavaScript",
+    "webassembly": "WebAssembly",
+    "outreachy": "Outreachy",
+    "devops": "DevOps",
+    "cpp": "C++",
+    "ai": "AI"
+  }
+}

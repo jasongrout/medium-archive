@@ -1,0 +1,7 @@
+# Authored typo (Omoju Miller interview): missing space after the
+# sentence-ending period. Present in both copies inside page.html --
+# the rendered DOM and Medium's stored paragraph text -- hence count: 2.
+file: 435db40d347e/page.html
+count: 2
+old: in the field.Her story
+new: in the field. Her story

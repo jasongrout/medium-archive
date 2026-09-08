@@ -1,0 +1,7 @@
+# Authored typo (C++ in Jupyter): missing space after the
+# sentence-ending period. Present in both copies inside page.html --
+# the rendered DOM and Medium's stored paragraph text -- hence count: 2.
+file: c9d93542f20b/page.html
+count: 2
+old: in Jupyter is possible.You can track
+new: in Jupyter is possible. You can track

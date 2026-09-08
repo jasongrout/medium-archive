@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Incident Report: Jupyter services down</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Incident Report: Jupyter services down</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+update: December 14, 20:45 UTC, all services should be restored and back up.
+</section>
+<section data-field="body" class="e-content">
+<section name="4bec" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="c073" id="c073" class="graf graf--h3 graf--leading graf--title">Incident Report: Jupyter services down</h3><p name="c862" id="c862" class="graf graf--p graf-after--h3"><strong class="markup--strong markup--p-strong">update:</strong> December 14, 20:45 UTC, all services should be restored and back up.</p><p name="c92e" id="c92e" class="graf graf--p graf-after--p">On December 13, at 22:10 UTC (4:10pm EST), a large number of Jupyter-provided services stopped responding. This included, but was not limited to <a href="https://nbviewer.jupyter.org," data-href="https://nbviewer.jupyter.org," class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">https://nbviewer.jupyter.org,</a> <a href="https://try.jupyter.org" data-href="https://try.jupyter.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">https://try.jupyter.org</a> (powered by tmpnb) and <a href="https://cdn.jupyter.org" data-href="https://cdn.jupyter.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">https://cdn.jupyter.org</a>. We quickly narrowed this down to an issue with our hosting provider and have been working with them to resolve the issue as fast as possible.</p><p name="8420" id="8420" class="graf graf--p graf-after--p">When outages happen, the <a href="http://status.jupyter.org/" data-href="http://status.jupyter.org/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Jupyter Status page</a> should show which services are affected and we publish updates there.</p><h3 name="d7dc" id="d7dc" class="graf graf--h3 graf-after--p">How are Jupyter services hosted?</h3><p name="29e4" id="29e4" class="graf graf--p graf-after--h3">To understand the cause of the outage, we need to understand how the Jupyter services are hosted and maintained. As Jupyter is an open organization which is mostly maintained by volunteers, we do not have a dev-ops team assigned to maintaining our infrastructure. Even with full-time developers hired through universities or companies, the time spent fixing infrastructure is taken on nights and weekends. These developers are often stretched thin and cannot be available 24/7.</p><p name="51ab" id="51ab" class="graf graf--p graf-after--p">Most of our cloud infrastructure is donated to us by companies like <a href="https://www.cloudflare.com/" data-href="https://www.cloudflare.com/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">CloudFlare</a>, <a href="https://www.rackspace.com/" data-href="https://www.rackspace.com/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Rackspace</a>, <a href="http://cloudflare" data-href="http://cloudflare" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Fastly</a>, <a href="https://cloud.google.com/" data-href="https://cloud.google.com/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Google</a>, and <a href="https://azure.microsoft.com" data-href="https://azure.microsoft.com" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Microsoft</a>. Donating resources can be challenging, both technically and legally. In this particular case, Rackspace graciously created a special account for Jupyter that handles invoices on our behalf, thereby making resources free to the project. Following a hiccup, this Jupyter account was suspended and all services are unavailable as a result.</p><h3 name="4a20" id="4a20" class="graf graf--h3 graf-after--p">Temporary resolution</h3><p name="31ed" id="31ed" class="graf graf--p graf-after--h3">As nbviewer is one of the most used services provided by Jupyter, we’ve moved it to one of our personal account at another cloud-provider. <a href="https://www.fastly.com/" data-href="https://www.fastly.com/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Fastly</a> was set up to load-balance on the yet-to-come-back-up instances as well as this newly created instance, so all should be fine now.</p><p name="c496" id="c496" class="graf graf--p graf-after--p">The other services (tmpnb, mails@jupyter.org, cdn.jupyter.org, …) will still unavailable or highly degraded until a permanent solution is found, or the services are restarted. <code class="markup--code markup--p-code">try.jupyter.org</code> will likely redirect to a repo on <a href="https://mybinder.org" data-href="https://mybinder.org" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">https://mybinder.org</a> in the meantime so people can still try out Jupyter.</p><h3 name="d7d1" id="d7d1" class="graf graf--h3 graf-after--p">Low bus factor</h3><p name="dd0c" id="dd0c" class="graf graf--p graf-after--h3">The outage of all these services lasted for a significant time (more than 18 hours). Which perturbed many of you relying on these services. We understand that this is hardly acceptable and we hope you’ll indulge us as these services are provided for free and without ads. One of the factors leading to the slow reestablishment of service was a relatively low <a href="https://en.wikipedia.org/wiki/Bus_factor" data-href="https://en.wikipedia.org/wiki/Bus_factor" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">bus factor</a>, with only one and a half of our developers knowing how to deploy and maintain these services. Documentation and access to credentials was also limited.</p><p name="a385" id="a385" class="graf graf--p graf-after--p">This is one of the challenges in a distributed team like Jupyter where contributors self-organize. It is easy to forget that new code is not the only way to contribute and that <a href="https://www.nytimes.com/2017/07/22/opinion/sunday/lets-get-excited-about-maintenance.html" data-href="https://www.nytimes.com/2017/07/22/opinion/sunday/lets-get-excited-about-maintenance.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">infrastructure and maintenance</a> are crucial.</p><p name="8222" id="8222" class="graf graf--p graf-after--p">We also overly rely on a single vendor (in this case Rackspace), and while we are happy with Rackspace and have no reason to move to another provider, we should have a plan to restore critical services even temporarily in case of failure.</p><p name="7453" id="7453" class="graf graf--p graf-after--p">A couple of months ago, the subject was brought to our attention, and we developed a plan to move many of our deployment to <a href="https://k8s.io" data-href="https://k8s.io" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Kubernetes</a> (which is provider agnostic). We underestimated the probability to need an emergency plan this early.</p><h3 name="728d" id="728d" class="graf graf--h3 graf-after--p">How can you help</h3><p name="6f51" id="6f51" class="graf graf--p graf-after--h3">Jupyter is mainly governed by the community all around the world. Contributing is not limited to writing code! We need members with knowledge in multiple languages, in design, dev-ops, etc. Whether you are an expert, or still learning, we would like you to <a href="https://jupyter.org/community.html" data-href="https://jupyter.org/community.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">get involved</a>.</p><p name="0405" id="0405" class="graf graf--p graf-after--p graf--trailing">Thanks everyone for your patience and the kind words when you reached to us when discovering the services were down.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@mbussonn" class="p-author h-card">M Bussonnier</a> on <a href="https://medium.com/p/f5b3888fa5c2"><time class="dt-published" datetime="2017-12-14T19:52:41.167Z">December 14, 2017</time></a>.</p><p><a href="https://medium.com/@mbussonn/incident-report-jupyter-services-down-f5b3888fa5c2" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 25, 2026.</p></footer></article></body></html>

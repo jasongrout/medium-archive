@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "ce580aa62f7143c9dbe3dcbdfd1c282a",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/cf3f1a36e3d55f8f644cb639df851d5b",
+      "domain": "gist.github.com",
+      "title": "ploomber-cli.sh",
+      "description": "Instantly share code, notes, and snippets. You can't perform that action at this time. You signed in with another tab or window. You signed out in another tab or window. Reload to refresh your session. Reload to refresh your session.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Fgists%2Fgist-og-image.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "edublancas",
+      "gist": {
+        "gistId": "cf3f1a36e3d55f8f644cb639df851d5b",
+        "githubUsername": "edublancas",
+        "gistScriptUrl": "https://gist.github.com/edublancas/cf3f1a36e3d55f8f644cb639df851d5b.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

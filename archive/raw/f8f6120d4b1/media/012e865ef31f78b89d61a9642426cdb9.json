@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "012e865ef31f78b89d61a9642426cdb9",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/gouarin/0ad0527e1ee0bdea171cba76d11b2202",
+      "domain": "gist.github.com",
+      "title": "rc_file",
+      "description": "rc_file. GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Favatars1.githubusercontent.com%2Fu%2F7510549%3Fs%3D400%26v%3D4&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 400,
+      "thumbnailHeight": 400,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "gouarin",
+      "gist": {
+        "gistId": "0ad0527e1ee0bdea171cba76d11b2202",
+        "githubUsername": "gouarin",
+        "gistScriptUrl": "https://gist.github.com/gouarin/0ad0527e1ee0bdea171cba76d11b2202.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

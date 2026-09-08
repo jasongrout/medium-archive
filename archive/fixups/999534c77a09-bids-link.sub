@@ -1,0 +1,11 @@
+# In "Simpler authentication for small scale JupyterHubs", the thank-you
+# link on "Berkeley Institute for Data Science" carries the whole
+# acknowledgement sentence as its URL ("http://I am grateful to the
+# Berkeley Institute for Data Science & NumFocus for jointly sponsoring
+# my Outreachy internship"), authored that way on Medium. Hugo's URL
+# parser rejects it. Point it at BIDS. (The href lives in the page's
+# embedded editor state; replacing an href value is safe -- markup
+# offsets index the paragraph text, which is untouched.)
+file: 999534c77a09/page.html
+old-regex: http:(\\u002F\\u002F|//)I am grateful[^"]*
+new: https://bids.berkeley.edu/

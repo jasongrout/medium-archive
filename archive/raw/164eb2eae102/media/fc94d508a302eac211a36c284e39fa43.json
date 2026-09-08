@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "payload": {
+    "value": {
+      "mediaResourceId": "fc94d508a302eac211a36c284e39fa43",
+      "mediaResourceType": "MediaResourceExternalLink",
+      "href": "https://gist.github.com/manzt/4f16aeb0f8b38733d333a5180d9fc54d",
+      "domain": "gist.github.com",
+      "title": "example_widget.py",
+      "description": "GitHub Gist: instantly share code, notes, and snippets.",
+      "iframeWidth": 0,
+      "iframeHeight": 0,
+      "iframeSrc": "",
+      "thumbnailUrl": "https://i.embed.ly/1/image?url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Fgists%2Fgist-og-image.png&key=a19fcc184b9711e1b4764040d3dc5c07",
+      "thumbnailWidth": 1280,
+      "thumbnailHeight": 640,
+      "display": 1,
+      "thumbnailImageId": "",
+      "authorName": "manzt",
+      "gist": {
+        "gistId": "4f16aeb0f8b38733d333a5180d9fc54d",
+        "githubUsername": "manzt",
+        "gistScriptUrl": "https://gist.github.com/manzt/4f16aeb0f8b38733d333a5180d9fc54d.js"
+      },
+      "type": "MediaResource"
+    },
+    "references": {}
+  },
+  "v": 3,
+  "b": "20260824-1717-root"
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Recent keyboard navigation improvements in Jupyter</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Recent keyboard navigation improvements in Jupyter</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Towards a more accessible Jupyter Notebook
+</section>
+<section data-field="body" class="e-content">
+<section name="6d5b" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="fb34" id="fb34" class="graf graf--h3 graf--leading graf--title">Recent keyboard navigation improvements in Jupyter</h3><p name="1e54" id="1e54" class="graf graf--p graf-after--h3">Towards a more accessible Jupyter Notebook</p><p name="0256" id="0256" class="graf graf--p graf-after--p">Upcoming versions of JupyterLab (4.1.0) and Notebook (7.1.0) will include major keyboard accessibility fixes.</p><p name="4503" id="4503" class="graf graf--p graf-after--p"><a href="https://www.w3.org/WAI/WCAG21/Understanding/keyboard-accessible" data-href="https://www.w3.org/WAI/WCAG21/Understanding/keyboard-accessible" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Keyboard accessibility</a> is fundamental to overall app accessibility. Interactions that require pointing devices like mice or trackpads are usability barriers for many users across a wide spectrum of disabilities. Ensuring that all UI features are seamlessly accessible through keyboard-only navigation is imperative for an inclusive user experience.</p><h3 name="f945" id="f945" class="graf graf--h3 graf-after--p">Keyboard navigation in JupyterLab</h3><p name="8eba" id="8eba" class="graf graf--p graf-after--h3">A recent audit of the JupyterLab UI highlighted significant gaps in keyboard navigation, posing obstacles to usability and accessibility. One of the main obstacles to efficient keyboard navigation in JupyterLab is the number of UI items to skim through before being able to perform an action, such as typing in a document or creating a file. Indeed, as with any feature-rich application, the JupyterLab UI includes many menus, widgets, and inputs to interact with. The user interface is made of three main areas (left, center, and right), each one split into several panels. And most of these panels include toolbars with buttons to perform specific actions.</p><p name="7d27" id="7d27" class="graf graf--p graf-after--p">Improving this navigation required separate fixes for different elements of the page:</p><ul class="postList"><li name="1a71" id="1a71" class="graf graf--li graf-after--p">Menu bar (<a href="https://github.com/jupyterlab/lumino/pull/465" data-href="https://github.com/jupyterlab/lumino/pull/465" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">Lumino #465)</a></li><li name="648b" id="648b" class="graf graf--li graf-after--li">Tab bar (<a href="https://github.com/jupyterlab/lumino/pull/612" data-href="https://github.com/jupyterlab/lumino/pull/612" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">Lumino #612)</a></li><li name="c81b" id="c81b" class="graf graf--li graf-after--li">Toolbar (<a href="https://github.com/jupyterlab/jupyterlab/pull/15021" data-href="https://github.com/jupyterlab/jupyterlab/pull/15021" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">JupyterLab #15021)</a></li></ul><p name="ebdf" id="ebdf" class="graf graf--p graf-after--li">All these changes follow the same logic: the Tab key is used to navigate between top-level elements (toolbar, menu, tab list), but not to navigate between items for which one should use arrow keys, nor to select an item for which one can use the Enter/Space keys. Most of these changes were actually applied to low-level components of JupyterLab, so that any JupyterLab extension built upon them will benefit from these improvements.</p><p name="25ec" id="25ec" class="graf graf--p graf-after--p">The changes to the toolbar make use of a new <a href="https://github.com/jupyterlab-contrib/jupyter-ui-toolkit" data-href="https://github.com/jupyterlab-contrib/jupyter-ui-toolkit" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">UI toolkit</a>, based on web components, which natively includes these accessibility features, but also helps standardize the widgets used across the JupyterLab UI and JupyterLab extensions.</p><h3 name="82b5" id="82b5" class="graf graf--h3 graf-after--p">Notebook Tab Traps</h3><p name="8164" id="8164" class="graf graf--p graf-after--h3">Another blocker to keyboard navigation was the existence of “tab traps” or “focus traps” in the notebook widget. Tab traps occur when a user cannot move focus away from an interactive element with the Tab key.</p><p name="a440" id="a440" class="graf graf--p graf-after--p">The main problem was that, while the input area of each notebook cell could be reached by using the Tab key, the input area itself, which is a text editor, does not allow moving to the next item using the Tab key since the Tab key is used to insert spaces into the editor.</p><p name="fa4d" id="fa4d" class="graf graf--p graf-after--p">This has been fixed in <a href="https://github.com/jupyterlab/jupyterlab/pull/14115" data-href="https://github.com/jupyterlab/jupyterlab/pull/14115" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterLab PR #14115</a>, by changing the tabbable items in the Notebook from the cell input to the cell itself. Now the Notebook follows the same logic mentioned above. Arrow keys are used to navigate the cells, whereas the Tab key is reserved mostly to navigate into and then back out of the Notebook. Entering or exiting the input element of the cell is done using the Enter and Escape keys, respectively.</p><p name="4e5e" id="4e5e" class="graf graf--p graf-after--p">These changes required a complete inversion in the way the keyboard events are handled in the notebook, especially with respect to keyboard shortcuts. These modifications were required to retain keyboard shortcuts in the output widget and at the notebook level, while changing the way element focus is managed in the notebook.</p><h3 name="fd4e" id="fd4e" class="graf graf--h3 graf-after--p">Future accessibility improvements</h3><p name="f93d" id="f93d" class="graf graf--p graf-after--h3">Accessibility work at Jupyter is grounded in the recommendations of the <a href="https://www.w3.org/WAI/" data-href="https://www.w3.org/WAI/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">W3C Web Accessibility Initiative</a>, in particular their standards for web content (WCAG), web apps (ARIA), and authoring tools (ATAG). There has been particular interest recently in addressing the authoring part of the equation.</p><p name="8d63" id="8d63" class="graf graf--p graf-after--p">That’s because a crucial aspect of the accessibility of notebooks lies in the content itself. It is imperative that Jupyter front ends actively support notebook authors in creating accessible content. This involves, for instance, prompting authors to include descriptive alt text for images, and issuing warnings when heading ranks are skipped. Skipping heading ranks can lead to difficulties in navigating the document outline, especially for users relying on screen readers. Such warnings could be brought through the language server protocol for markdown cells for example.</p><p name="1e95" id="1e95" class="graf graf--p graf-after--p">If your organization is interested in supporting such accessibility improvements, please reach out to the <a href="https://github.com/jupyter/accessibility" data-href="https://github.com/jupyter/accessibility" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Jupyter accessibility team</a>!</p><h3 name="0389" id="0389" class="graf graf--h3 graf-after--p">Feedback</h3><p name="3c40" id="3c40" class="graf graf--p graf-after--h3">Please try out the latest pre-release of JupyterLab 4.1. Try opening, editing, and saving a notebook without using your mouse or trackpad. Be aware that there are still areas of the UI as well as extensions that need fixing for mouseless use. We are keeping track of accessibility issues in a few places: <a href="https://github.com/jupyterlab/jupyterlab/labels/tag%3AAccessibility" data-href="https://github.com/jupyterlab/jupyterlab/labels/tag%3AAccessibility" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterLab GitHub accessibility label</a>, <a href="https://github.com/jupyter/notebook/issues?q=is%3Aopen+is%3Aissue+label%3Atag%3AAccessibility" data-href="https://github.com/jupyter/notebook/issues?q=is%3Aopen+is%3Aissue+label%3Atag%3AAccessibility" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Notebook 7 GitHub accessibility label</a>, JupyterLab issue <a href="https://github.com/jupyterlab/jupyterlab/issues/9399" data-href="https://github.com/jupyterlab/jupyterlab/issues/9399" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#9399</a>. As you will find at those links, there’s still loads more to do. If you can help with either fixing those things or identifying other issues, please come help us, your contribution is valuable and you are welcome!</p><h3 name="ced0" id="ced0" class="graf graf--h3 graf-after--p">About the Authors</h3><p name="a9b3" id="a9b3" class="graf graf--p graf-after--h3"><a href="https://twitter.com/NicolasBrichet_" data-href="https://twitter.com/NicolasBrichet_" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Nicolas Brichet</a> is a scientific software developer at <a href="https://twitter.com/QuantStack" data-href="https://twitter.com/QuantStack" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">QuantStack</a>, and a JupyterLab core team member. Prior to this work on keyboard navigation, Nicolas contributed to improving the accessibility of Jupyter by addressing the issues detected by the Axe accessibility testing engine.</p><p name="50bb" id="50bb" class="graf graf--p graf-after--p"><a href="https://github.com/gabalafou" data-href="https://github.com/gabalafou" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Gabriel Fouasnon</a> is a frontend developer at <a href="https://twitter.com/quansightai" data-href="https://twitter.com/quansightai" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Quansight</a>, a member of the Jupyter Software Steering Council representing the accessibility subproject, and a JupyterLab core team member.</p><h3 name="623e" id="623e" class="graf graf--h3 graf-after--p">Acknowledgments</h3><p name="d100" id="d100" class="graf graf--p graf-after--h3">This work on improving the keyboard navigation of JupyterLab was started with an audit of the keyboard navigation of the Jupyter Notebook v7 by Isabela Presedo-Floyd.</p><p name="ea40" id="ea40" class="graf graf--p graf-after--p">The work of Gabriel Fouasnon and Isabela Presedo-Floyd at Quansight on Jupyter accessibility was funded by the Chan Zuckerberg Initiative, through the “<a href="https://chanzuckerberg.com/eoss/" data-href="https://chanzuckerberg.com/eoss/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Essential Open Source Software for Science</a>” (EOSS) grant program.</p><p name="7cbc" id="7cbc" class="graf graf--p graf-after--p">The work by Nicolas Brichet at QuantStack on the accessibility of Jupyter was funded by <a href="https://www.insee.fr/" data-href="https://www.insee.fr/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">INSEE</a>, the French National Institute of Statistics and Economic Studies.</p><p name="e043" id="e043" class="graf graf--p graf-after--p graf--trailing">We also want to acknowledge all of the members of the Jupyter Accessibility Council: Tania Allard, Alex Bozarth, Frédéric Collonval, Martha Cryan, Afshin T. Darian, R Ely, Tony Fast, Gabriel Fouasnon, Michał Krassowski, and Isabela Presedo-Floyd, without whom this work would not be possible.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@ProjectJupyter" class="p-author h-card">Project Jupyter</a> on <a href="https://medium.com/p/4df32f97628d"><time class="dt-published" datetime="2023-12-16T09:48:35.856Z">December 16, 2023</time></a>.</p><p><a href="https://medium.com/@ProjectJupyter/recent-keyboard-navigation-improvements-in-jupyter-4df32f97628d" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 22, 2026.</p></footer></article></body></html>

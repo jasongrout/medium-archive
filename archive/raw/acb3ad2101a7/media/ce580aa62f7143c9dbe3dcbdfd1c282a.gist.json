@@ -1,0 +1,88 @@
+{
+  "url": "https://api.github.com/gists/cf3f1a36e3d55f8f644cb639df851d5b",
+  "forks_url": "https://api.github.com/gists/cf3f1a36e3d55f8f644cb639df851d5b/forks",
+  "commits_url": "https://api.github.com/gists/cf3f1a36e3d55f8f644cb639df851d5b/commits",
+  "id": "cf3f1a36e3d55f8f644cb639df851d5b",
+  "node_id": "MDQ6R2lzdGNmM2YxYTM2ZTNkNTVmOGY2NDRjYjYzOWRmODUxZDVi",
+  "git_pull_url": "https://gist.github.com/cf3f1a36e3d55f8f644cb639df851d5b.git",
+  "git_push_url": "https://gist.github.com/cf3f1a36e3d55f8f644cb639df851d5b.git",
+  "html_url": "https://gist.github.com/edublancas/cf3f1a36e3d55f8f644cb639df851d5b",
+  "files": {
+    "ploomber-cli.sh": {
+      "filename": "ploomber-cli.sh",
+      "type": "application/x-sh",
+      "language": "Shell",
+      "raw_url": "https://gist.githubusercontent.com/edublancas/cf3f1a36e3d55f8f644cb639df851d5b/raw/2081d957f1dc26b6e1680151290a808d80147091/ploomber-cli.sh",
+      "size": 28,
+      "truncated": false,
+      "content": "ploomber build --sample true",
+      "encoding": "utf-8"
+    }
+  },
+  "public": false,
+  "created_at": "2021-08-06T21:07:44Z",
+  "updated_at": "2021-08-06T21:07:44Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/cf3f1a36e3d55f8f644cb639df851d5b/comments",
+  "owner": {
+    "login": "edublancas",
+    "id": 989250,
+    "node_id": "MDQ6VXNlcjk4OTI1MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/989250?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/edublancas",
+    "html_url": "https://github.com/edublancas",
+    "followers_url": "https://api.github.com/users/edublancas/followers",
+    "following_url": "https://api.github.com/users/edublancas/following{/other_user}",
+    "gists_url": "https://api.github.com/users/edublancas/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/edublancas/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/edublancas/subscriptions",
+    "organizations_url": "https://api.github.com/users/edublancas/orgs",
+    "repos_url": "https://api.github.com/users/edublancas/repos",
+    "events_url": "https://api.github.com/users/edublancas/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/edublancas/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "edublancas",
+        "id": 989250,
+        "node_id": "MDQ6VXNlcjk4OTI1MA==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/989250?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/edublancas",
+        "html_url": "https://github.com/edublancas",
+        "followers_url": "https://api.github.com/users/edublancas/followers",
+        "following_url": "https://api.github.com/users/edublancas/following{/other_user}",
+        "gists_url": "https://api.github.com/users/edublancas/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/edublancas/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/edublancas/subscriptions",
+        "organizations_url": "https://api.github.com/users/edublancas/orgs",
+        "repos_url": "https://api.github.com/users/edublancas/repos",
+        "events_url": "https://api.github.com/users/edublancas/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/edublancas/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "0a373597fb79b381a1eb209f7b71d530b7807ba5",
+      "committed_at": "2021-08-06T21:07:44Z",
+      "change_status": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/cf3f1a36e3d55f8f644cb639df851d5b/0a373597fb79b381a1eb209f7b71d530b7807ba5"
+    }
+  ],
+  "truncated": false
+}

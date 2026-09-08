@@ -1,0 +1,115 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 3,
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2015-12-29T00:00:49.000Z",
+  "display_text_range": [
+    0,
+    137
+  ],
+  "entities": {
+    "media": [
+      {
+        "display_url": "pic.x.com/nhXzovERBl",
+        "expanded_url": "https://x.com/agogino/status/681625883027738624/photo/1",
+        "indices": [
+          114,
+          137
+        ],
+        "url": "https://t.co/nhXzovERBl"
+      }
+    ],
+    "user_mentions": [
+      {
+        "id_str": "2817995382",
+        "indices": [
+          36,
+          41
+        ],
+        "name": "Geneia@home",
+        "screen_name": "home"
+      }
+    ]
+  },
+  "id_str": "681625883027738624",
+  "text": "Signing Omoju Miller's dissertation @home - HipHopathy, A Socio-Curricular Study of Introductory Computer Science https://t.co/nhXzovERBl",
+  "user": {
+    "id_str": "159253027",
+    "name": "Alice M. Agogino",
+    "screen_name": "agogino",
+    "is_blue_verified": false,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/429713639285596161/D0ReK5-6_normal.jpeg"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "681625883027738624"
+    ],
+    "editable_until_msecs": "1451349049167",
+    "edits_remaining": "5",
+    "is_edit_eligible": true
+  },
+  "mediaDetails": [
+    {
+      "display_url": "pic.x.com/nhXzovERBl",
+      "expanded_url": "https://x.com/agogino/status/681625883027738624/photo/1",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        114,
+        137
+      ],
+      "media_url_https": "https://pbs.twimg.com/media/CXWfIEkUMAASDye.jpg",
+      "original_info": {
+        "focus_rects": [],
+        "height": 2764,
+        "width": 3686
+      },
+      "sizes": {
+        "large": {
+          "h": 1536,
+          "resize": "fit",
+          "w": 2048
+        },
+        "medium": {
+          "h": 900,
+          "resize": "fit",
+          "w": 1200
+        },
+        "small": {
+          "h": 510,
+          "resize": "fit",
+          "w": 680
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "photo",
+      "url": "https://t.co/nhXzovERBl"
+    }
+  ],
+  "photos": [
+    {
+      "backgroundColor": {
+        "red": 204,
+        "green": 214,
+        "blue": 221
+      },
+      "cropCandidates": [],
+      "expandedUrl": "https://x.com/agogino/status/681625883027738624/photo/1",
+      "url": "https://pbs.twimg.com/media/CXWfIEkUMAASDye.jpg",
+      "width": 3686,
+      "height": 2764
+    }
+  ],
+  "conversation_count": 0,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}

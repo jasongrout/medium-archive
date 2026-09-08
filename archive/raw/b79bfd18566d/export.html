@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Introducing the Helm Chart for JupyterHub Deployment with Kubernetes</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Introducing the Helm Chart for JupyterHub Deployment with Kubernetes</h1>
+</header>
+<section data-field="body" class="e-content">
+<section name="f025" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="1c82" id="1c82" class="graf graf--h3 graf--leading graf--title">Introducing the Helm Chart for JupyterHub Deployment with Kubernetes</h3><p name="4afc" id="4afc" class="graf graf--p graf-after--h3">The JupyterHub team proudly announces the release of a <a href="https://github.com/jupyterhub/helm-chart" data-href="https://github.com/jupyterhub/helm-chart" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">helm chart</a> for deploying JupyterHub on Kubernetes clusters. We’ve designed the JupyterHub helm chart to save you time in creating JupyterHub deployments.</p><p name="b0c4" id="b0c4" class="graf graf--p graf-after--p">You can find a repository with the helm chart <a href="https://github.com/jupyterhub/helm-chart" data-href="https://github.com/jupyterhub/helm-chart" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">here</a>.</p><p name="dca7" id="dca7" class="graf graf--p graf-after--p"><strong class="markup--strong markup--p-strong">This is a pre-release version of the helm-chart.</strong> It will likely change in a breaking fashion sometime in the future, though we will make every effort to minimize this as much as possible as modifications are made for new features and increased stability. If you have any questions or comments, reach out to us on <a href="https://gitter.im/jupyterhub/jupyterhub" data-href="https://gitter.im/jupyterhub/jupyterhub" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Gitter</a> or <a href="https://github.com/jupyterhub/helm-chart/issues" data-href="https://github.com/jupyterhub/helm-chart/issues" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">open an issue</a>. For help with deploying your own JupyterHub instance, see our <a href="https://zero-to-jupyterhub.readthedocs.io/en/latest/" data-href="https://zero-to-jupyterhub.readthedocs.io/en/latest/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">guide for setting up JupyterHub</a> (which uses this helm chart). Or, come find us at the <a href="https://conferences.oreilly.com/jupyter/jup-ny/public/schedule/detail/60074" data-href="https://conferences.oreilly.com/jupyter/jup-ny/public/schedule/detail/60074" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterHub talk</a> at JupyterCon.</p><p name="4a2f" id="4a2f" class="graf graf--p graf-after--p">The following principles guided development:</p><h4 name="6994" id="6994" class="graf graf--h4 graf-after--p">Easy to administer</h4><p name="7489" id="7489" class="graf graf--p graf-after--h4">The nitty gritty of JupyterHub setup and management can be cumbersome, complicated, and time-consuming. With the JupyterHub helm chart, you will spend less time debugging your setup, and more time deploying, customizing to your needs, and successfully running your JupyterHub. Within a cloud computing infrastructure, using the helm chart typically requires only one or two commands to get started.</p><h4 name="0414" id="0414" class="graf graf--h4 graf-after--p">Open source</h4><p name="a844" id="a844" class="graf graf--p graf-after--h4">The JupyterHub helm chart uses applications and codebases that are open and thriving. We prefer, prioritize, and select tools that have a history of stability and development, and which adhere to open-source principles when it comes to project and community growth. As a result, you’ll be able to easily connect with the many tools available in the open-source community, and you’ll have flexibility in where you deploy JupyterHub.</p><h4 name="fd53" id="fd53" class="graf graf--h4 graf-after--p">Cloud agnostic</h4><p name="6eb2" id="6eb2" class="graf graf--p graf-after--h4">We’ve made an effort to keep our helm chart as cloud-agnostic as possible. The only requirement is that your computing provider supports the Kubernetes infrastructure, an open-source platform that is widely available across many different online providers. You can run JupyterHub on cloud services such as Google Cloud, Microsoft Azure, and Amazon EC2, and even on your own hardware or institution-specific setup.</p><h4 name="4358" id="4358" class="graf graf--h4 graf-after--p">Scalable</h4><p name="8cb0" id="8cb0" class="graf graf--p graf-after--h4">We’ve taken great care to develop the JupyterHub helm chart with the ability to be used in a variety of work, research, and education settings. Some JupyterHub deployments have a dynamic userbase that works in spurts of activity. Others have users that have long periods of inactivity. Rather than capping the amount of resources available for users, the JupyterHub helm chart utilizes Kubernetes to scale computational resources up (or down) as needed. This means that large changes in user behavior don’t result in system-wide instability or slowdown issues. It also means that you can quickly update user hardware, push new files to user disks, and alter the environment in which users are operating.</p><p name="7888" id="7888" class="graf graf--p graf-after--p">JupyterHub has been deployed in a variety of places, including at least one class with nearly 1500 students. We’ve made sure that it can handle large groups of users, and we’re excited to see people push the limit even further.</p><h4 name="536b" id="536b" class="graf graf--h4 graf-after--p">Support</h4><p name="1250" id="1250" class="graf graf--p graf-after--h4">If you have any questions or comments, reach out to us on <a href="https://gitter.im/jupyterhub/jupyterhub" data-href="https://gitter.im/jupyterhub/jupyterhub" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Gitter</a> or <a href="https://github.com/jupyterhub/helm-chart/issues" data-href="https://github.com/jupyterhub/helm-chart/issues" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">open an issue</a>. For help with deploying your own JupyterHub instance, see our guide, <a href="https://zero-to-jupyterhub.readthedocs.io/en/latest/" data-href="https://zero-to-jupyterhub.readthedocs.io/en/latest/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Zero to JupyterHub</a>. Or, come find us at the <a href="https://conferences.oreilly.com/jupyter/jup-ny/public/schedule/detail/60074" data-href="https://conferences.oreilly.com/jupyter/jup-ny/public/schedule/detail/60074" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">JupyterHub talk</a> at JupyterCon.</p><h4 name="08bd" id="08bd" class="graf graf--h4 graf-after--p">Acknowledgements</h4><p name="e9f1" id="e9f1" class="graf graf--p graf-after--h4">JupyterHub and this helm chart wouldn’t have been possible without the goodwill, time, and funding from a lot of different people. In particular, we want to thank the Gordon and Betty Moore Foundation, the Sloan Foundation, the Helmsley Charitable Trust, the Berkeley Data Science Education Program, and the Wikimedia Foundation for supporting various members of our team. We also want to thank the individuals of the JupyterHub team (listed below), the Project Jupyter community, and our more than 100 contributors for continuing to grow and improve this technology.</p><p name="64ad" id="64ad" class="graf graf--p graf-after--p">Sincerely,<br><br><em class="markup--em markup--p-em">The JupyterHub Team (in alphabetical order)</em></p><p name="ff54" id="ff54" class="graf graf--p graf-after--p"><a href="https://www.google.com/url?q=http://data.berkeley.edu/&amp;sa=D&amp;ust=1498755372168000&amp;usg=AFQjCNFrmMhaSh1FrvBDYK6EYUZsWrK4vQ" data-href="https://www.google.com/url?q=http://data.berkeley.edu/&amp;sa=D&amp;ust=1498755372168000&amp;usg=AFQjCNFrmMhaSh1FrvBDYK6EYUZsWrK4vQ" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Berkeley Data Science Education Program</a> (Gunjan Baid, Sam Lau, Ryan Lovett, Yuvi Panda, Vinitra Swamy)</p><p name="8f06" id="8f06" class="graf graf--p graf-after--p"><a href="https://www.google.com/url?q=https://www.calblueprint.org/&amp;sa=D&amp;ust=1498755372168000&amp;usg=AFQjCNFqs3qDHccsrEcZoO1MnXMkdcmGHw" data-href="https://www.google.com/url?q=https://www.calblueprint.org/&amp;sa=D&amp;ust=1498755372168000&amp;usg=AFQjCNFqs3qDHccsrEcZoO1MnXMkdcmGHw" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Cal Blueprint</a> Team (Jiefu Gong, Sam Lau, Derrick Mar, Peter Veerman, Tony Yang)</p><p name="c9dd" id="c9dd" class="graf graf--p graf-after--p graf--trailing"><a href="http://jupyter.org/" data-href="http://jupyter.org/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Project Jupyter</a> (Chris Holdgraf, Yuvi Panda, Min Ragan-Kelley, Carol Willing)</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@ProjectJupyter" class="p-author h-card">Project Jupyter</a> on <a href="https://medium.com/p/b79bfd18566d"><time class="dt-published" datetime="2017-06-29T23:21:51.000Z">June 29, 2017</time></a>.</p><p><a href="https://medium.com/@ProjectJupyter/introducing-the-helm-chart-for-jupyterhub-deployment-with-kubernetes-b79bfd18566d" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 22, 2026.</p></footer></article></body></html>

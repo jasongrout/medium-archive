@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Jupyter Ascending</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Jupyter Ascending</h1>
+</header>
+<section data-field="body" class="e-content">
+<section name="a679" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="41a6" id="41a6" class="graf graf--h3 graf--leading graf--title">Jupyter Ascending</h3><p name="4edb" id="4edb" class="graf graf--p graf-after--h3">Today is an exciting day! We have just finished releasing IPython 4.0, the last piece of the first release of Jupyter and IPython after <a href="https://blog.jupyter.org/2015/04/15/the-big-split/" data-href="https://blog.jupyter.org/2015/04/15/the-big-split/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">The Big Split™</a>.</p><p name="d092" id="d092" class="graf graf--p graf-after--p">The quick way to get Jupyter upgraded is:</p><pre name="576f" id="576f" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">pip install --upgrade jupyter</code></pre><p name="f97d" id="f97d" class="graf graf--p graf-after--pre">If you are using conda or canopy, we hope to have packages on those distros soon.</p><p name="d8f7" id="d8f7" class="graf graf--p graf-after--p">This means that when you do</p><pre name="6cda" id="6cda" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">pip install --upgrade ipython[all]</code></pre><p name="621a" id="621a" class="graf graf--p graf-after--pre">You will get jupyter instead.</p><h4 name="5be4" id="5be4" class="graf graf--h4 graf-after--p">Refresher on The Big Split™</h4><p name="c514" id="c514" class="graf graf--p graf-after--h4">IPython 3 was the last major monolithic release of IPython containing all of the language-agnostic code, such as the notebook, which is moving under the new name <em class="markup--em markup--p-em">Jupyter</em>. As part of that process, we have created several discrete packages for each component — <code class="markup--code markup--p-code">nbformat</code> for the notebook format, <code class="markup--code markup--p-code">nbconvert</code> for the notebook conversion machinery, <code class="markup--code markup--p-code">notebook</code> for the HTML notebook application, etc.</p><p name="00a1" id="00a1" class="graf graf--p graf-after--p">You can get each of these components independently, e.g. with</p><pre name="c518" id="c518" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">pip install --upgrade notebook</code></pre><p name="61bc" id="61bc" class="graf graf--p graf-after--pre">which will not include the pieces that the notebook doesn’t depend on (e.g. <code class="markup--code markup--p-code">qtconsole</code>). Or you can get the whole thing with the <code class="markup--code markup--p-code">jupyter</code> metapackage, which will pull in everything that was part of IPython 3 (with the exception of IPython parallel, now called <code class="markup--code markup--p-code">ipyparallel</code>).</p><p name="5a20" id="5a20" class="graf graf--p graf-after--p">Since all of these packages were part of IPython 3, they are all starting out at 4.0. They won’t be updated in coordination with each other as their APIs and release schedules will be allowed to advance at their own respective paces.</p><p name="0d55" id="0d55" class="graf graf--p graf-after--p">There are import shims in the IPython repo for backward-compatibility, so any code that imports <code class="markup--code markup--p-code">IPython.nbformat</code>, for instance, should continue to work with a warning about the new home of the package:</p><pre name="ba50" id="ba50" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">In [1]: from IPython.nbformat import read<br>/.../site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.</code></pre><p name="fd9c" id="fd9c" class="graf graf--p graf-after--pre">If you have any code that imported from the old subpackage that worked on 3.x but doesn’t on 4.x, please <a href="https://github.com/ipython/ipython/issues" data-href="https://github.com/ipython/ipython/issues" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">let us know</a>.</p><p name="6cc6" id="6cc6" class="graf graf--p graf-after--p">This split also means that</p><pre name="cdd0" id="cdd0" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">pip install ipython</code></pre><p name="69af" id="69af" class="graf graf--p graf-after--pre">gets you a much smaller install, since it only includes the terminal IPython interface, which some people have been asking for for a long time.</p><h4 name="be17" id="be17" class="graf graf--h4 graf-after--p">Configuration</h4><p name="004f" id="004f" class="graf graf--p graf-after--h4">Many of the ipython subcommands are now jupyter subcommands, e.g.</p><pre name="d288" id="d288" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">ipython notebook</code></pre><p name="c2a2" id="c2a2" class="graf graf--p graf-after--pre">is now</p><pre name="6b1a" id="6b1a" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">jupyter notebook</code></pre><p name="e0da" id="e0da" class="graf graf--p graf-after--pre">The configuration files for these jupyter commands are now in your <code class="markup--code markup--p-code">~/.jupyter</code> directory instead of <code class="markup--code markup--p-code">~/.ipython/profile_default</code>. Jupyter should automatically migrate your notebook and qtconsole config to the new location if they exist.</p><p name="cefa" id="cefa" class="graf graf--p graf-after--p">See the <a href="https://jupyter.readthedocs.org/en/latest/config.html" data-href="https://jupyter.readthedocs.org/en/latest/config.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Jupyter config docs</a> for more info.</p><h4 name="e1ec" id="e1ec" class="graf graf--h4 graf-after--p">Docs</h4><p name="a103" id="a103" class="graf graf--p graf-after--h4">See the new <a href="https://jupyter.readthedocs.org/en/latest/" data-href="https://jupyter.readthedocs.org/en/latest/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Jupyter docs</a> for more information about Jupyter, its components, and installation.</p><h4 name="4a0f" id="4a0f" class="graf graf--h4 graf-after--p">Issues</h4><p name="07e7" id="07e7" class="graf graf--p graf-after--h4">Please let us know <a href="https://groups.google.com/forum/#!forum/jupyter" data-href="https://groups.google.com/forum/#!forum/jupyter" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">on the mailing list</a> if you have issues with the new install, or open an Issue on GitHub for the repo that is misbehaving. There’s a lot of reorganization, and we thank you for your patience during this transition.</p><h4 name="6d91" id="6d91" class="graf graf--h4 graf-after--p">Thanks</h4><p name="6491" id="6491" class="graf graf--p graf-after--h4 graf--trailing">Thanks to everyone who helped with the Big Split! Here’s to a bright future for IPython and Jupyter.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@ProjectJupyter" class="p-author h-card">Project Jupyter</a> on <a href="https://medium.com/p/1bf5b362d97e"><time class="dt-published" datetime="2015-08-12T05:48:58.000Z">August 12, 2015</time></a>.</p><p><a href="https://medium.com/@ProjectJupyter/jupyter-ascending-1bf5b362d97e" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on August 22, 2026.</p></footer></article></body></html>

@@ -1,0 +1,270 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 42,
+  "in_reply_to_screen_name": "jeffrafter",
+  "in_reply_to_status_id_str": "1398386665345798144",
+  "in_reply_to_user_id_str": "4176991",
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2021-05-28T21:26:55.000Z",
+  "display_text_range": [
+    53,
+    128
+  ],
+  "entities": {
+    "media": [
+      {
+        "display_url": "pic.x.com/PDKuTsBURT",
+        "expanded_url": "https://x.com/jtpio/status/1398390350989889537/video/1",
+        "indices": [
+          129,
+          152
+        ],
+        "url": "https://t.co/PDKuTsBURT"
+      }
+    ],
+    "urls": [
+      {
+        "display_url": "github.com/jtpio/jupyterl…",
+        "expanded_url": "https://github.com/jtpio/jupyterlite/pull/109",
+        "indices": [
+          105,
+          128
+        ],
+        "url": "https://t.co/rbEvEPMv17"
+      }
+    ],
+    "user_mentions": [
+      {
+        "id_str": "4176991",
+        "indices": [
+          0,
+          11
+        ],
+        "name": "Jeff Rafter",
+        "screen_name": "jeffrafter"
+      },
+      {
+        "id_str": "18104734",
+        "indices": [
+          12,
+          28
+        ],
+        "name": "👩‍💻 Paige Bailey",
+        "screen_name": "DynamicWebPaige"
+      },
+      {
+        "id_str": "13334762",
+        "indices": [
+          29,
+          36
+        ],
+        "name": "GitHub",
+        "screen_name": "github"
+      },
+      {
+        "id_str": "2460368252",
+        "indices": [
+          37,
+          52
+        ],
+        "name": "Project Jupyter",
+        "screen_name": "ProjectJupyter"
+      }
+    ]
+  },
+  "id_str": "1398390350989889537",
+  "text": "@jeffrafter @DynamicWebPaige @github @ProjectJupyter Real time collaboration in JupyterLite coming soon: https://t.co/rbEvEPMv17 https://t.co/PDKuTsBURT",
+  "user": {
+    "id_str": "228654508",
+    "name": "Jeremy Tuloup",
+    "screen_name": "jtpio",
+    "is_blue_verified": false,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1933583524075823104/VrMcYdLZ_normal.jpg"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "1398390350989889537"
+    ],
+    "editable_until_msecs": "1622239015169",
+    "edits_remaining": "5",
+    "is_edit_eligible": true
+  },
+  "mediaDetails": [
+    {
+      "additional_media_info": {},
+      "display_url": "pic.x.com/PDKuTsBURT",
+      "expanded_url": "https://x.com/jtpio/status/1398390350989889537/video/1",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        129,
+        152
+      ],
+      "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1398389859237216261/pu/img/Q9a7WbZP3-6tQUoJ.jpg",
+      "original_info": {
+        "focus_rects": [],
+        "height": 720,
+        "width": 1666
+      },
+      "sizes": {
+        "large": {
+          "h": 720,
+          "resize": "fit",
+          "w": 1666
+        },
+        "medium": {
+          "h": 519,
+          "resize": "fit",
+          "w": 1200
+        },
+        "small": {
+          "h": 294,
+          "resize": "fit",
+          "w": 680
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "video",
+      "url": "https://t.co/PDKuTsBURT",
+      "video_info": {
+        "aspect_ratio": [
+          833,
+          360
+        ],
+        "duration_millis": 19612,
+        "variants": [
+          {
+            "content_type": "application/x-mpegURL",
+            "url": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/pl/Jzh5FG06uFkUut3i.m3u8?tag=12"
+          },
+          {
+            "bitrate": 256000,
+            "content_type": "video/mp4",
+            "url": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/vid/624x270/Mw4QJcltWAOzzljx.mp4?tag=12"
+          },
+          {
+            "bitrate": 832000,
+            "content_type": "video/mp4",
+            "url": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/vid/832x360/EI4FOZQjgSxGNbXT.mp4?tag=12"
+          },
+          {
+            "bitrate": 2176000,
+            "content_type": "video/mp4",
+            "url": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/vid/1666x720/s-53dwvI7_uDFag4.mp4?tag=12"
+          }
+        ]
+      }
+    }
+  ],
+  "photos": [],
+  "video": {
+    "aspectRatio": [
+      833,
+      360
+    ],
+    "contentType": "media_entity",
+    "durationMs": 19612,
+    "mediaAvailability": {
+      "status": "available"
+    },
+    "poster": "https://pbs.twimg.com/ext_tw_video_thumb/1398389859237216261/pu/img/Q9a7WbZP3-6tQUoJ.jpg",
+    "variants": [
+      {
+        "type": "application/x-mpegURL",
+        "src": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/pl/Jzh5FG06uFkUut3i.m3u8?tag=12"
+      },
+      {
+        "type": "video/mp4",
+        "src": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/vid/624x270/Mw4QJcltWAOzzljx.mp4?tag=12"
+      },
+      {
+        "type": "video/mp4",
+        "src": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/vid/832x360/EI4FOZQjgSxGNbXT.mp4?tag=12"
+      },
+      {
+        "type": "video/mp4",
+        "src": "https://video.twimg.com/ext_tw_video/1398389859237216261/pu/vid/1666x720/s-53dwvI7_uDFag4.mp4?tag=12"
+      }
+    ],
+    "videoId": {
+      "type": "tweet",
+      "id": "1398390350989889537"
+    },
+    "viewCount": 0
+  },
+  "conversation_count": 3,
+  "news_action_type": "conversation",
+  "parent": {
+    "favorite_count": 3,
+    "lang": "en",
+    "reply_count": 2,
+    "retweet_count": 0,
+    "created_at": "2021-05-28T21:12:16.000Z",
+    "display_text_range": [
+      41,
+      180
+    ],
+    "entities": {
+      "user_mentions": [
+        {
+          "id_str": "18104734",
+          "indices": [
+            0,
+            16
+          ],
+          "name": "👩‍💻 Paige Bailey",
+          "screen_name": "DynamicWebPaige"
+        },
+        {
+          "id_str": "13334762",
+          "indices": [
+            17,
+            24
+          ],
+          "name": "GitHub",
+          "screen_name": "github"
+        },
+        {
+          "id_str": "2460368252",
+          "indices": [
+            25,
+            40
+          ],
+          "name": "Project Jupyter",
+          "screen_name": "ProjectJupyter"
+        }
+      ]
+    },
+    "id_str": "1398386665345798144",
+    "text": "@DynamicWebPaige @github @ProjectJupyter Absolutely, yes 🙌 - I'm a giant fan of every aspect - I would love to have WASM based Jupyter Notebooks with collaboration built right in.",
+    "user": {
+      "id_str": "4176991",
+      "name": "Jeff Rafter",
+      "screen_name": "jeffrafter",
+      "is_blue_verified": false,
+      "profile_image_shape": "Circle",
+      "verified": false,
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1613748675984986112/TNeuoEwJ_normal.png"
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "1398386665345798144"
+      ],
+      "editable_until_msecs": "1622238136443",
+      "edits_remaining": "5",
+      "is_edit_eligible": true
+    },
+    "isEdited": false,
+    "isStaleEdit": false
+  },
+  "isEdited": false,
+  "isStaleEdit": false
+}

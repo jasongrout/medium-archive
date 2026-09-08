@@ -1,0 +1,119 @@
+{
+  "url": "https://api.github.com/gists/20abbd0d2ed1e63414f20d0cbc979170",
+  "forks_url": "https://api.github.com/gists/20abbd0d2ed1e63414f20d0cbc979170/forks",
+  "commits_url": "https://api.github.com/gists/20abbd0d2ed1e63414f20d0cbc979170/commits",
+  "id": "20abbd0d2ed1e63414f20d0cbc979170",
+  "node_id": "MDQ6R2lzdDIwYWJiZDBkMmVkMWU2MzQxNGYyMGQwY2JjOTc5MTcw",
+  "git_pull_url": "https://gist.github.com/20abbd0d2ed1e63414f20d0cbc979170.git",
+  "git_push_url": "https://gist.github.com/20abbd0d2ed1e63414f20d0cbc979170.git",
+  "html_url": "https://gist.github.com/btel/20abbd0d2ed1e63414f20d0cbc979170",
+  "files": {
+    "cell_meta_data.json": {
+      "filename": "cell_meta_data.json",
+      "type": "application/json",
+      "language": "JSON",
+      "raw_url": "https://gist.githubusercontent.com/btel/20abbd0d2ed1e63414f20d0cbc979170/raw/c30a234bbac516c3972f4c8aeb77d393148bd4b4/cell_meta_data.json",
+      "size": 302,
+      "truncated": false,
+      "content": "{\n  \"extensions\": {\n    \"jupyter_dashboards\": {\n      \"version\": 1,\n      \"views\": {\n        \"grid_default\": {\n          \"col\": 0,\n          \"height\": 15,\n          \"hidden\": false,\n          \"row\": 9,\n          \"width\": 4\n        },\n        \"report_default\": {}\n      }\n    }\n  },\n  \"trusted\": false\n}",
+      "encoding": "utf-8"
+    }
+  },
+  "public": true,
+  "created_at": "2019-11-05T13:00:39Z",
+  "updated_at": "2019-11-06T09:34:43Z",
+  "description": "",
+  "comments": 0,
+  "user": null,
+  "comments_enabled": true,
+  "comments_url": "https://api.github.com/gists/20abbd0d2ed1e63414f20d0cbc979170/comments",
+  "owner": {
+    "login": "btel",
+    "id": 41565,
+    "node_id": "MDQ6VXNlcjQxNTY1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/41565?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/btel",
+    "html_url": "https://github.com/btel",
+    "followers_url": "https://api.github.com/users/btel/followers",
+    "following_url": "https://api.github.com/users/btel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/btel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/btel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/btel/subscriptions",
+    "organizations_url": "https://api.github.com/users/btel/orgs",
+    "repos_url": "https://api.github.com/users/btel/repos",
+    "events_url": "https://api.github.com/users/btel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/btel/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "btel",
+        "id": 41565,
+        "node_id": "MDQ6VXNlcjQxNTY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/41565?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/btel",
+        "html_url": "https://github.com/btel",
+        "followers_url": "https://api.github.com/users/btel/followers",
+        "following_url": "https://api.github.com/users/btel/following{/other_user}",
+        "gists_url": "https://api.github.com/users/btel/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/btel/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/btel/subscriptions",
+        "organizations_url": "https://api.github.com/users/btel/orgs",
+        "repos_url": "https://api.github.com/users/btel/repos",
+        "events_url": "https://api.github.com/users/btel/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/btel/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "bf83e2a83c75daf9323e34d2aff9a114e20cb9b9",
+      "committed_at": "2019-11-06T09:34:42Z",
+      "change_status": {
+        "total": 0,
+        "additions": 0,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/20abbd0d2ed1e63414f20d0cbc979170/bf83e2a83c75daf9323e34d2aff9a114e20cb9b9"
+    },
+    {
+      "user": {
+        "login": "btel",
+        "id": 41565,
+        "node_id": "MDQ6VXNlcjQxNTY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/41565?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/btel",
+        "html_url": "https://github.com/btel",
+        "followers_url": "https://api.github.com/users/btel/followers",
+        "following_url": "https://api.github.com/users/btel/following{/other_user}",
+        "gists_url": "https://api.github.com/users/btel/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/btel/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/btel/subscriptions",
+        "organizations_url": "https://api.github.com/users/btel/orgs",
+        "repos_url": "https://api.github.com/users/btel/repos",
+        "events_url": "https://api.github.com/users/btel/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/btel/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "version": "4853cef9e3309d8776508c9b996c18a3901a5160",
+      "committed_at": "2019-11-05T13:00:38Z",
+      "change_status": {
+        "total": 18,
+        "additions": 18,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/20abbd0d2ed1e63414f20d0cbc979170/4853cef9e3309d8776508c9b996c18a3901a5160"
+    }
+  ],
+  "truncated": false
+}

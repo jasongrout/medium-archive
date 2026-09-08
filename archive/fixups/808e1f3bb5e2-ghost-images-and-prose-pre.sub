@@ -1,0 +1,16 @@
+# Medium's Ghost migration dropped the login-page screenshot the
+# sentence "you will see this page:" refers to; re-add it from the
+# Ghost original. The migration also stored two closing prose
+# paragraphs as PRE blocks (the Ghost original has plain <p>s);
+# rebuild them as paragraphs.
+file: 808e1f3bb5e2/export.html
+old: access the notebook without authentication, you will see this page:</p>
+new: access the notebook without authentication, you will see this page:</p><figure name="gfx01" class="graf graf--figure graf-after--p"><img class="graf-image" src="https://blog.jupyter.org/content/images/2016/12/Screen-Shot-2016-12-20-at-16-13-37.png"></figure>
+old: <pre name="851b" id="851b" class="graf graf--pre graf-after--pre">This code
+new: <p name="851b" id="851b" class="graf graf--p graf-after--pre">This code
+old: the xsrf cookie will be undefined and ignored.</pre>
+new: the xsrf cookie will be undefined and ignored.</p>
+old: <pre name="8fab" id="8fab" class="graf graf--pre graf-after--pre">If you
+new: <p name="8fab" id="8fab" class="graf graf--p graf-after--pre">If you
+old: <code class="markup--code markup--pre-code">Cookie</code> header is set.</pre>
+new: <code class="markup--code markup--pre-code">Cookie</code> header is set.</p>
