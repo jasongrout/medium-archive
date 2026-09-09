@@ -11,11 +11,13 @@
         /* The link colour the picker offers (see link-picker.html).
            Every choice states a light value and a dark one; the palette
            in force picks between them, so a choice itself carries no
-           scheme rules. currentColor is the default, and the whole of
-           it: the word keeps the ink it inherits and the rule follows
-           in that same ink, the plainest link there is. The accent is
-           not among the choices -- at 2.83:1 on the white card and
-           2.58:1 on the page it sits under the 3:1 a non-text
+           scheme rules. currentColor is what the default and the "ink"
+           choice share, and the whole of the latter: the word keeps the
+           ink it inherits and the rule follows in that same ink, the
+           plainest link there is; the default ("ink-accent") is that
+           link with an accent rule on hover and nothing else. The
+           accent colours no choice's text -- at 2.83:1 on the white
+           card and 2.58:1 on the page it sits under the 3:1 a non-text
            indicator wants, so it marks headings and chrome instead. */
         --link-l: currentColor; --link-rule-l: currentColor;
         --link-d: currentColor; --link-rule-d: currentColor;
@@ -143,19 +145,21 @@ a { color: var(--link); text-decoration-line: underline;
 .tag, .share-link, .chip, ul.pagination .page-link,
 .archives a { text-decoration-line: none; color: currentColor; }
 a:hover { text-decoration-line: underline; }
-/* "ink-accent" is the default link with one thing added: the rule
-   turns the accent under the pointer. At rest it is the plain ink
-   link, letter for letter and rule for rule, so the page reads the
-   same; the orange appears only on hover, where it names the link the
-   pointer is on rather than marking links in the running text. The
-   accent's 2.83:1 rules it out as link text but not as a rule under
-   one: a hover rule carries no letterforms and no meaning of its own
-   -- the link is already a link, underlined, in ink that clears AAA --
-   so it is a non-text indicator on top of one that stands without it,
-   and the same orange the rest of the chrome hovers in. It holds in
-   both palettes: --accent is one value across the two, and the rule's
-   weight and position stay the browser's, as the default's are. */
-:root[data-link="ink-accent"] a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+/* "ink-accent" is the default, and it is the plain ink link with one
+   thing added: the rule turns the accent under the pointer. At rest it
+   is the ink link above, letter for letter and rule for rule, so the
+   page reads the same; the orange appears only on hover, where it
+   names the link the pointer is on rather than marking links in the
+   running text. The accent's 2.83:1 rules it out as link text but not
+   as a rule under one: a hover rule carries no letterforms and no
+   meaning of its own -- the link is already a link, underlined, in ink
+   that clears AAA -- so it is a non-text indicator on top of one that
+   stands without it, and the same orange the rest of the chrome hovers
+   in. It holds in both palettes: --accent is one value across the two,
+   and the rule's weight and position stay the browser's. Being the
+   default, it is the state with no attribute; "ink" is the choice that
+   drops the hover accent, and needs no rules of its own to do it. */
+:root:not([data-link]) a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
 /* The choices that colour the word as well as its rule. Both are the
    accent's complement in OKLCH -- its hue is 48deg, so 228deg -- and a
    step round towards a conventional link blue: "petrol-aaa" at the 7:1
