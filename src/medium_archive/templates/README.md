@@ -80,21 +80,21 @@ These embed verbatim in both engines' pages, so they must carry no
   floating stack, since the two are the same kind of question. It
   exists for the same reason: to compare candidates on real posts
   before the blog settles on one. A stored choice pins `data-link` on
-  `<html>`; no attribute means the default, the plainest link there
-  is: ink words under a rule in that same ink, at the browser's own
-  weight and position. `ink-accent` is that same link at rest and
-  turns its rule the accent under the pointer, so the orange names the
-  link being hovered rather than every link in the paragraph. The
-  other choices are two blues that colour the word and its rule
-  together, both at the accent's OKLCH complement (228deg) and a step
-  round towards a conventional link blue -- one at the 7:1 the body
-  grays hold, one at 5.5:1, which keeps three times the separation
-  from the body ink -- and the browser's own link, its colour and its
-  own rule, as the control the rest are read against. The accent
-  colours no choice's text: at 2.83:1 it sits under the 3:1 a non-text
-  indicator wants, which leaves it a hover rule under a link that
-  already reads as one, and the colour of headings and chrome.
-  `card.css` states a choice as a pair of values, light and dark, so a
+  `<html>`; no attribute means the default, `ink-accent`: ink words
+  under a rule in that same ink, at the browser's own weight and
+  position, with the rule turning the accent under the pointer, so the
+  orange names the link being hovered rather than every link in the
+  paragraph. The `ink` choice is that link without the hover accent,
+  the plainest link there is. The other choices are two blues that
+  colour the word and its rule together, both at the accent's OKLCH
+  complement (228deg) and a step round towards a conventional link
+  blue -- one at the 7:1 the body grays hold, one at 5.5:1, which keeps
+  three times the separation from the body ink -- and the browser's own
+  link, its colour and its own rule, as the control the rest are read
+  against. The accent colours no choice's text: at 2.83:1 it sits under
+  the 3:1 a non-text indicator wants, which leaves it a hover rule
+  under a link that already reads as one, and the colour of headings
+  and chrome. `card.css` states a choice as a pair of values, light and dark, so a
   candidate is one `:root[data-link=...]` block and no scheme rules of
   its own; it also carries the reasoning behind the numbers. The losing
   choices, and the picker with them, come out once the blog decides.

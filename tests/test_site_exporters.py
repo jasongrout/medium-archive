@@ -728,6 +728,10 @@ def test_theme_picker_and_dark_scheme(project):
     assert "@media (prefers-color-scheme: dark)" in css
     assert ':root:not([data-theme="light"])' in css
     assert ".theme-picker" in css
+    # the link default is "ink-accent", so it is the state with no
+    # data-link attribute; every other choice pins one
+    assert ":root:not([data-link]) a:hover" in css
+    assert ':root[data-link="ink-accent"]' not in css
     assert (pelican_site / "theme/static/css/style.css").read_text() == css
     for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):
@@ -758,6 +762,11 @@ def test_theme_picker_and_dark_scheme(project):
         assert text.index("localStorage.getItem") < text.index("stylesheet")
         assert text.index('localStorage.getItem("font")') < text.index("stylesheet")
         assert text.index('localStorage.getItem("link")') < text.index("stylesheet")
+        # the default is stored as no choice at all, so the picker
+        # falls back to it and the init script does not restore it
+        assert 'apply(known ? stored : "ink-accent");' in text, base
+        assert 'link === "ink-accent"' not in text, base
+        assert 'link === "ink"' in text, base
     # redirect stubs load no stylesheet, so they must paint the palette
     # themselves -- following a redirect must not flash white in dark mode
     for stub_source in ((hugo_site / "layouts/alias.html").read_text(),

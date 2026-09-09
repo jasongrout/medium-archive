@@ -19,10 +19,10 @@
   var options = select.options;
   function apply(choice) {
     select.value = choice;
-    if (choice === "ink") root.removeAttribute("data-link");
+    if (choice === "ink-accent") root.removeAttribute("data-link");
     else root.setAttribute("data-link", choice);
     try {
-      if (choice === "ink") localStorage.removeItem("link");
+      if (choice === "ink-accent") localStorage.removeItem("link");
       else localStorage.setItem("link", choice);
     } catch (e) {}
   }
@@ -34,7 +34,7 @@
   for (var i = 0; i < options.length; i++) {
     if (options[i].value === stored) known = true;
   }
-  apply(known ? stored : "ink");
+  apply(known ? stored : "ink-accent");
   picker.hidden = false;
 })();
 </script>
