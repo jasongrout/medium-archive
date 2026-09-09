@@ -155,7 +155,7 @@ a:hover { text-decoration-line: underline; }
    and the same orange the rest of the chrome hovers in. It holds in
    both palettes: --accent is one value across the two, and the rule's
    weight and position stay the browser's, as the default's are. */
-:root[data-link="ink-accent"] a:hover { text-decoration-color: var(--accent); }
+:root[data-link="ink-accent"] a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
 /* The choices that colour the word as well as its rule. Both are the
    accent's complement in OKLCH -- its hue is 48deg, so 228deg -- and a
    step round towards a conventional link blue: "petrol-aaa" at the 7:1
