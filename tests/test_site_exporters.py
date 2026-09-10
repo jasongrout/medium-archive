@@ -887,6 +887,9 @@ def test_theme_picker_and_dark_scheme(project):
     # data-link attribute; every other choice pins one
     assert ":root:not([data-link]) a:hover" in css
     assert ':root[data-link="ink-accent"]' not in css
+    # the two blues hover the way the default does: an accent rule
+    assert ':root[data-link="petrol-aaa"] a:hover' in css
+    assert ':root[data-link="link-blue"] a:hover' in css
     assert (pelican_site / "theme/static/css/style.css").read_text() == css
     for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):

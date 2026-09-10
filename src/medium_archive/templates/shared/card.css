@@ -177,6 +177,16 @@ a:hover { text-decoration-line: underline; }
 :root[data-link="petrol-aaa"] a, :root[data-link="link-blue"] a {
                                text-decoration-thickness: 1px;
                                text-underline-offset: .15em; }
+/* Both take the default's hover as well: the rule turns the accent and
+   thickens to 2px under the pointer, so a link says which one the
+   pointer is on the same way under every choice that draws a rule of
+   its own. The word keeps its blue, and the rule keeps the offset the
+   rest state gave it, so the hover moves nothing and recolours nothing
+   that carries letterforms -- the contrast each choice was picked for
+   is the text's, at rest and hovered alike. */
+:root[data-link="petrol-aaa"] a:hover, :root[data-link="link-blue"] a:hover {
+                               text-decoration-color: var(--accent);
+                               text-decoration-thickness: 2px; }
 /* "browser" is the control the rest are read against: a link drawn the
    way the browser draws one with no stylesheet at all, in LinkText,
    the reader's own platform link colour in the scheme the palette has
