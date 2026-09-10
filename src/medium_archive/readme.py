@@ -389,7 +389,12 @@ does not go stale when a theme gains a feature.
 
 The site-wide text and settings all three read come from the
 hand-written `site/site.json`, the one exporter input that is not part
-of the archive (see `archive/README.md`).
+of the archive (see `archive/README.md`). Each generated site carries
+its own copy of that data, separate from its generated machinery, so a
+site can be checked in and carried on as a project of its own: hugo's
+is `config/_default/params.toml` beside the `hugo.toml` that says how
+the site is built, pelican's is `site.json` beside the `pelicanconf.py`
+that reads it.
 
 ## Layout
 
@@ -415,6 +420,21 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
                                 generator-native front matter, config, and
                                 the shared card-grid theme; each carries
                                 its own redirects.csv
+  config/_default/            (hugo) the site config as a directory:
+    params.toml                 what the pages say about themselves --
+                                masthead, banner, footer line, newsletter
+                                band, share image -- filled from
+                                site/site.json and editable by hand
+    hugo.toml                   how the site is built: taxonomies,
+                                related posts, paginator, Goldmark and
+                                Chroma, plus the address, name and
+                                language Hugo takes at its root
+  site.json                   (pelican) the same data for the pelican
+                                site, read by pelicanconf.py, which
+                                holds none of it
+  pelicanconf.py              (pelican) the machinery: the CommonMark
+                                reader, the URL scheme and the site
+                                plugin, the same bytes for every archive
   data/tags.json,               the names tags and authors are shown under
   data/authornames.json,        and the profile address of each byline:
   data/authors.json             the same three files in both sites, read
@@ -450,11 +470,15 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
   one of the two is inert; the medium-archive README has the details.
   The stubs are the reason a built site's root carries a directory per
   old post path.
-* The `data/*.json` files in `site-hugo/` and `site-pelican/` are
-  derived from the archive like everything else in those directories,
-  so an exporter run overwrites them. A tag or author name belongs in
-  `archive/tags.json` or in the post's byline; editing the data file
-  directly is for a site kept as a checked-in project of its own.
+* The `data/*.json` files in `site-hugo/` and `site-pelican/`, and
+  each site's own config data (`config/_default/params.toml`,
+  `site.json`), are derived from the archive and from `site/site.json`
+  like everything else in those directories, so an exporter run
+  overwrites them. While the site is still generated, a tag or author
+  name belongs in `archive/tags.json` or in the post's byline and a
+  site-wide setting in `site/site.json`; editing the copies directly is
+  for a site kept as a checked-in project of its own, which is what
+  they are there for.
 
 ## Building the sites
 

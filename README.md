@@ -366,6 +366,22 @@ with none stored, the system scheme decides. The theme provides:
   every later one lazily, as WordPress treats the first content image:
   the first is usually on screen at load, and lazy-loading it delays
   the largest contentful paint.
+- The site's own data in one hand-editable file, separate from the
+  generated machinery, so a built site can be checked in and carried on
+  as a repository of its own. The hugo site's config is a directory:
+  `config/_default/params.toml` is what the pages say about themselves
+  (the masthead and where it points, the banner, the footer line, the
+  newsletter band, the share image, the handle and profiles) and
+  `config/_default/hugo.toml` is how the site is built (taxonomies,
+  related posts, the paginator, Goldmark and Chroma) plus the address,
+  name and language Hugo takes only at the root of its configuration.
+  The pelican site puts the same data in `site.json` beside its
+  `pelicanconf.py`, which reads it one key at a time and holds none of
+  it -- that config is the reader, the URL scheme and the plugins, and
+  is the same bytes for every archive. Both are filled from the
+  archive's own `site/site.json`, with the images resolved to the
+  copies the site carries; edit either in place and rebuild with the
+  generator alone, without re-running the exporter.
 - Three hand-editable data files, `data/tags.json`,
   `data/authornames.json` and `data/authors.json`, written the same in
   both sites: the name each tag and each author is shown under, and the
@@ -526,6 +542,7 @@ relative to `site/`.
 | `intro` | landing-page blurb (Markdown), rendered by every landing page |
 | `footer` | the line under every page (Markdown), `{year}` standing for the year the site is built; unset, the footer carries `description` |
 | `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter. Unset, the exporters warn and fall back to a placeholder, so share links and social previews point at a domain you do not own |
+| `locale` | the language of the pages: `<html lang>` and the feeds (`"en"` by default) |
 | `avatar` | image beside `site.json` for the header logo |
 | `logo` | image beside `site.json` for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
 | `logo_dark` | the same mark drawn for the dark palette, which the palettes switch between; only read when `logo` is set |
@@ -539,17 +556,17 @@ relative to `site/`.
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
 | `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |
 | `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
-| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`logo`/`logo_dark`/`favicon`, and extra `params` for the generated config |
+| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`logo`/`logo_dark`/`favicon`, and extra `params` for the generated site's `config/_default/params.toml` |
 
 The `hugo` section in full:
 
 ```json
-"hugo": {"locale": "en",                    // defaultContentLanguage
+"hugo": {"locale": "en",                    // overrides the top-level key
          "avatar": "avatar.png",            // overrides the top-level key
          "logo": "logo.png",                // overrides the top-level key
          "logo_dark": "logo-dark.png",      // overrides the top-level key
          "favicon": "favicon.ico",          // overrides the top-level key
-         "params": {"motto": "..."}}        // extra/override [params]
+         "params": {"motto": "..."}}        // extra/override params.toml keys
 ```
 
 ## Installation

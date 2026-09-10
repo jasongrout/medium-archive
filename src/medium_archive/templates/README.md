@@ -16,6 +16,10 @@ Loading (`sites.template_text` and `sites.fill_template`):
   (`$title`, `$base_url`, ...); the exporter serializes each value
   before substitution. `$` placeholders cannot collide with the braces
   Go templates, Jinja and Python dicts use, so the files read naturally.
+  A site's own data is not carried this way: it is written beside each
+  generated config as data of its own -- `config/_default/params.toml`
+  for hugo, `site.json` for pelican -- for the config to read, which is
+  why `pelicanconf.py` here is not a `.tmpl` at all.
 
 Files here carry no comments beyond what their formats can hide from
 the rendered output. Go-template and Jinja comments are fine. The
@@ -252,10 +256,21 @@ up in -- `baseof.html`, `home.html`, `page.html`, `section.html`,
 section and a term's page share `section.html`, written to the site as
 `term.html` too), plus:
 
-- `hugo.toml.tmpl` is the generated site config. Its
-  `[markup.highlight]` turns off Chroma's inline styles, whose default
-  Monokai would paint a dark block on the light page; the tokens get
-  classes instead and `card.css` colours them per palette.
+- `hugo.toml.tmpl` and `params.toml.tmpl` are the generated site
+  config, written as a config directory (`config/_default/`) so that
+  how the site is built and what it says about itself are separate
+  files. `hugo.toml` is the machinery -- the taxonomies, the
+  related-posts index, the paginator, Goldmark and Chroma -- plus the
+  address, name and language Hugo reads only at the root of its
+  configuration; its `[markup.highlight]` turns off Chroma's inline
+  styles, whose default Monokai would paint a dark block on the light
+  page, so the tokens get classes instead and `card.css` colours them
+  per palette. `params.toml` is the data the theme renders from,
+  filled from `site.json` (`hugo.params` merges last) and hand-editable
+  in a checked-in copy of the site: the file's name is what makes its
+  keys Hugo's `[params]`, so none of them is prefixed. Hugo reads a
+  config directory in preference to a root config file, so there is one
+  place to look.
 - `content/tags/_content.gotmpl` is a content adapter: it creates one
   term page per entry of `data/tags.json` (tag slug -> display name,
   written by `sites.write_data_files`), so the tag pages, cards, chip
@@ -320,8 +335,14 @@ section and a term's page share `section.html`, written to the site as
 
 ## pelican/
 
-- `pelicanconf.py.tmpl` is the generated config. Most of it is the
-  CommonMark reader that replaces Pelican's python-markdown one
+- `pelicanconf.py` is the generated config, and it is copied rather
+  than filled in: it carries no site data at all, so the same bytes
+  serve every archive. What the site says about itself is `site.json`
+  beside it, which the exporter writes (`sites.write_site_json`) and
+  the config reads at config time, one key to one setting -- the
+  counterpart of the hugo site's `params.toml`, and the file a
+  checked-in copy of the site edits. The rest is machinery, and most of
+  it is the CommonMark reader that replaces Pelican's python-markdown one
   (`pip install markdown-it-py mdit-py-plugins`), which is where
   everything this site needs from the Markdown layer hangs: heading
   ids for search anchors, Pygments on the `highlight` class the shared
