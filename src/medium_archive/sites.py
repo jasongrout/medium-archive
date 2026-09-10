@@ -5,8 +5,9 @@ archive/posts.json and archive/posts/ -- so every site is as reproducible
 as the posts are: raw/ + fixups/ -> convert -> posts/ -> exporter -> site dir.
 None of them touch the network; rendering is the site generator's job.
 
-Common to all of them: page URL slugs chosen from the Medium slug
-(date-prefixed only when several posts share one), links between posts of
+Common to all of them: page URL slugs chosen from the Medium slug,
+folded to ASCII and date-prefixed only when several posts share one,
+links between posts of
 the publication rewritten from Medium URLs to site pages, images placed
 from posts/ (hard-linked as they are when nothing is to be gained,
 else display copies -- see ImagePlacer), a redirect map from every old
@@ -180,17 +181,48 @@ def tag_names(manifest: dict, archive: Path) -> dict:
             for tag in p.get("tags") or []}
 
 
+def page_name(post: dict) -> str:
+    """One post's page name before duplicates are told apart: its Medium
+    slug folded to ASCII (see ascii_slug). Medium leaves a title's
+    accents in the path it builds -- voilà-0-5-0-homecoming -- and a URL
+    is no place for them: the address is only ever seen percent-encoded
+    (/posts/voil%C3%A0-0-5-0-homecoming/), each generator folds what it
+    is given its own way, and a filesystem is free to hand the name back
+    decomposed. So the page is served at voila-0-5-0-homecoming. Medium's
+    own spelling is kept where it is a fact rather than a choice: in
+    posts.json, and on the old-path side of the redirect map.
+
+    A slug with no ASCII in it at all -- a publication that writes its
+    titles in another script -- folds away to nothing, and the Medium id
+    its URL ends in names the page instead."""
+    return (ascii_slug(post["slug"])
+            or ascii_slug(post.get("medium_id") or "") or "post")
+
+
+def page_dir_name(post: dict) -> str:
+    """The name of the directory a post's page sits in, where a site
+    keeps the archive's own <YYYY-MM-DD>-<slug> grouping rather than
+    naming the directory for the page (myst does; hugo and pelican name
+    theirs page_stems' way). Folded to ASCII like the page name beside
+    it: Medium's spelling of a slug is the archive's business, and a
+    site built from it should carry no accent anywhere -- least of all
+    in a path a checked-in site would hold."""
+    return ascii_slug(Path(post["dir"]).name)
+
+
 def page_stems(manifest: dict) -> dict:
-    """url -> page name, which becomes the page's URL slug. The Medium
-    slug alone, unless several posts share it (deleted-and-republished
-    announcements, yearly series); those keep their date prefix so every
-    page URL is distinct and stable."""
+    """url -> page name, which becomes the page's URL slug: page_name's,
+    unless several posts share one (deleted-and-republished
+    announcements, yearly series, two slugs that differ only by an
+    accent); those keep their date prefix so every page URL is distinct
+    and stable."""
+    names = {url: page_name(p) for url, p in manifest.items()}
     counts = {}
-    for p in manifest.values():
-        counts[p["slug"]] = counts.get(p["slug"], 0) + 1
-    return {url: p["slug"] if counts[p["slug"]] == 1
-            else f"{(p['date'] or '')[:10] or 'undated'}-{p['slug']}"
-            for url, p in manifest.items()}
+    for name in names.values():
+        counts[name] = counts.get(name, 0) + 1
+    return {url: name if counts[name] == 1
+            else f"{(manifest[url]['date'] or '')[:10] or 'undated'}-{name}"
+            for url, name in names.items()}
 
 
 class LinkMap:
@@ -202,7 +234,7 @@ class LinkMap:
     def __init__(self, manifest: dict, stems: dict):
         self.by_path, self.by_id = {}, {}
         for url, p in manifest.items():
-            page = (Path(p["dir"]).name, stems[url])   # (post dir, page name)
+            page = (page_dir_name(p), stems[url])     # (post dir, page name)
             for u in (p["original_url"], p.get("ghost_url"),
                       p.get("canonical_url")):
                 if u:
@@ -919,6 +951,21 @@ _FOLD = str.maketrans({
 })
 
 
+def ascii_slug(text: str) -> str:
+    """Any term as the slug the sites key it by: pelican's own slugify,
+    reproduced so that the URLs it builds do not move. Fold to ASCII,
+    drop everything that is not a word character, space or hyphen, then
+    collapse runs to single hyphens. Everything a URL is built from goes
+    through this -- page names (page_name) and bylines (author_slug) --
+    so that one thing is one address, whichever generator serves it."""
+    text = unicodedata.normalize("NFKC", text).translate(_FOLD)
+    text = "".join(c for c in unicodedata.normalize("NFKD", text)
+                   if not unicodedata.combining(c))
+    text = text.encode("ascii", "ignore").decode("ascii")
+    text = re.sub(r"[^\w\s-]", "", text)
+    return re.sub(r"[-\s]+", "-", text.strip()).lower()
+
+
 def author_slug(name: str) -> str:
     """An author's name as the slug both sites key them by. Bylines are
     people's names, not slugs, so left as terms they would reach each
@@ -927,18 +974,8 @@ def author_slug(name: str) -> str:
     while pelican folds it to ASCII, so the two sites would serve one
     author under two addresses. Slugging here is what the tags do
     already, for the same reason -- the slug is the identity, and the
-    name is what a page shows.
-
-    The rules are pelican's own slugify, reproduced so its author URLs
-    do not move: fold to ASCII, drop everything that is not a word
-    character, space or hyphen, then collapse runs to single hyphens.
-    """
-    text = unicodedata.normalize("NFKC", name).translate(_FOLD)
-    text = "".join(c for c in unicodedata.normalize("NFKD", text)
-                   if not unicodedata.combining(c))
-    text = text.encode("ascii", "ignore").decode("ascii")
-    text = re.sub(r"[^\w\s-]", "", text)
-    return re.sub(r"[-\s]+", "-", text.strip()).lower()
+    name is what a page shows."""
+    return ascii_slug(name)
 
 
 def author_names(manifest: dict) -> dict:

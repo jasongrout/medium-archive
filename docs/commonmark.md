@@ -319,6 +319,20 @@ or reposition the marker at conversion time, which fixes Hugo and
 Pelican together; a `lint` rule for "emphasis a CommonMark parser will
 not open" is the way to keep it fixed.
 
+**(2026-09.)** The percent-encoding row no longer arises from this
+archive's own pages. A page name is now folded to ASCII, so the link
+`/posts/and-voilà/` above is written `/posts/and-voila/` and there is
+nothing left for either parser to encode. The accent was never in the
+post to begin with: Medium's path is percent-encoded
+(`/and-voil%C3%A0-f6a2c08a4a93`), `convert` decoded it into the slug
+`posts.json` records, the exporter spelled that decoded slug into the
+link, and markdown-it encoded it back. A scan of the archive as it
+stands finds a non-ASCII link target on 12 pages, 11 of them links into
+the eight posts whose Medium slug carried an accent; the twelfth points
+at `en.wikipedia.org/wiki/Read–eval–print_loop`, which is external, is
+still encoded by markdown-it, and is now the only such target in the
+built site. The counts in the table are left as they were measured.
+
 ## What the swap buys
 
 Goldmark's optional extensions have markdown-it-py counterparts, which

@@ -28,8 +28,14 @@ the figure directive below.
 
 Each post becomes content/posts/<stem>/index.md with its images beside
 it; image references are rewritten to Pelican's `{attach}` form so the
-files publish next to the article at /posts/<stem>/. Body images load
-lazily (the reader marks every image in an article's body) and are
+files publish next to the article at /posts/<stem>/. The stem is the
+page's URL slug, and the directory is the whole of where that comes
+from: the generated config reads a post's directory name as its slug
+(PATH_METADATA), the way hugo reads a page bundle's, so neither site
+restates in a post what its directory already says. A post that does
+carry a `slug:` is one deliberately served elsewhere -- what keeps a
+URL through a rename -- and the site plugin reports it; two posts that
+would write the same page stop the build. Body images load lazily (the reader marks every image in an article's body) and are
 served responsively: after each build the embedded plugin
 encodes webp variants of every still body image at the same widths as
 the hugo theme's render hook (480/736/1104, never upscaled,
@@ -217,7 +223,6 @@ def build_site(root):
                                  for a in post["authors"]]
         if post.get("tags"):
             fields["tags"] = list(post["tags"])
-        fields["slug"] = stems[url]
         if covers.path(url):
             fields["cover"] = covers.path(url)
         # the page's subtitle line; a FORMATTED_FIELD in the generated

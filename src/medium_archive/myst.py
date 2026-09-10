@@ -34,7 +34,7 @@ from pathlib import Path
 from .paths import archive_dir, site_dir
 from .sites import (IFRAME_RE, VIDEO_RE, Covers, ImagePlacer, LinkMap, by_year,
                     clean_site, markdown_text,
-                    load_site_inputs, page_stems, place_images,
+                    load_site_inputs, page_dir_name, page_stems, place_images,
                     read_post_body, retarget_images, rewrite_body as _rewrite,
                     rewrite_figures, tag_names, template_text,
                     write_redirects_csv)
@@ -249,7 +249,7 @@ def write_myst_yml(site: Path, manifest: dict, stems: dict, config: dict):
         lines.append(f"    - title: {_yml(year)}")
         lines.append("      children:")
         for url, p in posts:
-            lines.append(f"        - file: posts/{Path(p['dir']).name}/{stems[url]}.md")
+            lines.append(f"        - file: posts/{page_dir_name(p)}/{stems[url]}.md")
     lines += ["site:",
               "  template: book-theme",
               f"  title: {_yml(config['title'])}"]
@@ -283,7 +283,7 @@ def write_archive(site: Path, manifest: dict, stems: dict):
         for url, p in posts:
             date = (p.get("date") or "")[:10]
             entry = f"- {date} — [{esc(p['title'] or url)}]" \
-                    f"(posts/{Path(p['dir']).name}/{stems[url]}.md)"
+                    f"(posts/{page_dir_name(p)}/{stems[url]}.md)"
             if p.get("authors"):
                 entry += " · " + esc(", ".join(a["name"] for a in p["authors"]))
             lines.append(entry)
@@ -311,7 +311,7 @@ def build_site(root: Path) -> Path:
         if body is None:
             continue
         body = rewrite_body(body, links, "../")
-        page_dir = site / "posts" / Path(p["dir"]).name
+        page_dir = site / "posts" / page_dir_name(p)
         page_dir.mkdir()
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed

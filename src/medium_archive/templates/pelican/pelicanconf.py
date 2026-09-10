@@ -103,6 +103,15 @@ THEME = "theme"
 ARTICLE_PATHS = ["posts"]
 STATIC_PATHS = ["posts"]        # colocated images, placed via {attach}
 PAGE_PATHS = []
+# A post's directory name is its slug, so a post written by hand need
+# not repeat it in its front matter: pelican reads the path's metadata
+# before the post's own, which leaves the directory name a default a
+# `slug:` in the post overrides -- what a post that has to keep its URL
+# through a rename of its directory sets. The name is read as it stands
+# rather than slugified, so name a directory the way its URL should
+# read; the site plugin below reports the posts whose two differ, and
+# stops the build on two posts that would write the same page.
+PATH_METADATA = r"posts/(?P<slug>[^/]+)/"
 # directory-style URLs throughout, matching the hugo build's scheme
 ARTICLE_URL = "posts/{slug}/"
 ARTICLE_SAVE_AS = "posts/{slug}/index.html"
@@ -122,7 +131,9 @@ PAGINATION_PATTERNS = (
 )
 DEFAULT_PAGINATION = 24
 DEFAULT_CATEGORY = "posts"
-SLUGIFY_SOURCE = "basename"     # slugs are explicit in each article anyway
+SLUGIFY_SOURCE = "basename"     # a post outside PATH_METADATA's reach;
+                                # every post here is an index.md, so this
+                                # is a fallback and not a scheme
 DIRECT_TEMPLATES = ["index", "tags", "authors", "archives"]
 TEMPLATE_PAGES = {"search.html": "search/index.html"}
 CATEGORY_URL = ""               # tags and authors classify posts;

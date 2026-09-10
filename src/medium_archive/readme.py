@@ -409,7 +409,8 @@ site-myst/                    optional MyST site built by `medium-archive
   archive.md                  chronological post list, grouped by year
   listing-covers.mjs          generated myst-listing companion plugin: makes
                                 the gallery serve the local cover thumbnails
-  posts/<YYYY-MM-DD>-<slug>/
+  posts/<YYYY-MM-DD>-<slug>/  the archive's own grouping for the post,
+                                the slug folded to ASCII as page names are
     <page>.md                 the post, MyST front matter + rewritten body;
                                 the page's URL slug is the filename, capped
                                 by mystmd at 50 characters
@@ -466,6 +467,14 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
   Links to in-page anchors that never survived the Medium conversion
   (old footnote anchors) stay as they are in `archive/posts/` and are
   reported by `myst build`.
+* A page is named for its post's Medium slug folded to ASCII, so a post
+  Medium served at `/voilà-0-5-0-homecoming-<id>` is served here at
+  `/posts/voila-0-5-0-homecoming/`: an accent survives a URL only
+  percent-encoded, and each generator folds one its own way. Posts that
+  fold to the same name keep a date prefix, as posts sharing a slug
+  always have. Medium's own spelling is kept where it is a fact rather
+  than a choice -- `archive/posts.json`, and the old-path side of every
+  `redirects.csv`.
 * Each site's `redirects.csv` is the generator's own: it maps the old
   inbound paths of `archive/redirects.csv` to the page URLs that
   generator actually serves. It is written whatever `site/site.toml`'s

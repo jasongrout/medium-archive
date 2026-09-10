@@ -64,7 +64,6 @@ authors:
 - ada-lovelace
 tags:
 - jupyter
-slug: a-new-post
 subtitle: The line under the title, Markdown like the body
 summary: The excerpt on the card, and the page's meta description
 cover: images/cover.jpg
@@ -75,10 +74,16 @@ The body, as CommonMark.
 ![a diagram]({attach}images/diagram.png)
 ```
 
-- `slug` is the URL: the page is served at `/posts/<slug>/`, and the
-  directory name is not read. It is required, since Pelican is set to
-  take a slug from the file's name here and every post's file is
-  `index.md`.
+- `slug` is the URL: the page is served at `/posts/<slug>/`. Left out,
+  as above and as every post here leaves it out, it is the post's
+  directory name -- so a directory name is worth choosing as carefully
+  as a URL. It is read as it stands, not slugified: `A New Post` would
+  serve at `/posts/A New Post/`, and an accent in the name is an accent
+  in the address, which is why every name here is lowercase ASCII.
+  Write the field to keep a post's URL when its directory is renamed.
+  The build prints a line for each post served somewhere other than
+  under its directory name, and stops if two posts would write the same
+  page.
 - `authors` and `tags` are slugs, not names, so that their URLs are
   exact whatever the name holds; the name each is shown under comes
   from `data/authornames.json` and `data/tags.json`. A slug missing

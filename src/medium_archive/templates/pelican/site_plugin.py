@@ -358,10 +358,50 @@ def _relate_articles(article_generator):
     print(f"related posts: {len(articles)} articles")
 
 
+def _check_slugs(article_generator):
+    # A post's slug is its URL (ARTICLE_URL in the config above), so two
+    # posts sharing one write the same page. Pelican does catch that,
+    # but late and twice removed from the fix: a warning among the read
+    # log, then a FileOverwriteFailedError naming the output path and
+    # neither post -- and under `pelican -r` the error is swallowed and
+    # the last good build goes on being served. So the pair is named
+    # here instead, on article_generator_finalized, before a page is
+    # written, and the build stops.
+    #
+    # The directory names are a note rather than an error: a post keeps
+    # its URL through a rename of its directory by carrying the old slug
+    # in its front matter, which is what the field is for and what
+    # PATH_METADATA leaves it free to do. The line is there to catch the
+    # unintended one -- a slug edited without its directory, which moves
+    # the page and the images {attach} publishes beside it.
+    import collections
+    import os
+    import sys
+    pages = collections.defaultdict(list)
+    for article in article_generator.articles + article_generator.translations:
+        pages[article.save_as].append(article.relative_source_path)
+    renamed = sorted(
+        f"{a.relative_source_path} is served at /{a.url}"
+        for a in article_generator.articles
+        if os.path.basename(os.path.dirname(a.relative_source_path)) != a.slug)
+    for line in renamed:
+        print(f"slug: {line}")
+    clashes = sorted((page, sorted(paths))
+                     for page, paths in pages.items() if len(paths) > 1)
+    if clashes:
+        sys.exit("\n".join(
+            [f"{len(paths)} posts share a slug, and would write {page}:"
+             + "".join(f"\n  {path}" for path in paths)
+             for page, paths in clashes]))
+    print(f"slugs: {len(pages)} posts, {len(renamed)} not under their "
+          "directory name")
+
+
 class _SitePlugins:
     @staticmethod
     def register():
         from pelican import signals
+        signals.article_generator_finalized.connect(_check_slugs)
         signals.article_generator_finalized.connect(_name_tags)
         signals.article_generator_finalized.connect(_name_authors)
         signals.article_generator_finalized.connect(_relate_articles)
