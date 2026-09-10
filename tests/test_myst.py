@@ -385,7 +385,7 @@ def test_youtube_player_becomes_an_iframe_directive():
 
 def test_clip_becomes_a_video_image_or_figure():
     # mystmd renders an image whose source is a video as a <video>
-    line = '<video src="images/002-giphy.mp4" autoplay loop muted playsinline></video>'
+    line = ('<video src="images/002-giphy.mp4" preload="metadata" loop muted playsinline controls></video>')
     md = f"Intro.\n\n<figure>\n\n{line}\n\n<figcaption>\n\nCap.\n\n</figcaption>\n\n</figure>\n\n{line}\n"
     assert myst_figures(md) == (
         "Intro.\n\n:::{figure} images/002-giphy.mp4\n\nCap.\n:::\n\n"

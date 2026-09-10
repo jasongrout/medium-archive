@@ -775,8 +775,9 @@ def test_giphy_embed_becomes_the_archived_file(tmp_path):
     body = BeautifulSoup(f"<article>{html}</article>", "html.parser")
     md, used = to_markdown(body, URL, img_map, raw, out)
     assert md == ("![See Ya Kiss GIF by CBC](images/001-giphy.gif)\n\n"
-                  "<figure>\n\n<video src=\"images/002-giphy.mp4\" autoplay loop "
-                  "muted playsinline></video>\n\n<figcaption>\n\nRobot arm\n\n"
+                  "<figure>\n\n<video src=\"images/002-giphy.mp4\" "
+                  "preload=\"metadata\" loop muted playsinline controls>"
+                  "</video>\n\n<figcaption>\n\nRobot arm\n\n"
                   "</figcaption>\n\n</figure>\n")
     assert used == ["images/002-giphy.mp4", "images/001-giphy.gif"]
     assert (out / "images" / "002-giphy.mp4").read_bytes() == b"mp4"
@@ -784,7 +785,7 @@ def test_giphy_embed_becomes_the_archived_file(tmp_path):
     md, used = to_markdown(BeautifulSoup(f"<article>{html}</article>", "html.parser"),
                            URL, {}, raw, out)
     assert f"![See Ya Kiss GIF by CBC]({GIPHY_GIF})" in md
-    assert f'<video src="{GIPHY_MP4}" autoplay' in md and used == []
+    assert f'<video src="{GIPHY_MP4}" preload="metadata"' in md and used == []
 
 
 TWEET = "https://twitter.com/ann/status/12345"

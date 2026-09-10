@@ -523,6 +523,62 @@ STILL_MAX_EDGE = 1600
 ANIMATED_MAX_EDGE = 1104
 STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
+# An animation is placed as h264 video rather than as a gif. The same
+# frames cost a seventh of the bytes -- the reference archive's 228 gifs
+# are 609 MB of its pelican site and 88 MB as mp4 -- and, more than
+# that, a <video> is something a reader can stop. An animated gif cannot
+# be paused, and any of these clips that runs past five seconds fails
+# WCAG 2.2.2 (Pause, Stop, Hide) in that format no matter what the theme
+# does; a clip can be paused, replayed, and left unplayed for a reader
+# who asks for less motion. What that costs is carried deliberately
+# elsewhere: a <video> has no alt attribute, so the exporters put the
+# image's text alternative on it as an aria-label (SC 1.2.1), and the
+# poster below is what stands in for the movement.
+#
+# The encode is tuned for screencasts, which is what this archive's
+# animations are: text has to stay sharp, so -crf 20 rather than the 26
+# the 2026-09 measurement started from (on a synthetic 1104x620
+# screencast, 41.2 dB PSNR against the source gif at crf 20 against
+# 39.0 dB at crf 26, for ~30% more bytes), and -preset fast, which on
+# this archive's real screencasts lands within 0.01 dB and 0.5% of the
+# bytes of -preset medium for about three quarters of its encode time.
+# yuv420p and the high profile are what every browser decodes, and they
+# need even dimensions (see video_size).
+#
+# site.toml's [images] table tunes all of it: animated_format = "gif"
+# keeps gifsicle's resized gifs instead, and video_crf / video_preset
+# trade bytes against detail. animated_max_edge still caps the longest
+# edge; 0 leaves a clip at its own size rather than turning video off.
+ANIMATED_FORMAT = "mp4"
+VIDEO_CRF = 20
+VIDEO_PRESET = "fast"
+# The still a clip carries, beside it under this suffix. It is what a
+# gif showed at rest (the clip's own first frame, so nothing jumps when
+# playback starts), what a reduced-motion reader sees instead of
+# movement, what a feed reader shows where it drops the <video>, and
+# what the page paints while preload="none" fetches nothing -- which is
+# what keeps a page from pulling several megabytes of clip nobody
+# scrolls to. Named after the clip so a template finds it without being
+# told, and webp because that is what the sites already ask a browser
+# to decode for line art. It is written in the same ffmpeg pass as the
+# clip -- one decode of the gif, and the still costs nothing measurable
+# beside the encode -- and it is lossy, at a quality that leaves a
+# screencast's text crisp: keeping a frame pixel-exact is effort spent
+# on the one frame of a clip that is lossy from the next frame on, and
+# through Pillow it measured longer than encoding the whole clip.
+POSTER_SUFFIX = "-poster.webp"
+POSTER_QUALITY = 90
+# What WCAG 2.2.2 (Pause, Stop, Hide) turns on: motion that runs longer
+# than five seconds has to be stoppable. A display copy is normally
+# placed only when it undercuts what it replaces, and a clip past this
+# length is the exception -- what it buys there is the pause control,
+# not the bytes. On the reference archive that is 18 gifs, the longest
+# of them 76 seconds, whose clips came out no smaller: small, heavily
+# optimized animations where h264 spends more on the gif's dithering
+# than the gif does. Under five seconds the smaller file wins and the
+# gif stays a gif.
+MOTION_SECONDS = 5
+
 # A still is line art when it holds few enough distinct colors and
 # enough flat runs. The two classes separate cleanly on that pair --
 # this archive's line art runs 200-8000 colors at 0.55-0.98 flat, its
@@ -542,7 +598,43 @@ LINE_ART_QUALITY = 90
 PHOTO_QUALITY = 85
 # Bumped when the copies a given cap produces change shape, so caches
 # written by an older scheme are ignored rather than misread.
-CACHE_SCHEME = "v2"
+CACHE_SCHEME = "v4"
+
+
+def poster_path(clip: Path) -> Path:
+    """The poster beside a clip: <name>-poster.webp, wherever the clip
+    is -- the cache, a post's images directory, a site's."""
+    return clip.with_name(clip.stem + POSTER_SUFFIX)
+
+
+def discard_copy(tmp: str):
+    """Drop a display copy that is not going to be used, and the poster
+    beside it when the copy was a clip."""
+    Path(tmp).unlink(missing_ok=True)
+    poster_path(Path(tmp)).unlink(missing_ok=True)
+
+
+def video_size(size, cap: int):
+    """The (width, height) a gif this size is encoded at: scaled to cap
+    on its longest edge, then rounded down to the even dimensions
+    yuv420p is defined for. A cap of 0 only rounds."""
+    w, h = size
+    if cap and max(w, h) > cap:
+        scale = cap / max(w, h)
+        w, h = max(1, round(w * scale)), max(1, round(h * scale))
+    return max(2, w - w % 2), max(2, h - h % 2)
+
+
+def transparent_first_frame(im) -> bool:
+    """Whether a gif is really see-through where a page shows it. Gif
+    uses its transparent index to mean "unchanged since the previous
+    frame" as well, so `"transparency" in im.info` says almost nothing
+    about an animation -- 141 of the reference archive's 228 gifs
+    declare one and not one of them has a transparent pixel in its
+    composited first frame. The question a video copy turns on is alpha
+    on that composited frame, which is what this asks."""
+    im.seek(0)
+    return im.convert("RGBA").getchannel("A").getextrema()[0] < 255
 
 
 def flat_fraction(im) -> float:
@@ -578,30 +670,47 @@ class ImagePlacer:
     nothing is to be gained (or nothing available can process it), else
     place a display copy. Line-art PNGs become full-resolution lossless
     webp, photographs are capped and encoded lossily (JPEG, or webp when
-    they carry alpha), animated gifs go through gifsicle. Copies are
-    built once into the project's .image-cache/<scheme-caps>/ and hard-linked
-    into every site that wants them, so the three exporters (and re-runs)
-    share the work. Stills need Pillow and animated gifs need gifsicle;
-    when either is missing the affected images are placed unchanged,
-    with a note in the summary.
+    they carry alpha), animated gifs become h264 clips with a poster
+    beside them (see ANIMATED_FORMAT) or, where that is turned off or
+    cannot be done, go through gifsicle. Copies are built once into the
+    project's .image-cache/<scheme-caps>/ and hard-linked into every
+    site that wants them, so the three exporters (and re-runs) share the
+    work. Stills need Pillow, clips need Pillow and ffmpeg, and resized
+    gifs need gifsicle; when a tool is missing the affected images are
+    placed by whatever is left, with a note in the summary.
 
     place() returns the path it actually wrote, which carries a new
     extension when the copy changed format -- the exporters rewrite
-    their pages' image references from it."""
+    their pages' image references from it. A clip's poster is placed
+    beside it under the name poster_path() gives, which is how the hugo
+    and pelican themes find it."""
 
     def __init__(self, cache: Path, config: dict):
         images = config.get("images", {})
         self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
         self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
-        self.cache = (Path(cache)
-                      / f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}")
+        self.animated_format = (images.get("animated_format")
+                                or ANIMATED_FORMAT).lower()
+        self.video_crf = images.get("video_crf", VIDEO_CRF)
+        self.video_preset = images.get("video_preset", VIDEO_PRESET)
+        # the encode settings name the cache directory beside the caps:
+        # they decide what a clip comes out as, the way a cap does
+        video = (f"-mp4{self.video_crf}-{self.video_preset}"
+                 if self.animated_format == "mp4" else "-gif")
+        self.cache = (
+            Path(cache)
+            / f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}{video}")
         self.gifsicle = shutil.which("gifsicle")
+        self.ffmpeg = (shutil.which("ffmpeg")
+                       if self.animated_format == "mp4" else None)
+        self.ffmpeg_webp = None            # asked once, on the first clip
+        self.ffprobe = None                # looked up on the first clip
         try:
             from PIL import Image
             self.pillow = Image
         except ImportError:
             self.pillow = None
-        self.resized = self.converted = self.unchanged = 0
+        self.resized = self.converted = self.unchanged = self.clips = 0
         self.bytes_in = self.bytes_out = 0
         self.notes = []
 
@@ -622,6 +731,11 @@ class ImagePlacer:
         self.bytes_in += src.stat().st_size
         self.bytes_out += copy.stat().st_size
         link_or_copy(copy, dst)
+        poster = poster_path(copy)
+        if poster.exists():            # a clip travels with its still
+            self.clips += 1
+            self.bytes_out += poster.stat().st_size
+            link_or_copy(poster, poster_path(dst))
         return dst
 
     def warm(self, archive: Path, manifest: dict):
@@ -641,8 +755,9 @@ class ImagePlacer:
     def report(self):
         if self.resized or self.converted:
             mb = 1e6
-            print(f"display-copy images: {self.converted} re-encoded, "
-                  f"{self.resized} resized "
+            clips = f" ({self.clips} of them clips)" if self.clips else ""
+            print(f"display-copy images: {self.converted} re-encoded"
+                  f"{clips}, {self.resized} resized "
                   f"({self.bytes_in / mb:.0f} MB -> "
                   f"{self.bytes_out / mb:.0f} MB), "
                   f"{self.unchanged} placed as they are", file=sys.stderr)
@@ -664,15 +779,18 @@ class ImagePlacer:
         None -- the verdict is remembered, not recomputed."""
         ext = src.suffix.lower()
         if ext == ".gif":
-            cap, build, candidates = self.gif_cap, self._resize_gif, (ext,)
-            if not cap:
-                return None
-            if not self.gifsicle:
-                self._note("gifsicle not installed: animated gifs keep "
-                           "their full size")
-                return None
-            size = self._probe(src)
-            if size is None or max(size) <= cap:
+            # the extensions an animation's copy can carry, newest
+            # scheme first: a clip in .mp4, and a resized gif -- or the
+            # verdict that neither paid off -- under .gif. Which of the
+            # two is built is decided on a cache miss, inside
+            # _place_animation: reading a gif's frames to find out
+            # whether it can become a clip costs more than the lookup
+            cap, candidates = self.gif_cap, (".mp4", ext)
+            if self.animated_format == "mp4":
+                build = self._place_animation
+            elif self._resizes_gif(src, cap):
+                build, candidates = self._resize_gif, (ext,)
+            else:
                 return None
         elif ext in STILL_EXTS:
             # the extensions a still's copy can carry, newest scheme
@@ -698,24 +816,38 @@ class ImagePlacer:
         for suffix in candidates:
             cached = self.cache / f"{digest}{suffix}"
             if cached.exists():
-                return (cached if cached.stat().st_size < src.stat().st_size
-                        else None)
+                return cached if self._worth_placing(cached, src) else None
         self.cache.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=self.cache, suffix=ext)
         os.close(fd)
         built = build(src, tmp, cap)
         if not built:
-            os.remove(tmp)
+            discard_copy(tmp)
             return None
-        if os.path.getsize(tmp) >= src.stat().st_size:
-            os.remove(tmp)                 # the copy did not pay off
+        if built != ".mp4" and os.path.getsize(tmp) >= src.stat().st_size:
+            discard_copy(tmp)              # the copy did not pay off
             built = ext                    # cache the verdict all the same
             cached = self.cache / f"{digest}{built}"
             link_or_copy(src, cached)
         else:
             cached = self.cache / f"{digest}{built}"
+            # the poster first: a cached clip is only found by the name
+            # the clip lands under, so the still has to be there by the
+            # time another thread (or run) sees it
+            poster = poster_path(Path(tmp))
+            if poster.exists():
+                os.replace(poster, poster_path(cached))
             os.replace(tmp, cached)
-        return cached if cached.stat().st_size < src.stat().st_size else None
+        return cached if self._worth_placing(cached, src) else None
+
+    def _worth_placing(self, copy: Path, src: Path) -> bool:
+        """Whether a display copy is placed at all: it has to undercut
+        what it replaces -- except a clip, which _encode_video has
+        already weighed against the gif and against what a reader can
+        do with it (see MOTION_SECONDS), and which is never in the
+        cache unless it won that."""
+        return (copy.suffix == ".mp4"
+                or copy.stat().st_size < src.stat().st_size)
 
     def _probe(self, src: Path):
         """(width, height), by header sniff or Pillow, else None."""
@@ -730,6 +862,135 @@ class ImagePlacer:
             except Exception:
                 return None
         return size
+
+    def _place_animation(self, src: Path, tmp: str, cap: int):
+        """A gif's display copy where this archive places animations as
+        video: the clip, or -- for a gif that cannot become one, and for
+        an ffmpeg that failed on it -- the resized gif gifsicle makes of
+        it, or nothing."""
+        if self._encodes_video(src):
+            built = self._encode_video(src, tmp, cap)
+            if built:
+                return built
+            discard_copy(tmp)              # a clip that came to nothing
+        return (self._resize_gif(src, tmp, cap)
+                if self._resizes_gif(src, cap) else None)
+
+    def _encodes_video(self, src: Path) -> bool:
+        """Whether this gif is placed as a clip: an animation, with the
+        tools to encode it and to read it, and nothing see-through to
+        lose on the way."""
+        if not self.ffmpeg:
+            self._note("ffmpeg not installed: animated gifs stay gifs "
+                       "(install ffmpeg to place them as video)")
+            return False
+        if not self.pillow:
+            self._note("pillow not installed: animated gifs stay gifs")
+            return False
+        if not self._writes_webp():
+            return False
+        try:
+            with self.pillow.open(src) as im:
+                if getattr(im, "n_frames", 1) < 2:
+                    return False           # a still under a .gif name
+                if transparent_first_frame(im):
+                    self._note(f"{src.name} is transparent where it is "
+                               "shown, which video cannot carry; "
+                               "kept as a gif")
+                    return False
+        except Exception as e:
+            self._note(f"unreadable gif {src.name} ({e}); kept as a gif")
+            return False
+        return True
+
+    def _writes_webp(self) -> bool:
+        """Whether this ffmpeg can write a clip's poster. Most builds
+        carry libwebp; one that does not fails the whole run with
+        "Encoder not found", taking the clip down with the still, which
+        is worth saying plainly once rather than reporting as an ffmpeg
+        error per gif."""
+        if self.ffmpeg_webp is None:
+            run = subprocess.run([self.ffmpeg, "-hide_banner", "-loglevel",
+                                  "error", "-encoders"],
+                                 capture_output=True, text=True)
+            self.ffmpeg_webp = " libwebp " in (run.stdout or "")
+            if not self.ffmpeg_webp:
+                self._note(
+                    f"{self.ffmpeg} was built without libwebp, which a "
+                    "clip's poster frame needs: animated gifs stay gifs. "
+                    "Install an ffmpeg built with libwebp (the ffmpeg "
+                    "package on Debian, Ubuntu and Homebrew is), or set "
+                    '[images] animated_format = "gif" in site.toml to '
+                    "stop asking for clips.")
+        return self.ffmpeg_webp
+
+    def _encode_video(self, src: Path, tmp: str, cap: int):
+        """The gif's frames as h264 in mp4, and its first frame beside
+        it as the poster, from one ffmpeg run: the gif is decoded once
+        and feeds both outputs, so the still is free. Timestamps pass
+        through untouched, so a gif's per-frame delays survive as the
+        clip's own variable frame rate; faststart puts the index first,
+        so a clip starts playing before it has all arrived. Returns
+        None -- for the caller to fall back on -- when ffmpeg fails or
+        when clip and poster together do not undercut the gif."""
+        size = self._probe(src)
+        if size is None:
+            return None
+        width, height = video_size(size, cap)
+        scale = ([] if (width, height) == tuple(size)
+                 else ["-vf", f"scale={width}:{height}:flags=lanczos"])
+        poster = poster_path(Path(tmp))
+        run = subprocess.run(
+            [self.ffmpeg, "-nostdin", "-loglevel", "error", "-y",
+             "-i", str(src),
+             *scale,
+             "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
+             "-crf", str(self.video_crf), "-preset", str(self.video_preset),
+             "-fps_mode", "passthrough", "-an", "-movflags", "+faststart",
+             "-f", "mp4", tmp,
+             "-map", "0:v", *scale, "-frames:v", "1",
+             "-c:v", "libwebp", "-q:v", str(POSTER_QUALITY),
+             "-f", "webp", str(poster)],
+            capture_output=True, text=True)
+        if run.returncode or not os.path.getsize(tmp) or not poster.exists():
+            detail = (run.stderr or "").strip().splitlines()
+            self._note(f"ffmpeg failed on {src.name}"
+                       + (f": {detail[-1]}" if detail else "")
+                       + "; kept as a gif")
+            return None
+        if (os.path.getsize(tmp) + poster.stat().st_size
+                >= src.stat().st_size
+                and self._clip_seconds(tmp) <= MOTION_SECONDS):
+            return None      # no smaller, and short enough to leave as a gif
+        return ".mp4"
+
+    def _clip_seconds(self, clip: str) -> float:
+        """How long a clip runs. ffprobe reads it from the container it
+        just wrote, without decoding anything; where ffprobe is not on
+        the path the answer is 0, which leaves the byte rule to decide
+        alone (see MOTION_SECONDS)."""
+        if self.ffprobe is None:
+            self.ffprobe = shutil.which("ffprobe") or ""
+        if not self.ffprobe:
+            return 0.0
+        run = subprocess.run([self.ffprobe, "-v", "error", "-show_entries",
+                              "format=duration", "-of", "csv=p=0", clip],
+                             capture_output=True, text=True)
+        try:
+            return float((run.stdout or "").strip())
+        except ValueError:
+            return 0.0
+
+    def _resizes_gif(self, src: Path, cap: int) -> bool:
+        """Whether gifsicle has anything to do for this gif."""
+        if not cap:
+            return False
+        if not self.gifsicle:
+            self._note("gifsicle not installed: animated gifs keep "
+                       "their full size")
+            return False
+        size = self._probe(src)
+        return size is not None and max(size) > cap
 
     def _resize_gif(self, src: Path, tmp: str, cap: int):
         # -O2 re-optimizes frames after the resize (2/3 the bytes of a

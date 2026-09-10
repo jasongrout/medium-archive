@@ -933,7 +933,7 @@ def test_theme_picker_and_dark_scheme(project):
     for name in ("theme-init", "theme-picker", "font-init", "font-picker",
                  "link-init", "link-picker", "term-sort", "announcement",
                  "nav-current", "image-zoom", "code-copy",
-                 "heading-anchor", "feed-icon", "share-icons",
+                 "clip-motion", "heading-anchor", "feed-icon", "share-icons",
                  "newsletter"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
@@ -1837,10 +1837,11 @@ def make_image_post(tmp_path, still_bytes=None, gif_bytes=None):
               "images/junk.png"]
     if gif_bytes:
         images.append("images/anim.gif")
+    body = "![big](images/big.png)\n\n![chart](images/chart.png)\n"
+    if gif_bytes:
+        body += "\n![a screen recording](images/anim.gif)\n"
     make_post(tmp_path, manifest, "picture-post", "ccc333ccc333",
-              "2022-06-01T10:00:00Z",
-              "![big](images/big.png)\n\n![chart](images/chart.png)\n",
-              images=images)
+              "2022-06-01T10:00:00Z", body, images=images)
     img_dir = archive_dir(tmp_path) / "posts/2022-06-01-picture-post/images"
     img_dir.mkdir()
 
@@ -1924,17 +1925,191 @@ def test_line_art_classifier(tmp_path):
     assert not sites.is_line_art(inset)
 
 
-@pytest.mark.skipif(not __import__("shutil").which("gifsicle"),
-                    reason="gifsicle not installed")
-def test_animated_gifs_capped_via_gifsicle(tmp_path):
+@pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
+                    reason="ffmpeg not installed")
+def test_animated_gifs_placed_as_video(tmp_path):
+    """An animation is placed as an h264 clip with its first frame
+    beside it as a poster, and the page follows it to its new
+    extension. The clip carries the frames at the animated cap, rounded
+    to the even dimensions yuv420p is defined for; the poster is the
+    same size, so it states the clip's dimensions for the theme."""
     from PIL import Image
 
     src = make_image_post(tmp_path, gif_bytes=True)
+    site = build(hugo, tmp_path)
+    placed = site / "content/posts/picture-post/images"
+    assert not (placed / "anim.gif").exists()
+    assert (placed / "anim.mp4").stat().st_size < (
+        src / "anim.gif").stat().st_size
+    with Image.open(placed / "anim-poster.webp") as im:
+        assert im.size == (1104, 828)      # 1600x1200, capped
+    page = (site / "content/posts/picture-post/index.md").read_text()
+    assert "![a screen recording](images/anim.mp4)" in page
+    # built once and shared: the pelican site links the same clip and
+    # the same poster
+    pelican_site = build(pelican, tmp_path)
+    for name in ("anim.mp4", "anim-poster.webp"):
+        assert (pelican_site / "content/posts/picture-post/images" / name
+                ).stat().st_ino == (placed / name).stat().st_ino
+
+
+@pytest.mark.skipif(not __import__("shutil").which("gifsicle"),
+                    reason="gifsicle not installed")
+def test_animated_gifs_capped_via_gifsicle(tmp_path):
+    """A site that asks for gifs keeps them: gifsicle resizes them to
+    the animated cap, and no clip is written."""
+    from PIL import Image
+
+    src = make_image_post(tmp_path, gif_bytes=True)
+    write_site(tmp_path,
+               {"title": "Pics", "images": {"animated_format": "gif"}})
     site = build(hugo, tmp_path)
     placed = site / "content/posts/picture-post/images/anim.gif"
     with Image.open(placed) as im:
         assert max(im.size) == 1104 and im.n_frames == 3
     assert placed.stat().st_size < (src / "anim.gif").stat().st_size
+    assert not (placed.parent / "anim.mp4").exists()
+
+
+def animation(path, frames, duration=100, **save):
+    frames[0].save(path, save_all=True, append_images=frames[1:],
+                   duration=duration, loop=0, **save)
+    return path
+
+
+def gradient_frame(size, shift, see_through=False):
+    """A frame of a moving greyscale gradient: bulky as gif, cheap as
+    video, so a clip of it is worth placing. Colour 0 -- the index a
+    gif spends on transparency -- is left out of the picture unless the
+    frame is meant to be see-through."""
+    from PIL import Image
+
+    w, h = size
+    base = 0 if see_through else 1
+    span = 256 - base
+    frame = Image.frombytes(
+        "P", size, bytes((base + (x + y + shift) % span)
+                         for y in range(h) for x in range(w)))
+    frame.putpalette([v for level in range(256) for v in (level,) * 3])
+    return frame
+
+
+@pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
+                    reason="ffmpeg not installed")
+def test_a_see_through_gif_keeps_its_format(tmp_path):
+    """Gif spends its transparent index on "unchanged since the
+    previous frame", so declaring one says nothing about whether a
+    reader sees through the picture. What decides is alpha on the
+    composited first frame: a gif transparent there cannot become a
+    clip, and one that is merely delta-coded can."""
+    src = tmp_path / "src"
+    src.mkdir()
+    size = (400, 300)
+    holes = animation(
+        src / "holes.gif",
+        [gradient_frame(size, i * 9, see_through=True) for i in range(8)],
+        transparency=0)
+    deltas = animation(
+        src / "deltas.gif",
+        [gradient_frame(size, i * 9) for i in range(8)], transparency=0)
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    out = tmp_path / "out"
+    out.mkdir()
+    assert placer.place(holes, out / "holes.gif").suffix == ".gif"
+    assert any("transparent" in note for note in placer.notes)
+    clip = placer.place(deltas, out / "deltas.gif")
+    assert clip.suffix == ".mp4"
+    assert sites.poster_path(clip).exists()
+
+
+def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
+    """A build without libwebp cannot write a clip's poster, and fails
+    the whole run with "Encoder not found" rather than just the still.
+    That is asked about once, up front, and reported as the thing to
+    fix -- not as an ffmpeg error against every gif in the archive."""
+    src = tmp_path / "src"
+    src.mkdir()
+    gif = animation(src / "clip.gif",
+                    [gradient_frame((400, 300), i * 9) for i in range(8)])
+    build = tmp_path / "ffmpeg"                # one without libwebp
+    build.write_text("#!/bin/sh\necho ' V....D libx264   H.264'\n")
+    build.chmod(0o755)
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    placer.ffmpeg = str(build)
+    out = tmp_path / "out"
+    out.mkdir()
+    assert placer.place(gif, out / "clip.gif").suffix == ".gif"
+    assert any("libwebp" in note and "animated_format" in note
+               for note in placer.notes), placer.notes
+
+
+@pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
+                    reason="ffmpeg not installed")
+def test_a_long_animation_is_a_clip_even_where_it_costs_more(tmp_path):
+    """A display copy is placed only when it undercuts what it replaces
+    -- except a clip of an animation that runs past five seconds, where
+    what it buys is the pause control WCAG 2.2.2 asks for rather than
+    the bytes. Noise is the one thing gif carries more cheaply than
+    near-lossless video, so both of these cost more as clips; only the
+    long one is placed as one."""
+    import os
+
+    from PIL import Image
+
+    src = tmp_path / "src"
+    src.mkdir()
+
+    def noise_loop(name, frames):
+        pictures = [Image.frombytes("RGB", (160, 120),
+                                    os.urandom(160 * 120 * 3)).convert("P")
+                    for _ in range(frames)]
+        return animation(src / name, pictures, duration=200)
+
+    long_loop = noise_loop("long.gif", 30)          # 6 s
+    short_loop = noise_loop("short.gif", 10)        # 2 s
+    placer = sites.ImagePlacer(tmp_path / "cache", {"images": {"video_crf": 1}})
+    out = tmp_path / "out"
+    out.mkdir()
+    clip = placer.place(long_loop, out / "long.gif")
+    assert clip.suffix == ".mp4"
+    assert (clip.stat().st_size + sites.poster_path(clip).stat().st_size
+            > long_loop.stat().st_size)          # placed for the controls
+    assert placer.place(short_loop, out / "short.gif").suffix == ".gif"
+
+
+def test_video_size_rounds_to_the_even_dimensions_video_needs():
+    assert sites.video_size((1600, 1200), 1104) == (1104, 828)
+    assert sites.video_size((801, 603), 0) == (800, 602)
+    assert sites.video_size((1000, 500), 1104) == (1000, 500)
+    assert sites.video_size((1, 1), 1104) == (2, 2)
+
+
+def test_clips_are_video_the_reader_controls(project):
+    """A clip reaches both card themes as a <video>: its picture until
+    it is played (the poster), its text alternative as the accessible
+    name a <video> has no alt attribute for, controls to stop it with,
+    and nothing fetched until it is asked for."""
+    hugo_site = build(hugo, project)
+    pelican_site = build(pelican, project)
+    partial = (hugo_site
+               / "layouts/_partials/post-image.html").read_text()
+    plugin = (pelican_site / "pelicanconf.py").read_text()
+    assert 'strings.HasSuffix .src ".mp4"' in partial
+    assert 'VIDEO_SUFFIXES = (".mp4",)' in plugin
+    for source in (partial, plugin):
+        assert "-poster.webp" in source
+        assert "preload=\"none\"" in source
+        assert "aria-label" in source
+        assert "controls" in source
+    # and the script that gives a gif's motion back where it is welcome
+    # follows the article on both engines
+    for page in (hugo_site / "layouts/page.html",
+                 pelican_site / "theme/templates/article.html"):
+        text = page.read_text()
+        assert "prefers-reduced-motion: reduce" in text, page
+        assert text.index("</article>") < text.index("IntersectionObserver"), page
+        # a clip the reader pauses is not started again
+        assert 'clip.dataset.held = "1"' in text, page
 
 
 def test_multiple_authors_reach_both_sites(tmp_path):

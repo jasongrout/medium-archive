@@ -122,6 +122,16 @@ BODY_IMAGE_ATTR = "data-body-image"
 # the placer kept whole (see ImagePlacer), whose 9 px text does not
 # survive a 736 px variant, and an animated gif would lose its frames.
 VARIANT_SUFFIXES = (".jpg", ".jpeg")
+# An animation is placed as a clip (see ImagePlacer), so a body image
+# can be an .mp4: it leaves this pass as a <video> the reader controls
+# rather than as an <img> no browser would show. The alt text moves to
+# an aria-label, <video> having no alt of its own, and the poster the
+# placer wrote beside the clip gives the element its still and its
+# dimensions -- so nothing is fetched, and the layout cannot shift,
+# until the reader (or the theme's clip-motion script, where motion is
+# welcome) asks for the clip itself.
+VIDEO_SUFFIXES = (".mp4",)
+POSTER_SUFFIX = "-poster.webp"
 
 
 def _prioritize_first_images(pelican_obj):
@@ -151,6 +161,34 @@ def _prioritize_first_images(pelican_obj):
             fh.write(html[:m.start()] + first + html[m.end():])
         pages += 1
     print(f"first images: {pages} pages load theirs eagerly")
+
+
+def _clip(src, path, attrs, output_path, here):
+    """The <video> a body .mp4 becomes: the clip's own poster, its size
+    read off that poster, and the image's alt text as the accessible
+    name (see VIDEO_SUFFIXES). Attribute values come from the rendered
+    tag, so they are already escaped."""
+    import os
+
+    from PIL import Image
+
+    poster = os.path.splitext(path)[0] + POSTER_SUFFIX
+    parts = poster.lstrip("/").split("/")
+    still = os.path.join(here, PATH, *parts)
+    if not os.path.exists(still):
+        still = os.path.join(output_path, *parts)
+    extra = ""
+    if os.path.exists(still):
+        extra = ' poster="%s"' % (os.path.splitext(src)[0] + POSTER_SUFFIX)
+        try:
+            with Image.open(still) as im:
+                extra += ' width="%d" height="%d"' % im.size
+        except OSError:
+            pass
+    label = attrs.get("alt", "")
+    return ('<video src="%s"%s preload="none" loop muted playsinline'
+            ' controls%s></video>'
+            % (src, extra, ' aria-label="%s"' % label if label else ""))
 
 
 def _optimize_article_images(pelican_obj):
@@ -190,6 +228,8 @@ def _optimize_article_images(pelican_obj):
         # lint reports) has no file here to measure or re-encode
         if "srcset" in attrs or "://" in path:
             return bare
+        if path.lower().endswith(VIDEO_SUFFIXES):
+            return _clip(src, path, attrs, pelican_obj.output_path, here)
         parts = path.lstrip("/").split("/")
         local = os.path.join(pelican_obj.output_path, *parts)
         # encode from (and cache against) the content-side original:

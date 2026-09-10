@@ -446,12 +446,43 @@ instead.
   pixel-exact. Downscaling is what makes 9 px axis labels unreadable,
   and it barely saves bytes on flat color anyway.
 - Photographs are resized past a size cap as they are placed, to a
-  1600 px longest edge through Pillow, and lossily re-encoded. Animated
-  gifs get no srcset variants and dominate the built sites byte-wise,
-  so they are resized to 1104 px through gifsicle when it is installed.
-- `site.toml` tunes or disables the caps:
-  `"images": {"still_max_edge": N, "animated_max_edge": N}`, with 0
-  meaning off.
+  1600 px longest edge through Pillow, and lossily re-encoded.
+- Animated gifs are placed as video: h264 in mp4 through ffmpeg,
+  capped to 1104 px, with the clip's first frame beside it as
+  `<name>-poster.webp`. That is where the built sites' bytes are --
+  the reference archive's 228 gifs are 609 MB of its pelican site and
+  88 MB as mp4 -- and it is also the accessibility fix: an animated gif
+  cannot be paused, so any clip running past five seconds fails WCAG
+  2.2.2 (Pause, Stop, Hide) in that format, whatever the theme does.
+  A gif keeps its format when the site asks for gifs, when ffmpeg or
+  Pillow is missing, and when it is really see-through (alpha on its
+  composited first frame -- not the transparency index, which gif also
+  spends on "unchanged since the previous frame"); gifsicle resizes
+  those to the cap as before. `raw/` and `posts/` keep the original gif
+  either way: this is display-copy work.
+- A display copy is placed only when it undercuts what it replaces,
+  and a clip of an animation running past five seconds is the
+  exception: there the clip is what makes the motion stoppable at all,
+  which is worth more than the bytes. Under five seconds WCAG 2.2.2
+  does not apply and the smaller file wins, so a short loop that is
+  cheaper as a gif stays one. On the reference archive 18 animations
+  are placed as clips on that rule, the longest of them 76 seconds.
+- Both card themes render a clip as a `<video>` with `controls`, the
+  poster as its picture until it is played, real width and height off
+  that poster, `preload="none"` so nothing is fetched until it is
+  asked for, and the image's alt text as its `aria-label` -- `<video>`
+  has no `alt`, and the text alternative would otherwise be lost in
+  the move. A shared script gives the gif's autoplay back only where
+  the reader has not asked for less motion (`prefers-reduced-motion`)
+  and only while the clip is on screen; a clip the reader pauses stays
+  paused.
+- `site.toml` tunes or disables all of it:
+  `"images": {"still_max_edge": N, "animated_max_edge": N,
+  "animated_format": "mp4"|"gif", "video_crf": N,
+  "video_preset": "..."}`. A cap of 0 is off (an animation is still
+  placed as video, at its own size); `animated_format = "gif"` is what
+  turns video off. The encode defaults, `-crf 20 -preset fast`, are
+  chosen for screencasts, where small text has to stay sharp.
 
 ### Redirects and feeds
 
@@ -574,12 +605,13 @@ it stores content. Any git operation that writes a file (a checkout, a
 stash, a merge) replaces it with its own copy and breaks the link; the
 next run relinks it. Byte-identical output means `git status` stays
 clean, so a site repository only sees a diff when the archive changed
--- or when Pillow or gifsicle re-encodes differently, which a different
-version of either will do.
+-- or when Pillow, ffmpeg or gifsicle re-encodes differently, which a
+different version of any of them will do.
 
-Install `gifsicle` before the first commit if the archive has animated
-gifs: without it they are placed at full size, and the site carries
-them into git at that size until a later run replaces them.
+Install `ffmpeg` before the first commit if the archive has animated
+gifs: without it they are placed as gifs (resized by `gifsicle` if that
+is installed, at full size if not), and the site carries them into git
+that way until a later run replaces them.
 
 ## `site.toml`
 
@@ -618,7 +650,7 @@ documentation for the input, in one place.
 | `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
 | `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |
-| `images` | display-copy size caps, an `[images]` table of `still_max_edge` and `animated_max_edge`; `0` disables that cap |
+| `images` | display copies, an `[images]` table: the size caps `still_max_edge` and `animated_max_edge` (`0` disables that cap), and what an animation is placed as -- `animated_format` (`"mp4"`, the default, or `"gif"`), `video_crf` and `video_preset`, the ffmpeg settings a clip is encoded with |
 | `hugo` | hugo-specific settings, a `[hugo]` table: `locale`, per-exporter `avatar`/`logo`/`logo_dark`/`favicon`, and a `[hugo.params]` table of extra params for the generated site's `config/_default/params.toml` |
 
 The `hugo` section in full:

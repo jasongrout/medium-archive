@@ -632,6 +632,76 @@ Feeds and sharing:
   section heading stays a heading.
 
 
+- **The archive's animated gifs are placed as video.** The 228 gifs
+  were 609 MB of the pelican site's 670 MB of images, and gif is also a
+  format the reader cannot stop: an animation running past five seconds
+  fails WCAG 2.2.2 (Pause, Stop, Hide) in it, whatever the theme does.
+  `ImagePlacer` now encodes an animation to h264 in mp4 through ffmpeg,
+  straight from the archive's own gif -- the 1104 px cap is a scale
+  filter in that same pass, so gifsicle is not in the path at all --
+  and writes the clip's first frame beside it as
+  `<name>-poster.webp`, from a second output of that one run. The
+  exporters rewrite each page's reference the way they already do for
+  any display copy that changed format. On the reference archive:
+  NUMBERS_HERE
+
+  What the 2026-09 note left to decide, and what was decided:
+
+  - **The encode is for screencasts, not for the smallest file.**
+    `-crf 20 -preset fast`, and yes, both belong in `site.toml`'s
+    `[images]` beside the caps (`video_crf`, `video_preset`), with
+    `animated_format = "gif"` to turn video off altogether. crf 20
+    measures 41.2 dB PSNR against the source gif on a synthetic
+    1104x620 screencast where crf 26 gives 39.0 dB, for ~30% more
+    bytes, and a code-heavy frame read at crf 20 the way the gif did.
+    On the archive's real screencasts `-preset fast` lands within
+    0.01 dB and 0.5% of the bytes of `-preset medium` in three
+    quarters of the encode time.
+  - **Per-clip `controls`, not one site-wide pause control.** They are
+    keyboard-reachable with no script running, they are where a reader
+    looks, and the tab stop per clip is the smaller cost of the two.
+  - **The poster is the clip's first frame**, not its most
+    representative one: it is what the gif showed at rest, so nothing
+    jumps when playback starts. It is lossy webp (q90), not the
+    lossless encode a still gets -- keeping frame one pixel-exact when
+    every frame after it is lossy measured 6.9 s through Pillow,
+    longer than encoding the whole clip, where ffmpeg writes it in the
+    encode pass for no measurable time at all.
+
+  Transparency is decided on the composited first frame, as the note
+  said it had to be: `"transparency" in im.info` says nearly nothing
+  about an animation, gif spending that index on "unchanged since the
+  previous frame". A gif that really is see-through keeps its format,
+  and so does one ffmpeg fails on, and every gif at all when
+  `animated_format = "gif"` or ffmpeg or Pillow is missing; gifsicle
+  still resizes those to the cap.
+
+  The placer's own "a copy that came out no smaller is not placed"
+  rule needed an exception, which the first full run over the archive
+  found: 20 of the 228 gifs are small, heavily optimized animations
+  whose clips come out no smaller -- and 18 of those run past five
+  seconds, one of them for 76, which is to say they were exactly the
+  WCAG 2.2.2 failures this work exists to fix, kept broken by a rule
+  about bytes. Past five seconds the clip is now placed whichever way
+  the bytes fall (`MOTION_SECONDS`, read off the encoded clip with
+  ffprobe); under it, 2.2.2 does not apply and the smaller file still
+  wins.
+
+  The text alternative is carried across rather than lost on the way:
+  a `<video>` has no `alt`, so both card themes put the image's alt
+  text on it as an `aria-label` (SC 1.2.1, video-only prerecorded
+  content), and a captioned clip keeps its visible `<figcaption>` as
+  before. `preload="none"` and the poster take `loading="lazy"`'s
+  place, so a page fetches no clip nobody scrolled to, and the poster
+  is what a reduced-motion reader sees, what a feed reader shows where
+  it drops the `<video>`, and what states the clip's dimensions to the
+  theme. `shared/clip-motion.html` gives the gif's autoplay back only
+  where the reader has not asked for less motion and only while the
+  clip is on screen, and a clip the reader pauses is never started
+  again. The Giphy clips `convert` writes lost their `autoplay` and
+  gained `controls`, so a post's animations all behave alike.
+
+
 ### Remaining
 
 - Take the share bar's marks from each network's own brand material
@@ -701,100 +771,13 @@ Feeds and sharing:
   the feed when it was added, and whether the feed's cleaner block
   structure was the reason is worth confirming before swapping them.
 
-- Ship the archive's animated gifs as video rather than as gifs. The
-  reference archive's 228 gifs are 609 MB of the pelican site's 670 MB
-  of images -- the whole of the rest of the site, posts and theme and
-  every still, is 61 MB -- which is what a site kept as a git
-  repository of its own (`--out`) commits and carries forever. Every
-  one of them was transcoded and measured in 2026-09, at the 1104 px
-  cap `ANIMATED_MAX_EDGE` already resizes animations to:
-
-  | target | size | of 609 MB |
-  |--------|------|-----------|
-  | gif, as placed today without gifsicle | 609 MB | 100% |
-  | h264 mp4 (`-crf 26 -preset veryfast`, yuv420p) | 88.2 MB | 14.5% |
-  | animated webp (libwebp `-q:v 60`), 15-gif sample | -- | 31% (mp4 was 20% on the same sample) |
-
-  All 228 encoded in 5.7 minutes with no failures, and the five
-  largest -- screen recordings of 300 to 2200 frames -- land between
-  1.7% and 4.6% of their original size. The site's images would go
-  from 670 MB to about 150 MB.
-
-  Video, not animated webp: webp came out about 1.5x larger than mp4
-  on the same sample and slower to encode, and Pillow's own animated
-  webp writer is worse still (on an 851-frame screencast: 70% of the
-  original at lossy q60, 103% at q80, 270% lossless), because it
-  expands every frame to full RGBA and throws away exactly what gif's
-  per-frame deltas were doing. Screen recordings are what inter-frame
-  video codecs are for. h264 in mp4 needs no second format: it plays
-  everywhere the sites are read, `playsinline` included.
-
-  Transparency is not an obstacle here, though the obvious check says
-  it is: 141 of the 228 declare a transparency index, and none has a
-  single transparent pixel in its composited first frame. Gif uses the
-  transparent index to mean "unchanged since the previous frame", so
-  `"transparency" in im.info` is close to meaningless for an
-  animation; the real question is alpha on the composited frame, and
-  by that question nothing in this archive needs it. A gif that does
-  should keep its format (or take webp), and the test has to be the
-  composited one.
-
-  What it takes, cheapest first:
-
-  - `ImagePlacer`: a gif -> mp4 branch beside `_resize_gif`, ffmpeg
-    taking gifsicle's place as the tool an animation goes through. The
-    cache is already content-addressed, `place()` already returns a
-    copy under a new extension and the exporters already rewrite the
-    page's reference from it, and the existing "the copy did not pay
-    off" rule covers the 4 of 228 that come out no smaller as mp4.
-  - myst: nothing. mystmd renders `![](x.mp4)` as a `<video>`, which
-    `myst_figures` already relies on for Giphy clips.
-  - hugo: a video branch in `layouts/_partials/post-image.html`, which
-    the render hook and the figure shortcode share, so one edit covers
-    a captioned and a bare clip.
-  - pelican: the image pass in `site_plugin.py` swaps
-    `<img src="....mp4">` for a `<video>`. `VARIANT_SUFFIXES` is
-    `.jpg`/`.jpeg`, so the srcset ladder already skips it.
-
-  `convert` already writes `<video src="..." autoplay loop muted
-  playsinline>` for Giphy clips (and `lint` knows it as `VIDEO_RE`), so
-  the markup is the archive's own pattern, not a new one.
-
-  Accessibility is the other half of the case, and it cuts both ways.
-  The gain is a real conformance fix rather than a nicety: an animated
-  gif cannot be paused, stopped or hidden by the reader, so every clip
-  that runs past five seconds -- which the screen recordings do, the
-  largest running to hundreds and thousands of frames -- fails WCAG
-  2.2.2 (Pause, Stop, Hide) as the sites serve them today, and no
-  amount of care in the theme can fix that while the format is gif. A
-  `<video>` can be paused, replayed and scrubbed, and can be left
-  un-autoplayed under `prefers-reduced-motion: reduce`, which matters
-  to vestibular readers and which a gif offers no way to honour.
-
-  The cost is that the text alternative has to be carried across
-  deliberately. Today a clip is an `<img>` whose alt comes from its
-  caption (`caption_text`), covering SC 1.1.1. `<video>` has no `alt`
-  attribute, and as video-only prerecorded content it falls under SC
-  1.2.1 instead: the same text has to reach it as an `aria-label` (the
-  `<figcaption>` stays where it is, and a captioned clip keeps its
-  visible text either way), or the alternative is silently lost in the
-  move. The other cost is focus order: `controls` on every clip adds a
-  tab stop per clip in a post that may hold several, so the choice is
-  between per-clip controls, a lighter pause affordance that appears on
-  hover and focus, and one site-wide "pause motion" control. Loading
-  changes shape too -- today's `loading="lazy"` on the `<img>` becomes
-  `preload="none"` plus a poster, which is also what keeps a page from
-  fetching several megabytes of clip nobody scrolls to.
-
-  That makes the poster frame a requirement rather than an option: it
-  is what a reduced-motion reader sees instead of movement, what a feed
-  reader shows where it drops the `<video>`, and what the page paints
-  before anything is fetched. Left to decide: per-clip controls or one
-  site-wide pause control; whether `-crf`/`-preset` belong in
-  `site.toml`'s `[images]` beside the size caps; and whether the poster
-  is the clip's first frame or its most representative one. `raw/` and
-  `posts/` keep the original gif regardless -- this is display-copy
-  work, not archive work.
+- The myst site's clips are whatever mystmd renders for an image
+  whose source is an mp4. That exporter writes image syntax because
+  raw HTML is not guaranteed to render there (`myst_figures`), so its
+  clips carry none of what the two card themes give theirs: no poster,
+  no `preload="none"`, no `aria-label`, and no say over whether they
+  autoplay. Worth revisiting only if that site becomes a shipping
+  target rather than the simpler alternate.
 
 Archive-specific follow-ups (posts whose images still need fetching,
 hand-correction candidates) live in each archive's own notes, alongside
