@@ -197,9 +197,14 @@ def page_name(post: dict) -> str:
 
     A slug with no ASCII in it at all -- a publication that writes its
     titles in another script -- folds away to nothing, and the Medium id
-    its URL ends in names the page instead."""
-    return (ascii_slug(post["slug"])
-            or ascii_slug(post.get("medium_id") or "") or "post")
+    its URL ends in names the page instead.
+
+    Cut to SLUG_MAX at a word boundary (see truncate_slug): the page is
+    filed and served under its year, so the slug carries the title and
+    not the date, and it need not be long enough to be unique on its
+    own."""
+    return truncate_slug(ascii_slug(post["slug"])
+                         or ascii_slug(post.get("medium_id") or "") or "post")
 
 
 def page_dir_name(post: dict) -> str:
@@ -215,17 +220,35 @@ def page_dir_name(post: dict) -> str:
 
 def page_stems(manifest: dict) -> dict:
     """url -> page name, which becomes the page's URL slug: page_name's,
-    unless several posts share one (deleted-and-republished
-    announcements, yearly series, two slugs that differ only by an
-    accent); those keep their date prefix so every page URL is distinct
-    and stable."""
+    unless several posts of one year share it.
+
+    A post is filed and served under its publish year, so a name has
+    only to be unique within that year -- which is what makes the
+    archive's two yearly series (the distinguished-contributor and
+    community-workshop announcements, six and three posts sharing one
+    Medium slug apiece) need nothing at all: no two of them fall in the
+    same year. A collision inside one year keeps the rest of its date,
+    so the pages stay distinct and each address stays stable -- with
+    room made for it, so that no name outgrows SLUG_MAX."""
     names = {url: page_name(p) for url, p in manifest.items()}
     counts = {}
-    for name in names.values():
-        counts[name] = counts.get(name, 0) + 1
-    return {url: name if counts[name] == 1
-            else f"{(manifest[url]['date'] or '')[:10] or 'undated'}-{name}"
+    for url, name in names.items():
+        key = (post_year(manifest[url]), name)
+        counts[key] = counts.get(key, 0) + 1
+    return {url: name if counts[(post_year(manifest[url]), name)] == 1
+            else (truncate_slug(name, SLUG_MAX - len("-01-01")) + "-"
+                  + ((manifest[url]["date"] or "")[5:10] or "undated"))
             for url, name in names.items()}
+
+
+def page_paths(manifest: dict, stems: dict) -> dict:
+    """url -> the site-relative address the hugo and pelican sites serve
+    the post at: /posts/<year>/<stem>/. The year is the publish year
+    (post_year), so a reader seeing an address can date the post before
+    opening it, and the years an archive spans are that many
+    directories rather than one of several hundred."""
+    return {url: f"/posts/{post_year(p)}/{stems[url]}/"
+            for url, p in manifest.items()}
 
 
 class LinkMap:
@@ -237,7 +260,8 @@ class LinkMap:
     def __init__(self, manifest: dict, stems: dict):
         self.by_path, self.by_id = {}, {}
         for url, p in manifest.items():
-            page = (page_dir_name(p), stems[url])     # (post dir, page name)
+            # (post dir, page name, publish year)
+            page = (page_dir_name(p), stems[url], post_year(p))
             for u in (p["original_url"], p.get("ghost_url"),
                       p.get("canonical_url")):
                 if u:
@@ -248,7 +272,7 @@ class LinkMap:
                 self.by_id[p["medium_id"]] = page
 
     def page_for(self, url: str):
-        """(post dir, page name, fragment) or None."""
+        """(post dir, page name, publish year, fragment) or None."""
         parts = urlsplit(url)
         if parts.scheme not in ("http", "https"):
             return None
@@ -1125,15 +1149,18 @@ def old_paths(post: dict, url: str):
 
 def redirect_rules(manifest: dict, stems: dict, new_path):
     """(old inbound path, new page URL, original URL) for every old
-    path of every post, oldest post first; new_path(stem) chooses the
-    URL scheme."""
+    path of every post, oldest post first; new_path(url) chooses the
+    URL scheme. Keyed by the post's URL rather than its page name,
+    since an address is built from more than the name -- the hugo and
+    pelican sites file a page under its publish year, and two years may
+    hold the same name."""
     for url, p in sorted(manifest.items(), key=lambda kv: kv[1].get("date") or ""):
         for old, original in old_paths(p, url):
-            yield old, new_path(stems[url]), original
+            yield old, new_path(url), original
 
 
 def write_redirects_csv(site: Path, manifest: dict, stems: dict, new_path):
-    """old inbound path -> new page URL (new_path(stem) chooses the URL
+    """old inbound path -> new page URL (new_path(url) chooses the URL
     scheme). The archive-root redirects.csv maps to posts/ directories;
     this one maps to the URLs the exported site actually serves."""
     def q(v):
@@ -1240,6 +1267,37 @@ def ascii_slug(text: str) -> str:
     text = text.encode("ascii", "ignore").decode("ascii")
     text = re.sub(r"[^\w\s-]", "", text)
     return re.sub(r"[-\s]+", "-", text.strip()).lower()
+
+
+SLUG_MAX = 55
+
+
+def truncate_slug(slug: str, limit: int = SLUG_MAX) -> str:
+    """A slug cut to `limit` characters at a word boundary. Medium builds
+    a slug from the whole of a title, so they run to 80 characters and
+    the address bar shows a paragraph; the cut falls on the last hyphen
+    at or before the limit, so a URL ends on a whole word rather than
+    mid-syllable. A slug with no hyphen to cut at is cut hard, and a cut
+    that lands on a hyphen loses it -- no URL ends in one.
+
+    55 rather than a round 50 because 50 severs
+    ...-accessibility-workshops-part-1 and -part-2 at exactly the part
+    that tells them apart, and they are the archive's longest names that
+    still earn their length."""
+    if len(slug) <= limit:
+        return slug
+    cut = slug[:limit + 1]
+    hyphen = cut.rfind("-")
+    return (cut[:hyphen] if hyphen > 0 else slug[:limit]).rstrip("-")
+
+
+def post_year(post: dict) -> str:
+    """The year a post was published, as the sites file and address it
+    by: the year of `date` (Medium's datePublished, or the exact
+    first-publish timestamp an imported export carries), never of
+    `updated`. A post whose date never resolved is filed under
+    "undated" rather than dropped."""
+    return (post.get("date") or "")[:4] or "undated"
 
 
 def author_slug(name: str) -> str:
@@ -1487,16 +1545,28 @@ def clean_out(site: Path, build_dirs=()):
         shutil.rmtree(child) if child.is_dir() else child.unlink()
 
 
-def report_stale_pages(pages_dir: Path, stems) -> int:
+def report_stale_pages(pages_dir: Path, stems, nested: bool = False) -> int:
     """Page directories under pages_dir that this run did not write --
     a post deleted from the archive, or one whose slug or date changed
     -- named on stderr with what removes them. A rebuild writes over
     the pages it makes and leaves everything else alone, so without
-    this a site keeps serving a page the archive no longer has."""
+    this a site keeps serving a page the archive no longer has.
+
+    `nested` for the hugo and pelican trees, where a page sits a year
+    deep (content/posts/<year>/<stem>/) and `stems` holds
+    "<year>/<stem>" names; a year directory the archive has emptied is
+    itself reported, since an empty one still publishes a year page."""
     if not pages_dir.is_dir():
         return 0
-    stale = sorted(d.name for d in pages_dir.iterdir()
-                   if d.is_dir() and d.name not in stems)
+    if nested:
+        found = {f"{y.name}/{d.name}" for y in pages_dir.iterdir() if y.is_dir()
+                 for d in y.iterdir() if d.is_dir()}
+        empty = {y.name for y in pages_dir.iterdir()
+                 if y.is_dir() and not any(d.is_dir() for d in y.iterdir())}
+        stale = sorted((found - set(stems)) | empty)
+    else:
+        stale = sorted(d.name for d in pages_dir.iterdir()
+                       if d.is_dir() and d.name not in stems)
     if stale:
         shown = ", ".join(stale[:5]) + (", ..." if len(stale) > 5 else "")
         print(f"{len(stale)} page(s) in {pages_dir} are not in the archive "
@@ -1558,14 +1628,15 @@ def place_images(archive: Path, post: dict, page_dir: Path, placer=None) -> dict
 def export_content(archive: Path, site: Path, manifest: dict, stems: dict,
                    front_matter, escape=None, placer=None,
                    transform=None, covers=None) -> int:
-    """The shared page loop for the /posts/<stem>/ exporters (hugo,
-    pelican): one content/posts/<stem>/index.md per post -- front matter
-    from front_matter(url, post), body with in-publication links rewritten
-    to /posts/<stem>/ and then through transform() when given (a
-    generator-specific whole-body rewrite, like each exporter's own
-    figure form) -- plus the post's images beside it (through
-    placer, when given -- see ImagePlacer) and its baked card cover
-    (covers, when given -- see Covers). Returns the page count."""
+    """The shared page loop for the /posts/<year>/<stem>/ exporters
+    (hugo, pelican): one content/posts/<year>/<stem>/index.md per post --
+    front matter from front_matter(url, post), body with in-publication
+    links rewritten to /posts/<year>/<stem>/ and then through
+    transform() when given (a generator-specific whole-body rewrite,
+    like each exporter's own figure form) -- plus the post's images
+    beside it (through placer, when given -- see ImagePlacer) and its
+    baked card cover (covers, when given -- see Covers). Returns the
+    page count."""
     links = LinkMap(manifest, stems)
     if placer:
         placer.warm(archive, manifest)
@@ -1574,8 +1645,8 @@ def export_content(archive: Path, site: Path, manifest: dict, stems: dict,
         hit = links.page_for(url)
         if hit is None:
             return None
-        _, stem, frag = hit
-        return f"/posts/{stem}/" + (f"#{frag}" if frag else "")
+        _, stem, year, frag = hit
+        return f"/posts/{year}/{stem}/" + (f"#{frag}" if frag else "")
 
     pages = 0
     for url, p in manifest.items():
@@ -1594,7 +1665,7 @@ def export_content(archive: Path, site: Path, manifest: dict, stems: dict,
                  subtitle=rewrite_body(p.get("subtitle") or "", target_for))
         if transform is not None:
             body = transform(body)
-        page_dir = site / "content" / "posts" / stems[url]
+        page_dir = site / "content" / "posts" / post_year(p) / stems[url]
         page_dir.mkdir(parents=True, exist_ok=True)
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed

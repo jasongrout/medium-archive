@@ -26,16 +26,26 @@ layer hangs -- heading ids, Pygments on the class the shared theme
 styles, Pelican's {attach} placeholders, the body-image marking, and
 the figure directive below.
 
-Each post becomes content/posts/<stem>/index.md with its images beside
-it; image references are rewritten to Pelican's `{attach}` form so the
-files publish next to the article at /posts/<stem>/. The stem is the
-page's URL slug, and the directory is the whole of where that comes
-from: the generated config reads a post's directory name as its slug
-(PATH_METADATA), the way hugo reads a page bundle's, so neither site
-restates in a post what its directory already says. A post that does
-carry a `slug:` is one deliberately served elsewhere -- what keeps a
-URL through a rename -- and the site plugin reports it; two posts that
-would write the same page stop the build. Body images load lazily (the reader marks every image in an article's body) and are
+Each post becomes content/posts/<year>/<stem>/index.md with its images
+beside it, filed under the year it was published in; image references
+are rewritten to Pelican's `{attach}` form so the files publish next to
+the article at /posts/<year>/<stem>/. Twelve directories of about
+thirty beat one of several hundred, and an address carries the year, so
+a reader can date a post before opening it. The year in the address is
+the year of the post's own `date:` (ARTICLE_URL), not of the directory
+it sits in, so an address states when a post was published even if its
+file is filed under the wrong year; the site plugin reports a post
+whose two disagree. /posts/<year>/ is an address a reader reaches by
+trimming a post's, so it answers with that year's posts
+(YEAR_ARCHIVE_SAVE_AS, period_archives.html) rather than a 404.
+
+The stem is the page's URL slug, and the directory is the whole of
+where that comes from: the generated config reads a post's directory
+name as its slug (PATH_METADATA), the way hugo reads a page bundle's,
+so neither site restates in a post what its directory already says. A
+post that does carry a `slug:` is one deliberately served elsewhere --
+what keeps a URL through a rename -- and the site plugin reports it;
+two posts that would write the same page stop the build. Body images load lazily (the reader marks every image in an article's body) and are
 served responsively: after each build the embedded plugin
 encodes webp variants of every still body image at the same widths as
 the hugo theme's render hook (480/736/1104, never upscaled,
@@ -115,6 +125,7 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     copy_site_asset, export_content,
                     front_matter_yaml, image_size, load_site_inputs,
                     masthead_link, newsletter_params, page_stems,
+                    page_paths, post_year,
                     quote_arg, redirect_mode, report_stale_pages,
                     rewrite_figures,
                     site_profiles, template_text, write_data_files,
@@ -145,6 +156,8 @@ TEMPLATES = {
     "theme/templates/tags.html": "pelican/theme/templates/tags.html",
     "theme/templates/authors.html": "pelican/theme/templates/authors.html",
     "theme/templates/archives.html": "pelican/theme/templates/archives.html",
+    "theme/templates/period_archives.html":
+        "pelican/theme/templates/period_archives.html",
     "theme/templates/search.html": "pelican/theme/templates/search.html",
     "theme/static/css/style.css": "shared/card.css",
 }
@@ -324,8 +337,11 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
     # sites.write_data_files).
     write_data_files(site, manifest, archive)
     write_templates(site, TEMPLATES)
-    write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
-    report_stale_pages(site / "content" / "posts", set(stems.values()))
+    write_redirects_csv(site, manifest, stems,
+                        page_paths(manifest, stems).__getitem__)
+    report_stale_pages(site / "content" / "posts",
+                       {f"{post_year(p)}/{stems[url]}"
+                        for url, p in manifest.items()}, nested=True)
     print(f"pelican done: {pages}/{len(manifest)} pages -> {site}",
           file=sys.stderr)
     print(f"render it with: cd {site} && pelican && pagefind --site output"

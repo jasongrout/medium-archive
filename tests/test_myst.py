@@ -12,6 +12,7 @@ from medium_archive import myst
 from medium_archive.myst import (LinkMap, escape_prose,
                                  myst_figures, myst_slug, page_paths,
                                  page_stems, rewrite_body)
+from medium_archive.sites import truncate_slug
 
 BASE = "https://blog.example.com"
 
@@ -113,20 +114,70 @@ def test_internal_links_rewritten(archive):
     assert "second-post-bbb222bbb222" not in text
 
 
-def test_shared_slugs_keep_date_prefix(tmp_path):
+def test_truncate_slug_cuts_on_a_hyphen_and_keeps_what_fits():
+    """The cut falls on the last hyphen at or before the limit, so an
+    address ends on a whole word; a name already short enough is
+    untouched, one with no hyphen to cut at is cut hard, and no result
+    ends in the hyphen the cut landed on."""
+    assert truncate_slug("short-name", 55) == "short-name"
+    assert truncate_slug("a" * 55, 55) == "a" * 55        # exactly the limit
+    assert truncate_slug("a" * 60, 55) == "a" * 55        # nothing to cut at
+    assert truncate_slug("one-two-three-four", 12) == "one-two"
+    # the limit falls on a hyphen: it goes rather than trailing the URL
+    assert truncate_slug("one-two-three", 7) == "one-two"
+    assert truncate_slug("one-two-three", 8) == "one-two"
+    assert not truncate_slug("a-very-long-name-indeed", 10).endswith("-")
+
+
+def test_a_shared_slug_in_two_years_is_left_alone(tmp_path):
+    """A page is filed and served under its publish year, so a name has
+    only to be unique within one. The archive's yearly series -- one
+    Medium slug reused for an announcement each year -- need nothing."""
     manifest = {}
     make_post(tmp_path, manifest, "workshops", "aaa111aaa111",
               "2019-06-01T00:00:00Z", "One.\n")
     make_post(tmp_path, manifest, "unique-post", "ccc333ccc333",
               "2019-07-01T00:00:00Z", "Two.\n")
-    # same slug under a new id: deleted and republished
+    # same slug under a new id: deleted and republished, a year later
     manifest2 = {}
     make_post(tmp_path, manifest2, "workshops", "bbb222bbb222",
               "2020-06-01T00:00:00Z", "Three.\n")
     manifest.update(manifest2)
     stems = page_stems(manifest)
-    assert sorted(stems.values()) == ["2019-06-01-workshops",
-                                      "2020-06-01-workshops", "unique-post"]
+    assert sorted(stems.values()) == ["unique-post", "workshops", "workshops"]
+
+
+def test_a_shared_slug_within_one_year_keeps_the_rest_of_its_date(tmp_path):
+    """Two posts of one year under one name would be one page, so the
+    month and day that tell them apart join the name."""
+    manifest = {}
+    make_post(tmp_path, manifest, "workshops", "aaa111aaa111",
+              "2019-06-01T00:00:00Z", "One.\n")
+    manifest2 = {}
+    make_post(tmp_path, manifest2, "workshops", "bbb222bbb222",
+              "2019-11-30T00:00:00Z", "Two.\n")
+    manifest.update(manifest2)
+    assert sorted(page_stems(manifest).values()) == ["workshops-06-01",
+                                                     "workshops-11-30"]
+
+
+def test_page_names_are_cut_at_a_word_boundary(tmp_path):
+    """Medium builds a slug from the whole of a title. A page name is
+    cut to 55 characters at the last hyphen that fits, so an address
+    ends on a whole word and never on the hyphen itself."""
+    manifest = {}
+    long = ("a-users-journey-with-plugin-playground-from-first-idea-"
+            "to-installable-jupyterlab")
+    make_post(tmp_path, manifest, long, "aaa111aaa111",
+              "2026-05-01T00:00:00Z", "One.\n")
+    # 55 exactly: kept whole, hyphens and all
+    exact = "join-us-for-the-jupyter-accessibility-workshops-part-1"
+    make_post(tmp_path, manifest, exact, "bbb222bbb222",
+              "2022-01-01T00:00:00Z", "Two.\n")
+    stems = sorted(page_stems(manifest).values())
+    assert stems == ["a-users-journey-with-plugin-playground-from-first-idea",
+                     exact]
+    assert all(len(s) <= 55 and not s.endswith("-") for s in stems)
 
 
 def test_page_directories_fold_to_ascii(tmp_path):
@@ -175,8 +226,10 @@ def test_page_names_fold_to_ascii(tmp_path):
     make_post(tmp_path, manifest, "\u65e5\u672c\u8a9e", "eee555eee555",
               "2022-03-03T00:00:00Z", "Five.\n")
 
+    # the two that differ only by the accent fold to one name, and are
+    # left alone: they fall in different years, so they are two pages
     assert sorted(page_stems(manifest).values()) == [
-        "2019-01-01-and-voila", "2020-02-02-and-voila", "eee555eee555",
+        "and-voila", "and-voila", "eee555eee555",
         "jupyterlite-jupyter-webassembly", "voila-0-5-0-homecoming"]
 
 
@@ -188,7 +241,7 @@ def test_link_map_matches_url_variants():
         "canonical_url": None, "medium_id": "abc123abc123",
         "date": "2020-01-01T00:00:00Z"}}
     links = LinkMap(manifest, page_stems(manifest))
-    page = ("2020-01-01-a-post", "a-post")
+    page = ("2020-01-01-a-post", "a-post", "2020")
     for url in (f"{BASE}/a-post-abc123abc123",           # canonical
                 f"{BASE}/a-post-abc123abc123/",          # trailing slash
                 BASE.replace("https", "http") + "/a-post-abc123abc123",
@@ -310,20 +363,20 @@ def test_page_paths_number_collisions_in_toc_order(tmp_path):
     # both truncate to the same 50-character slug; mystmd numbers the one
     # it loads second -- the older post, in the newest-first toc
     base = "join-us-for-the-jupyter-accessibility-workshops-part"
-    make_post(tmp_path, manifest, base + "-1", "aaa111aaa111",
-              "2022-08-01T00:00:00Z", "One.\n")
-    make_post(tmp_path, manifest, base + "-2", "bbb222bbb222",
-              "2022-11-01T00:00:00Z", "Two.\n")
+    one = make_post(tmp_path, manifest, base + "-1", "aaa111aaa111",
+                    "2022-08-01T00:00:00Z", "One.\n")
+    two = make_post(tmp_path, manifest, base + "-2", "bbb222bbb222",
+                    "2022-11-01T00:00:00Z", "Two.\n")
     # a post literally named archive collides with the archive page
-    make_post(tmp_path, manifest, "archive", "ccc333ccc333",
-              "2023-01-01T00:00:00Z", "Three.\n")
+    archive_post = make_post(tmp_path, manifest, "archive", "ccc333ccc333",
+                             "2023-01-01T00:00:00Z", "Three.\n")
     stems = page_stems(manifest)
     paths = page_paths(manifest, stems)
     trunc = myst_slug(base + "-2")
     assert trunc == myst_slug(base + "-1")     # they do collide
-    assert paths[base + "-2"] == f"/{trunc}"
-    assert paths[base + "-1"] == f"/{trunc}-1"
-    assert paths["archive"] == "/archive-1"
+    assert paths[two] == f"/{trunc}"
+    assert paths[one] == f"/{trunc}-1"
+    assert paths[archive_post] == "/archive-1"
 
 
 def test_redirects_use_served_urls(tmp_path):

@@ -32,7 +32,7 @@ as they are. `pagefind` (`npm install -g pagefind`) fills the
 | `data/tags.json` | tag slug → the name the tag is shown under |
 | `data/authornames.json` | author slug → the name they are shown under |
 | `data/authors.json` | author name → their profile address, which the structured data names as theirs |
-| `content/posts/<slug>/index.md` | the posts, with their images beside them |
+| `content/posts/<year>/<slug>/index.md` | the posts, filed under the year they were published in, with their images beside them |
 | `theme/` | the templates and the stylesheet: how the pages look |
 | `pelicanconf.py` | machinery — the CommonMark reader, the URL scheme, the feeds, and the plugins. It reads `site.toml` and holds no site data of its own |
 
@@ -47,14 +47,20 @@ set it to the domain the site is actually served from.
 
 ## Write a post
 
-A post is a directory under `content/posts/` holding an `index.md`,
-with its images beside it:
+A post is a directory under `content/posts/<year>/` holding an
+`index.md`, with its images beside it:
 
 ```
-content/posts/a-new-post/
+content/posts/2026/a-new-post/
   index.md
   images/diagram.png
 ```
+
+The year is the year the post is published in. Nothing reads it to
+build the URL — `date:` does that — so a draft can sit under the
+current year while it is written and only needs moving if it is still
+unpublished when the year turns. The build prints a line for any post
+whose directory year and `date:` disagree.
 
 ```markdown
 ---
@@ -74,16 +80,28 @@ The body, as CommonMark.
 ![a diagram]({attach}images/diagram.png)
 ```
 
-- `slug` is the URL: the page is served at `/posts/<slug>/`. Left out,
-  as above and as every post here leaves it out, it is the post's
+- `slug` is the second half of the URL: the page is served at
+  `/posts/<year>/<slug>/`, where the year is `date:`'s. Left out, as
+  above and as every post here leaves it out, the slug is the post's
   directory name -- so a directory name is worth choosing as carefully
   as a URL. It is read as it stands, not slugified: `A New Post` would
-  serve at `/posts/A New Post/`, and an accent in the name is an accent
-  in the address, which is why every name here is lowercase ASCII.
-  Write the field to keep a post's URL when its directory is renamed.
-  The build prints a line for each post served somewhere other than
-  under its directory name, and stops if two posts would write the same
-  page.
+  serve at `/posts/2026/A New Post/`, and an accent in the name is an
+  accent in the address, which is why every name here is lowercase
+  ASCII. The names here are cut to 55 characters at a word boundary,
+  which is long enough to say what a post is and short enough to read
+  in an address bar; a new post need not match that, but it reads
+  better for it. Write the field to keep a post's URL when its
+  directory is renamed. The build prints a line for each post served
+  somewhere other than under its directory name, and stops if two
+  posts would write the same page.
+- A slug has only to be unique within its year, since the year is part
+  of the address. Two posts of the same year under one name would be
+  one page, and the build stops rather than letting one overwrite the
+  other.
+- `/posts/<year>/` is a page of its own, listing that year's posts —
+  what a reader gets by trimming a post's address, and what the year
+  headings on `/archives/` link to. It is built from the posts; there
+  is nothing to write.
 - `authors` and `tags` are slugs, not names, so that their URLs are
   exact whatever the name holds; the name each is shown under comes
   from `data/authornames.json` and `data/tags.json`. A slug missing
