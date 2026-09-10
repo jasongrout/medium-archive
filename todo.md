@@ -741,13 +741,12 @@ Feeds and sharing:
 
   What it takes, cheapest first:
 
-  - `ImagePlacer`: a gif -> mp4 branch beside `_resize_gif`, with
-    ffmpeg optional exactly as gifsicle is now -- missing, the gif is
-    placed unchanged with a note in the summary. The cache is already
-    content-addressed, `place()` already returns a copy under a new
-    extension and the exporters already rewrite the page's reference
-    from it, and the existing "the copy did not pay off" rule covers
-    the 4 of 228 that come out no smaller as mp4.
+  - `ImagePlacer`: a gif -> mp4 branch beside `_resize_gif`, ffmpeg
+    taking gifsicle's place as the tool an animation goes through. The
+    cache is already content-addressed, `place()` already returns a
+    copy under a new extension and the exporters already rewrite the
+    page's reference from it, and the existing "the copy did not pay
+    off" rule covers the 4 of 228 that come out no smaller as mp4.
   - myst: nothing. mystmd renders `![](x.mp4)` as a `<video>`, which
     `myst_figures` already relies on for Giphy clips.
   - hugo: a video branch in `layouts/_partials/post-image.html`, which
@@ -761,13 +760,39 @@ Feeds and sharing:
   playsinline>` for Giphy clips (and `lint` knows it as `VIDEO_RE`), so
   the markup is the archive's own pattern, not a new one.
 
-  Left to decide: whether to write a poster frame beside each clip
-  (one small jpeg, which is also what a feed reader shows -- readers
-  commonly drop a `<video>` where they would have shown the gif);
-  whether `-crf`/`-preset` belong in `site.toml`'s `[images]` beside
-  the size caps; and whether gifsicle stays for the no-ffmpeg path or
-  goes. Worth having either way: an autoplaying `<video>` can honour
-  `prefers-reduced-motion`, which a gif cannot, and `raw/` and
+  Accessibility is the other half of the case, and it cuts both ways.
+  The gain is a real conformance fix rather than a nicety: an animated
+  gif cannot be paused, stopped or hidden by the reader, so every clip
+  that runs past five seconds -- which the screen recordings do, the
+  largest running to hundreds and thousands of frames -- fails WCAG
+  2.2.2 (Pause, Stop, Hide) as the sites serve them today, and no
+  amount of care in the theme can fix that while the format is gif. A
+  `<video>` can be paused, replayed and scrubbed, and can be left
+  un-autoplayed under `prefers-reduced-motion: reduce`, which matters
+  to vestibular readers and which a gif offers no way to honour.
+
+  The cost is that the text alternative has to be carried across
+  deliberately. Today a clip is an `<img>` whose alt comes from its
+  caption (`caption_text`), covering SC 1.1.1. `<video>` has no `alt`
+  attribute, and as video-only prerecorded content it falls under SC
+  1.2.1 instead: the same text has to reach it as an `aria-label` (the
+  `<figcaption>` stays where it is, and a captioned clip keeps its
+  visible text either way), or the alternative is silently lost in the
+  move. The other cost is focus order: `controls` on every clip adds a
+  tab stop per clip in a post that may hold several, so the choice is
+  between per-clip controls, a lighter pause affordance that appears on
+  hover and focus, and one site-wide "pause motion" control. Loading
+  changes shape too -- today's `loading="lazy"` on the `<img>` becomes
+  `preload="none"` plus a poster, which is also what keeps a page from
+  fetching several megabytes of clip nobody scrolls to.
+
+  That makes the poster frame a requirement rather than an option: it
+  is what a reduced-motion reader sees instead of movement, what a feed
+  reader shows where it drops the `<video>`, and what the page paints
+  before anything is fetched. Left to decide: per-clip controls or one
+  site-wide pause control; whether `-crf`/`-preset` belong in
+  `site.toml`'s `[images]` beside the size caps; and whether the poster
+  is the clip's first frame or its most representative one. `raw/` and
   `posts/` keep the original gif regardless -- this is display-copy
   work, not archive work.
 
