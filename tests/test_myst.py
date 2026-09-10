@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from medium_archive.paths import archive_dir, site_config
+from medium_archive.siteconf import toml_document
 from medium_archive.myst import (LinkMap, build_site, escape_prose,
                                  myst_figures, myst_slug, page_paths,
                                  page_stems, rewrite_body)
@@ -154,10 +155,10 @@ def test_rewrite_leaves_fences_and_autolinks_external(archive):
     assert "[outside](https://example.org/other)" in got
 
 
-def test_redirects_and_site_json(archive):
+def test_redirects_and_site_config(archive):
     out, _ = archive
     site_config(out).parent.mkdir(exist_ok=True)
-    site_config(out).write_text(json.dumps(
+    site_config(out).write_text(toml_document(
         {"title": "Example Blog", "description": "An example.",
          "intro": "Welcome to the archive."}))
     site = build_site(out)

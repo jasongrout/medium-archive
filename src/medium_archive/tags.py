@@ -5,7 +5,7 @@ publication inherits tags that are meaningless on a standalone site (a
 Jupyter blog where two-thirds of the posts are tagged "jupyter") and
 fragmented variants of one concept ("notebook" / "notebooks" /
 "jupyter-notebook"). An optional hand-written archive/tags.json cleans
-them up reproducibly -- like fixups and site.json, it is an input that
+them up reproducibly -- like fixups and site.toml, it is an input that
 survives regeneration, while raw/ keeps the original tags untouched:
 
     {

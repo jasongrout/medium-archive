@@ -3,7 +3,12 @@ name = "medium-archive"
 version = "0.1.0"
 description = "Archive a Medium publication as raw HTML plus a Markdown conversion"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
+# 3.11 for tomllib: site.toml, the hand-written input every exporter
+# reads, is TOML so that each of its keys can carry what it is for
+# beside it, and so is each site's own copy of that data -- which the
+# generated pelican config reads back with tomllib too, in whatever
+# environment the site is built in.
 dependencies = [
     "requests",
     "beautifulsoup4",

@@ -263,7 +263,7 @@ def main():
                         "redirect map from old inbound paths to page URLs. "
                         "Rebuilt from scratch each run; site-wide text (title, "
                         "description, landing-page intro) comes from an "
-                        "optional hand-written site/site.json. Render with "
+                        "optional hand-written site/site.toml. Render with "
                         "`myst start` or `myst build --html` inside site-myst/ "
                         "(https://mystmd.org)")
     parser("hugo", help="build a Hugo site in site-hugo/ from the "

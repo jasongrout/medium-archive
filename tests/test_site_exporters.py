@@ -13,20 +13,34 @@ from jinja2 import Environment, FileSystemLoader
 
 from medium_archive import hugo, pelican, sites
 from medium_archive.paths import archive_dir, site_config
+from medium_archive.siteconf import load_toml, toml_document
 
 BASE = "https://blog.example.com"
 
 
-def site_json(root: Path) -> Path:
-    """The project's hand-written site/site.json, its directory made on
+def site_toml(root: Path) -> Path:
+    """The project's hand-written site/site.toml, its directory made on
     demand."""
     site_config(root).parent.mkdir(parents=True, exist_ok=True)
     return site_config(root)
 
 
+def read_site(root: Path) -> dict:
+    """That file, as the exporters read it."""
+    return load_toml(site_toml(root))
+
+
+def write_site(root: Path, config: dict):
+    """That file, written from a dict: plain TOML, since what a test
+    sets is read back by an exporter and not by a person (the
+    documented form each exporter writes is siteconf.documented_toml).
+    A None value is a key the file does not carry, TOML having no null."""
+    site_toml(root).write_text(toml_document(config), encoding="utf-8")
+
+
 def site_asset(root: Path, name: str) -> Path:
-    """An image site.json names, which it names relative to itself."""
-    return site_json(root).parent / name
+    """An image site.toml names, which it names relative to itself."""
+    return site_toml(root).parent / name
 
 
 def hugo_config(site: Path) -> str:
@@ -38,10 +52,20 @@ def hugo_config(site: Path) -> str:
             + (default / "params.toml").read_text())
 
 
+def hugo_params(site: Path) -> dict:
+    """The hugo site's params, as Hugo reads them. A key the site does
+    not set is absent, the file documenting it commented out beside an
+    example of it set, so a "does it set this?" question is asked of
+    the parsed params rather than of the text."""
+    return load_toml(site / "config" / "_default" / "params.toml")
+
+
 def pelican_data(site: Path) -> dict:
-    """site.json beside the pelican site's config: its own data, which
-    the generated pelicanconf.py reads and holds none of."""
-    return json.loads((site / "site.json").read_text())
+    """site.toml beside the pelican site's config: its own data, which
+    the generated pelicanconf.py reads and holds none of. A key the
+    site does not set is absent (written commented out, beside an
+    example of it set), TOML having no null to write."""
+    return load_toml(site / "site.toml")
 
 
 def manifest_json(root: Path) -> Path:
@@ -86,17 +110,17 @@ def project(tmp_path):
     (second / "images").mkdir()
     (second / "images" / "001-pic.png").write_bytes(b"PNG")
     manifest_json(tmp_path).write_text(json.dumps(manifest))
-    site_json(tmp_path).write_text(json.dumps(
+    write_site(tmp_path, 
         {"title": "Example Blog", "description": "An example.",
-         "intro": "Welcome.", "base_url": "https://blog.example.org/"}))
+         "intro": "Welcome.", "base_url": "https://blog.example.org/"})
     return tmp_path
 
 
 def test_hugo_site(project):
     site_asset(project, "icon.svg").write_bytes(b"SVG")
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["favicon"] = "icon.svg"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     site = hugo.build_site(project)
     page = site / "content/posts/second-post/index.md"
     front = page_front(page)
@@ -387,17 +411,17 @@ def test_non_image_figure_shells_stay_raw_html():
 
 def test_hugo_site_config_and_front_matter(project, capsys):
     site_asset(project, "logo.png").write_bytes(b"IMG")
-    site_json(project).write_text(json.dumps(
+    write_site(project, 
         {"title": "Example Blog", "favicon": "missing.ico",
-         "hugo": {"avatar": "logo.png", "params": {"motto": "hello"}}}))
+         "hugo": {"avatar": "logo.png", "params": {"motto": "hello"}}})
     site = hugo.build_site(project)
     config = hugo_config(site)
     assert "theme = " not in config             # always the built-in theme
     assert 'motto = "hello"' in config          # user params merge last
     assert 'avatar = "img/avatar.png"' in config
     assert (site / "static/img/avatar.png").read_bytes() == b"IMG"
-    # an asset site.json names but the archive lacks is skipped, noted
-    assert "favicon = " not in config
+    # an asset site.toml names but the archive lacks is skipped, noted
+    assert "favicon" not in hugo_params(site)
     assert "favicon not found, skipped" in capsys.readouterr().err
     assert (site / "layouts/baseof.html").exists()
     assert (site / "content/search.md").exists()
@@ -418,12 +442,12 @@ def test_a_site_keeps_its_data_apart_from_its_machinery(project):
     repository of its own, so what it says about itself is one
     hand-editable file and the generated machinery beside it holds none
     of that: the hugo site splits its config directory into params.toml
-    and hugo.toml, the pelican site into site.json and pelicanconf.py.
+    and hugo.toml, the pelican site into site.toml and pelicanconf.py.
     Editing the data file alone, without the exporter, must be enough
     to rename a site."""
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["twitter"] = "@example"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
 
@@ -447,7 +471,7 @@ def test_a_site_keeps_its_data_apart_from_its_machinery(project):
     # and a hand edit to that file reaches the settings on its own,
     # with no exporter run in between
     data["title"] = "Renamed By Hand"
-    (pelican_site / "site.json").write_text(json.dumps(data))
+    (pelican_site / "site.toml").write_text(toml_document(data))
     assert config_namespace(pelican_site)["SITENAME"] == "Renamed By Hand"
 
 
@@ -465,7 +489,7 @@ def test_each_site_carries_what_makes_it_a_repository(project):
     ignored = (pelican_site / ".gitignore").read_text()
     assert "/output/" in ignored and "__pycache__/" in ignored
     readme = (pelican_site / "README.md").read_text()
-    for named in ("site.json", "data/tags.json", "pelicanconf.py",
+    for named in ("site.toml", "data/tags.json", "pelicanconf.py",
                   "content/posts/", "pelican -l"):
         assert named in readme, named
     assert not (pelican_site / "content" / "README.md").exists()
@@ -606,7 +630,7 @@ def test_tag_display_names_reach_both_sites(project):
 
 
 def test_both_sites_write_the_same_hand_editable_data_files(project):
-    """The maps that are neither a post nor site.json -- tag names,
+    """The maps that are neither a post nor site.toml -- tag names,
     author names, byline profiles -- are data files beside each site's
     config, the same three files with the same contents in both sites.
     Hugo reads them through hugo.Data; the pelican config reads them at
@@ -756,10 +780,10 @@ def test_every_article_gets_the_named_tag_object(project):
 def test_pelican_site(project):
     site_asset(project, "logo.png").write_bytes(b"IMG")
     site_asset(project, "icon.svg").write_bytes(b"SVG")
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["avatar"] = "logo.png"
     cfg["favicon"] = "icon.svg"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     site = pelican.build_site(project)
     text = (site / "content/posts/second-post/index.md").read_text()
     front = post_front(site, "second-post")
@@ -779,7 +803,7 @@ def test_pelican_site(project):
     # the CommonMark reader replaces pelican's python-markdown one, and
     # takes its settings with it
     assert "_CommonMarkReader" in config and "MARKDOWN = {" not in config
-    # what the site says about itself is site.json beside the config,
+    # what the site says about itself is site.toml beside the config,
     # which holds none of it: the config reads that file instead
     data = pelican_data(site)
     assert data["title"] == "Example Blog"
@@ -867,20 +891,23 @@ def test_theme_picker_and_dark_scheme(project):
                  "newsletter"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
-    # without an avatar or announcement the site's data says so with a
-    # null, which the config reads back as None
+    # without an avatar or announcement the site's data leaves the key
+    # out -- written commented out, beside an example of it set -- and
+    # the config reads the absence back as None
     data = pelican_data(pelican_site)
     settings = config_namespace(pelican_site)
+    raw = (pelican_site / "site.toml").read_text()
     for key in ("avatar", "favicon", "announcement"):
-        assert data[key] is None, key
+        assert key not in data, key
         assert settings[key.upper()] is None, key
+        assert f"# {key} = " in raw, key
 
 
 def test_announcement_banner(project):
     banner_url = "https://jupyter.org/assets/banner.html"
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["announcement"] = banner_url
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
     assert f'announcement = "{banner_url}"' in hugo_config(hugo_site)
@@ -909,15 +936,15 @@ def test_announcement_banner(project):
 
 def test_newsletter_band(project):
     # jupyter.org's signup band at the foot of every page: the heading
-    # from site.json, the HubSpot form's ids on the section the snippet
+    # from site.toml, the HubSpot form's ids on the section the snippet
     # reads them off, and the band hidden until that form is on its way
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["newsletter"] = {
         "heading": "Subscribe for updates",
         "hubspot_portal": "8112310",
         "hubspot_form": "3a79d744-5260-4a98-b069-39defccc8f42",
     }
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
     hugo_cfg = hugo_config(hugo_site)
@@ -965,8 +992,8 @@ def test_newsletter_band_absent_or_incomplete(project, capsys):
     # no "newsletter" at all: no band, and configs that are still valid
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
-    assert "[newsletter]" not in hugo_config(hugo_site)
-    assert pelican_data(pelican_site)["newsletter"] is None
+    assert "newsletter" not in hugo_params(hugo_site)
+    assert "newsletter" not in pelican_data(pelican_site)
     assert config_namespace(pelican_site)["NEWSLETTER"] is None
     # the band's markup is guarded by that setting, so an archive that
     # configures no newsletter renders no empty band
@@ -976,22 +1003,22 @@ def test_newsletter_band_absent_or_incomplete(project, capsys):
             in (pelican_site / "theme/templates/base.html").read_text())
     # a half-filled entry is a mistake worth hearing about, not a band
     # quietly missing from the built site
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["newsletter"] = {"heading": "Subscribe for updates"}
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo.build_site(project)
     err = capsys.readouterr().err
     assert "hubspot_portal" in err and "hubspot_form" in err
 
 
 def test_footer_line(project):
-    # site.json's "footer" is the line under every page, Markdown, with
+    # site.toml's "footer" is the line under every page, Markdown, with
     # {year} the year of the build -- jupyter.org's trademark notice,
     # which carries a link and a copyright year, is the shape of it
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["footer"] = ("Trademarks are registered by "
                      "[LF Charities](https://lf-charities.org/). \u00a9 {year}")
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
     assert "[LF Charities](https://lf-charities.org/)" in hugo_config(hugo_site)
@@ -1019,8 +1046,8 @@ def test_footer_falls_back_to_the_description(project):
     # carried, and a config that is still valid Python
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
-    assert "footer = " not in hugo_config(hugo_site)
-    assert pelican_data(pelican_site)["footer"] is None
+    assert "footer" not in hugo_params(hugo_site)
+    assert "footer" not in pelican_data(pelican_site)
     assert config_namespace(pelican_site)["FOOTER"] is None
     assert "{{ site.Params.description }}" in (
         hugo_site / "layouts/baseof.html").read_text()
@@ -1029,14 +1056,14 @@ def test_footer_falls_back_to_the_description(project):
 
 
 def test_masthead_logo(project):
-    # site.json's "logo": a wordmark standing in for the site's name in
+    # site.toml's "logo": a wordmark standing in for the site's name in
     # the header, the way jupyter.org's navbar carries its rectangle
     # logo, with "logo_dark" the same mark for the dark palette
     site_asset(project, "logo.svg").write_bytes(b"<svg/>")
     site_asset(project, "logo-dark.svg").write_bytes(b"<svg dark/>")
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["logo"], cfg["logo_dark"] = "logo.svg", "logo-dark.svg"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
     assert 'logo = "img/logo.svg"' in hugo_config(hugo_site)
@@ -1062,14 +1089,14 @@ def test_masthead_logo(project):
 
 
 def test_masthead_logo_link(project):
-    # site.json's "logo_link": a mark that stands for something larger
+    # site.toml's "logo_link": a mark that stands for something larger
     # than the blog (the Jupyter mark over a Jupyter blog) links there
     # instead of to the site's home, and the link reads under that
     # address's host rather than the site's own title
     site_asset(project, "logo.svg").write_bytes(b"<svg/>")
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["logo"], cfg["logo_link"] = "logo.svg", "https://jupyter.org"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
     toml = hugo_config(hugo_site)
@@ -1091,22 +1118,22 @@ def test_masthead_link_defaults_home(project):
     # no "logo_link": the masthead links to the site's own home, named
     # by the site's title, as it always has
     site_asset(project, "logo.svg").write_bytes(b"<svg/>")
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["logo"] = "logo.svg"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
-    assert "logo_link" not in hugo_config(hugo_site)
-    assert pelican_data(pelican_site)["logo_link"] is None
+    assert "logo_link" not in hugo_params(hugo_site)
+    assert "logo_link" not in pelican_data(pelican_site)
     # and with no logo to carry it the link is not read at all: the
     # masthead is then the site's own name, which cannot lead off-site
     del cfg["logo"]
     cfg["logo_link"] = "https://jupyter.org"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)
-    assert "logo_link" not in hugo_config(hugo_site)
-    assert pelican_data(pelican_site)["logo_link"] is None
+    assert "logo_link" not in hugo_params(hugo_site)
+    assert "logo_link" not in pelican_data(pelican_site)
 
 
 def test_nav_current_highlight(project):
@@ -1529,7 +1556,7 @@ def test_pelican_escapes_by_default(project):
         assert key in config, key
     # the genuinely-HTML values in the theme, and the only ones: the
     # rendered body, and the landing-page intro and footer line the
-    # config renders from site.json's Markdown. Both of those are
+    # config renders from site.toml's Markdown. Both of those are
     # hand-written and versioned with the archive, unlike a title or a
     # tag name, which come from whoever wrote the post -- that is what
     # makes them safe to mark safe.
@@ -1564,8 +1591,8 @@ def test_the_subtitle_reaches_every_post_page(tmp_path):
     make_post(tmp_path, manifest, "second-post", "bbb222bbb222",
               "2021-03-01T10:00:00Z", "Body.\n")
     manifest_json(tmp_path).write_text(json.dumps(manifest))
-    site_json(tmp_path).write_text(json.dumps(
-        {"title": "Example Blog", "base_url": "https://blog.example.org/"}))
+    write_site(tmp_path, 
+        {"title": "Example Blog", "base_url": "https://blog.example.org/"})
 
     for build in (hugo.build_site, pelican.build_site):
         site = build(tmp_path)
@@ -1593,12 +1620,12 @@ def test_missing_base_url_is_not_silent(tmp_path, capsys):
     make_post(tmp_path, manifest, "post", "aaa111aaa111",
               "2020-01-05T10:00:00Z", "Hello.\n")
     manifest_json(tmp_path).write_text(json.dumps(manifest))
-    site_json(tmp_path).write_text(json.dumps({"title": "Example"}))
+    write_site(tmp_path, {"title": "Example"})
     sites.load_site_inputs(tmp_path)
     assert "no base_url" in capsys.readouterr().err
     # and stays quiet once it is set
-    site_json(tmp_path).write_text(json.dumps(
-        {"title": "Example", "base_url": "https://blog.example.org"}))
+    write_site(tmp_path, 
+        {"title": "Example", "base_url": "https://blog.example.org"})
     sites.load_site_inputs(tmp_path)
     assert "base_url" not in capsys.readouterr().err
 
@@ -1659,7 +1686,7 @@ def make_image_post(tmp_path, still_bytes=None, gif_bytes=None):
         frames[0].save(img_dir / "anim.gif", save_all=True,
                        append_images=frames[1:], duration=100, loop=0)
     manifest_json(tmp_path).write_text(json.dumps(manifest))
-    site_json(tmp_path).write_text(json.dumps({"title": "Pics"}))
+    write_site(tmp_path, {"title": "Pics"})
     return img_dir
 
 
@@ -1686,8 +1713,8 @@ def test_photographs_capped_into_display_copies(tmp_path):
     assert (pelican_site / "content/posts/picture-post/images/big.jpg"
             ).stat().st_ino == (placed / "big.jpg").stat().st_ino
     # caps are configurable, 0 leaves stills alone entirely
-    site_json(tmp_path).write_text(json.dumps(
-        {"title": "Pics", "images": {"still_max_edge": 0}}))
+    write_site(tmp_path, 
+        {"title": "Pics", "images": {"still_max_edge": 0}})
     site = hugo.build_site(tmp_path)
     assert (placed / "big.png").stat().st_ino == (src / "big.png").stat().st_ino
 
@@ -1757,7 +1784,7 @@ def test_multiple_authors_reach_both_sites(tmp_path):
     make_post(tmp_path, manifest, "solo", "abc123abc125", "2020-01-03T00:00:00Z",
               "Hi.\n", authors=[])
     manifest_json(tmp_path).write_text(json.dumps(manifest))
-    site_json(tmp_path).write_text(json.dumps({"title": "T"}))
+    write_site(tmp_path, {"title": "T"})
 
     site = hugo.build_site(tmp_path)
     front = lambda stem: post_front(site, stem)
@@ -1851,13 +1878,13 @@ def test_crawl_files(project):
 
 
 def test_noindex_and_twitter_reach_both_sites(project):
-    """site.json's "noindex" keeps search engines off a deployment (a
+    """site.toml's "noindex" keeps search engines off a deployment (a
     preview, which would otherwise be indexed as a copy of the real
     site); "twitter" credits the publication's handle on shared links."""
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["noindex"] = True
     cfg["twitter"] = "@example"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     config = hugo_config(hugo.build_site(project))
     assert "noindex = true" in config and 'twitter = "@example"' in config
     data = pelican_data(pelican.build_site(project))
@@ -1954,16 +1981,16 @@ def test_external_canonical_reaches_the_head(project):
 
 
 def test_share_image_stands_in_for_a_missing_cover(project):
-    """site.json "share_image": the og:image of every page without a
+    """site.toml "share_image": the og:image of every page without a
     cover of its own, so a listing or a coverless post still shares
     with a picture; both heads declare the image's dimensions, so
     Facebook renders the large card on the first share."""
     pytest.importorskip("PIL")
     from PIL import Image
     Image.new("RGB", (1200, 630)).save(site_asset(project, "share.png"))
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["share_image"] = "share.png"
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     hugo_site = hugo.build_site(project)
     assert 'share_image = "img/share.png"' in hugo_config(hugo_site)
     assert (hugo_site / "assets/img/share.png").is_file()   # readable dims
@@ -1983,10 +2010,10 @@ def test_share_image_stands_in_for_a_missing_cover(project):
         assert f'property="{prop}"' in base, prop
     # unset: no fallback, no size, nothing declared
     del cfg["share_image"]
-    site_json(project).write_text(json.dumps(cfg))
-    assert "share_image" not in hugo_config(hugo.build_site(project))
+    write_site(project, cfg)
+    assert "share_image" not in hugo_params(hugo.build_site(project))
     data = pelican_data(pelican.build_site(project))
-    assert data["share_image"] is None and data["share_image_size"] is None
+    assert "share_image" not in data and "share_image_size" not in data
 
 
 def test_structured_data_graph(project):
@@ -2002,10 +2029,10 @@ def test_structured_data_graph(project):
     assert sites.site_profiles({}) == []
     manifest = json.loads(manifest_json(project).read_text())
     assert sites.author_links(manifest) == {"Ada Lovelace": "https://medium.com/@ada"}
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     cfg["twitter"] = "@example"
     cfg["profiles"] = ["https://github.com/example"]
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
 
     hugo_site = hugo.build_site(project)
     assert json.loads((hugo_site / "data/authors.json").read_text()) \
@@ -2099,7 +2126,7 @@ def test_alt_text_falls_back_to_the_caption():
 
 
 def test_intro_reaches_both_landing_pages(project):
-    """site.json's "intro" is the landing-page blurb, and belongs on
+    """site.toml's "intro" is the landing-page blurb, and belongs on
     both preferred targets. Hugo renders it from content/_index.md; the
     pelican config renders the same Markdown (jinja has no Markdown
     filter of its own) and index.html emits it into the same .intro
@@ -2115,11 +2142,11 @@ def test_intro_reaches_both_landing_pages(project):
 def test_intro_absent_leaves_a_valid_config(project):
     """No intro is a null in the site's data, and the config reads it
     back as no blurb rather than the string "None"."""
-    cfg = json.loads(site_json(project).read_text())
+    cfg = read_site(project)
     del cfg["intro"]
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
     site = pelican.build_site(project)
-    assert pelican_data(site)["intro"] is None
+    assert "intro" not in pelican_data(site)
     assert config_namespace(site)["INTRO"] is None
 
 
@@ -2202,7 +2229,7 @@ def test_author_slugs_are_clean_and_shared_by_both_sites(tmp_path):
                   f"2020-01-0{i + 1}T00:00:00Z", "Hi.\n",
                   authors=[{"name": name, "url": None}])
     manifest_json(tmp_path).write_text(json.dumps(manifest))
-    site_json(tmp_path).write_text(json.dumps({"title": "T"}))
+    write_site(tmp_path, {"title": "T"})
     slugs = [slug for _name, slug in hard]
 
     # the map both sites are named from: slug -> the name it shows
@@ -2297,13 +2324,13 @@ def test_figure_alt_text_cannot_end_its_own_tag(project):
 
 
 def set_redirects(project, mode):
-    """site.json's "redirects" set to one mode, for the exporters to read."""
-    cfg = json.loads(site_json(project).read_text())
+    """site.toml's "redirects" set to one mode, for the exporters to read."""
+    cfg = read_site(project)
     if mode is None:
         cfg.pop("redirects", None)
     else:
         cfg["redirects"] = mode
-    site_json(project).write_text(json.dumps(cfg))
+    write_site(project, cfg)
 
 
 def run_pelican_redirects(site, tmp_path):

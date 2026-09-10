@@ -91,6 +91,6 @@ The body, as Markdown.
 `medium-archive hugo` rewrites every file here except `public/` and
 `resources/`, so until this site is a repository of its own,
 corrections belong upstream in the archive: site-wide settings in its
-`site/site.json`, tag names in its `archive/tags.json`, a byline in the
+`site/site.toml`, tag names in its `archive/tags.json`, a byline in the
 post itself. Once it is a repository of its own, this is the only copy,
 and the files here are the ones to edit.

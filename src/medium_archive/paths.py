@@ -5,7 +5,7 @@
                             convert derives from them (posts/, posts.json,
                             redirects.csv)
     <root>/site/          the hand-written site inputs every exporter
-                            reads: site.json and the images it names
+                            reads: site.toml and the images it names
     <root>/site-hugo/     one generated site per exporter
     <root>/site-pelican/
     <root>/site-myst/
@@ -29,14 +29,17 @@ def archive_dir(root: Path) -> Path:
 
 
 def site_inputs(root: Path) -> Path:
-    """The hand-written site inputs: site.json, and the images it names
+    """The hand-written site inputs: site.toml, and the images it names
     (avatar, logo, favicon, share image), which it names relative to
     here so the directory moves as one."""
     return root / "site"
 
 
 def site_config(root: Path) -> Path:
-    return site_inputs(root) / "site.json"
+    """What the built sites say about themselves, hand-written and read
+    by every exporter: TOML so that each key can carry its own
+    documentation (see siteconf)."""
+    return site_inputs(root) / "site.toml"
 
 
 def site_dir(root: Path, generator: str) -> Path:

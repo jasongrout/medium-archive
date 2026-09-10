@@ -18,7 +18,7 @@ Loading (`sites.template_text` and `sites.fill_template`):
   Go templates, Jinja and Python dicts use, so the files read naturally.
   A site's own data is not carried this way: it is written beside each
   generated config as data of its own -- `config/_default/params.toml`
-  for hugo, `site.json` for pelican -- for the config to read, which is
+  for hugo, `site.toml` for pelican -- for the config to read, which is
   why `pelicanconf.py` here is not a `.tmpl` at all.
 
 Files here carry no comments beyond what their formats can hide from
@@ -122,7 +122,7 @@ These embed verbatim in both engines' pages, so they must carry no
   item, so the icon still centres.
 - `announcement.html` is the site-wide announcement banner. The base
   templates emit the `.announcement` div (above the header, hidden)
-  only when site.json sets `"announcement"`. The script fills it from
+  only when site.toml sets `"announcement"`. The script fills it from
   the div's `data-source`: an http(s) URL is fetched client-side, so
   many sites can share one live banner file (how Jupyter projects use
   Sphinx's `announcement` option with jupyter.org/assets/banner.html;
@@ -227,7 +227,7 @@ These embed verbatim in both engines' pages, so they must carry no
   Pygments (Pelican, through the fence rule in the generated config's
   reader, which names the same `highlight` class) share.
 - `newsletter.html` renders the signup band both base templates close
-  a page with (site.json `"newsletter"`), the section jupyter.org ends
+  a page with (site.toml `"newsletter"`), the section jupyter.org ends
   its own pages on. The form is a HubSpot embed, which draws itself
   inside an iframe no stylesheet here can reach, so the band's own
   tokens -- ink, muted, accent, the body face -- are read off the page
@@ -274,7 +274,7 @@ section and a term's page share `section.html`, written to the site as
   styles, whose default Monokai would paint a dark block on the light
   page, so the tokens get classes instead and `card.css` colours them
   per palette. `params.toml` is the data the theme renders from,
-  filled from `site.json` (`hugo.params` merges last) and hand-editable
+  filled from `site.toml` (`hugo.params` merges last) and hand-editable
   in a checked-in copy of the site: the file's name is what makes its
   keys Hugo's `[params]`, so none of them is prefixed. Hugo reads a
   config directory in preference to a root config file, so there is one
@@ -328,7 +328,7 @@ section and a term's page share `section.html`, written to the site as
   "More posts": the scoring guesses at a kinship from tags and
   bylines, so the heading claims none.
 - `layouts/robots.txt` names the sitemap Hugo generates, or disallows
-  everything when site.json sets `"noindex"` (the same switch puts a
+  everything when site.toml sets `"noindex"` (the same switch puts a
   `noindex` robots tag on every page, as a page's own front matter
   does for the search page).
 - `layouts/_markup/render-image.html` handles body images from
@@ -351,8 +351,8 @@ section and a term's page share `section.html`, written to the site as
   Pelican only reads what is under `PATH`, which is `content/`.
 - `pelicanconf.py` is the generated config, and it is copied rather
   than filled in: it carries no site data at all, so the same bytes
-  serve every archive. What the site says about itself is `site.json`
-  beside it, which the exporter writes (`sites.write_site_json`) and
+  serve every archive. What the site says about itself is `site.toml`
+  beside it, which the exporter writes (`sites.write_site_config`) and
   the config reads at config time, one key to one setting -- the
   counterpart of the hugo site's `params.toml`, and the file a
   checked-in copy of the site edits. The rest is machinery, and most of
@@ -390,7 +390,7 @@ section and a term's page share `section.html`, written to the site as
   or a profile is what a checked-in copy of a site corrects by hand
   while this file is generated; a missing one leaves the terms showing
   as their slugs rather than failing the build. The config also renders
-  `INTRO`, site.json's landing-page blurb, through the reader's own
+  `INTRO`, site.toml's landing-page blurb, through the reader's own
   parser: `index.html` emits it into the same `.intro` block the hugo
   landing page uses, and Jinja has no Markdown filter to do it in the
   theme.
@@ -416,7 +416,7 @@ section and a term's page share `section.html`, written to the site as
   in Jinja, included by `base.html` after the page's address, name
   and share image are set; author profiles come from `AUTHOR_LINKS`
   (the config's reading of `data/authors.json`) and the publisher's
-  from `PROFILES`, which site.json fills in directly.
+  from `PROFILES`, which site.toml fills in directly.
 - `theme/templates/` is the Jinja theme. A tag page and an author page
   are the same page, and so are the two chip indexes, so each pair is
   written once: `term.html` renders one term's posts and `terms.html` a

@@ -5,8 +5,8 @@ inside site-pelican/ (https://getpelican.com, `pip install
 pelican markdown-it-py mdit-py-plugins pyyaml`).
 
 What the site says about itself and how it is built are separate
-files. site.json beside the config is the data -- the archive's own
-site/site.json resolved for this site, with the images as the copies
+files. site.toml beside the config is the data -- the archive's own
+site/site.toml resolved for this site, with the images as the copies
 the site carries and what the exporter works out from several keys at
 once (the profile list, the masthead link's label, the newsletter
 band's defaults) written out as what it came to. pelicanconf.py reads
@@ -14,7 +14,7 @@ it, one key at a time, into the settings the theme and the plugins
 render from; nothing else in that file is site data, so it is copied
 from templates/pelican/pelicanconf.py rather than filled in, and it is
 the same bytes for every archive. A checked-in copy of this site edits
-site.json and the three data/*.json name maps and nothing else. The
+site.toml and the three data/*.json name maps and nothing else. The
 hugo site splits the same two apart in its own config directory (see
 hugo.py).
 
@@ -81,7 +81,7 @@ generated config embeds a small plugin (templates/pelican/site_plugin.py,
 appended verbatim): after each build it reads the exported redirects.csv
 -- the map of every old inbound path (Medium slug+id, /p/<id>,
 Ghost-era) to the page this site serves -- and renders it as whichever
-mechanism site.json's "redirects" asks for (see sites.REDIRECT_MODES): a
+mechanism site.toml's "redirects" asks for (see sites.REDIRECT_MODES): a
 meta-refresh stub at each old path, the same page Hugo renders for an
 alias and working on any static host; a `_redirects` file for the hosts
 that turn one into HTTP 301s; or both.
@@ -92,7 +92,7 @@ each post page closes with (by shared tags, then author, then date);
 the theme's pages carry the metadata search engines and share targets read
 (see templates/README.md): the structured data's author and publisher
 profiles come from AUTHOR_LINKS (data/authors.json: the Medium profile
-of every byline) and site.json's "profiles"/"twitter", the og:image of a page with no
+of every byline) and site.toml's "profiles"/"twitter", the og:image of a page with no
 cover from its "share_image", and a post that declared a canonical on
 another host (Medium's "originally published at") carries it as a
 Canonical: header; the Medium copy is never a page's canonical.
@@ -109,7 +109,7 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     masthead_link, newsletter_params, page_stems,
                     quote_arg, redirect_mode, rewrite_figures,
                     site_profiles, template_text, write_data_files,
-                    write_redirects_csv, write_site_json, write_templates)
+                    write_redirects_csv, write_site_config, write_templates)
 
 # The files the exporter copies in: file in the site -> its templates/
 # source (see templates/README.md). The theme is most of them, and its
@@ -195,7 +195,7 @@ def build_site(root):
     inputs = site_inputs(root)
     manifest, config = load_site_inputs(root)
     stems = page_stems(manifest)
-    mode = redirect_mode(config)        # site.json "redirects"
+    mode = redirect_mode(config)        # site.toml "redirects"
     site = site_dir(root, "pelican")
     clean_site(site, keep=("output",))
     (site / "content").mkdir(parents=True)
@@ -255,47 +255,42 @@ def build_site(root):
                             site / "theme" / "static" / "img", "share")
     share_size = (image_size(site / "theme" / "static" / "img" / share)
                   if share else None)
-    # site.json beside the config: this site's own data, the archive's
-    # site/site.json resolved for this site -- the images as the copies
+    # site.toml beside the config: this site's own data, the archive's
+    # site/site.toml resolved for this site -- the images as the copies
     # placed above, and what is worked out from several keys at once
     # (the profile list, the masthead link's label, the newsletter
     # band's defaults) as what it came to. Every key the config reads
-    # is written, unset ones as null, so the file is also the list of
-    # what there is to set. It, and data/*.json below, are the whole of
-    # what a checked-in copy of this site edits by hand; pelicanconf.py
-    # is machinery and says so.
-    write_site_json(site, {
+    # is written under its own documentation, unset ones commented out
+    # beside an example, so the file is also the list of what there is
+    # to set and what each one would look like set (see siteconf). It,
+    # and data/*.json below, are the whole of what a checked-in copy of
+    # this site edits by hand; pelicanconf.py is machinery and says so,
+    # holding not one line about what any of these keys mean.
+    write_site_config(site, {
         "title": config["title"],
-        "description": config.get("description", ""),
-        "base_url": config.get("base_url", ""),
-        "locale": config.get("locale", "en"),
-        # the landing-page blurb and the footer line, Markdown; the
-        # config renders both
+        "description": config.get("description") or None,
+        "base_url": config.get("base_url") or None,
+        "locale": config.get("locale") or "en",
         "intro": config.get("intro") or None,
         "footer": config.get("footer") or None,
         "avatar": avatar and f"theme/img/{avatar}",
         "favicon": favicon and f"theme/{favicon}",
         "logo": logo and f"theme/img/{logo}",
         "logo_dark": logo_dark and f"theme/img/{logo_dark}",
-        # where the mark points when it stands for something larger
-        # than the blog (see sites.masthead_link); read, like the dark
-        # mark, only where there is a logo to carry the link
+        # read, like the dark mark, only where there is a logo to
+        # carry it (see sites.masthead_link)
         "logo_link": (logo and masthead_link(config)) or None,
-        # a site-wide banner above the header -- an http(s) URL the theme
-        # fetches client-side (empty content hides the banner, like Sphinx
-        # themes' html announcement option), or literal HTML
         "announcement": config.get("announcement") or None,
-        # the signup band at the foot of every page: its heading and
-        # the HubSpot form's ids (see sites.newsletter_params)
+        # see sites.newsletter_params
         "newsletter": newsletter_params(config),
         "twitter": config.get("twitter") or None,
-        "profiles": site_profiles(config),
+        "profiles": site_profiles(config) or None,
         "share_image": share and f"theme/img/{share}",
         "share_image_size": list(share_size) if share_size else None,
         "cover_size": list(COVER_SIZE) if covers.pillow else None,
         "noindex": bool(config.get("noindex")),
-        # which redirect mechanism the embedded plugin renders
-        # redirects.csv as (see sites.REDIRECT_MODES)
+        # which mechanism the embedded plugin renders redirects.csv
+        # as (see sites.REDIRECT_MODES)
         "redirects": mode,
     })
     # the config itself carries no site data, so it is copied rather
