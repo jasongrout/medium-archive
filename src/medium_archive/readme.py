@@ -394,7 +394,10 @@ its own copy of that data, separate from its generated machinery, so a
 site can be checked in and carried on as a project of its own: hugo's
 is `config/_default/params.toml` beside the `hugo.toml` that says how
 the site is built, pelican's is `site.json` beside the `pelicanconf.py`
-that reads it.
+that reads it. Each site also carries its own `README.md` -- what to
+edit, what builds it, how to write a post -- and a `.gitignore` for
+the build output, so the directory stands on its own once it is taken
+out of here.
 
 ## Layout
 
@@ -420,6 +423,12 @@ site-pelican/                   `medium-archive hugo|pelican`: the same
                                 generator-native front matter, config, and
                                 the shared card-grid theme; each carries
                                 its own redirects.csv
+  README.md                   what to edit, what builds the site, and
+                                how to write a post: the two files that
+  .gitignore                    let the directory stand on its own as a
+                                repository, the second keeping the
+                                build output (public/, resources/,
+                                output/) out of it
   config/_default/            (hugo) the site config as a directory:
     params.toml                 what the pages say about themselves --
                                 masthead, banner, footer line, newsletter

@@ -89,15 +89,22 @@ from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     wants_redirects_file, write_data_files,
                     write_redirects_csv, write_templates)
 
-# The built-in theme: file in the site -> its templates/ source (see
-# templates/README.md for the rationale behind the individual files).
-# The regular list and taxonomy pages share one layout; the stylesheet
-# is the card look shared with the pelican theme. The feed override and
-# the figure shortcode (with the image partial it and the render hook
+# The files the exporter copies in: file in the site -> its templates/
+# source (see templates/README.md for the rationale behind the
+# individual files). The built-in theme is most of them: the regular
+# list and taxonomy pages share one layout, and the stylesheet is the
+# card look shared with the pelican theme. The feed override and the
+# figure shortcode (with the image partial it and the render hook
 # share) are content policy rather than styling: the pages' figure
 # calls resolve to that shortcode, which takes the caption as inner
-# content.
+# content. The README and the .gitignore are neither: they are what
+# make the directory a repository of its own rather than a build
+# output, which is what it becomes once the archive is done with it.
+# (The .gitignore's source is named without the dot, so that git does
+# not read it as an ignore file for templates/hugo/ itself.)
 TEMPLATES = {
+    "README.md": "hugo/README.md",
+    ".gitignore": "hugo/gitignore",
     "layouts/baseof.html": "hugo/layouts/baseof.html",
     "layouts/_partials/card.html": "hugo/layouts/_partials/card.html",
     "layouts/_partials/share.html": "hugo/layouts/_partials/share.html",

@@ -111,10 +111,17 @@ from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     site_profiles, template_text, write_data_files,
                     write_redirects_csv, write_site_json, write_templates)
 
-# The theme's files: file in the site -> its templates/ source (see
-# templates/README.md). The stylesheet is the card look shared with the
-# hugo theme.
+# The files the exporter copies in: file in the site -> its templates/
+# source (see templates/README.md). The theme is most of them, and its
+# stylesheet is the card look shared with the hugo theme; the README
+# and the .gitignore are what make the directory a repository of its
+# own rather than a build output, which is what it becomes once the
+# archive is done with it. (The .gitignore's source is named without
+# the dot, so that git does not read it as an ignore file for
+# templates/pelican/ itself.)
 TEMPLATES = {
+    "README.md": "pelican/README.md",
+    ".gitignore": "pelican/gitignore",
     "theme/templates/base.html": "pelican/theme/templates/base.html",
     "theme/templates/jsonld.html": "pelican/theme/templates/jsonld.html",
     "theme/templates/macros.html": "pelican/theme/templates/macros.html",

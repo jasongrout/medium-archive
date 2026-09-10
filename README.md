@@ -381,7 +381,11 @@ with none stored, the system scheme decides. The theme provides:
   is the same bytes for every archive. Both are filled from the
   archive's own `site/site.json`, with the images resolved to the
   copies the site carries; edit either in place and rebuild with the
-  generator alone, without re-running the exporter.
+  generator alone, without re-running the exporter. Each site also
+  carries a `README.md` of its own -- what to edit, what builds it, how
+  to write a post -- and a `.gitignore` for the build output, so the
+  directory stands on its own the moment it is taken out of the
+  archive's project.
 - Three hand-editable data files, `data/tags.json`,
   `data/authornames.json` and `data/authors.json`, written the same in
   both sites: the name each tag and each author is shown under, and the

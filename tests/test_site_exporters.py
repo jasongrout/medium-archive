@@ -451,6 +451,34 @@ def test_a_site_keeps_its_data_apart_from_its_machinery(project):
     assert config_namespace(pelican_site)["SITENAME"] == "Renamed By Hand"
 
 
+def test_each_site_carries_what_makes_it_a_repository(project):
+    """A built site is meant to be checked in and carried on, so each
+    one ships the two files that make a directory a repository rather
+    than a build output: a README naming what to edit and how to build,
+    and a .gitignore that keeps what the generator builds out of it --
+    the same directories the exporter itself preserves across a
+    rebuild. Neither is published as a page: both sit outside the
+    content the generator reads."""
+    hugo_site = hugo.build_site(project)
+    pelican_site = pelican.build_site(project)
+
+    ignored = (pelican_site / ".gitignore").read_text()
+    assert "/output/" in ignored and "__pycache__/" in ignored
+    readme = (pelican_site / "README.md").read_text()
+    for named in ("site.json", "data/tags.json", "pelicanconf.py",
+                  "content/posts/", "pelican -l"):
+        assert named in readme, named
+    assert not (pelican_site / "content" / "README.md").exists()
+
+    ignored = (hugo_site / ".gitignore").read_text()
+    assert "/public/" in ignored and "/resources/" in ignored
+    readme = (hugo_site / "README.md").read_text()
+    for named in ("config/_default/params.toml", "config/_default/hugo.toml",
+                  "data/tags.json", "content/posts/", "hugo server"):
+        assert named in readme, named
+    assert not (hugo_site / "content" / "README.md").exists()
+
+
 def test_cover_prefers_stills_falls_back_to_gifs_skips_huge(tmp_path):
     import struct
     images = tmp_path / "images"

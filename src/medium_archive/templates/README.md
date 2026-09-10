@@ -256,6 +256,14 @@ up in -- `baseof.html`, `home.html`, `page.html`, `section.html`,
 section and a term's page share `section.html`, written to the site as
 `term.html` too), plus:
 
+- `README.md` and `gitignore` are copied into the site root as
+  `README.md` and `.gitignore`: what a built site needs to stand on its
+  own as a repository -- what to edit, what builds it, and what to keep
+  out of version control (`public/`, `resources/`, the build lock),
+  which is exactly what the exporter preserves across a rebuild. The
+  source is named without the dot so that git does not read it as an
+  ignore file for this directory. Neither reaches a page: Hugo only
+  publishes what is under `content/`.
 - `hugo.toml.tmpl` and `params.toml.tmpl` are the generated site
   config, written as a config directory (`config/_default/`) so that
   how the site is built and what it says about itself are separate
@@ -335,6 +343,12 @@ section and a term's page share `section.html`, written to the site as
 
 ## pelican/
 
+- `README.md` and `gitignore` are the pelican site's counterparts of
+  the hugo ones above, copied into the site root as `README.md` and
+  `.gitignore`: what to edit, what builds it, how to write a post, and
+  the build output to keep out of version control (`output/`,
+  `__pycache__/`, Pelican's content cache). Neither reaches a page:
+  Pelican only reads what is under `PATH`, which is `content/`.
 - `pelicanconf.py` is the generated config, and it is copied rather
   than filled in: it carries no site data at all, so the same bytes
   serve every archive. What the site says about itself is `site.json`

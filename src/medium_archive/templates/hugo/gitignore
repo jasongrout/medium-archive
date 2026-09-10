@@ -1,0 +1,9 @@
+# What `hugo` builds, and what `pagefind --site public` adds to it:
+# derived from everything else here, so it is rebuilt rather than kept.
+/public/
+
+# Hugo's caches: the images its pipeline has already resized, and the
+# lock file a build holds. Both are rebuilt, and the first is worth
+# keeping between builds on one machine but not in a repository.
+/resources/
+.hugo_build.lock
