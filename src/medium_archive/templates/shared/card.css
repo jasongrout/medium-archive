@@ -156,10 +156,29 @@ a:hover { text-decoration-line: underline; }
    that clears AAA -- so it is a non-text indicator on top of one that
    stands without it, and the same orange the rest of the chrome hovers
    in. It holds in both palettes: --accent is one value across the two,
-   and the rule's weight and position stay the browser's. Being the
-   default, it is the state with no attribute; "ink" is the choice that
-   drops the hover accent, and needs no rules of its own to do it. */
-:root:not([data-link]) a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+   and the rule's position stays the browser's. Being the default, it is
+   the state with no attribute; "ink" is the choice that drops the hover
+   accent, and needs no rules of its own to do it.
+
+   The hovered rule's weight is the heavier of 2px and the rule the
+   link already carries (--rule-w): 2px is a floor, so the hairline
+   under a byline or a page number thickens into an indicator, and it
+   is only a floor, so a rule already heavier than that is not thinned
+   on hover. The rest thickness here is the browser's own, which no
+   CSS value can name inside a max(), so --rule-w states what the
+   browser draws: Chromium rounds em/10 down to whole pixels (1px up to
+   19px text, 2px from 20px, 3px from 30px -- measured), and the
+   engines that take the font's own underline metric draw thinner than
+   that, so .1em is at or above what any of them puts under a word at
+   rest. Being the ceiling of a rounded-down value, it can land a pixel
+   over the rest rule on large text -- measured in Chromium, a link
+   goes 1px -> 2px at 13px text, 2px -> 2px at 20px and 3px -> 4px at
+   38px -- which is the direction a hover should err in anyway. A
+   choice that states a rest thickness of its own restates it in
+   --rule-w, and its hover follows that instead. */
+:root { --rule-w: .1em; }
+:root:not([data-link]) a:hover { text-decoration-color: var(--accent);
+                                 text-decoration-thickness: max(2px, var(--rule-w)); }
 /* The choices that colour the word as well as its rule. Both are the
    accent's complement in OKLCH -- its hue is 48deg, so 228deg -- and a
    step round towards a conventional link blue: "petrol-aaa" at the 7:1
@@ -172,11 +191,25 @@ a:hover { text-decoration-line: underline; }
    rather than long gaps. (Source Serif 4's own underline sits at
    -0.05em, where its descenders at -0.25em break the line into
    pieces and a thin rule reads thinner still.) */
-:root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea; }
-:root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe; }
+:root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
+                                --rule-w: 1px; }
+:root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe;
+                               --rule-w: 1px; }
 :root[data-link="petrol-aaa"] a, :root[data-link="link-blue"] a {
-                               text-decoration-thickness: 1px;
+                               text-decoration-thickness: var(--rule-w);
                                text-underline-offset: .15em; }
+/* Both take the default's hover as well: the rule turns the accent
+   under the pointer, at the same heavier-of-2px-and-the-rest-rule
+   weight, so a link says which one the pointer is on the same way
+   under every choice that draws a rule of its own. Their rest rule is
+   1px at every size, so that maximum is 2px throughout. The word keeps
+   its blue and the rule keeps the offset the rest state gave it, so
+   the hover moves nothing and recolours nothing that carries
+   letterforms -- the contrast each choice was picked for is the
+   text's, at rest and hovered alike. */
+:root[data-link="petrol-aaa"] a:hover, :root[data-link="link-blue"] a:hover {
+                               text-decoration-color: var(--accent);
+                               text-decoration-thickness: max(2px, var(--rule-w)); }
 /* "browser" is the control the rest are read against: a link drawn the
    way the browser draws one with no stylesheet at all, in LinkText,
    the reader's own platform link colour in the scheme the palette has
