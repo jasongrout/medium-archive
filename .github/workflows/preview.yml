@@ -6,7 +6,7 @@
 # Everything is regenerated from archive/raw/ + archive/fixups/ on each
 # run: `convert` rebuilds archive/posts/, each site exporter rebuilds
 # its top-level site directory with base_url pointed at this
-# deployment's subpath (site/site.json is patched only in the runner's
+# deployment's subpath (site/site.toml is patched only in the runner's
 # workspace), and each generator builds its site. Nothing derived is
 # committed.
 #
@@ -90,7 +90,7 @@ jobs:
 
       - name: Build the Hugo site
         run: |
-          python3 .github/scripts/set_base_url.py site/site.json "${{ steps.pages.outputs.base_url }}/hugo"
+          python3 .github/scripts/set_base_url.py site/site.toml "${{ steps.pages.outputs.base_url }}/hugo"
           medium-archive hugo
           cd site-hugo
           hugo
@@ -98,7 +98,7 @@ jobs:
 
       - name: Build the Pelican site
         run: |
-          python3 .github/scripts/set_base_url.py site/site.json "${{ steps.pages.outputs.base_url }}/pelican"
+          python3 .github/scripts/set_base_url.py site/site.toml "${{ steps.pages.outputs.base_url }}/pelican"
           medium-archive pelican
           cd site-pelican
           pelican
