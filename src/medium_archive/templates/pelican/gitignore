@@ -1,0 +1,9 @@
+# What `pelican` builds, and what `pagefind --site output` adds to it:
+# derived from everything else here, so it is rebuilt rather than kept.
+/output/
+
+# Pelican imports pelicanconf.py, and Python compiles what it imports.
+__pycache__/
+
+# Pelican's content cache, when LOAD_CONTENT_CACHE is turned on.
+/cache/

@@ -4,6 +4,20 @@ the converted archive. Same reproducibility contract as the myst step
 inside site-pelican/ (https://getpelican.com, `pip install
 pelican markdown-it-py mdit-py-plugins pyyaml`).
 
+What the site says about itself and how it is built are separate
+files. site.json beside the config is the data -- the archive's own
+site/site.json resolved for this site, with the images as the copies
+the site carries and what the exporter works out from several keys at
+once (the profile list, the masthead link's label, the newsletter
+band's defaults) written out as what it came to. pelicanconf.py reads
+it, one key at a time, into the settings the theme and the plugins
+render from; nothing else in that file is site data, so it is copied
+from templates/pelican/pelicanconf.py rather than filled in, and it is
+the same bytes for every archive. A checked-in copy of this site edits
+site.json and the three data/*.json name maps and nothing else. The
+hugo site splits the same two apart in its own config directory (see
+hugo.py).
+
 The site reads CommonMark rather than the python-markdown dialect
 Pelican reads by default: the generated config carries a reader built
 on markdown-it-py, which replaces Pelican's own (see the config
@@ -84,25 +98,30 @@ another host (Medium's "originally published at") carries it as a
 Canonical: header; the Medium copy is never a page's canonical.
 """
 
-import json
 import re
 import sys
 
 from .paths import archive_dir, site_dir, site_inputs
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
                     canonical_for, caption_text, clean_site,
-                    copy_site_asset, export_content, fill_template,
+                    copy_site_asset, export_content,
                     front_matter_yaml, image_size, load_site_inputs,
                     masthead_link, newsletter_params, page_stems,
                     quote_arg, redirect_mode, rewrite_figures,
-                    site_profiles, template_text, wants_redirect_stubs,
-                    wants_redirects_file, write_data_files,
-                    write_redirects_csv, write_templates)
+                    site_profiles, template_text, write_data_files,
+                    write_redirects_csv, write_site_json, write_templates)
 
-# The theme's files: file in the site -> its templates/ source (see
-# templates/README.md). The stylesheet is the card look shared with the
-# hugo theme.
+# The files the exporter copies in: file in the site -> its templates/
+# source (see templates/README.md). The theme is most of them, and its
+# stylesheet is the card look shared with the hugo theme; the README
+# and the .gitignore are what make the directory a repository of its
+# own rather than a build output, which is what it becomes once the
+# archive is done with it. (The .gitignore's source is named without
+# the dot, so that git does not read it as an ignore file for
+# templates/pelican/ itself.)
 TEMPLATES = {
+    "README.md": "pelican/README.md",
+    ".gitignore": "pelican/gitignore",
     "theme/templates/base.html": "pelican/theme/templates/base.html",
     "theme/templates/jsonld.html": "pelican/theme/templates/jsonld.html",
     "theme/templates/macros.html": "pelican/theme/templates/macros.html",
@@ -236,44 +255,55 @@ def build_site(root):
                             site / "theme" / "static" / "img", "share")
     share_size = (image_size(site / "theme" / "static" / "img" / share)
                   if share else None)
-    setting = lambda v: json.dumps(v) if v else "None"   # Python literals
-    (site / "pelicanconf.py").write_text(fill_template(
-        "pelican/pelicanconf.py.tmpl",
-        title=json.dumps(config["title"], ensure_ascii=False),
-        description=json.dumps(config.get("description", ""),
-                               ensure_ascii=False),
-        base_url=json.dumps(config.get("base_url", "").rstrip("/")),
-        avatar=setting(avatar and f"theme/img/{avatar}"),
-        favicon=setting(favicon and f"theme/{favicon}"),
-        logo=setting(logo and f"theme/img/{logo}"),
-        logo_dark=setting(logo_dark and f"theme/img/{logo_dark}"),
+    # site.json beside the config: this site's own data, the archive's
+    # site/site.json resolved for this site -- the images as the copies
+    # placed above, and what is worked out from several keys at once
+    # (the profile list, the masthead link's label, the newsletter
+    # band's defaults) as what it came to. Every key the config reads
+    # is written, unset ones as null, so the file is also the list of
+    # what there is to set. It, and data/*.json below, are the whole of
+    # what a checked-in copy of this site edits by hand; pelicanconf.py
+    # is machinery and says so.
+    write_site_json(site, {
+        "title": config["title"],
+        "description": config.get("description", ""),
+        "base_url": config.get("base_url", ""),
+        "locale": config.get("locale", "en"),
+        # the landing-page blurb and the footer line, Markdown; the
+        # config renders both
+        "intro": config.get("intro") or None,
+        "footer": config.get("footer") or None,
+        "avatar": avatar and f"theme/img/{avatar}",
+        "favicon": favicon and f"theme/{favicon}",
+        "logo": logo and f"theme/img/{logo}",
+        "logo_dark": logo_dark and f"theme/img/{logo_dark}",
         # where the mark points when it stands for something larger
         # than the blog (see sites.masthead_link); read, like the dark
         # mark, only where there is a logo to carry the link
-        logo_link=setting(logo and masthead_link(config)),
+        "logo_link": (logo and masthead_link(config)) or None,
         # a site-wide banner above the header -- an http(s) URL the theme
         # fetches client-side (empty content hides the banner, like Sphinx
         # themes' html announcement option), or literal HTML
-        announcement=(json.dumps(config["announcement"], ensure_ascii=False)
-                      if config.get("announcement") else "None"),
-        # the landing-page blurb and the footer line, Markdown; the
-        # config renders both
-        intro=setting(config.get("intro")),
-        footer=setting(config.get("footer")),
-        noindex="True" if config.get("noindex") else "False",
-        # which redirect mechanism the embedded plugin renders
-        # redirects.csv as (see sites.REDIRECT_MODES)
-        redirect_stubs="True" if wants_redirect_stubs(mode) else "False",
-        redirect_file="True" if wants_redirects_file(mode) else "False",
-        twitter=setting(config.get("twitter")),
-        profiles=json.dumps(site_profiles(config)),
+        "announcement": config.get("announcement") or None,
         # the signup band at the foot of every page: its heading and
         # the HubSpot form's ids (see sites.newsletter_params)
-        newsletter=setting(newsletter_params(config)),
-        share_image=setting(share and f"theme/img/{share}"),
-        share_image_size=setting(share_size and list(share_size)),
-        cover_size=setting(list(COVER_SIZE) if covers.pillow else None),
-    ) + "\n\n" + template_text("pelican/site_plugin.py"), encoding="utf-8")
+        "newsletter": newsletter_params(config),
+        "twitter": config.get("twitter") or None,
+        "profiles": site_profiles(config),
+        "share_image": share and f"theme/img/{share}",
+        "share_image_size": list(share_size) if share_size else None,
+        "cover_size": list(COVER_SIZE) if covers.pillow else None,
+        "noindex": bool(config.get("noindex")),
+        # which redirect mechanism the embedded plugin renders
+        # redirects.csv as (see sites.REDIRECT_MODES)
+        "redirects": mode,
+    })
+    # the config itself carries no site data, so it is copied rather
+    # than filled in: the same bytes for every archive, with the site
+    # plugin appended verbatim
+    (site / "pelicanconf.py").write_text(
+        template_text("pelican/pelicanconf.py") + "\n\n"
+        + template_text("pelican/site_plugin.py"), encoding="utf-8")
 
     # data/tags.json, data/authornames.json and data/authors.json: the
     # slug-to-name maps the site plugin names the Tag and Author objects

@@ -56,10 +56,23 @@ click-to-zoom body images (post pages open an image whose original
 holds more detail than the column shows full size in a modal, like
 Medium's); search is then
 the one feature Hugo does not generate (run `pagefind --site public`
-after `hugo` for a static search UI). site.json's optional `hugo`
-section tunes the generated config: `locale`, `avatar` and `favicon`
-(overriding the top-level keys), and `params` merged last into
-[params].
+after `hugo` for a static search UI).
+
+The config is written as a directory, config/_default/, so that what
+the site says about itself and how it is built are separate files:
+params.toml carries the data the theme renders from (the masthead and
+where it points, the banner, the footer line, the newsletter band, the
+share image, `noindex`, the publication's handle and profiles), and
+hugo.toml the machinery -- the taxonomies, the related-posts index,
+the paginator, Goldmark and Chroma -- plus the address, name and
+language Hugo takes only at the root of its configuration. That is the
+same split the pelican site makes between its site.json and its
+generated pelicanconf.py, in the file Hugo's own conventions put it
+in. Hugo reads a config directory in preference to a root config file,
+so there is one place to look. site.json's optional `hugo` section
+tunes what is written: `locale`, `avatar`, `favicon`, `logo` and
+`logo_dark` (overriding the top-level keys), and `params` merged last
+into params.toml.
 """
 
 import json
@@ -76,15 +89,22 @@ from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     wants_redirects_file, write_data_files,
                     write_redirects_csv, write_templates)
 
-# The built-in theme: file in the site -> its templates/ source (see
-# templates/README.md for the rationale behind the individual files).
-# The regular list and taxonomy pages share one layout; the stylesheet
-# is the card look shared with the pelican theme. The feed override and
-# the figure shortcode (with the image partial it and the render hook
+# The files the exporter copies in: file in the site -> its templates/
+# source (see templates/README.md for the rationale behind the
+# individual files). The built-in theme is most of them: the regular
+# list and taxonomy pages share one layout, and the stylesheet is the
+# card look shared with the pelican theme. The feed override and the
+# figure shortcode (with the image partial it and the render hook
 # share) are content policy rather than styling: the pages' figure
 # calls resolve to that shortcode, which takes the caption as inner
-# content.
+# content. The README and the .gitignore are neither: they are what
+# make the directory a repository of its own rather than a build
+# output, which is what it becomes once the archive is done with it.
+# (The .gitignore's source is named without the dot, so that git does
+# not read it as an ignore file for templates/hugo/ itself.)
 TEMPLATES = {
+    "README.md": "hugo/README.md",
+    ".gitignore": "hugo/gitignore",
     "layouts/baseof.html": "hugo/layouts/baseof.html",
     "layouts/_partials/card.html": "hugo/layouts/_partials/card.html",
     "layouts/_partials/share.html": "hugo/layouts/_partials/share.html",
@@ -173,14 +193,16 @@ def front_matter(url: str, post: dict, cover: str | None = None,
 
 
 def _toml_params(params: dict) -> str:
-    """[params] as TOML: flat keys first, dict values as sub-tables whose
-    dict entries render as inline tables. Values go through JSON, whose
-    scalar/list syntax TOML shares."""
+    """The body of config/_default/params.toml: flat keys first, dict
+    values as tables whose dict entries render as inline tables. The
+    file's name is what makes these Hugo's [params], so no key is
+    prefixed and no table header names one. Values go through JSON,
+    whose scalar/list syntax TOML shares."""
     j = lambda v: json.dumps(v, ensure_ascii=False)
     flat, tables = [], []
     for key, value in params.items():
         if isinstance(value, dict):
-            rows = [f"[params.{key}]"]
+            rows = [f"[{key}]"]
             for name, item in value.items():
                 if isinstance(item, dict):
                     inner = ", ".join(f"{k} = {j(v)}" for k, v in item.items())
@@ -190,7 +212,8 @@ def _toml_params(params: dict) -> str:
             tables.append("\n".join(rows))
         else:
             flat.append(f"{key} = {j(value)}")
-    return "\n\n".join(["[params]\n" + "\n".join(flat)] + tables)
+    # flat keys before the first table header, as TOML requires
+    return "\n\n".join(([("\n".join(flat))] if flat else []) + tables)
 
 
 def build_site(root):
@@ -323,13 +346,27 @@ def build_site(root):
     if share:
         params["share_image"] = f"img/{share}"
     params.update(hugo_config.get("params", {}))
-    (site / "hugo.toml").write_text(fill_template(
+    # The config as a directory rather than one hugo.toml, so that what
+    # this site says about itself and how it is built are separate
+    # files: params.toml is the site's data, hand-editable and the only
+    # one a checked-in copy of the site has to touch for its own
+    # furniture; hugo.toml is the machinery, plus the three keys Hugo
+    # takes at the root of its configuration and nowhere else -- its
+    # address, its name and its language. Hugo reads a config directory
+    # in preference to a root config file, so nothing else in the site
+    # is a second place to look. The pelican site splits the same two
+    # apart the same way (site.json and pelicanconf.py).
+    config_dir = site / "config" / "_default"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    (config_dir / "hugo.toml").write_text(fill_template(
         "hugo/hugo.toml.tmpl",
         base_url=json.dumps(config.get("base_url", "https://example.org/")),
         title=json.dumps(config["title"], ensure_ascii=False),
-        locale=json.dumps(hugo_config.get("locale", "en")),
-        params=_toml_params(params),
+        locale=json.dumps(hugo_config.get("locale")
+                          or config.get("locale") or "en"),
     ), encoding="utf-8")
+    (config_dir / "params.toml").write_text(fill_template(
+        "hugo/params.toml.tmpl", params=_toml_params(params)), encoding="utf-8")
     write_templates(site, TEMPLATES)
     new_path = lambda stem: f"/posts/{stem}/"
     # the map itself, whichever mechanism serves it: what a redirect

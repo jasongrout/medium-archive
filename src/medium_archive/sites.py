@@ -994,6 +994,22 @@ def write_data_files(site: Path, manifest: dict, archive: Path) -> dict:
     return data
 
 
+def write_site_json(site: Path, data: dict):
+    """<site>/site.json: this site's own data, in the shape its
+    generated config reads. It is the archive's hand-written
+    site/site.json resolved for one built site -- the images as the
+    copies that site carries, and what several keys together come to
+    (the profile list, the masthead link's label) written out -- so
+    that a checked-in copy of the site has one file to edit for
+    everything the pages say about themselves, and none of it is buried
+    in generated machinery. Hugo has its own place for the same data
+    (config/_default/params.toml, which is that engine's file for it);
+    this is the pelican site's."""
+    (site / "site.json").write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8")
+
+
 def site_profiles(config: dict) -> list:
     """The publication's addresses elsewhere, for the Organization's
     sameAs: site.json "profiles" (a list of URLs) plus the X/Twitter
