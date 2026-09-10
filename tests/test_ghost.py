@@ -10,7 +10,7 @@ from _fakes import FakeResp, FakeSession
 from medium_archive import compare as comparemod
 from medium_archive import convert as convertmod
 from medium_archive import ghost as ghostmod
-from medium_archive.paths import archive_dir
+from _project import archive_dir
 from medium_archive.pages import ghost_body, ghost_metadata, is_ghost_page
 
 BASE = "http://blog.example.com/"
@@ -130,7 +130,8 @@ def test_ghost_page_parsing():
 def run_import(out, monkeypatch, **overrides):
     session = FakeSession(router=router)
     monkeypatch.setattr(ghostmod, "make_session", lambda: session)
-    args = dict(out=out, base=BASE, urls=None, limit=0, force=False,
+    args = dict(archive=archive_dir(out), base=BASE, urls=None, limit=0,
+                force=False,
                 delay=0, no_images=False)
     ghostmod.cmd_import_ghost(SimpleNamespace(**{**args, **overrides}))
     return session
@@ -192,7 +193,8 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
                    for c in snapshot_calls)
 
     # standalone ghost posts convert as before
-    convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
+    convertmod.cmd_convert(SimpleNamespace(archive=archive_dir(tmp_path),
+                                           prefer_page=False,
                                            prefer_ghost=False, only=[url],
                                            clean=False, base=None))
     posts = archive_dir(tmp_path) / "posts"
@@ -202,7 +204,8 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     assert '"ghost_url": null' in md    # original_url IS the ghost URL
 
     # a twin converts from the Medium page by default...
-    convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
+    convertmod.cmd_convert(SimpleNamespace(archive=archive_dir(tmp_path),
+                                           prefer_page=False,
                                            prefer_ghost=False, only=[MIGRATED_URL],
                                            clean=False, base=None))
     md = (posts / "2015-05-05-migrated-post" / "index.md").read_text()
@@ -210,7 +213,8 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     assert '"ghost_url": "http://blog.example.com/2015/05/05/migrated"' in md
 
     # ...and from the attached Ghost capture with --prefer-ghost
-    convertmod.cmd_convert(SimpleNamespace(out=tmp_path, prefer_page=False,
+    convertmod.cmd_convert(SimpleNamespace(archive=archive_dir(tmp_path),
+                                           prefer_page=False,
                                            prefer_ghost=True, only=[MIGRATED_URL],
                                            clean=False, base=None))
     md = (posts / "2015-05-05-migrated-post" / "index.md").read_text()
@@ -222,7 +226,8 @@ def test_import_ghost_attach_and_convert(tmp_path, monkeypatch):
     assert "/migrated-post-abcdef123456,abcdef123456," in redirects
 
     # compare --ghost reports the difference without gating (no SystemExit)
-    comparemod.cmd_compare(SimpleNamespace(out=tmp_path, only=None, ghost=True))
+    comparemod.cmd_compare(SimpleNamespace(archive=archive_dir(tmp_path),
+                                           only=None, ghost=True))
 
 
 def test_snapshot_candidates_spread_past_a_post_ghost_era():

@@ -31,13 +31,15 @@ import re
 import sys
 from pathlib import Path
 
-from .paths import archive_dir, site_dir
+from .paths import (DEFAULT_IMAGE_CACHE, DEFAULT_SITE_INPUTS,
+                    default_out)
 from .sites import (IFRAME_RE, VIDEO_RE, Covers, ImagePlacer, LinkMap, by_year,
-                    clean_site, markdown_text,
+                    clean_out, markdown_text,
                     load_site_inputs, page_dir_name, page_stems, place_images,
-                    read_post_body, retarget_images, rewrite_body as _rewrite,
+                    read_post_body, report_stale_pages, retarget_images,
+                    rewrite_body as _rewrite,
                     rewrite_figures, tag_names, template_text,
-                    write_redirects_csv)
+                    write_redirects_csv, write_templates)
 
 # Segments MyST-escaping must leave alone: inline code, link destinations,
 # autolinks. Everything else in a prose line is text MyST will parse.
@@ -57,6 +59,16 @@ LISTING_PLUGIN_URL = ("https://github.com/myst-contrib/myst-listing/"
 # gallery's cover images need it). It must be listed *after* myst-listing
 # in myst.yml: plugin transforms run in listing order.
 COVER_SHIM_NAME = "listing-covers.mjs"
+
+# What makes the directory a repository of its own rather than a build
+# output, as the hugo and pelican sites carry: a README naming what to
+# edit and how to build it, and a .gitignore keeping mystmd's _build/
+# out. (The .gitignore's source is named without the dot, so that git
+# does not read it as an ignore file for templates/myst/ itself.)
+TEMPLATES = {
+    "README.md": "myst/README.md",
+    ".gitignore": "myst/gitignore",
+}
 
 
 def _yml(value) -> str:
@@ -291,19 +303,24 @@ def write_archive(site: Path, manifest: dict, stems: dict):
     (site / "archive.md").write_text("\n".join(lines), encoding="utf-8")
 
 
-def build_site(root: Path) -> Path:
-    archive = archive_dir(root)
-    manifest, config = load_site_inputs(root)
+def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
+               cache=DEFAULT_IMAGE_CACHE, clean=False) -> Path:
+    """The MyST site in `out`, from the archive and the hand-written
+    site inputs. Written in place, so `out` can be a checkout of the
+    published site; --clean empties it first, keeping what git ignores
+    there -- mystmd's _build/, its template cache and rendered output,
+    among them (see clean_out)."""
+    archive, inputs = Path(archive), Path(inputs)
+    site = Path(out) if out is not None else default_out("myst")
+    manifest, config = load_site_inputs(archive, inputs)
     names = tag_names(manifest, archive)
     stems = page_stems(manifest)
     links = LinkMap(manifest, stems)
-    # Rebuild from scratch, but keep mystmd's _build/ (its template cache
-    # and rendered output) so regenerating doesn't force a re-download.
-    site = site_dir(root, "myst")
-    clean_site(site, keep=("_build",))
-    (site / "posts").mkdir(parents=True)
+    if clean:
+        clean_out(site, build_dirs=("_build",))
+    (site / "posts").mkdir(parents=True, exist_ok=True)
     covers = Covers(archive, manifest, shown_as="gallery covers")
-    placer = ImagePlacer(root, config)
+    placer = ImagePlacer(cache, config)
     placer.warm(archive, manifest)
     pages = 0
     for url, p in manifest.items():
@@ -312,7 +329,7 @@ def build_site(root: Path) -> Path:
             continue
         body = rewrite_body(body, links, "../")
         page_dir = site / "posts" / page_dir_name(p)
-        page_dir.mkdir()
+        page_dir.mkdir(exist_ok=True)
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed
         renames = place_images(archive, p, page_dir, placer)
@@ -329,8 +346,11 @@ def build_site(root: Path) -> Path:
     (site / COVER_SHIM_NAME).write_text(
         template_text("myst/listing-covers.mjs"), encoding="utf-8")
     write_myst_yml(site, manifest, stems, config)
+    write_templates(site, TEMPLATES)
     write_redirects_csv(site, manifest, stems,
                         page_paths(manifest, stems).__getitem__)
+    report_stale_pages(site / "posts", {page_dir_name(p)
+                                        for p in manifest.values()})
     print(f"myst done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && myst start   (or: myst build --html)",
           file=sys.stderr)
@@ -338,4 +358,5 @@ def build_site(root: Path) -> Path:
 
 
 def cmd_myst(args):
-    build_site(args.out)
+    build_site(args.archive, args.out, args.site_inputs,
+               args.image_cache, args.clean)

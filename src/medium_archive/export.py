@@ -16,7 +16,6 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from .paths import archive_dir
 from .pages import mark_subtitle
 from .urls import canonical_url, medium_id
 
@@ -95,7 +94,7 @@ def post_id(meta: dict, filename: str) -> str | None:
 def cmd_import_export(args):
     from .fetch import read_index, write_index   # avoid import cycle
 
-    raw_dir = archive_dir(args.out) / "raw"
+    raw_dir = Path(args.archive) / "raw"
     index = read_index(raw_dir)
     by_id = {e.get("medium_id"): url for url, e in index.items()}
     imported = drafts = unmatched = skipped = 0

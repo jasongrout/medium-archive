@@ -6,7 +6,7 @@ import zipfile
 from pathlib import Path
 
 from medium_archive.export import cmd_import_export, iter_export_files
-from medium_archive.paths import archive_dir
+from _project import archive_dir
 
 POST = """<html><head><title>Hello</title></head><body>
 <footer><a class="p-canonical" href="https://blog.example.com/hello-0123456789ab">Canonical</a>
@@ -71,7 +71,8 @@ def test_unzipped_export_directory(tmp_path):
 
 def test_import_posts_only_zip(tmp_path, capsys):
     z = make_zip(tmp_path / "posts.zip", ["2020-01-02_Hello--0123456789ab.html"])
-    args = argparse.Namespace(out=tmp_path, export_path=z, all=True, drafts=False)
+    args = argparse.Namespace(archive=archive_dir(tmp_path), export_path=z,
+                              all=True, drafts=False)
     cmd_import_export(args)
     raw = archive_dir(tmp_path) / "raw"
     assert (raw / "0123456789ab" / "export.html").read_text() == POST

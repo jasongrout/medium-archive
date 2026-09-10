@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import requests
 
 from _fakes import FakeResp, FakeSession
-from medium_archive.paths import archive_dir
+from _project import archive_dir
 from medium_archive import fetch as fetchmod
 
 BASE = "https://blog.example.com/"
@@ -33,7 +33,8 @@ def run_fetch(out, gone_now, monkeypatch):
     monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
     monkeypatch.setattr(fetchmod, "make_session", lambda: FakeSession())
     fetchmod.cmd_fetch(SimpleNamespace(
-        out=out, base=BASE, urls=None, no_wayback=False, start=None, end=None,
+        archive=archive_dir(out), base=BASE, urls=None, no_wayback=False,
+        start=None, end=None,
         oldest_first=False, limit=0, existing=None, force=False, delay=0,
         no_images=True))
 
@@ -124,7 +125,8 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
 
     monkeypatch.setattr(fetchmod, "fetch_post", fail_fetch_post)
     fetchmod.cmd_fetch(SimpleNamespace(
-        out=tmp_path, base=BASE, urls=None, no_wayback=False, start=None,
+        archive=archive_dir(tmp_path), base=BASE, urls=None,
+        no_wayback=False, start=None,
         end=None, oldest_first=False, limit=0, existing=None, force=False,
         delay=0, no_images=True))
     assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.json").exists()

@@ -88,9 +88,12 @@ The body, as Markdown.
 
 ## While this directory is still generated
 
-`medium-archive hugo` rewrites every file here except `public/` and
-`resources/`, so until this site is a repository of its own,
-corrections belong upstream in the archive: site-wide settings in its
-`site/site.toml`, tag names in its `archive/tags.json`, a byline in the
-post itself. Once it is a repository of its own, this is the only copy,
-and the files here are the ones to edit.
+`medium-archive hugo` writes the files it generates over whatever is
+here and leaves everything else alone, so until this site is a
+repository of its own, corrections belong upstream in the archive:
+site-wide settings in its `site/site.toml`, tag names in its
+`archive/tags.json`, a byline in the post itself. Once it is a
+repository of its own — `medium-archive hugo --out DIR` builds into it,
+and `--clean` sweeps out the pages the archive no longer has, sparing
+`.git/` and everything `.gitignore` here covers — this is the only
+copy, and the files here are the ones to edit.

@@ -25,7 +25,6 @@ from .state import (state_embed_targets, state_image_urls,
                     state_media_resources)
 from .net import fetch, make_session
 from .pages import extract_metadata
-from .paths import archive_dir
 from .readme import write_readme
 from .urls import (canonical_url, carbon_id, medium_id, norm_key, slug_of,
                    tweet_id)
@@ -453,7 +452,7 @@ def resolve_post_ref(line: str, out: Path, index: dict) -> str:
 
 
 def cmd_fetch(args):
-    archive = archive_dir(args.out)
+    archive = Path(args.archive)
     raw_dir = archive / "raw"
     start = args.start or datetime.now(timezone.utc)
     end = args.end
