@@ -119,6 +119,31 @@ def test_shared_slugs_keep_date_prefix(tmp_path):
                                       "2020-06-01-workshops", "unique-post"]
 
 
+def test_page_names_fold_to_ascii(tmp_path):
+    """Medium leaves a title's accents in the path it builds, and a page
+    URL is no place for them: the site serves the post at the folded
+    name. Two slugs that differ only by an accent fold to one name, and
+    are told apart the way any other shared name is."""
+    manifest = {}
+    make_post(tmp_path, manifest, "voil\u00e0-0-5-0-homecoming", "aaa111aaa111",
+              "2023-09-01T00:00:00Z", "One.\n")
+    # a variation selector, left behind by an emoji in the title
+    make_post(tmp_path, manifest, "jupyterlite-jupyter-\ufe0f-webassembly",
+              "bbb222bbb222", "2021-05-01T00:00:00Z", "Two.\n")
+    # the accent is the whole of the difference between these two
+    make_post(tmp_path, manifest, "and-voil\u00e0", "ccc333ccc333",
+              "2019-01-01T00:00:00Z", "Three.\n")
+    make_post(tmp_path, manifest, "and-voila", "ddd444ddd444",
+              "2020-02-02T00:00:00Z", "Four.\n")
+    # nothing ASCII to fold to: the id its URL ends in names the page
+    make_post(tmp_path, manifest, "\u65e5\u672c\u8a9e", "eee555eee555",
+              "2022-03-03T00:00:00Z", "Five.\n")
+
+    assert sorted(page_stems(manifest).values()) == [
+        "2019-01-01-and-voila", "2020-02-02-and-voila", "eee555eee555",
+        "jupyterlite-jupyter-webassembly", "voila-0-5-0-homecoming"]
+
+
 def test_link_map_matches_url_variants():
     manifest = {f"{BASE}/a-post-abc123abc123": {
         "dir": "posts/2020-01-01-a-post", "slug": "a-post",
