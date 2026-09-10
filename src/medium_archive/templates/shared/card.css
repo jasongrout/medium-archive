@@ -392,20 +392,28 @@ a:hover { text-decoration-line: underline; }
         font-size: 1.25rem; line-height: 1.6;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
-/* A heading takes the accent as a rule beneath it, never as its own
-   colour: #f37626 sets at 2.83:1 on the white card, under even the 3:1
-   floor large text asks for, so it belongs on the page as a mark and
-   not as words. The rule runs the column's full measure, where a stub
-   under a heading several times its length reads as an unfinished
-   edge; at that width it carries some twenty times the ink, so it is
-   drawn a pixel thinner than the nav's 3px bar to keep the weight
-   where the short one had it. It marks the section headings only: the
-   title needs no rule under it, since the byline already sets it off
-   from what follows, and deeper levels are structure, not signposts. */
-.post h2::after { content: ""; display: block;
-                  height: 2px; margin: .5rem 0 0;
-                  background: var(--accent); }
-.post h2 { margin-top: 2.2rem; }
+/* Headings set their own leading. .post carries line-height 1.6 for
+   running text, and a heading that inherits it computes that 1.6
+   against its own size: an h2 at the UA's 1.5em is 30px of glyph in a
+   48px line box, and the 9px of half-leading under the words reads as
+   a gap rather than as line spacing. 1.25 is what h1 and the
+   newsletter heading already state for the same reason.
+
+   The margins are asymmetric on purpose: a heading belongs to the text
+   beneath it, so the space that separates it from the section above
+   has to be several times the space that joins it to its own first
+   paragraph. Left to the UA it is neither -- h2's 0.83em top and
+   bottom, with the paragraph's own 1em collapsing into the bottom,
+   land near-equal space on both sides and the heading floats between
+   two paragraphs instead of opening one. Roughly 3:1 binds it.
+
+   h2 takes those margins in rem, the fixed measure h1 above states.
+   The deeper levels take em, so one rule serves all four: each is
+   spaced in proportion to whatever size it is set at, and h6's air
+   does not match h3's. */
+.post :is(h2, h3, h4, h5, h6) { line-height: 1.25; }
+.post h2 { margin: 2.75rem 0 .5rem; }
+.post :is(h3, h4, h5, h6) { margin: 1.8em 0 .3em; }
 /* The link mark heading-anchor.html hangs on the end of every heading
    in the body, the affordance jupyter.org's own pages carry: it
    addresses the section it sits in, so a reader can send someone to
