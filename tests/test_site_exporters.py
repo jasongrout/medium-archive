@@ -890,6 +890,10 @@ def test_theme_picker_and_dark_scheme(project):
     # the two blues hover the way the default does: an accent rule
     assert ':root[data-link="petrol-aaa"] a:hover' in css
     assert ':root[data-link="link-blue"] a:hover' in css
+    # and every accent hover is drawn at the heavier of 2px and the
+    # rule the link already carries, so it never thins that rule
+    assert css.count("max(2px, var(--rule-w))") == 2
+    assert "--rule-w: .1em;" in css
     assert (pelican_site / "theme/static/css/style.css").read_text() == css
     for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):

@@ -96,11 +96,15 @@ These embed verbatim in both engines' pages, so they must carry no
   three times the separation from the body ink -- and the browser's own
   link, its colour and its own rule, as the control the rest are read
   against. Both blues take the default's hover as well: the word keeps
-  its blue and the rule turns 2px accent under the pointer, so `ink`
-  and the browser's own link are the choices that go without it. The
-  accent colours no choice's text: at 2.83:1 it sits under the 3:1 a
-  non-text indicator wants, which leaves it a hover rule under a link
-  that already reads as one, and the colour of headings and chrome.
+  its blue and the rule turns accent under the pointer, so `ink` and
+  the browser's own link are the choices that go without it. A hovered
+  rule is drawn at the heavier of 2px and the rule the link already
+  carries (`--rule-w` in `card.css`), so it thickens a hairline under
+  small text into an indicator without thinning the heavier rule large
+  text gets. The accent colours no choice's text: at 2.83:1 it sits
+  under the 3:1 a non-text indicator wants, which leaves it a hover
+  rule under a link that already reads as one, and the colour of
+  headings and chrome.
   `card.css` states a choice as a pair of values, light and dark, so a
   candidate is one `:root[data-link=...]` block and no scheme rules of
   its own; it also carries the reasoning behind the numbers. The losing
