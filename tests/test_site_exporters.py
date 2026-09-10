@@ -1971,9 +1971,9 @@ def test_animated_gifs_capped_via_gifsicle(tmp_path):
     assert not (placed.parent / "anim.mp4").exists()
 
 
-def animation(path, frames, **save):
+def animation(path, frames, duration=100, **save):
     frames[0].save(path, save_all=True, append_images=frames[1:],
-                   duration=100, loop=0, **save)
+                   duration=duration, loop=0, **save)
     return path
 
 
@@ -2041,6 +2041,40 @@ def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
     assert placer.place(gif, out / "clip.gif").suffix == ".gif"
     assert any("libwebp" in note and "animated_format" in note
                for note in placer.notes), placer.notes
+
+
+@pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
+                    reason="ffmpeg not installed")
+def test_a_long_animation_is_a_clip_even_where_it_costs_more(tmp_path):
+    """A display copy is placed only when it undercuts what it replaces
+    -- except a clip of an animation that runs past five seconds, where
+    what it buys is the pause control WCAG 2.2.2 asks for rather than
+    the bytes. Noise is the one thing gif carries more cheaply than
+    near-lossless video, so both of these cost more as clips; only the
+    long one is placed as one."""
+    import os
+
+    from PIL import Image
+
+    src = tmp_path / "src"
+    src.mkdir()
+
+    def noise_loop(name, frames):
+        pictures = [Image.frombytes("RGB", (160, 120),
+                                    os.urandom(160 * 120 * 3)).convert("P")
+                    for _ in range(frames)]
+        return animation(src / name, pictures, duration=200)
+
+    long_loop = noise_loop("long.gif", 30)          # 6 s
+    short_loop = noise_loop("short.gif", 10)        # 2 s
+    placer = sites.ImagePlacer(tmp_path / "cache", {"images": {"video_crf": 1}})
+    out = tmp_path / "out"
+    out.mkdir()
+    clip = placer.place(long_loop, out / "long.gif")
+    assert clip.suffix == ".mp4"
+    assert (clip.stat().st_size + sites.poster_path(clip).stat().st_size
+            > long_loop.stat().st_size)          # placed for the controls
+    assert placer.place(short_loop, out / "short.gif").suffix == ".gif"
 
 
 def test_video_size_rounds_to_the_even_dimensions_video_needs():

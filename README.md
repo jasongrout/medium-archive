@@ -460,6 +460,13 @@ instead.
   spends on "unchanged since the previous frame"); gifsicle resizes
   those to the cap as before. `raw/` and `posts/` keep the original gif
   either way: this is display-copy work.
+- A display copy is placed only when it undercuts what it replaces,
+  and a clip of an animation running past five seconds is the
+  exception: there the clip is what makes the motion stoppable at all,
+  which is worth more than the bytes. Under five seconds WCAG 2.2.2
+  does not apply and the smaller file wins, so a short loop that is
+  cheaper as a gif stays one. On the reference archive 18 animations
+  are placed as clips on that rule, the longest of them 76 seconds.
 - Both card themes render a clip as a `<video>` with `controls`, the
   poster as its picture until it is played, real width and height off
   that poster, `preload="none"` so nothing is fetched until it is

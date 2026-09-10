@@ -568,6 +568,16 @@ VIDEO_PRESET = "fast"
 # through Pillow it measured longer than encoding the whole clip.
 POSTER_SUFFIX = "-poster.webp"
 POSTER_QUALITY = 90
+# What WCAG 2.2.2 (Pause, Stop, Hide) turns on: motion that runs longer
+# than five seconds has to be stoppable. A display copy is normally
+# placed only when it undercuts what it replaces, and a clip past this
+# length is the exception -- what it buys there is the pause control,
+# not the bytes. On the reference archive that is 18 gifs, the longest
+# of them 76 seconds, whose clips came out no smaller: small, heavily
+# optimized animations where h264 spends more on the gif's dithering
+# than the gif does. Under five seconds the smaller file wins and the
+# gif stays a gif.
+MOTION_SECONDS = 5
 
 # A still is line art when it holds few enough distinct colors and
 # enough flat runs. The two classes separate cleanly on that pair --
@@ -588,7 +598,7 @@ LINE_ART_QUALITY = 90
 PHOTO_QUALITY = 85
 # Bumped when the copies a given cap produces change shape, so caches
 # written by an older scheme are ignored rather than misread.
-CACHE_SCHEME = "v3"
+CACHE_SCHEME = "v4"
 
 
 def poster_path(clip: Path) -> Path:
@@ -694,6 +704,7 @@ class ImagePlacer:
         self.ffmpeg = (shutil.which("ffmpeg")
                        if self.animated_format == "mp4" else None)
         self.ffmpeg_webp = None            # asked once, on the first clip
+        self.ffprobe = None                # looked up on the first clip
         try:
             from PIL import Image
             self.pillow = Image
@@ -805,8 +816,7 @@ class ImagePlacer:
         for suffix in candidates:
             cached = self.cache / f"{digest}{suffix}"
             if cached.exists():
-                return (cached if cached.stat().st_size < src.stat().st_size
-                        else None)
+                return cached if self._worth_placing(cached, src) else None
         self.cache.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=self.cache, suffix=ext)
         os.close(fd)
@@ -814,7 +824,7 @@ class ImagePlacer:
         if not built:
             discard_copy(tmp)
             return None
-        if os.path.getsize(tmp) >= src.stat().st_size:
+        if built != ".mp4" and os.path.getsize(tmp) >= src.stat().st_size:
             discard_copy(tmp)              # the copy did not pay off
             built = ext                    # cache the verdict all the same
             cached = self.cache / f"{digest}{built}"
@@ -828,7 +838,16 @@ class ImagePlacer:
             if poster.exists():
                 os.replace(poster, poster_path(cached))
             os.replace(tmp, cached)
-        return cached if cached.stat().st_size < src.stat().st_size else None
+        return cached if self._worth_placing(cached, src) else None
+
+    def _worth_placing(self, copy: Path, src: Path) -> bool:
+        """Whether a display copy is placed at all: it has to undercut
+        what it replaces -- except a clip, which _encode_video has
+        already weighed against the gif and against what a reader can
+        do with it (see MOTION_SECONDS), and which is never in the
+        cache unless it won that."""
+        return (copy.suffix == ".mp4"
+                or copy.stat().st_size < src.stat().st_size)
 
     def _probe(self, src: Path):
         """(width, height), by header sniff or Pillow, else None."""
@@ -940,9 +959,27 @@ class ImagePlacer:
                        + "; kept as a gif")
             return None
         if (os.path.getsize(tmp) + poster.stat().st_size
-                >= src.stat().st_size):
-            return None                    # the pair costs more than the gif
+                >= src.stat().st_size
+                and self._clip_seconds(tmp) <= MOTION_SECONDS):
+            return None      # no smaller, and short enough to leave as a gif
         return ".mp4"
+
+    def _clip_seconds(self, clip: str) -> float:
+        """How long a clip runs. ffprobe reads it from the container it
+        just wrote, without decoding anything; where ffprobe is not on
+        the path the answer is 0, which leaves the byte rule to decide
+        alone (see MOTION_SECONDS)."""
+        if self.ffprobe is None:
+            self.ffprobe = shutil.which("ffprobe") or ""
+        if not self.ffprobe:
+            return 0.0
+        run = subprocess.run([self.ffprobe, "-v", "error", "-show_entries",
+                              "format=duration", "-of", "csv=p=0", clip],
+                             capture_output=True, text=True)
+        try:
+            return float((run.stdout or "").strip())
+        except ValueError:
+            return 0.0
 
     def _resizes_gif(self, src: Path, cap: int) -> bool:
         """Whether gifsicle has anything to do for this gif."""

@@ -672,10 +672,20 @@ Feeds and sharing:
   said it had to be: `"transparency" in im.info` says nearly nothing
   about an animation, gif spending that index on "unchanged since the
   previous frame". A gif that really is see-through keeps its format,
-  and so does one whose clip and poster fail to undercut it, one
-  ffmpeg fails on, and every gif at all when `animated_format = "gif"`
-  or ffmpeg or Pillow is missing; gifsicle still resizes those to the
-  cap.
+  and so does one ffmpeg fails on, and every gif at all when
+  `animated_format = "gif"` or ffmpeg or Pillow is missing; gifsicle
+  still resizes those to the cap.
+
+  The placer's own "a copy that came out no smaller is not placed"
+  rule needed an exception, which the first full run over the archive
+  found: 20 of the 228 gifs are small, heavily optimized animations
+  whose clips come out no smaller -- and 18 of those run past five
+  seconds, one of them for 76, which is to say they were exactly the
+  WCAG 2.2.2 failures this work exists to fix, kept broken by a rule
+  about bytes. Past five seconds the clip is now placed whichever way
+  the bytes fall (`MOTION_SECONDS`, read off the encoded clip with
+  ffprobe); under it, 2.2.2 does not apply and the smaller file still
+  wins.
 
   The text alternative is carried across rather than lost on the way:
   a `<video>` has no `alt`, so both card themes put the image's alt
