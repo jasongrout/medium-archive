@@ -868,6 +868,8 @@ class ImagePlacer:
         if not self.pillow:
             self._note("pillow not installed: animated gifs stay gifs")
             return False
+        if not self._writes_webp():
+            return False
         try:
             with self.pillow.open(src) as im:
                 if getattr(im, "n_frames", 1) < 2:
@@ -883,32 +885,35 @@ class ImagePlacer:
         return True
 
     def _writes_webp(self) -> bool:
-        """Whether this ffmpeg can write the poster itself. Most builds
-        carry libwebp and some do not -- and a build without it fails
-        the whole run ("Encoder not found"), taking the clip with the
-        still -- so it is asked once, and Pillow writes the poster
-        where the answer is no."""
+        """Whether this ffmpeg can write a clip's poster. Most builds
+        carry libwebp; one that does not fails the whole run with
+        "Encoder not found", taking the clip down with the still, which
+        is worth saying plainly once rather than reporting as an ffmpeg
+        error per gif."""
         if self.ffmpeg_webp is None:
             run = subprocess.run([self.ffmpeg, "-hide_banner", "-loglevel",
                                   "error", "-encoders"],
                                  capture_output=True, text=True)
             self.ffmpeg_webp = " libwebp " in (run.stdout or "")
             if not self.ffmpeg_webp:
-                self._note("ffmpeg has no libwebp: clip posters are "
-                           "written by pillow instead")
+                self._note(
+                    f"{self.ffmpeg} was built without libwebp, which a "
+                    "clip's poster frame needs: animated gifs stay gifs. "
+                    "Install an ffmpeg built with libwebp (the ffmpeg "
+                    "package on Debian, Ubuntu and Homebrew is), or set "
+                    '[images] animated_format = "gif" in site.toml to '
+                    "stop asking for clips.")
         return self.ffmpeg_webp
 
     def _encode_video(self, src: Path, tmp: str, cap: int):
         """The gif's frames as h264 in mp4, and its first frame beside
-        it as the poster -- from one ffmpeg run where that build can
-        encode webp, since the gif is then decoded once and feeds both
-        outputs, and through Pillow where it cannot. Timestamps pass
+        it as the poster, from one ffmpeg run: the gif is decoded once
+        and feeds both outputs, so the still is free. Timestamps pass
         through untouched, so a gif's per-frame delays survive as the
         clip's own variable frame rate; faststart puts the index first,
         so a clip starts playing before it has all arrived. Returns
-        None -- for the caller to fall back on -- when ffmpeg fails,
-        when no poster could be written, or when clip and poster
-        together do not undercut the gif."""
+        None -- for the caller to fall back on -- when ffmpeg fails or
+        when clip and poster together do not undercut the gif."""
         size = self._probe(src)
         if size is None:
             return None
@@ -916,9 +921,6 @@ class ImagePlacer:
         scale = ([] if (width, height) == tuple(size)
                  else ["-vf", f"scale={width}:{height}:flags=lanczos"])
         poster = poster_path(Path(tmp))
-        still = (["-map", "0:v", *scale, "-frames:v", "1",
-                  "-c:v", "libwebp", "-q:v", str(POSTER_QUALITY),
-                  "-f", "webp", str(poster)] if self._writes_webp() else [])
         run = subprocess.run(
             [self.ffmpeg, "-nostdin", "-loglevel", "error", "-y",
              "-i", str(src),
@@ -926,41 +928,21 @@ class ImagePlacer:
              "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
              "-crf", str(self.video_crf), "-preset", str(self.video_preset),
              "-fps_mode", "passthrough", "-an", "-movflags", "+faststart",
-             "-f", "mp4", tmp, *still],
+             "-f", "mp4", tmp,
+             "-map", "0:v", *scale, "-frames:v", "1",
+             "-c:v", "libwebp", "-q:v", str(POSTER_QUALITY),
+             "-f", "webp", str(poster)],
             capture_output=True, text=True)
-        if run.returncode or not os.path.getsize(tmp):
+        if run.returncode or not os.path.getsize(tmp) or not poster.exists():
             detail = (run.stderr or "").strip().splitlines()
             self._note(f"ffmpeg failed on {src.name}"
                        + (f": {detail[-1]}" if detail else "")
                        + "; kept as a gif")
             return None
-        if not poster.exists() and not self._write_poster(src, poster,
-                                                          (width, height)):
-            return None
         if (os.path.getsize(tmp) + poster.stat().st_size
                 >= src.stat().st_size):
             return None                    # the pair costs more than the gif
         return ".mp4"
-
-    def _write_poster(self, src: Path, poster: Path, size) -> bool:
-        """The poster Pillow's way, for an ffmpeg that cannot write
-        webp: the gif's first frame at the clip's own size, lossily
-        encoded like the one ffmpeg would have written -- a still whose
-        clip is h264 has nothing to gain from a lossless encode, which
-        on a screencast frame measured longer than the clip itself."""
-        try:
-            with self.pillow.open(src) as im:
-                im.seek(0)
-                frame = im.convert("RGB")
-                if frame.size != size:
-                    frame = frame.resize(size,
-                                         self.pillow.Resampling.LANCZOS)
-                frame.save(poster, "WEBP", quality=POSTER_QUALITY, method=4)
-        except Exception as e:
-            self._note(f"poster failed on {src.name} ({e}); kept as a gif")
-            poster.unlink(missing_ok=True)
-            return False
-        return True
 
     def _resizes_gif(self, src: Path, cap: int) -> bool:
         """Whether gifsicle has anything to do for this gif."""

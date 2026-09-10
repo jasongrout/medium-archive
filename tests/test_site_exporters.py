@@ -2022,27 +2022,25 @@ def test_a_see_through_gif_keeps_its_format(tmp_path):
     assert sites.poster_path(clip).exists()
 
 
-@pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
-                    reason="ffmpeg not installed")
-def test_a_clip_survives_an_ffmpeg_that_cannot_write_webp(tmp_path):
-    """An ffmpeg built without libwebp fails the whole run, clip and
-    all, rather than just the still ("Encoder not found"), so the
-    poster is asked of Pillow instead and the clip is placed either
-    way."""
-    from PIL import Image
-
+def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
+    """A build without libwebp cannot write a clip's poster, and fails
+    the whole run with "Encoder not found" rather than just the still.
+    That is asked about once, up front, and reported as the thing to
+    fix -- not as an ffmpeg error against every gif in the archive."""
     src = tmp_path / "src"
     src.mkdir()
     gif = animation(src / "clip.gif",
                     [gradient_frame((400, 300), i * 9) for i in range(8)])
+    build = tmp_path / "ffmpeg"                # one without libwebp
+    build.write_text("#!/bin/sh\necho ' V....D libx264   H.264'\n")
+    build.chmod(0o755)
     placer = sites.ImagePlacer(tmp_path / "cache", {})
-    placer.ffmpeg_webp = False                 # a build without libwebp
+    placer.ffmpeg = str(build)
     out = tmp_path / "out"
     out.mkdir()
-    clip = placer.place(gif, out / "clip.gif")
-    assert clip.suffix == ".mp4"
-    with Image.open(sites.poster_path(clip)) as im:
-        assert im.size == (400, 300) and im.format == "WEBP"
+    assert placer.place(gif, out / "clip.gif").suffix == ".gif"
+    assert any("libwebp" in note and "animated_format" in note
+               for note in placer.notes), placer.notes
 
 
 def test_video_size_rounds_to_the_even_dimensions_video_needs():
