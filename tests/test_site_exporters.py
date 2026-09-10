@@ -2022,6 +2022,29 @@ def test_a_see_through_gif_keeps_its_format(tmp_path):
     assert sites.poster_path(clip).exists()
 
 
+@pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
+                    reason="ffmpeg not installed")
+def test_a_clip_survives_an_ffmpeg_that_cannot_write_webp(tmp_path):
+    """An ffmpeg built without libwebp fails the whole run, clip and
+    all, rather than just the still ("Encoder not found"), so the
+    poster is asked of Pillow instead and the clip is placed either
+    way."""
+    from PIL import Image
+
+    src = tmp_path / "src"
+    src.mkdir()
+    gif = animation(src / "clip.gif",
+                    [gradient_frame((400, 300), i * 9) for i in range(8)])
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    placer.ffmpeg_webp = False                 # a build without libwebp
+    out = tmp_path / "out"
+    out.mkdir()
+    clip = placer.place(gif, out / "clip.gif")
+    assert clip.suffix == ".mp4"
+    with Image.open(sites.poster_path(clip)) as im:
+        assert im.size == (400, 300) and im.format == "WEBP"
+
+
 def test_video_size_rounds_to_the_even_dimensions_video_needs():
     assert sites.video_size((1600, 1200), 1104) == (1104, 828)
     assert sites.video_size((801, 603), 0) == (800, 602)
