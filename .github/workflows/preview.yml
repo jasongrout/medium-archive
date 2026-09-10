@@ -11,11 +11,12 @@
 # committed.
 #
 # Note on size: the exporters place capped display copies of the
-# images (originals stay in archive/raw/ and archive/posts/), which
-# puts each built site around 0.7 GB and the three previews together
-# around 2.0 GB. That is above GitHub Pages' documented 1 GB site limit
-# -- observed to deploy fine (the hard limit is the 10 GB artifact) --
-# and the eventual single-site deployment fits comfortably within it.
+# images (originals stay in archive/raw/ and archive/posts/), and an
+# animated gif is placed as an h264 clip with a poster, which is where
+# most of the weight went: the archive's 805 MB of images become 237 MB
+# placed, of which the 228 animations are 157 MB against 609 MB as
+# gifs. Each built site is a few hundred MB and the three previews
+# together well under GitHub Pages' documented 1 GB site limit.
 #
 # One-time setup: the configure-pages step below enables Pages for the
 # repository (source: GitHub Actions) if it is not enabled yet.
@@ -67,17 +68,19 @@ jobs:
       - name: Install medium-archive from this checkout, and Pelican
         run: pip install -e ".[covers]" pelican markdown mdit_py_plugins
 
-      - name: Install Hugo (extended), MyST, Pagefind and gifsicle
+      - name: Install Hugo (extended), MyST, Pagefind, ffmpeg and gifsicle
         run: |
-          sudo apt-get install -y gifsicle
+          sudo apt-get install -y ffmpeg gifsicle
           curl -sSL "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz" | sudo tar -xz -C /usr/local/bin hugo
           npm install -g "mystmd@${MYSTMD_VERSION}" "pagefind@${PAGEFIND_VERSION}"
           hugo version && myst --version && pagefind --version
 
-      # The exporters place resized display copies of oversized images,
+      # The exporters place display copies of the archive's images,
       # built once into .image-cache/ (content-addressed, so a restored
-      # cache stays valid across checkouts). The big animated-gif
-      # re-encodes take ~15 min cold; cached, they cost nothing.
+      # cache stays valid across checkouts): the clips ffmpeg makes of
+      # the animated gifs, and the webp and jpeg re-encodes of the
+      # stills. A cold cache costs ~20 min on a four-core runner;
+      # restored, it costs nothing.
       - name: Restore the display-copy image cache
         uses: actions/cache@v4
         with:
