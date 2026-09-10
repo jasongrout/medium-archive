@@ -119,6 +119,32 @@ def test_shared_slugs_keep_date_prefix(tmp_path):
                                       "2020-06-01-workshops", "unique-post"]
 
 
+def test_page_directories_fold_to_ascii(tmp_path):
+    """A page's directory is the archive's <date>-<slug> grouping, and
+    Medium's accents are the archive's business: the site carries none,
+    in its directories, its toc, or the links between its pages."""
+    manifest = {}
+    make_post(tmp_path, manifest, "voil\u00e0-0-5-0-homecoming", "aaa111aaa111",
+              "2023-09-25T10:00:00Z", "One.\n")
+    make_post(tmp_path, manifest, "second-post", "bbb222bbb222",
+              "2023-10-01T10:00:00Z",
+              f"See [the first]({BASE}/voil\u00e0-0-5-0-homecoming-aaa111aaa111).\n")
+    (archive_dir(tmp_path) / "posts.json").write_text(json.dumps(manifest))
+    site = build_site(tmp_path)
+
+    page = site / "posts/2023-09-25-voila-0-5-0-homecoming"
+    assert (page / "voila-0-5-0-homecoming.md").exists()
+    yml = (site / "myst.yml").read_text()
+    assert "- file: posts/2023-09-25-voila-0-5-0-homecoming/" \
+        "voila-0-5-0-homecoming.md" in yml
+    linking = (site / "posts/2023-10-01-second-post/second-post.md").read_text()
+    assert "(../2023-09-25-voila-0-5-0-homecoming/" \
+        "voila-0-5-0-homecoming.md)" in linking
+    archive_page = (site / "archive.md").read_text()
+    assert "(posts/2023-09-25-voila-0-5-0-homecoming/" \
+        "voila-0-5-0-homecoming.md)" in archive_page
+
+
 def test_page_names_fold_to_ascii(tmp_path):
     """Medium leaves a title's accents in the path it builds, and a page
     URL is no place for them: the site serves the post at the folded

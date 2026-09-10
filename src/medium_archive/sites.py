@@ -199,6 +199,17 @@ def page_name(post: dict) -> str:
             or ascii_slug(post.get("medium_id") or "") or "post")
 
 
+def page_dir_name(post: dict) -> str:
+    """The name of the directory a post's page sits in, where a site
+    keeps the archive's own <YYYY-MM-DD>-<slug> grouping rather than
+    naming the directory for the page (myst does; hugo and pelican name
+    theirs page_stems' way). Folded to ASCII like the page name beside
+    it: Medium's spelling of a slug is the archive's business, and a
+    site built from it should carry no accent anywhere -- least of all
+    in a path a checked-in site would hold."""
+    return ascii_slug(Path(post["dir"]).name)
+
+
 def page_stems(manifest: dict) -> dict:
     """url -> page name, which becomes the page's URL slug: page_name's,
     unless several posts share one (deleted-and-republished
@@ -223,7 +234,7 @@ class LinkMap:
     def __init__(self, manifest: dict, stems: dict):
         self.by_path, self.by_id = {}, {}
         for url, p in manifest.items():
-            page = (Path(p["dir"]).name, stems[url])   # (post dir, page name)
+            page = (page_dir_name(p), stems[url])     # (post dir, page name)
             for u in (p["original_url"], p.get("ghost_url"),
                       p.get("canonical_url")):
                 if u:

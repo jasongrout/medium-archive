@@ -409,7 +409,8 @@ site-myst/                    optional MyST site built by `medium-archive
   archive.md                  chronological post list, grouped by year
   listing-covers.mjs          generated myst-listing companion plugin: makes
                                 the gallery serve the local cover thumbnails
-  posts/<YYYY-MM-DD>-<slug>/
+  posts/<YYYY-MM-DD>-<slug>/  the archive's own grouping for the post,
+                                the slug folded to ASCII as page names are
     <page>.md                 the post, MyST front matter + rewritten body;
                                 the page's URL slug is the filename, capped
                                 by mystmd at 50 characters
