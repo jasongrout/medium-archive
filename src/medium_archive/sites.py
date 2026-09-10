@@ -36,7 +36,7 @@ from urllib.parse import unquote, urlsplit
 import yaml
 
 from .lint import split_post
-from .paths import archive_dir, image_cache, site_config
+from .paths import site_config
 from .pages import markdown_text
 from .siteconf import documented_toml, load_toml
 from .tags import display_name, load_tag_display
@@ -130,23 +130,26 @@ LINK_RE = re.compile(r"\]\((https?://[^)\s]+)\)")  # inline [text](url)
 AUTOLINK_RE = re.compile(r"<(https?://[^>\s]+)>")  # autolink <url>
 
 
-def load_site_inputs(root: Path):
-    """(manifest, site.toml config) for an exporter, or exit."""
-    manifest_path = archive_dir(root) / "posts.json"
+def load_site_inputs(archive: Path, inputs: Path):
+    """(manifest, site.toml config) for an exporter, or exit. The two
+    inputs are named apart because they are: the archive is generated
+    (convert writes posts.json), the site inputs are hand-written and
+    keep no copy of the archive."""
+    manifest_path = archive / "posts.json"
     if not manifest_path.exists():
         sys.exit(f"nothing to build: {manifest_path} missing (run convert first)")
     manifest = json.loads(manifest_path.read_text())
     if not manifest:
         sys.exit("nothing to build: posts.json is empty (run convert first)")
     config = {"title": "Blog archive", "description": "", "intro": ""}
-    if site_config(root).exists():
-        config.update(load_toml(site_config(root)))
-    elif (legacy := site_config(root).with_suffix(".json")).exists():
+    if site_config(inputs).exists():
+        config.update(load_toml(site_config(inputs)))
+    elif (legacy := site_config(inputs).with_suffix(".json")).exists():
         # The file was JSON until each key was given its own
         # documentation, which JSON has nowhere to put. Say so rather
         # than build a site named "Blog archive" from defaults.
         sys.exit(f"{legacy} is no longer read: the site's own data is now "
-                 f"{site_config(root).name}, TOML so that every key can "
+                 f"{site_config(inputs).name}, TOML so that every key can "
                  "carry what it is for beside it. Convert it (the keys "
                  "are unchanged) and delete the old file.")
     # Optional keys both card themes read: "noindex" (true keeps search
@@ -351,8 +354,20 @@ def pick_cover(post: dict, post_dir) -> str | None:
 
 
 def link_or_copy(src: Path, dst: Path):
+    """src at dst, as a hard link when the two share a filesystem --
+    posts/ and the image cache already hold the bytes, so a site costs
+    no second copy of them -- and as a copy when they do not.
+
+    dst is replaced when it exists: a rebuild writes over the site it
+    built last time, and git breaks the link whenever it writes the
+    file itself (checkout, stash, merge), so relinking is the common
+    case rather than the exception. Removing dst first also keeps the
+    write off the inode the cache shares: an in-place write would
+    change the cached copy under its content-addressed name."""
+    if dst.exists() or dst.is_symlink():
+        dst.unlink()
     try:
-        os.link(src, dst)                  # posts/ already holds the bytes
+        os.link(src, dst)
     except OSError:
         shutil.copy2(src, dst)
 
@@ -574,11 +589,11 @@ class ImagePlacer:
     extension when the copy changed format -- the exporters rewrite
     their pages' image references from it."""
 
-    def __init__(self, root: Path, config: dict):
+    def __init__(self, cache: Path, config: dict):
         images = config.get("images", {})
         self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
         self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
-        self.cache = (image_cache(root)
+        self.cache = (Path(cache)
                       / f"{CACHE_SCHEME}-{self.still_cap}-{self.gif_cap}")
         self.gifsicle = shutil.which("gifsicle")
         try:
@@ -1159,44 +1174,74 @@ def first_image(markdown: str) -> str | None:
     return None
 
 
-# What a rebuild never deletes: a site built into a repository of its
-# own (--site-out) keeps its history, the rules that describe it as a
-# repository, and the workflows that deploy it -- none of them the
-# exporter's to write or to throw away. (.gitignore is on the list for
-# the site that carries a hand-written one; the hugo and pelican sites
-# write their own over it either way.)
-VCS_KEEP = (".git", ".gitignore", ".gitattributes", ".github")
+def git_ignored(site: Path, names) -> set:
+    """Which of `names` git ignores inside site, as a set -- empty when
+    the rules there say nothing about the site's contents, which is the
+    caller's signal to keep its own list instead.
+
+    They say nothing in two cases: site is not in a git working tree
+    (or git is not installed), and site is a directory the enclosing
+    repository ignores whole -- site-pelican/ in this project's own
+    .gitignore, say, which makes git call every file under it ignored
+    and would otherwise read as "keep all of it"."""
+    def git(*args, **kw):
+        try:
+            return subprocess.run(["git", "-C", str(site), *args],
+                                  capture_output=True, text=True, **kw)
+        except OSError:                    # no git on this machine
+            return None
+    itself = git("check-ignore", "-q", ".")
+    # 0: this very directory is ignored, 1: it is not, 128: not a
+    # working tree
+    if itself is None or itself.returncode != 1:
+        return set()
+    run = git("check-ignore", "--stdin", "-z", input="\0".join(names))
+    if run is None or run.returncode not in (0, 1):
+        return set()
+    return {name for name in run.stdout.split("\0") if name}
 
 
-def clean_site(site: Path, keep=(), expect=(), force=False):
-    """Delete a site directory's generated content, keeping the
-    generator's own build output and caches (cheap to keep, expensive or
-    network-bound to recreate), and whatever version control the
-    directory carries: a site kept as its own git repository (the
-    exporters' --site-out) is rebuilt in place, and its history, its
-    ignore rules and the workflows that deploy it are not this step's
-    to delete.
+def clean_out(site: Path, build_dirs=()):
+    """Empty a site directory before it is rebuilt, keeping what is not
+    the exporter's to delete: `.git/`, and every entry git ignores
+    there. What is left is what a previous run wrote and what a person
+    has added, so a page whose post has left the archive goes with it
+    -- which is the point, and what a rebuild alone cannot do (it
+    overwrites what it writes and knows nothing of the rest).
 
-    `expect` names entries the exporter's own previous run leaves at the
-    top of the site. A directory holding other people's files and none
-    of those is not this site: a mistyped --site-out, or a directory
-    that was meant to be somewhere else. It is refused rather than
-    emptied, unless the caller was told to overwrite it anyway (force).
-    """
+    The ignore rules do the keeping because the site carries its own:
+    the .gitignore each exporter writes lists that generator's build
+    output and caches (`output/`, `public/`, `resources/`, `_build/`),
+    which are expensive or network-bound to rebuild. Outside a git
+    working tree there are no rules to read, so `build_dirs` is kept
+    instead and everything else goes."""
     if not site.exists():
         return
-    children = [c for c in site.iterdir()
-                if c.name not in keep and c.name not in VCS_KEEP]
-    if (children and not force
-            and not any(c.name in expect for c in children)):
-        sys.exit(
-            f"refusing to empty {site}: it holds files this step did not "
-            f"write and none of {', '.join(expect)}, so it does not look "
-            "like a site this step generated. Point --site-out at an "
-            "empty or generated directory, or pass --force to overwrite "
-            "this one.")
+    children = [c for c in site.iterdir() if c.name != ".git"]
+    ignored = git_ignored(site, [c.name for c in children])
+    keep = ignored or set(build_dirs)
     for child in children:
+        if child.name in keep:
+            continue
         shutil.rmtree(child) if child.is_dir() else child.unlink()
+
+
+def report_stale_pages(pages_dir: Path, stems) -> int:
+    """Page directories under pages_dir that this run did not write --
+    a post deleted from the archive, or one whose slug or date changed
+    -- named on stderr with what removes them. A rebuild writes over
+    the pages it makes and leaves everything else alone, so without
+    this a site keeps serving a page the archive no longer has."""
+    if not pages_dir.is_dir():
+        return 0
+    stale = sorted(d.name for d in pages_dir.iterdir()
+                   if d.is_dir() and d.name not in stems)
+    if stale:
+        shown = ", ".join(stale[:5]) + (", ..." if len(stale) > 5 else "")
+        print(f"{len(stale)} page(s) in {pages_dir} are not in the archive "
+              f"({shown}); rebuild with --clean to remove them",
+              file=sys.stderr)
+    return len(stale)
 
 
 def front_matter_yaml(fields: dict) -> str:
@@ -1237,7 +1282,7 @@ def place_images(archive: Path, post: dict, page_dir: Path, placer=None) -> dict
     images = archive / post["dir"] / "images"
     if not images.is_dir():
         return renames
-    (page_dir / "images").mkdir()
+    (page_dir / "images").mkdir(exist_ok=True)
     for img in sorted(images.iterdir()):
         dst = page_dir / "images" / img.name
         if placer:
@@ -1289,7 +1334,7 @@ def export_content(archive: Path, site: Path, manifest: dict, stems: dict,
         if transform is not None:
             body = transform(body)
         page_dir = site / "content" / "posts" / stems[url]
-        page_dir.mkdir(parents=True)
+        page_dir.mkdir(parents=True, exist_ok=True)
         # images first: a display copy can change format, and the page
         # has to reference the name that was actually placed
         renames = place_images(archive, p, page_dir, placer)

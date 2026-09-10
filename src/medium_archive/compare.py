@@ -19,11 +19,12 @@ from urllib.parse import unquote_plus
 
 from bs4 import BeautifulSoup
 
+from pathlib import Path
+
 from .convert import load_media, to_markdown
 from .export import export_body, parse_export
 from .fetch import read_index
 from .fixup import load_fixups, read_raw
-from .paths import archive_dir
 from .pages import extract_metadata, ghost_body, page_body
 from .state import apollo_post_state, state_body
 from .urls import canonical_url
@@ -148,7 +149,7 @@ def compare_ghost(args):
     difference is authored content: an image or paragraph Medium dropped
     (worth converting with --prefer-ghost) or an edit made after the
     migration (worth keeping on the Medium side). Nothing is gated."""
-    archive = archive_dir(args.out)
+    archive = Path(args.archive)
     raw_dir = archive / "raw"
     index = read_index(raw_dir)
     if not index:
@@ -208,7 +209,7 @@ def compare_ghost(args):
 def cmd_compare(args):
     if getattr(args, "ghost", False):
         return compare_ghost(args)
-    archive = archive_dir(args.out)
+    archive = Path(args.archive)
     raw_dir = archive / "raw"
     index = read_index(raw_dir)
     if not index:

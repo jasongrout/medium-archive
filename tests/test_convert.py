@@ -533,13 +533,14 @@ def convert_archive(tmp_path):
     from types import SimpleNamespace
 
     from medium_archive.convert import cmd_convert
-    from medium_archive.paths import archive_dir
+    from _project import archive_dir
     raw = archive_dir(tmp_path) / "raw" / "0123456789ab"
     raw.mkdir(parents=True)
     (raw / "page.html").write_text(medium_page())
     (raw.parent / "index.json").write_text(json.dumps(
         {URL: {"medium_id": "0123456789ab"}}))
-    args = SimpleNamespace(out=tmp_path, prefer_page=False, prefer_ghost=False,
+    args = SimpleNamespace(archive=archive_dir(tmp_path), prefer_page=False,
+                           prefer_ghost=False,
                            only=None, clean=False, base=None)
     cmd_convert(args)
     return args, cmd_convert
@@ -557,19 +558,21 @@ def test_convert_rewrites_the_archive_readme(tmp_path):
     assert "# Medium archive of https://blog.example.com" in readme.read_text()
 
 
-def test_convert_documents_posts_and_sites_outside_the_archive_readme(tmp_path):
+def test_convert_documents_the_posts_outside_the_archive_readme(tmp_path):
     # the archive README is the one file an archive commits, so what
     # only describes the ignored trees lives with those trees instead:
-    # a conversion or theme change must not churn the committed file
+    # a conversion or theme change must not churn the committed file.
+    # Each generated site documents itself, in the README its exporter
+    # writes into it, so nothing here describes the sites either
     convert_archive(tmp_path)
     archive = (tmp_path / "archive" / "README.md").read_text()
     posts = (tmp_path / "archive" / "posts" / "README.md").read_text()
-    sites = (tmp_path / "SITES.md").read_text()
 
     assert "## Front matter" in posts and "body source preference" in posts.lower()
     assert "## Front matter" not in archive
-    assert "hugo" in sites and "myst start" in sites
     assert "myst start" not in archive and "pip install pelican" not in archive
+    # and convert writes no site README of its own: the exporters do
+    assert not (tmp_path / "SITES.md").exists()
     # the fields are documented once, and reach both files that need them
     assert "| `body_source`" in archive and "| `body_source`" in posts
 
@@ -579,7 +582,7 @@ def test_convert_leaves_unchanged_readmes_untouched(tmp_path):
     # own: git looks at the mtime before the content, and so does every
     # build and sync downstream of a committed README
     args, cmd_convert = convert_archive(tmp_path)
-    names = ("archive/README.md", "archive/posts/README.md", "SITES.md")
+    names = ("archive/README.md", "archive/posts/README.md")
     for name in names:
         os.utime(tmp_path / name, (0, 0))
 
@@ -592,7 +595,7 @@ def test_convert_readmes_carry_no_generation_date(tmp_path):
     # a date rewritten on every run is churn in a committed file, and
     # says nothing the git history does not
     convert_archive(tmp_path)
-    for name in ("archive/README.md", "archive/posts/README.md", "SITES.md"):
+    for name in ("archive/README.md", "archive/posts/README.md"):
         text = (tmp_path / name).read_text()
         assert not re.search(r"\d{4}-\d{2}-\d{2}", text), name
 

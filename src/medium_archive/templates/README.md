@@ -437,5 +437,13 @@ section and a term's page share `section.html`, written to the site as
 
 ## myst/
 
-`listing-covers.mjs` is the companion transform for the myst-listing
-gallery plugin; its header comment explains why cover images need it.
+- `listing-covers.mjs` is the companion transform for the myst-listing
+  gallery plugin; its header comment explains why cover images need it.
+- `README.md` and `gitignore` are this site's counterparts of the hugo
+  and pelican ones above, copied into the site root as `README.md` and
+  `.gitignore` (`myst.TEMPLATES`): what to edit, what builds it, how to
+  write a post, and the build output to keep out of version control
+  (`_build/`, which holds mystmd's downloaded site template as well as
+  the render, and which `--clean` therefore keeps by reading the ignore
+  rules). Neither is a page: `myst.yml`'s table of contents names the
+  pages, and these are not in it.

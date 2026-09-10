@@ -13,9 +13,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from .paths import archive_dir
 from .fetch import archive_base, read_index, read_missing
-from .paths import archive_dir
 
 FRONT_RE = re.compile(r"\A---\n.*?\n---\n", re.S)
 MD_NOISE_RE = re.compile(r"!\[[^\]]*\]\([^)]*\)|\[([^\]]*)\]\([^)]*\)|[#>*`|-]")
@@ -77,7 +75,7 @@ def print_provenance(out: Path, manifest: dict, sources: Counter):
 
 
 def cmd_stats(args):
-    archive = archive_dir(args.out)
+    archive = Path(args.archive)
     manifest_path = archive / "posts.json"
     if not manifest_path.exists():
         sys.exit(f"no stats to report: {manifest_path} missing (run convert first)")

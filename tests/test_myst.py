@@ -5,13 +5,23 @@ from pathlib import Path
 
 import pytest
 
-from medium_archive.paths import archive_dir, site_config
+from _project import archive_dir, image_cache, site_inputs
+from medium_archive.paths import site_config
 from medium_archive.siteconf import toml_document
-from medium_archive.myst import (LinkMap, build_site, escape_prose,
+from medium_archive import myst
+from medium_archive.myst import (LinkMap, escape_prose,
                                  myst_figures, myst_slug, page_paths,
                                  page_stems, rewrite_body)
 
 BASE = "https://blog.example.com"
+
+
+def build_site(root, **kw):
+    """The myst exporter over a test project laid out like a
+    checkout (see _project.build)."""
+    return myst.build_site(archive_dir(root),
+                           kw.pop("out", root / "site-myst"),
+                           site_inputs(root), image_cache(root), **kw)
 
 
 def make_post(root: Path, manifest: dict, slug: str, mid: str, date: str,
@@ -208,8 +218,8 @@ def test_rewrite_leaves_fences_and_autolinks_external(archive):
 
 def test_redirects_and_site_config(archive):
     out, _ = archive
-    site_config(out).parent.mkdir(exist_ok=True)
-    site_config(out).write_text(toml_document(
+    site_config(site_inputs(out)).parent.mkdir(exist_ok=True)
+    site_config(site_inputs(out)).write_text(toml_document(
         {"title": "Example Blog", "description": "An example.",
          "intro": "Welcome to the archive."}))
     site = build_site(out)
@@ -380,3 +390,37 @@ def test_clip_becomes_a_video_image_or_figure():
     assert myst_figures(md) == (
         "Intro.\n\n:::{figure} images/002-giphy.mp4\n\nCap.\n:::\n\n"
         "![](images/002-giphy.mp4)\n")
+
+
+def test_the_myst_site_carries_what_makes_it_a_repository(archive):
+    """A built site is meant to be checked in and carried on, so this
+    one ships what the hugo and pelican sites do: a README naming what
+    to edit and how to build it, and a .gitignore keeping the build
+    output -- which is also what --clean reads to know what to keep."""
+    out, _ = archive
+    site = build_site(out)
+
+    ignored = (site / ".gitignore").read_text()
+    assert "/_build/" in ignored
+    readme = (site / "README.md").read_text()
+    for named in ("myst.yml", "myst start", "posts/", "index.md"):
+        assert named in readme, named
+    # and neither is a page of the site: both sit outside posts/
+    assert not (site / "posts" / "README.md").exists()
+
+
+def test_clean_removes_a_page_the_archive_lost(archive):
+    """A rebuild writes its own pages over what is there; --clean is
+    what takes away a page whose post has left the archive."""
+    out, _ = archive
+    site = build_site(out)
+    stale = site / "posts" / "2019-01-01-gone"
+    stale.mkdir(parents=True)
+    (stale / "gone.md").write_text("a post the archive no longer has\n")
+
+    build_site(out)
+    assert stale.exists()                 # left alone, and reported
+
+    build_site(out, clean=True)
+    assert not stale.exists()
+    assert (site / "posts" / "2020-01-05-first-post").is_dir()

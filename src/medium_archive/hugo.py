@@ -79,12 +79,14 @@ import json
 import sys
 from pathlib import Path
 
-from .paths import archive_dir, site_dir, site_inputs
+from .paths import (DEFAULT_IMAGE_CACHE, DEFAULT_SITE_INPUTS,
+                    default_out)
 from .siteconf import documented_toml
 from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
-                    caption_text, clean_site, copy_site_asset,
+                    caption_text, clean_out, copy_site_asset,
                     export_content, fill_template, front_matter_yaml,
                     load_site_inputs, masthead_link, newsletter_params,
+                    report_stale_pages,
                     old_paths, page_stems, quote_arg,
                     redirect_mode, redirect_rules, redirects_file,
                     rewrite_figures, site_profiles, wants_redirect_stubs,
@@ -219,19 +221,21 @@ HUGO_EXAMPLES = {
 HUGO_OMITTED = ("intro", "share_image_size", "cover_size", "redirects")
 
 
-def build_site(root, site=None, force=False):
-    archive = archive_dir(root)
-    inputs = site_inputs(root)
-    manifest, config = load_site_inputs(root)
+def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
+               cache=DEFAULT_IMAGE_CACHE, clean=False) -> Path:
+    """The hugo site in `out`, from the archive and the hand-written
+    site inputs. Written in place, so `out` can be a checkout of the
+    published site; --clean empties it first (see clean_out)."""
+    archive, inputs = Path(archive), Path(inputs)
+    site = Path(out) if out is not None else default_out("hugo")
+    manifest, config = load_site_inputs(archive, inputs)
     stems = page_stems(manifest)
     hugo_config = config.get("hugo", {})
     mode = redirect_mode(config)        # site.toml "redirects"
-    # site-hugo/ beside the archive, or wherever --site-out sends it
-    site = Path(site) if site else site_dir(root, "hugo")
-    clean_site(site, keep=("public", "resources"),
-               expect=("config", "content"), force=force)
+    if clean:
+        clean_out(site, build_dirs=("public", "resources"))
 
-    (site / "content").mkdir(parents=True)
+    (site / "content").mkdir(parents=True, exist_ok=True)
     (site / "content" / "_index.md").write_text(
         front_matter_yaml({"title": config["title"]})
         + (config.get("intro", "") + "\n" if config.get("intro") else ""),
@@ -259,7 +263,7 @@ def build_site(root, site=None, force=False):
         lambda url, p: front_matter(url, p, cover=covers.path(url),
                                     canonical=canonical_for(p),
                                     aliases=wants_redirect_stubs(mode)),
-        placer=ImagePlacer(root, config), transform=figure_shortcodes,
+        placer=ImagePlacer(cache, config), transform=figure_shortcodes,
         covers=covers)
     # Hugo makes content/posts/ a section and publishes a list page and
     # a feed for it unasked: /posts/ is the home listing again, its 14
@@ -379,6 +383,7 @@ def build_site(root, site=None, force=False):
         (site / "static" / "_redirects").write_text(
             redirects_file(redirect_rules(manifest, stems, new_path)),
             encoding="utf-8")
+    report_stale_pages(site / "content" / "posts", set(stems.values()))
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "
           "`pagefind --site public` for search)", file=sys.stderr)
@@ -386,4 +391,5 @@ def build_site(root, site=None, force=False):
 
 
 def cmd_hugo(args):
-    build_site(args.out, args.site_out, args.force)
+    build_site(args.archive, args.out, args.site_inputs,
+               args.image_cache, args.clean)

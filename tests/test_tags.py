@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from medium_archive.paths import archive_dir
+from _project import archive_dir
 from medium_archive.convert import cmd_convert, convert_post
 from medium_archive.sites import tag_names
 from medium_archive.tags import default_display, display_name, load_tag_map
@@ -34,7 +34,8 @@ def write_raw_post(out, tags):
 
 
 def convert_args(out, only=None):
-    return SimpleNamespace(out=out, only=only, clean=False, prefer_page=False,
+    return SimpleNamespace(archive=archive_dir(out), only=only, clean=False,
+                           prefer_page=False,
                            prefer_ghost=False, base=None)
 
 

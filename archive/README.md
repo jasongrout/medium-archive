@@ -7,11 +7,11 @@ support migrating the blog off Medium.
 
 This file covers the archive itself: the downloaded sources, the
 hand-written files that belong with them, and the two small derived
-files worth keeping beside them. Everything a site is built *into* sits
-beside this directory, in the project root, and is documented where it
-is generated -- `posts/README.md` for the converted posts, `../SITES.md`
-for the generated sites -- so a change in how a post converts or how a
-site is built leaves this file alone.
+files worth keeping beside them. Everything built *from* this directory
+is documented where it is generated -- `posts/README.md` for the
+converted posts, and a README in each site an exporter writes -- so a
+change in how a post converts or how a site is built leaves this file
+alone.
 
 * `raw/` is the **source of truth**: material downloaded from Medium,
   unmodified. `medium-archive fetch` produces it. Back it up. It is the
@@ -32,8 +32,8 @@ site is built leaves this file alone.
   intro), the optional extras a site can carry, and `base_url`, the
   domain the site is served from. Every absolute URL a generated site
   bakes in comes from `base_url`, so set it before deploying and re-run
-  the exporter (see `../SITES.md`). The images it names -- the avatar,
-  the logo, the tab icon -- sit beside it.
+  the exporter. The images it names -- the avatar, the logo, the tab
+  icon -- sit beside it.
 * `fixups/` (optional) holds **hand-written corrections** that `convert`
   and `compare` apply to the in-memory copy of raw files. Defects
   authored into the sources themselves, such as a broken href, a typo
@@ -151,9 +151,9 @@ The rest of the project sits beside this directory:
                                 logo_link, favicon, announcement, newsletter,
                                 image caps, hugo
 ../site/*.svg                 the images site.toml names, beside it
-../site-myst/,                the generated sites, built from posts/ by the
-../site-hugo/,                  site exporters; described by ../SITES.md
-../site-pelican/
+../site-myst/,                the generated sites, built from posts/ by
+../site-hugo/,                  the site exporters unless --out sends one
+../site-pelican/                elsewhere; each carries its own README
 ```
 
 ## Post fields (`posts.json`)
@@ -230,4 +230,5 @@ From the project root, the directory above this one:
     medium-archive lint               # check for conversion defects
     medium-archive stats              # summarize the archive
 
-Building the generated sites is documented in `../SITES.md`.
+Each generated site documents its own layout and build in the README
+its exporter writes into it.

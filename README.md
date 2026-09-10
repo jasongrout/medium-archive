@@ -23,19 +23,24 @@ docs/                 the analysis behind the project's open decisions
 todo.md               one work list, in a tool part and an archive part
 site-hugo/,           the sites built from the archive, generated and
 site-pelican/,          git-ignored: `medium-archive hugo` and friends
-site-myst/              write them, the generators render them
+site-myst/              write them (or `--out DIR` elsewhere), the
+                        generators render them
 ```
 
 `archive/` is a full working archive of the Jupyter blog -- 340 posts,
 their images, and the embed content Medium's pages do not carry -- and
-it is the tool's reference corpus. Every step takes `--out DIR`, the
-project root, which defaults to the working directory: from a checkout
-the steps need no arguments at all.
+it is the tool's reference corpus. Every step takes `--archive DIR`
+(default `archive/`), and the three exporters add `--site-inputs DIR`
+(default `site/`), `--out DIR` (default `site-<generator>/`) and
+`--image-cache DIR` (default `.image-cache/`); each defaults to where a
+checkout keeps it, so from the project root the steps need no arguments
+at all.
 
 ```sh
 uv run medium-archive convert           # rebuild archive/posts/
 uv run medium-archive lint --embeds
 uv run medium-archive pelican           # then: cd site-pelican && pelican
+uv run medium-archive pelican --out ../blog-pelican --clean   # into a site repo
 ```
 
 CI runs both halves against each other: `Tests` runs the test suite on
@@ -117,7 +122,9 @@ cleans up the Medium tags on the way into front matter; see
 
 **`myst`**, **`hugo`** and **`pelican`** (optional) each build a
 ready-to-render site from the converted posts, in `site-myst/`,
-`site-hugo/` and `site-pelican/` beside the archive. All three give the posts
+`site-hugo/` and `site-pelican/` beside the archive, or wherever
+`--out DIR` sends one -- a checkout of the published site, kept in git
+(see [Building a site into its own repository](#building-a-site-into-its-own-repository)). All three give the posts
 the same page URLs, rewrite links between posts of the publication to
 those pages, read the same `site.toml`, and write a `redirects.csv`
 into the site, so the generators can be compared on identical content.
@@ -169,8 +176,9 @@ each sits with the files it describes:
   fields of `posts.json`.
 - `posts/README.md` covers the converted posts: their layout, their
   front matter, and the conversion caveats.
-- `SITES.md` covers the generated sites: their layout, their caveats,
-  and how to build them.
+- each generated site carries its own `README.md`, written by its
+  exporter: that site's layout, what to edit in it, and how to build
+  it.
 
 The split is what keeps an archive's one committed README still: a
 change to how a post converts or to what a site exporter writes rewrites
@@ -411,7 +419,10 @@ and `hugo.Data` for its data files -- so it wants Hugo extended
 
 All three sites carry display copies of the images, not the archival
 originals. `raw/` and `posts/` keep full resolution. Copies are built
-once into `.image-cache/` and hard-linked into every site.
+once into `.image-cache/` (`--image-cache DIR`) and hard-linked into
+every site that wants them, so a copy costs no second set of bytes
+while a site holds it; a site on another filesystem gets copies
+instead.
 
 - Card covers are 640×360 thumbnails baked at export time through
   Pillow (`pip install pillow`, or the `covers` extra). The source is
@@ -530,6 +541,46 @@ listing plugin at build time, like the site theme itself. Render with
 `myst start` or `myst build --html` inside `site-myst/`
 (`npm install -g mystmd`).
 
+### Building a site into its own repository
+
+An exporter builds into `site-<generator>/` beside the archive by
+default. `--out DIR` builds into any directory instead, which is how a
+published site becomes a git repository of its own:
+
+```sh
+git init ../blog-pelican
+medium-archive pelican --out ../blog-pelican
+cd ../blog-pelican && git add -A && git commit -m "the site, as generated"
+```
+
+`--out` is written in place. The exporter overwrites the files it
+generates and touches nothing else, so a `CNAME`, a workflow under
+`.github/`, and the repository itself all survive a rebuild, and a run
+shows up as a working-tree diff to read and commit.
+
+What that leaves behind is a page whose post has since left the archive
+(or changed slug or date): a rebuild has nothing to overwrite it with.
+Every run names such pages on stderr, and `--clean` sweeps them out --
+it empties `--out` first, keeping `.git/` and everything git ignores
+there. That is what the `.gitignore` each exporter writes into its site
+is for: it lists that generator's build output and caches (`output/`,
+`public/`, `resources/`, `_build/`), so `--clean` keeps them without
+being told. Outside a git working tree there are no rules to read, so
+`--clean` keeps those build directories by name and deletes the rest.
+
+Images are hard-linked from `posts/` and the image cache when they
+share a filesystem with the site, which git neither sees nor minds --
+it stores content. Any git operation that writes a file (a checkout, a
+stash, a merge) replaces it with its own copy and breaks the link; the
+next run relinks it. Byte-identical output means `git status` stays
+clean, so a site repository only sees a diff when the archive changed
+-- or when Pillow or gifsicle re-encodes differently, which a different
+version of either will do.
+
+Install `gifsicle` before the first commit if the archive has animated
+gifs: without it they are placed at full size, and the site carries
+them into git at that size until a later run replaces them.
+
 ## `site.toml`
 
 `site/site.toml`: hand-written, versioned beside the archive, and read
@@ -615,13 +666,17 @@ medium-archive pelican                                      # posts/ -> site-pel
 medium-archive lint                                         # check for conversion defects
 medium-archive stats                                        # summarize the archive
 medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
+medium-archive pelican --out ../blog-pelican --clean        # into a site repo
 ```
 
 Only `fetch` and `all` need the publication root URL; `/sitemap/sitemap.xml`
 and `/feed` must resolve under it. The other steps work offline from the
-archive alone. `--out DIR` (default: the working directory) sets the
-project root on every step: the archive is `<DIR>/archive/`, the site
-inputs `<DIR>/site/`, and each built site `<DIR>/site-<generator>/`.
+archive alone. `--archive DIR` (default `archive/`) is the archive
+every step reads or writes; the three exporters add `--site-inputs DIR`
+(default `site/`) for the hand-written `site.toml` and its images,
+`--out DIR` (default `site-<generator>/`) for the site they build, and
+`--image-cache DIR` (default `.image-cache/`). None of the four has to
+sit beside any other.
 See `medium-archive fetch --help` and `medium-archive convert --help`
 for the per-step options: date windows, limits, fetch delays, skipping
 posts already in earlier archives, converting a single post, and more.
@@ -635,7 +690,7 @@ no longer lists, work through the steps in order:
    result before committing to a long run:
 
    ```sh
-   medium-archive all https://blog.example.com/ --limit 5 --out myblog
+   medium-archive all https://blog.example.com/ --limit 5 --archive myblog/archive
    ```
 
 2. **Fetch everything.** Discovery merges the sitemap, the RSS feed, and the
@@ -645,7 +700,7 @@ no longer lists, work through the steps in order:
    run reports `0 new`:
 
    ```sh
-   medium-archive fetch https://blog.example.com/ --out myblog
+   medium-archive fetch https://blog.example.com/ --archive myblog/archive
    ```
 
 3. **Review `raw/missing.json`** if the fetch summary mentions it. Those
@@ -661,8 +716,8 @@ no longer lists, work through the steps in order:
    `compare` verify the scraped pages against the export's clean HTML:
 
    ```sh
-   medium-archive import-export alice-export.zip --out myblog
-   medium-archive compare --out myblog
+   medium-archive import-export alice-export.zip --archive myblog/archive
+   medium-archive compare --archive myblog/archive
    ```
 
    This step is optional but worthwhile: export bodies convert most
@@ -677,8 +732,8 @@ no longer lists, work through the steps in order:
    `convert --prefer-ghost --only URL`.
 
    ```sh
-   medium-archive import-ghost https://blog.example.com/ --out myblog
-   medium-archive compare --ghost --out myblog
+   medium-archive import-ghost https://blog.example.com/ --archive myblog/archive
+   medium-archive compare --ghost --archive myblog/archive
    ```
 
 6. **Convert and check the totals.** `stats` shows posts per year, authors,
@@ -687,9 +742,9 @@ no longer lists, work through the steps in order:
    posts, which can be seeded from any URL list via `fetch --urls FILE`:
 
    ```sh
-   medium-archive convert --out myblog
-   medium-archive lint --out myblog
-   medium-archive stats --out myblog
+   medium-archive convert --archive myblog/archive
+   medium-archive lint --archive myblog/archive
+   medium-archive stats --archive myblog/archive
    ```
 
 7. **Back up `raw/`.** It is the only part that cannot be regenerated once
@@ -861,7 +916,7 @@ src/medium_archive/
   myst.py        the myst step: archive/posts/ -> a MyST site in site-myst/
   hugo.py        the hugo step: archive/posts/ -> a Hugo site in site-hugo/
   pelican.py     the pelican step: archive/posts/ -> a Pelican site in site-pelican/
-  paths.py       where a project keeps its archive, site inputs and sites
+  paths.py       the four directories and the defaults that name them
   sites.py       machinery shared by the site exporters: page slugs, the
                  in-publication link map, image placement, covers,
                  redirect maps, site.toml
@@ -879,8 +934,9 @@ src/medium_archive/
   dates.py       date parsing and the --start/--end window check
   urls.py        Medium URL and post-identifier helpers
   tags.py        hand-curated tag cleanup (archive/tags.json), applied by convert
-  readme.py      the generated READMEs: archive/README.md,
-                 archive/posts/README.md and SITES.md
+  readme.py      the generated READMEs: archive/README.md and
+                 archive/posts/README.md (each site's own README is a
+                 template the exporter copies in)
 tests/           offline tests (canned HTTP responses, no network);
                  run with `uv run pytest`
 archive/         the Jupyter blog archive this tool is exercised against;

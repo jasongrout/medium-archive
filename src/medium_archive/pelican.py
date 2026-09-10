@@ -108,13 +108,15 @@ import re
 import sys
 from pathlib import Path
 
-from .paths import archive_dir, site_dir, site_inputs
+from .paths import (DEFAULT_IMAGE_CACHE, DEFAULT_SITE_INPUTS,
+                    default_out)
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
-                    canonical_for, caption_text, clean_site,
+                    canonical_for, caption_text, clean_out,
                     copy_site_asset, export_content,
                     front_matter_yaml, image_size, load_site_inputs,
                     masthead_link, newsletter_params, page_stems,
-                    quote_arg, redirect_mode, rewrite_figures,
+                    quote_arg, redirect_mode, report_stale_pages,
+                    rewrite_figures,
                     site_profiles, template_text, write_data_files,
                     write_redirects_csv, write_site_config, write_templates)
 
@@ -197,19 +199,21 @@ def _one_line(value: str) -> str:
     return " ".join(value.split())    # front matter holds no newlines
 
 
-def build_site(root, site=None, force=False):
-    archive = archive_dir(root)
-    inputs = site_inputs(root)
-    manifest, config = load_site_inputs(root)
+def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
+               cache=DEFAULT_IMAGE_CACHE, clean=False) -> Path:
+    """The pelican site in `out`, from the archive and the hand-written
+    site inputs. The site is self-contained, so it builds as happily
+    inside a repository of its own as beside the archive it came from:
+    each file is written where it belongs and everything else in `out`
+    is left alone, unless --clean sweeps it first (see clean_out)."""
+    archive, inputs = Path(archive), Path(inputs)
+    site = Path(out) if out is not None else default_out("pelican")
+    manifest, config = load_site_inputs(archive, inputs)
     stems = page_stems(manifest)
     mode = redirect_mode(config)        # site.toml "redirects"
-    # site-pelican/ beside the archive, or wherever --site-out sends it
-    # -- the site is self-contained, so it builds as happily inside a
-    # repository of its own as beside the archive it came from
-    site = Path(site) if site else site_dir(root, "pelican")
-    clean_site(site, keep=("output",), expect=("pelicanconf.py", "content"),
-               force=force)
-    (site / "content").mkdir(parents=True)
+    if clean:
+        clean_out(site, build_dirs=("output",))
+    (site / "content").mkdir(parents=True, exist_ok=True)
     covers = Covers(archive, manifest)
 
     def front_matter(url, post):
@@ -242,7 +246,7 @@ def build_site(root, site=None, force=False):
 
     pages = export_content(archive, site, manifest, stems, front_matter,
                            escape=attach_images,
-                           placer=ImagePlacer(root, config),
+                           placer=ImagePlacer(cache, config),
                            transform=figure_directives, covers=covers)
 
     # the header logo and the tab icon, shipped through the theme's
@@ -321,6 +325,7 @@ def build_site(root, site=None, force=False):
     write_data_files(site, manifest, archive)
     write_templates(site, TEMPLATES)
     write_redirects_csv(site, manifest, stems, lambda stem: f"/posts/{stem}/")
+    report_stale_pages(site / "content" / "posts", set(stems.values()))
     print(f"pelican done: {pages}/{len(manifest)} pages -> {site}",
           file=sys.stderr)
     print(f"render it with: cd {site} && pelican && pagefind --site output"
@@ -329,4 +334,5 @@ def build_site(root, site=None, force=False):
 
 
 def cmd_pelican(args):
-    build_site(args.out, args.site_out, args.force)
+    build_site(args.archive, args.out, args.site_inputs,
+               args.image_cache, args.clean)

@@ -28,11 +28,12 @@ from urllib.parse import urlencode, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
+from pathlib import Path
+
 from .fetch import read_index, write_index
 from .images import image_source, safe_filename
 from .net import fetch, make_session
 from .pages import ghost_body, ghost_metadata, is_ghost_page, meta
-from .paths import archive_dir
 from .readme import write_readme
 from .urls import POST_ID_RE, canonical_url, norm_key, slug_of
 
@@ -268,7 +269,7 @@ def import_standalone(session, raw_dir, index, url: str, ts: str, html: str,
 
 
 def cmd_import_ghost(args):
-    archive = archive_dir(args.out)
+    archive = Path(args.archive)
     raw_dir = archive / "raw"
     session = make_session()
     index = read_index(raw_dir)

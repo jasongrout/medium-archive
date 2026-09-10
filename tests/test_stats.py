@@ -4,7 +4,7 @@ source, posts gone from Medium)."""
 import json
 from types import SimpleNamespace
 
-from medium_archive.paths import archive_dir
+from _project import archive_dir
 from medium_archive import stats as statsmod
 
 A = "https://blog.example.com/alpha-111122223333"
@@ -54,7 +54,8 @@ def build_archive(root):
 
 
 def run_stats(out, capsys):
-    statsmod.cmd_stats(SimpleNamespace(out=out, base=None, top=15))
+    statsmod.cmd_stats(SimpleNamespace(archive=archive_dir(out), base=None,
+                                       top=15))
     return capsys.readouterr().out
 
 

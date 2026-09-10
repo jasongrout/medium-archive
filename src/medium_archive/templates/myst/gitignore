@@ -1,0 +1,5 @@
+# What `myst build` writes: its template cache, the downloaded site
+# template, and the rendered output. All of it is derived from
+# everything else here, and re-downloading it costs a network round
+# trip, so it is kept between builds and out of the repository.
+/_build/

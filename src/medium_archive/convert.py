@@ -30,8 +30,7 @@ from .pages import (collapse_br_pairs, extract_metadata, feed_body,
                     untruncated_summary)
 from .state import (apollo_post_state, gist_blocks, gist_code_blocks,
                     state_body, state_metadata, state_title)
-from .paths import archive_dir
-from .readme import write_posts_readme, write_readme, write_sites_readme
+from .readme import write_posts_readme, write_readme
 from .tags import load_tag_map
 from .urls import (canonical_url, carbon_id, medium_id, resolve_canonical,
                    slug_of, tweet_id)
@@ -1013,7 +1012,7 @@ def write_redirects(manifest: dict, out: Path):
 
 
 def cmd_convert(args):
-    archive = archive_dir(args.out)
+    archive = Path(args.archive)
     raw_dir = archive / "raw"
     index = read_index(raw_dir)
     if not index:
@@ -1064,7 +1063,6 @@ def cmd_convert(args):
     write_readme(archive, args.base or archive_base(archive)
                  or "(unknown publication)")
     write_posts_readme(archive)
-    write_sites_readme(args.out)
     print(f"convert done: {ok}/{len(targets)} posts -> {posts_root}", file=sys.stderr)
     # A tags.json entry that changed no post is stale config -- fail
     # loudly, like a fixup that no longer applies. Only a complete run

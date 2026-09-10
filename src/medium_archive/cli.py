@@ -11,10 +11,11 @@
     compare        verify the page conversion against the account export
     convert        turn the raw archive into Markdown + front matter + local
                    images in archive/posts/, plus posts.json and redirects.csv
-    myst           build a MyST (mystmd) site in site-myst/ from the
-                   converted posts, ready for `myst start` / `myst build`
-    hugo           build a Hugo site in site-hugo/
-    pelican        build a Pelican site in site-pelican/
+    myst           build a MyST (mystmd) site (site-myst/ by default, or
+                   --out DIR) from the converted posts, ready for
+                   `myst start` / `myst build`
+    hugo           build a Hugo site (site-hugo/ by default)
+    pelican        build a Pelican site (site-pelican/ by default)
     lint           scan converted posts for conversion-defect signatures
                    (--embeds: embeds whose content the archive lacks;
                    --seo: SEO page analysis)
@@ -42,6 +43,7 @@ Examples:
     medium-archive convert                                      # raw -> posts/
     medium-archive myst                                         # posts/ -> site-myst/
     medium-archive hugo                                         # posts/ -> site-hugo/
+    medium-archive pelican --out ../blog-pelican --clean         # into a site repo
     medium-archive stats                                        # summarize the archive
     medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
 
@@ -106,13 +108,19 @@ Notes:
     Stale entries (changing no post) abort a full convert run; `stats
     --tags` lists every tag with its post count as the worklist for
     curating the file.
-  * Site output: each exporter builds into <out>/site-<generator>/, a
-    throwaway rebuilt from scratch on every run. --site-out DIR builds it
-    somewhere else instead -- a checkout of the published site's own
-    repository, say, whose .git/, .gitignore, .gitattributes and .github/
-    the rebuild keeps, so a run reads as a working-tree diff. A directory
-    holding files the step did not write is refused (--force overrides).
-  * The archive layout is documented in the README.md written into archive/.
+  * Directories: --archive DIR (default archive/) is the archive every
+    step reads or writes. The exporters add --site-inputs DIR (default
+    site/), --image-cache DIR (default .image-cache/) and --out DIR
+    (default site-<generator>/), so a site can be built anywhere --
+    a checkout of the published site, kept in git. --out is written in
+    place: files the exporter generates are overwritten, everything else
+    is left alone, and a page whose post has left the archive is reported
+    rather than removed. --clean empties --out first, keeping .git/ and
+    what git ignores there (each site's own .gitignore covers that
+    generator's build output and caches).
+  * The archive layout is documented in the README.md written into archive/;
+    each generated site documents itself in the README its exporter
+    writes into it.
 Progress is written to stderr.
 """
 
@@ -130,6 +138,8 @@ from .myst import cmd_myst
 from .pelican import cmd_pelican
 from .stats import cmd_stats
 from .dates import parse_date
+from .paths import (DEFAULT_ARCHIVE, DEFAULT_IMAGE_CACHE, DEFAULT_SITE_INPUTS,
+                    default_out)
 from .export import cmd_import_export
 from .fetch import cmd_fetch
 from .ghost import cmd_import_ghost
@@ -212,38 +222,54 @@ def add_convert_args(p):
 
 
 def add_site_args(p, generator: str):
-    """What every exporter takes: where the site it generates goes.
+    """What the three exporters take on top of --archive: where the
+    site goes, what it says about itself, and where the display copies
+    of its images are built.
 
-    The default, <out>/site-<generator>/, is a throwaway beside the
-    archive: rebuilt from scratch each run and left out of the
-    archive's version control. --site-out builds the same site
-    somewhere else, which is how it is kept as a repository of its own
-    -- a checkout of the published site is rebuilt in place, its
-    .git/, .gitattributes, .github/ and .gitignore untouched, so what
-    the run changed is a working-tree diff to read and commit."""
-    p.add_argument("--site-out", type=Path, default=None, metavar="DIR",
-                   help=f"build the site in DIR instead of "
-                        f"<out>/site-{generator}/, e.g. in a checkout of "
-                        "the published site's own repository; DIR is "
-                        "rebuilt from scratch, keeping its .git/, "
-                        ".gitignore, .gitattributes and .github/")
-    p.add_argument("--force", action="store_true",
-                   help="rebuild --site-out DIR even though it holds files "
-                        "this step did not write; without it a directory "
-                        f"that does not look like a generated {generator} "
-                        "site (a mistyped path) is refused rather than "
-                        "emptied")
+    --out is written in place rather than emptied first, so it can be a
+    checkout of the published site kept in git: the exporter overwrites
+    the files it generates, touches nothing else, and a run shows up
+    there as a working-tree diff to read and commit. What that leaves
+    behind is a page whose post has since left the archive, which
+    --clean sweeps up (and every run reports either way)."""
+    p.add_argument("--out", type=Path, default=None, metavar="DIR",
+                   help="where to build the site; the files this step "
+                        "generates are overwritten in place and nothing "
+                        "else in DIR is touched, so DIR can be a checkout "
+                        "of the published site (default: "
+                        f"{default_out(generator)}/)")
+    p.add_argument("--clean", action="store_true",
+                   help="empty --out first, keeping .git/ and every file "
+                        "git ignores there -- the site's own .gitignore "
+                        "covers this generator's build output and caches. "
+                        "This is what removes a page the archive no longer "
+                        "has. Outside a git working tree, the build "
+                        "directories are kept and the rest is deleted")
+    p.add_argument("--site-inputs", type=Path, default=DEFAULT_SITE_INPUTS,
+                   metavar="DIR",
+                   help="the hand-written site inputs: site.toml and the "
+                        "images it names (avatar, logo, favicon, share "
+                        f"image) (default: {DEFAULT_SITE_INPUTS}/)")
+    p.add_argument("--image-cache", type=Path, default=DEFAULT_IMAGE_CACHE,
+                   metavar="DIR",
+                   help="where display copies of oversized images are built "
+                        "and kept, content-addressed, for re-runs and the "
+                        "other exporters to reuse; they are hard-linked "
+                        "into the site when DIR shares its filesystem, "
+                        f"copied when it does not (default: "
+                        f"{DEFAULT_IMAGE_CACHE}/)")
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--out", default=Path("."), type=Path, metavar="DIR",
-                        help="project root: the archive lives in <DIR>/archive/, "
-                             "the hand-written site inputs in <DIR>/site/, and "
-                             "each generated site in <DIR>/site-<generator>/ "
-                             "(default: the working directory)")
+    common.add_argument("--archive", default=DEFAULT_ARCHIVE, type=Path,
+                        metavar="DIR",
+                        help="the archive directory: raw/ and the "
+                             "hand-written files beside it, and what convert "
+                             "derives from them (posts/, posts.json, "
+                             f"redirects.csv) (default: {DEFAULT_ARCHIVE}/)")
     ap.set_defaults(base=None)   # only fetch and all take the URL
     sub = ap.add_subparsers(dest="command", required=True)
 
