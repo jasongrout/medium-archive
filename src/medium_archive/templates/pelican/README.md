@@ -75,13 +75,12 @@ The body, as CommonMark.
 ```
 
 - `slug` is the URL: the page is served at `/posts/<slug>/`. Left out,
-  as above, it is the post's directory name -- which is why every post
-  here sits in a directory named the way its URL reads, and why a
-  directory name is worth choosing as carefully as a URL: it is read as
-  it stands, not slugified, so `A New Post` would serve at
-  `/posts/A New Post/`. Write the field to keep a post's URL when its
-  directory is renamed; the exported posts carry it for no better
-  reason than that the exporter wrote what it had named the directory.
+  as above and as every post here leaves it out, it is the post's
+  directory name -- so a directory name is worth choosing as carefully
+  as a URL. It is read as it stands, not slugified: `A New Post` would
+  serve at `/posts/A New Post/`, and an accent in the name is an accent
+  in the address, which is why every name here is lowercase ASCII.
+  Write the field to keep a post's URL when its directory is renamed.
   The build prints a line for each post served somewhere other than
   under its directory name, and stops if two posts would write the same
   page.

@@ -790,7 +790,7 @@ def test_pelican_site(project):
     assert front["title"] == "Second Post"
     assert front["date"] == "2021-03-01 10:00"
     assert front["authors"] == ["ada-lovelace"]
-    assert front["tags"] == ["example"] and front["slug"] == "second-post"
+    assert front["tags"] == ["example"]
     assert front["cover"].startswith("images/")   # summary-card cover
     # colocated images become {attach} links -- but not inside fences
     assert "]({attach}images/001-pic.png)" in text
@@ -849,7 +849,6 @@ def test_a_post_directory_names_the_page_it_serves(project):
         match = re.match(namespace["PATH_METADATA"],
                          f"posts/{post.name}/index.md")
         assert match and match.group("slug") == post.name
-        assert post_front(site, post.name)["slug"] == post.name
 
     check = namespace["_check_slugs"]
     check(SimpleNamespace(articles=[_fake_article("posts/a-post/index.md",
