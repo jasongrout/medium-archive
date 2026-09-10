@@ -250,7 +250,7 @@ def test_giphy_embed_is_an_asset_not_a_link(tmp_path):
     (raw / MID / "page.html").write_text(shell_html(state))
     front = {**FRONT, "medium_id": MID, "body_source": "export"}
     d = write_post(tmp_path, "x\n" * 100 + "![](images/001-giphy.gif)\n\n"
-                   '<video src="images/002-giphy.mp4" autoplay loop muted playsinline></video>\n',
+                   '<video src="images/002-giphy.mp4" preload="metadata" loop muted playsinline controls></video>\n',
                    front=front)
     (d / "images").mkdir()
     (d / "images" / "001-giphy.gif").write_bytes(b"GIF89a")

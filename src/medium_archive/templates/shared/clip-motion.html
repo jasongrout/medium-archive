@@ -1,0 +1,65 @@
+<!-- Motion for a post's clips -- the mp4s the placer made of the
+     archive's animated gifs, and the mp4s a Giphy embed was archived as.
+     Both are served as a poster frame with controls and nothing
+     preloaded, so a clip is a still picture with a play button until
+     something asks for more. This gives back what a gif did, on two
+     conditions the gif format could not honour: the reader has not
+     asked for less motion (prefers-reduced-motion), and the clip is on
+     screen, so a page never fetches clips nobody scrolled to. A clip
+     the reader pauses stays paused -- that is the whole point of
+     serving video rather than gif (WCAG 2.2.2) -- and a reader who
+     switches the preference mid-page has every clip stop where it is.
+     Without this script, or without IntersectionObserver, the controls
+     in the markup are the whole feature. -->
+<script>
+(function () {
+  var reduced = window.matchMedia
+    && window.matchMedia("(prefers-reduced-motion: reduce)");
+  function init() {
+    var post = document.querySelector(".post");
+    if (!post || !window.IntersectionObserver) return;
+    var clips = Array.prototype.slice.call(post.querySelectorAll("video"));
+    if (!clips.length) return;
+    function wanted(clip) {
+      return clip.dataset.onScreen === "1" && !clip.dataset.held
+        && !(reduced && reduced.matches);
+    }
+    function settle(clip) {
+      if (wanted(clip)) {
+        var playing = clip.play();
+        if (playing && playing.catch) playing.catch(function () {});
+      } else if (!clip.paused) {
+        clip.dataset.auto = "1";          // ours, not the reader's
+        clip.pause();                     // the pause event clears it
+      }
+    }
+    clips.forEach(function (clip) {
+      // a clip the archive still serves as an autoplaying loop is one
+      // this script decides for too, so the preference is honoured
+      clip.removeAttribute("autoplay");
+      if (!clip.hasAttribute("controls")) clip.setAttribute("controls", "");
+      clip.addEventListener("pause", function () {
+        if (clip.dataset.auto) delete clip.dataset.auto;
+        else clip.dataset.held = "1";     // the reader's own pause
+      });
+      clip.addEventListener("play", function () {
+        delete clip.dataset.held;
+      });
+    });
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        entry.target.dataset.onScreen = entry.isIntersecting ? "1" : "0";
+        settle(entry.target);
+      });
+    }, { rootMargin: "200px 0px" });
+    clips.forEach(function (clip) { seen.observe(clip); });
+    if (reduced && reduced.addEventListener)
+      reduced.addEventListener("change", function () {
+        clips.forEach(settle);
+      });
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>

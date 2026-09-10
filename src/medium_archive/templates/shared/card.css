@@ -466,7 +466,11 @@ a:hover { text-decoration-line: underline; }
    at its fixed size, which overflows a phone-width column. */
 .post iframe { width: 100%; max-width: 100%; height: auto; aspect-ratio: 16 / 9;
                border: 0; border-radius: 4px; }
-/* A looping clip (a Giphy mp4 embed) sits like the gif it stands for. */
+/* A clip -- what an animated gif was placed as, and what a Giphy
+   embed was archived as -- sits where the animation it stands for did.
+   It carries a poster frame, so the box is filled before anything is
+   fetched, and its controls are the reader's way to stop the motion
+   (shared/clip-motion.html decides whether it starts at all). */
 .post video { max-width: 100%; height: auto; border-radius: 4px; }
 .post p:has(> video:only-child) { text-align: center; }
 /* An image standing on its own -- a paragraph holding nothing but the

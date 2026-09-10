@@ -200,11 +200,18 @@ class _Converter(MarkdownConverter):
         return f"\n\n<figure>\n\n{text.strip()}\n\n</figure>\n\n"
 
     def convert_video(self, el, text, parent_tags):
-        # the looping clip a Giphy mp4 embed became (see to_markdown): the
-        # gif's behaviour, as one canonical HTML block the exporters and
-        # lint recognize (VIDEO_RE in sites.py)
+        # the looping clip a Giphy mp4 embed became (see to_markdown), as
+        # one canonical HTML block the exporters and lint recognize
+        # (VIDEO_RE in sites.py). It loops silently in place like the gif
+        # it stands for, but it is the reader who starts it: an animation
+        # that cannot be stopped is a WCAG 2.2.2 failure, which is what
+        # the controls answer, and the sites' clip-motion script gives
+        # the autoplay back where the reader has not asked for less
+        # motion. preload="metadata" is what paints the first frame
+        # without fetching the clip.
         return (f'\n\n<video src="{escape(el.get("src") or "", quote=True)}" '
-                'autoplay loop muted playsinline></video>\n\n')
+                'preload="metadata" loop muted playsinline controls>'
+                '</video>\n\n')
 
     def convert_iframe(self, el, text, parent_tags):
         # a player to_markdown left in place (every other iframe became

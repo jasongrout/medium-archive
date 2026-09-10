@@ -4,16 +4,30 @@
        shortcode, so a captioned and a bare image carry the same markup.
        Only photographs get the ladder: png and webp here are line art
        the placer kept whole (see ImagePlacer), whose 9 px text does not
-       survive a 736 px variant, and an animated gif loses its frames
-       through the image pipeline. The post's first image (front
+       survive a 736 px variant, and an animated gif (one the placer
+       could not place as video) loses its frames through the image
+       pipeline. The post's first image (front
        matter first_image, from the exporter) is the one most likely
        on screen at load, so it is fetched eagerly and first, as
        WordPress treats the first content image; every other one is
-       lazy. */ -}}
+       lazy.
+
+       An .mp4 here is what an animated gif was placed as (see
+       ImagePlacer): it renders as a clip the reader controls rather
+       than as a picture. The alt text becomes the aria-label, since
+       <video> has no alt attribute and the text alternative would
+       otherwise be dropped in the move from <img>; the poster the
+       placer wrote beside the clip is what the page shows until it is
+       played, and what gives the element its width and height, so the
+       layout cannot shift. Nothing is fetched until the reader (or
+       shared/clip-motion.html, where motion is welcome) asks for it. */ -}}
 {{- $img := .page.Resources.Get .src -}}
 {{- $alt := .alt -}}
 {{- $loading := cond (eq .src .page.Params.first_image) ` fetchpriority="high"` ` loading="lazy"` -}}
-{{- if and $img (eq $img.MediaType.MainType "image") (ne $img.MediaType.SubType "svg") -}}
+{{- if strings.HasSuffix .src ".mp4" -}}
+{{- $poster := .page.Resources.Get (printf "%s-poster.webp" (strings.TrimSuffix ".mp4" .src)) -}}
+<video src="{{ with $img }}{{ .RelPermalink }}{{ else }}{{ $.src | safeURL }}{{ end }}"{{ with $poster }} poster="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}"{{ end }} preload="none" loop muted playsinline controls{{ with $alt }} aria-label="{{ . }}"{{ end }}></video>
+{{- else if and $img (eq $img.MediaType.MainType "image") (ne $img.MediaType.SubType "svg") -}}
 {{- $srcset := slice -}}
 {{- if not (in (slice "gif" "webp" "png") $img.MediaType.SubType) -}}
 {{- range $w := slice 480 736 1104 -}}
