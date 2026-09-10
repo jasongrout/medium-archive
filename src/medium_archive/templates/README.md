@@ -171,6 +171,19 @@ These embed verbatim in both engines' pages, so they must carry no
   image). Images inside a link are skipped, so a linked image still
   follows its link. It closes on a click anywhere, on Esc (the dialog's
   own) and on a page scroll, like Medium's, and re-measures on resize.
+- `clip-motion.html` decides whether a post's clips move, spliced into
+  the post templates beside `image-zoom.html`, since only article pages
+  carry clips. The markup both exporters write is a poster frame with
+  `controls` and `preload="none"`, so a clip is a still picture with a
+  play button until this runs; the script gives back what the gif it
+  replaced did -- playing in place, silently, on a loop -- on the two
+  conditions gif could not honour: the reader has not asked for less
+  motion (`prefers-reduced-motion: reduce`), and the clip is on screen,
+  so no page fetches clips nobody scrolled to. A clip the reader pauses
+  is never started again, which is the point of serving video rather
+  than gif (WCAG 2.2.2), and a reader who changes the preference
+  mid-page has every clip stop where it is. The Giphy clips convert
+  writes as raw `<video>` go through the same script.
 - `code-copy.html` is the copy button in the corner of every code
   block, spliced into the post templates beside `image-zoom.html`,
   since only article pages have code blocks. Every `<pre>` in the

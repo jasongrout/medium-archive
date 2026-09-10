@@ -539,10 +539,11 @@ STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 # animations are: text has to stay sharp, so -crf 20 rather than the 26
 # the 2026-09 measurement started from (on a synthetic 1104x620
 # screencast, 41.2 dB PSNR against the source gif at crf 20 against
-# 39.0 dB at crf 26, for ~30% more bytes), and -preset medium, which is
-# about a second a clip here and where quality per byte stops improving
-# cheaply. yuv420p and the high profile are what every browser decodes,
-# and they need even dimensions (see video_size).
+# 39.0 dB at crf 26, for ~30% more bytes), and -preset fast, which on
+# this archive's real screencasts lands within 0.01 dB and 0.5% of the
+# bytes of -preset medium for about three quarters of its encode time.
+# yuv420p and the high profile are what every browser decodes, and they
+# need even dimensions (see video_size).
 #
 # site.toml's [images] table tunes all of it: animated_format = "gif"
 # keeps gifsicle's resized gifs instead, and video_crf / video_preset
@@ -550,7 +551,7 @@ STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 # edge; 0 leaves a clip at its own size rather than turning video off.
 ANIMATED_FORMAT = "mp4"
 VIDEO_CRF = 20
-VIDEO_PRESET = "medium"
+VIDEO_PRESET = "fast"
 # The still a clip carries, beside it under this suffix. It is what a
 # gif showed at rest (the clip's own first frame, so nothing jumps when
 # playback starts), what a reduced-motion reader sees instead of
@@ -559,8 +560,14 @@ VIDEO_PRESET = "medium"
 # what keeps a page from pulling several megabytes of clip nobody
 # scrolls to. Named after the clip so a template finds it without being
 # told, and webp because that is what the sites already ask a browser
-# to decode for line art.
+# to decode for line art. It is written in the same ffmpeg pass as the
+# clip -- one decode of the gif, and the still costs nothing measurable
+# beside the encode -- and it is lossy, at a quality that leaves a
+# screencast's text crisp: keeping a frame pixel-exact is effort spent
+# on the one frame of a clip that is lossy from the next frame on, and
+# through Pillow it measured longer than encoding the whole clip.
 POSTER_SUFFIX = "-poster.webp"
+POSTER_QUALITY = 90
 
 # A still is line art when it holds few enough distinct colors and
 # enough flat runs. The two classes separate cleanly on that pair --
@@ -875,63 +882,44 @@ class ImagePlacer:
         return True
 
     def _encode_video(self, src: Path, tmp: str, cap: int):
-        """The gif's frames as h264 in mp4, with its poster written
-        beside it. Timestamps pass through untouched, so a gif's
-        per-frame delays survive as the clip's own variable frame rate;
-        faststart puts the index first, so a clip starts playing before
-        it has all arrived. Returns None -- for the caller to fall back
-        on -- when ffmpeg fails, when the poster cannot be made, or when
-        clip and poster together do not undercut the gif."""
+        """The gif's frames as h264 in mp4, and its first frame beside
+        it as the poster, from one ffmpeg run: the gif is decoded once
+        and feeds both outputs, so the still is free. Timestamps pass
+        through untouched, so a gif's per-frame delays survive as the
+        clip's own variable frame rate; faststart puts the index first,
+        so a clip starts playing before it has all arrived. Returns
+        None -- for the caller to fall back on -- when ffmpeg fails,
+        when it wrote no poster, or when clip and poster together do
+        not undercut the gif."""
         size = self._probe(src)
         if size is None:
             return None
         width, height = video_size(size, cap)
+        scale = ([] if (width, height) == tuple(size)
+                 else ["-vf", f"scale={width}:{height}:flags=lanczos"])
+        poster = poster_path(Path(tmp))
         run = subprocess.run(
             [self.ffmpeg, "-nostdin", "-loglevel", "error", "-y",
              "-i", str(src),
-             "-vf", f"scale={width}:{height}:flags=lanczos",
+             *scale,
              "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
              "-crf", str(self.video_crf), "-preset", str(self.video_preset),
              "-fps_mode", "passthrough", "-an", "-movflags", "+faststart",
-             "-f", "mp4", tmp],
+             "-f", "mp4", tmp,
+             "-map", "0:v", *scale, "-frames:v", "1",
+             "-c:v", "libwebp", "-q:v", str(POSTER_QUALITY),
+             "-f", "webp", str(poster)],
             capture_output=True, text=True)
-        if run.returncode or not os.path.getsize(tmp):
+        if run.returncode or not os.path.getsize(tmp) or not poster.exists():
             detail = (run.stderr or "").strip().splitlines()
             self._note(f"ffmpeg failed on {src.name}"
                        + (f": {detail[-1]}" if detail else "")
                        + "; kept as a gif")
             return None
-        poster = poster_path(Path(tmp))
-        if not self._write_poster(src, poster, (width, height)):
-            return None
         if (os.path.getsize(tmp) + poster.stat().st_size
                 >= src.stat().st_size):
             return None                    # the pair costs more than the gif
         return ".mp4"
-
-    def _write_poster(self, src: Path, poster: Path, size) -> bool:
-        """The clip's first frame, at the clip's own size, as the webp
-        beside it: lossless where the frame is line art, which a
-        screencast's first frame is, and lossy where it is a
-        photograph (see _save_line_art)."""
-        try:
-            with self.pillow.open(src) as im:
-                im.seek(0)
-                frame = im.convert("RGB")
-                if frame.size != size:
-                    frame = frame.resize(size,
-                                         self.pillow.Resampling.LANCZOS)
-                if is_line_art(frame):
-                    self._save_line_art(frame, str(poster))
-                else:
-                    frame.save(poster, "WEBP", quality=PHOTO_QUALITY,
-                               method=4)
-        except Exception as e:
-            self._note(f"poster failed on {src.name} ({e}); kept as a gif")
-            if poster.exists():
-                poster.unlink()
-            return False
-        return True
 
     def _resizes_gif(self, src: Path, cap: int) -> bool:
         """Whether gifsicle has anything to do for this gif."""
