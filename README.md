@@ -17,7 +17,7 @@ are not committed.
 src/medium_archive/   the tool; `medium-archive` on the command line
 tests/                its offline test suite (`uv run pytest`)
 archive/              an archive of https://blog.jupyter.org, made with it
-site/                 site.json and the images it names: what the built
+site/                 site.toml and the images it names: what the built
                         sites say about the publication
 docs/                 the analysis behind the project's open decisions
 todo.md               one work list, in a tool part and an archive part
@@ -119,7 +119,7 @@ cleans up the Medium tags on the way into front matter; see
 ready-to-render site from the converted posts, in `site-myst/`,
 `site-hugo/` and `site-pelican/` beside the archive. All three give the posts
 the same page URLs, rewrite links between posts of the publication to
-those pages, read the same `site.json`, and write a `redirects.csv`
+those pages, read the same `site.toml`, and write a `redirects.csv`
 into the site, so the generators can be compared on identical content.
 The hugo and pelican sites are the preferred targets and carry the full
 feature set, and both read a post the same way: hugo through Goldmark,
@@ -227,7 +227,7 @@ with none stored, the system scheme decides. The theme provides:
   URL while the page still shows the name in full.
 - Article pages, tag and author card listings, and chip indexes
   sortable by name or by post count.
-- An optional header logo and browser-tab icon: `site.json`'s
+- An optional header logo and browser-tab icon: `site.toml`'s
   `"avatar"` and `"favicon"`, archive-relative image paths copied into
   the site so it stays self-contained. A publication with a wordmark of
   its own gives it as `"logo"` instead, and it stands in the header for
@@ -240,15 +240,15 @@ with none stored, the system scheme decides. The theme provides:
   and the link then reads under that address's host, since naming it
   with the site's title would promise a reader the blog and hand them
   somewhere else. The nav's own "Blog" link still leads home.
-- The landing-page blurb, `site.json`'s `"intro"`, as Markdown above the
+- The landing-page blurb, `site.toml`'s `"intro"`, as Markdown above the
   card grid. Hugo renders it from the section's own content; the pelican
   config renders the same Markdown, since Jinja has no filter for it.
-- The line under every page, `site.json`'s `"footer"`, as Markdown too,
+- The line under every page, `site.toml`'s `"footer"`, as Markdown too,
   with `{year}` in it standing for the year the site is built -- so a
   trademark or copyright notice stays current, as jupyter.org's own
   footer keeps it. Unset, the footer carries the site's description.
 - An optional site-wide announcement banner above the header, from
-  `site.json`'s `"announcement"`: either an http(s) URL fetched
+  `site.toml`'s `"announcement"`: either an http(s) URL fetched
   client-side or literal HTML. The URL form is the mechanism behind
   Sphinx's `announcement` theme option, so one file such as
   `https://jupyter.org/assets/banner.html` can drive a blog and its
@@ -256,7 +256,7 @@ with none stored, the system scheme decides. The theme provides:
   banner. Dismissal persists per browser, and a changed announcement
   clears it.
 - An optional newsletter signup band at the foot of every page, from
-  `site.json`'s `"newsletter"`: a heading and a HubSpot form, the
+  `site.toml`'s `"newsletter"`: a heading and a HubSpot form, the
   section jupyter.org closes its own pages with, laid out the way that
   page reads down -- heading, the fields on one row, the consent copy,
   the button -- and drawn in the site's own type and colours. The form renders inside HubSpot's iframe, so
@@ -304,7 +304,7 @@ with none stored, the system scheme decides. The theme provides:
 - Open Graph metadata on every page: `og:site_name`, `og:type`,
   `og:title`, `og:url`, `og:description`, the baked 640×360 cover as
   `og:image` (with `twitter:card` following whether there is one, and
-  `twitter:site` from `site.json`'s `"twitter"`), `article:published_time`
+  `twitter:site` from `site.toml`'s `"twitter"`), `article:published_time`
   and `article:modified_time`, the post's authors (by name in the
   `author` meta tag, by author page in `article:author`) and tags, and
   a canonical link. LinkedIn's and Facebook's share URLs carry only the
@@ -320,16 +320,16 @@ with none stored, the system scheme decides. The theme provides:
   `/page/2/`, not folded into page 1. A `sitemap.xml` (Hugo's own; the
   Pelican plugin writes one) lists the posts with their last-modified
   dates, and a `robots.txt` names it. The search page is kept out of
-  both, and `"noindex": true` in `site.json` keeps a whole deployment
+  both, and `"noindex": true` in `site.toml` keeps a whole deployment
   out (a preview, which would otherwise be indexed as a copy of the
   real site). Old inbound links are carried
-  forward by the mechanism `site.json`'s `redirects` names -- stub
+  forward by the mechanism `site.toml`'s `redirects` names -- stub
   pages, a `_redirects` file, or both (see [Redirects and
   feeds](#redirects-and-feeds)).
 - What WordPress's SEO plugins add on top, in both themes:
   - One schema.org graph on every page rather than a lone node: the
     `Organization` (publisher, with its logo and its profiles elsewhere
-    as `sameAs`, from `site.json`'s `"profiles"` and `"twitter"`), the
+    as `sameAs`, from `site.toml`'s `"profiles"` and `"twitter"`), the
     `WebSite` (with the search page as its `SearchAction`), a
     `BreadcrumbList` placing the page (home, the tag or author index,
     the page), the post's `BlogPosting` with each author's Medium
@@ -342,7 +342,7 @@ with none stored, the system scheme decides. The theme provides:
     (Medium's "originally published at", for a story imported from a
     gist, a Notion page or someone's own blog): that page is a copy of
     it and says so in its canonical link.
-  - A site-wide share image, `site.json`'s `"share_image"`: the
+  - A site-wide share image, `site.toml`'s `"share_image"`: the
     `og:image` of every page without a cover of its own (listings,
     posts with no usable image), so every share carries a picture.
     Both themes declare `og:image:width`/`og:image:height`, so
@@ -375,11 +375,11 @@ with none stored, the system scheme decides. The theme provides:
   `config/_default/hugo.toml` is how the site is built (taxonomies,
   related posts, the paginator, Goldmark and Chroma) plus the address,
   name and language Hugo takes only at the root of its configuration.
-  The pelican site puts the same data in `site.json` beside its
+  The pelican site puts the same data in `site.toml` beside its
   `pelicanconf.py`, which reads it one key at a time and holds none of
   it -- that config is the reader, the URL scheme and the plugins, and
   is the same bytes for every archive. Both are filled from the
-  archive's own `site/site.json`, with the images resolved to the
+  archive's own `site/site.toml`, with the images resolved to the
   copies the site carries; edit either in place and rebuild with the
   generator alone, without re-running the exporter. Each site also
   carries a `README.md` of its own -- what to edit, what builds it, how
@@ -438,7 +438,7 @@ once into `.image-cache/` and hard-linked into every site.
   1600 px longest edge through Pillow, and lossily re-encoded. Animated
   gifs get no srcset variants and dominate the built sites byte-wise,
   so they are resized to 1104 px through gifsicle when it is installed.
-- `site.json` tunes or disables the caps:
+- `site.toml` tunes or disables the caps:
   `"images": {"still_max_edge": N, "animated_max_edge": N}`, with 0
   meaning off.
 
@@ -446,7 +446,7 @@ once into `.image-cache/` and hard-linked into every site.
 
 Both card-theme sites carry every old inbound path (Medium slug+id,
 `/p/<id>`, Ghost-era) forward to the page that replaces it. There are
-two ways a static host does that, and `site.json`'s `redirects` chooses
+two ways a static host does that, and `site.toml`'s `redirects` chooses
 between them, because **no host reads both**: on a host that reads one,
 the other is inert weight.
 
@@ -530,14 +530,22 @@ listing plugin at build time, like the site theme itself. Render with
 `myst start` or `myst build --html` inside `site-myst/`
 (`npm install -g mystmd`).
 
-## `site.json`
+## `site.toml`
 
-`site/site.json`: hand-written, versioned beside the archive, and read
+`site/site.toml`: hand-written, versioned beside the archive, and read
 by all three exporters. It holds everything about a built site that
 belongs to the publication rather than the tool -- which is why it sits
 in its own directory rather than in the archive, together with the
 images it names. Every key is optional, and every image path is
 relative to `site/`.
+
+It is TOML so that each key can carry what it is for on the line above
+it, which is how the copies the exporters write are documented too:
+`site-pelican/site.toml` and `site-hugo/config/_default/params.toml`
+each list every key, the unset ones commented out beside an example of
+them set, and neither generated config (`pelicanconf.py`, `hugo.toml`)
+says a word about what any of them mean. The table below is the same
+documentation for the input, in one place.
 
 | key | what it does |
 |-----|--------------|
@@ -547,30 +555,33 @@ relative to `site/`.
 | `footer` | the line under every page (Markdown), `{year}` standing for the year the site is built; unset, the footer carries `description` |
 | `base_url` | **the domain the site is served from**, e.g. `"https://blog.example.com"`. Everything absolute is built from it: feed URLs, redirect stubs, the Open Graph tags, the per-post share links. Set it before deploying and re-run the exporter. Unset, the exporters warn and fall back to a placeholder, so share links and social previews point at a domain you do not own |
 | `locale` | the language of the pages: `<html lang>` and the feeds (`"en"` by default) |
-| `avatar` | image beside `site.json` for the header logo |
-| `logo` | image beside `site.json` for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
+| `avatar` | image beside `site.toml` for the header logo |
+| `logo` | image beside `site.toml` for a masthead logo that stands in for the site's name in the header (a wordmark, as jupyter.org's navbar carries one); set, it replaces the avatar and the name, and the link is labelled with the title |
 | `logo_dark` | the same mark drawn for the dark palette, which the palettes switch between; only read when `logo` is set |
 | `logo_link` | where the masthead links, for a mark that stands for something larger than the blog (`"https://jupyter.org"` under the Jupyter blog's Jupyter mark); unset, it links to the site's own home. The link is labelled with the address's host rather than the site's title; only read when `logo` is set |
 | `favicon` | archive-relative image path for the browser-tab icon |
 | `announcement` | site-wide banner: an http(s) URL fetched client-side, or literal HTML |
-| `newsletter` | the signup band at the foot of every page: `{"heading": ..., "hubspot_portal": ..., "hubspot_form": ..., "hubspot_region": ...}`. The heading and the first two ids are required (a partial entry is reported and the band left out); the region defaults to `"na1"` |
+| `newsletter` | the signup band at the foot of every page, a `[newsletter]` table of `heading`, `hubspot_portal`, `hubspot_form` and `hubspot_region`. The heading and the first two ids are required (a partial entry is reported and the band left out); the region defaults to `"na1"` |
 | `redirects` | which mechanism carries old inbound links: `"stubs"` (a meta-refresh page at every old path -- any static host, and the only mechanism GitHub Pages has), `"file"` (a `_redirects` file at the site root -- Netlify, Cloudflare Pages and their imitators, a real HTTP 301, and nothing on GitHub Pages), `"both"` (the default, for a host not yet chosen) or `"none"` (redirects configured elsewhere). `redirects.csv` is written whichever it is. See [Redirects and feeds](#redirects-and-feeds) |
 | `noindex` | `true` keeps search engines off the whole deployment (a `noindex` robots tag on every page, a `robots.txt` that disallows all): for previews and staging, which would otherwise be indexed as a copy of the real site |
 | `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
 | `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |
-| `images` | display-copy size caps: `{"still_max_edge": N, "animated_max_edge": N}`, `0` to disable |
-| `hugo` | hugo-specific settings: `locale`, per-exporter `avatar`/`logo`/`logo_dark`/`favicon`, and extra `params` for the generated site's `config/_default/params.toml` |
+| `images` | display-copy size caps, an `[images]` table of `still_max_edge` and `animated_max_edge`; `0` disables that cap |
+| `hugo` | hugo-specific settings, a `[hugo]` table: `locale`, per-exporter `avatar`/`logo`/`logo_dark`/`favicon`, and a `[hugo.params]` table of extra params for the generated site's `config/_default/params.toml` |
 
 The `hugo` section in full:
 
-```json
-"hugo": {"locale": "en",                    // overrides the top-level key
-         "avatar": "avatar.png",            // overrides the top-level key
-         "logo": "logo.png",                // overrides the top-level key
-         "logo_dark": "logo-dark.png",      // overrides the top-level key
-         "favicon": "favicon.ico",          // overrides the top-level key
-         "params": {"motto": "..."}}        // extra/override params.toml keys
+```toml
+[hugo]
+locale = "en"               # overrides the top-level key
+avatar = "avatar.png"       # overrides the top-level key
+logo = "logo.png"           # overrides the top-level key
+logo_dark = "logo-dark.png" # overrides the top-level key
+favicon = "favicon.ico"     # overrides the top-level key
+
+[hugo.params]
+motto = "..."               # extra/override params.toml keys
 ```
 
 ## Installation
@@ -853,7 +864,7 @@ src/medium_archive/
   paths.py       where a project keeps its archive, site inputs and sites
   sites.py       machinery shared by the site exporters: page slugs, the
                  in-publication link map, image placement, covers,
-                 redirect maps, site.json
+                 redirect maps, site.toml
   templates/     the site scaffolding the exporters copy into each site:
                  generator configs, themes, CSS, shared JS snippets
                  (see templates/README.md)
@@ -874,7 +885,7 @@ tests/           offline tests (canned HTTP responses, no network);
                  run with `uv run pytest`
 archive/         the Jupyter blog archive this tool is exercised against;
                  its own layout is documented in archive/README.md
-site/            site.json and the images it names, read by the exporters
+site/            site.toml and the images it names, read by the exporters
 docs/            compare.md, commonmark.md, commonmark-plan.md: the
                  analysis behind the renderer and generator decisions,
                  and the blog_export commit map

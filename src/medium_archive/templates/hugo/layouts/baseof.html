@@ -15,7 +15,7 @@
 {{ with or .Description site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
 {{/* max-image-preview:large lets a search engine show the post's images
      at full size in results and Discover, WordPress's default on every
-     page; "noindex" (site.json, for a preview deployment, or a page's
+     page; "noindex" (site.toml, for a preview deployment, or a page's
      front matter, the search page) keeps a page out of the index */}}
 <meta name="robots" content="{{ if or site.Params.noindex .Params.noindex }}noindex{{ else }}index, follow, max-image-preview:large{{ end }}">
 {{/* Open Graph, which LinkedIn and Facebook read and nothing else
@@ -24,8 +24,8 @@
      a share link is only ever as good as this block. Bluesky, Mastodon
      and mail carry the title in the link itself and need none of it.
      Every URL here is absolute against baseURL, so they are as real as
-     site.json's base_url (which the exporter warns about when unset). */}}
-{{/* the share image: the post's baked cover, else site.json's
+     site.toml's base_url (which the exporter warns about when unset). */}}
+{{/* the share image: the post's baked cover, else site.toml's
      share_image (assets/img/, so its dimensions can be read), so a
      listing or a coverless post still shares with a picture. Its
      width and height are declared so Facebook renders the large card
@@ -79,10 +79,10 @@
 <!-- @include shared/announcement.html -->
 {{ end }}<header class="site-header"><div class="wrap bar">
 {{/* the masthead: a logo of the publication's own standing in for its
-     name (site.json "logo", with "logo_dark" the same mark drawn for
+     name (site.toml "logo", with "logo_dark" the same mark drawn for
      the dark palette), as jupyter.org's navbar carries its rectangle
      logo; failing that, the site's name, with the avatar beside it. It
-     links to the site's home, or to site.json's "logo_link" where the
+     links to the site's home, or to site.toml's "logo_link" where the
      mark stands for something larger than the blog -- and then the
      link is named by where it goes, not by this site */}}
 <a class="site-title" href="{{ with site.Params.logo_link }}{{ .url }}{{ else }}{{ site.Home.RelPermalink }}{{ end }}"{{ with site.Params.logo }} aria-label="{{ with site.Params.logo_link }}{{ .label }}{{ else }}{{ site.Title }}{{ end }}"{{ end }}>{{ with site.Params.logo }}<img class="site-logo{{ if site.Params.logo_dark }} site-logo-light{{ end }}" src="{{ . | relURL }}" alt="">{{ with site.Params.logo_dark }}<img class="site-logo site-logo-dark" src="{{ . | relURL }}" alt="">{{ end }}{{ else }}{{ with site.Params.avatar }}<img src="{{ . | relURL }}" alt="">{{ end }}{{ site.Title }}{{ end }}</a>
@@ -102,7 +102,7 @@
 <main class="wrap">
 {{ block "main" . }}{{ end }}
 </main>
-{{/* jupyter.org's newsletter band (site.json "newsletter"), the last
+{{/* jupyter.org's newsletter band (site.toml "newsletter"), the last
      thing on every page there and here: the heading, and the HubSpot
      signup form the snippet renders into it. Hidden until that form
      is on its way, so a blocked embed leaves no heading promising a
@@ -114,7 +114,7 @@
 </div>
 </section>
 <!-- @include shared/newsletter.html -->
-{{ end }}{{/* the line under every page: site.json's "footer" as
+{{ end }}{{/* the line under every page: site.toml's "footer" as
      Markdown, with `{year}` the year of the build so a copyright
      notice stays current, as jupyter.org's own footer keeps it; with
      no footer set, the site's description, as before */}}

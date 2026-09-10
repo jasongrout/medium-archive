@@ -14,7 +14,7 @@ inbound path to its page URL, tag names from the archive's tags.json
 `display` map (the tags themselves stay slugs -- spaces and capitals are
 a display concern, so nothing a URL is built from moves), and site-wide
 text (title, description, landing-page intro, optional base_url) from the
-hand-written site/site.json.
+hand-written site/site.toml.
 """
 
 import hashlib
@@ -37,6 +37,7 @@ import yaml
 from .lint import split_post
 from .paths import archive_dir, image_cache, site_config
 from .pages import markdown_text
+from .siteconf import documented_toml, load_toml
 from .tags import display_name, load_tag_display
 from .urls import medium_id
 
@@ -73,8 +74,8 @@ def write_templates(site: Path, templates: dict):
 
 
 def copy_site_asset(inputs: Path, rel, dst_dir: Path, stem: str):
-    """An image site.json names (the header avatar, the tab icon),
-    resolved beside site.json itself so the site inputs move as one
+    """An image site.toml names (the header avatar, the tab icon),
+    resolved beside site.toml itself so the site inputs move as one
     directory, copied into the site as dst_dir/<stem><its extension> so
     the site stays self-contained; the file name written, or None when
     rel is unset or the file is missing (noted)."""
@@ -129,7 +130,7 @@ AUTOLINK_RE = re.compile(r"<(https?://[^>\s]+)>")  # autolink <url>
 
 
 def load_site_inputs(root: Path):
-    """(manifest, site.json config) for an exporter, or exit."""
+    """(manifest, site.toml config) for an exporter, or exit."""
     manifest_path = archive_dir(root) / "posts.json"
     if not manifest_path.exists():
         sys.exit(f"nothing to build: {manifest_path} missing (run convert first)")
@@ -138,7 +139,15 @@ def load_site_inputs(root: Path):
         sys.exit("nothing to build: posts.json is empty (run convert first)")
     config = {"title": "Blog archive", "description": "", "intro": ""}
     if site_config(root).exists():
-        config.update(json.loads(site_config(root).read_text()))
+        config.update(load_toml(site_config(root)))
+    elif (legacy := site_config(root).with_suffix(".json")).exists():
+        # The file was JSON until each key was given its own
+        # documentation, which JSON has nowhere to put. Say so rather
+        # than build a site named "Blog archive" from defaults.
+        sys.exit(f"{legacy} is no longer read: the site's own data is now "
+                 f"{site_config(root).name}, TOML so that every key can "
+                 "carry what it is for beside it. Convert it (the keys "
+                 "are unchanged) and delete the old file.")
     # Optional keys both card themes read: "noindex" (true keeps search
     # engines off the whole site -- a preview deployment, which would
     # otherwise be indexed as a copy of the real one -- through a
@@ -146,7 +155,7 @@ def load_site_inputs(root: Path):
     # all), "twitter" (the publication's @handle, for twitter:site),
     # "profiles" (its addresses elsewhere, for the Organization's
     # sameAs -- see site_profiles) and "share_image" (a raster beside
-    # site.json, the og:image of every page without a cover of its own).
+    # site.toml, the og:image of every page without a cover of its own).
     # Absolute links -- feed URLs, redirect stubs, the Open Graph tags
     # and the share links a reader hands to LinkedIn or Facebook -- are
     # built from base_url. Without it each exporter falls back to a
@@ -154,7 +163,7 @@ def load_site_inputs(root: Path):
     # else's domain, so say so once here rather than let the build look
     # clean until a share link is clicked in the wild.
     if not config.get("base_url"):
-        print("site.json has no base_url: absolute links (feeds, redirect "
+        print("site.toml has no base_url: absolute links (feeds, redirect "
               "stubs, Open Graph tags, share links) will not point at this "
               "site. Set it to the domain the site is served from and "
               "re-run.", file=sys.stderr)
@@ -448,9 +457,9 @@ class Covers:
 # they are placed into a site. 1600 px keeps them sharp past the card
 # themes' widest srcset variant (1104 px); animated gifs get no srcset
 # variants, render in the ~736 px body column, and dominate the built
-# sites byte-wise, so they are capped tighter. site.json overrides
-# either cap ("images": {"still_max_edge": N, "animated_max_edge": N},
-# 0 = leave that kind untouched).
+# sites byte-wise, so they are capped tighter. site.toml overrides
+# either cap ([images] with still_max_edge / animated_max_edge, 0 =
+# leave that kind untouched).
 #
 # Line art -- the charts, screenshots and diagrams that most of this
 # archive's PNGs are -- is exempt from the still cap and never encoded
@@ -838,7 +847,7 @@ def redirects_file(rules) -> str:
     return "".join(f"{old} {new} 301\n" for old, new, *_ in rules)
 
 
-# What a site does about old inbound links, as site.json's "redirects".
+# What a site does about old inbound links, as site.toml's "redirects".
 # The two mechanisms are alternatives, not layers: no host reads both,
 # and on a host that reads one the other is inert weight.
 #
@@ -863,11 +872,11 @@ REDIRECT_MODES = ("both", "stubs", "file", "none")
 
 
 def redirect_mode(config: dict) -> str:
-    """site.json's "redirects" (see REDIRECT_MODES), defaulting to
+    """site.toml's "redirects" (see REDIRECT_MODES), defaulting to
     "both"; an unknown value is reported and read as the default."""
     mode = config.get("redirects", "both")
     if mode not in REDIRECT_MODES:
-        print(f'site.json "redirects": {mode!r} is not one of '
+        print(f'site.toml "redirects": {mode!r} is not one of '
               f'{", ".join(REDIRECT_MODES)}; using "both"', file=sys.stderr)
         return "both"
     return mode
@@ -961,7 +970,7 @@ def site_data(manifest: dict, archive: Path) -> dict:
     """File name -> the map it holds, for the data files both the hugo
     and the pelican site are built with. They hold what a site is
     rendered from that is neither the posts nor the hand-written
-    site.json: the names tags and authors are shown under, and the
+    site.toml: the names tags and authors are shown under, and the
     profile address of each byline. Derived from the archive here and
     written beside the site's config rather than baked into it, so a
     checked-in copy of a site can correct a name or add a profile by
@@ -994,25 +1003,28 @@ def write_data_files(site: Path, manifest: dict, archive: Path) -> dict:
     return data
 
 
-def write_site_json(site: Path, data: dict):
-    """<site>/site.json: this site's own data, in the shape its
+def write_site_config(site: Path, data: dict):
+    """<site>/site.toml: this site's own data, in the shape its
     generated config reads. It is the archive's hand-written
-    site/site.json resolved for one built site -- the images as the
+    site/site.toml resolved for one built site -- the images as the
     copies that site carries, and what several keys together come to
     (the profile list, the masthead link's label) written out -- so
     that a checked-in copy of the site has one file to edit for
     everything the pages say about themselves, and none of it is buried
-    in generated machinery. Hugo has its own place for the same data
+    in generated machinery. Every key is written under its own
+    documentation, an unset one commented out beside an example (see
+    siteconf), so the file is also the list of what there is to set.
+    Hugo has its own place for the same data
     (config/_default/params.toml, which is that engine's file for it);
     this is the pelican site's."""
-    (site / "site.json").write_text(
-        json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+    (site / "site.toml").write_text(
+        fill_template("pelican/site.toml.tmpl", site=documented_toml(data)),
         encoding="utf-8")
 
 
 def site_profiles(config: dict) -> list:
     """The publication's addresses elsewhere, for the Organization's
-    sameAs: site.json "profiles" (a list of URLs) plus the X/Twitter
+    sameAs: site.toml "profiles" (a list of URLs) plus the X/Twitter
     profile its "twitter" handle names, deduplicated, in that order."""
     profiles = list(config.get("profiles") or [])
     handle = (config.get("twitter") or "").strip().lstrip("@")
@@ -1022,7 +1034,7 @@ def site_profiles(config: dict) -> list:
 
 
 def masthead_link(config: dict):
-    """site.json's "logo_link" as the href and the accessible name of
+    """site.toml's "logo_link" as the href and the accessible name of
     the masthead's link, or None when the masthead links to the site's
     own home, as it does by default. A logo is set as that link when it
     stands for something larger than the blog -- the Jupyter blog's
@@ -1036,7 +1048,7 @@ def masthead_link(config: dict):
     return {"url": url, "label": urlsplit(url).netloc or url}
 
 
-# site.json's "newsletter", the signup band both themes put at the foot
+# site.toml's "newsletter", the signup band both themes put at the foot
 # of every page (jupyter.org's own, which is where the shape of it comes
 # from). The form is a HubSpot embed, named the way HubSpot names its
 # three parts, so the values are the ones already on hand for whoever
@@ -1046,7 +1058,7 @@ NEWSLETTER_KEYS = ("heading", "hubspot_portal", "hubspot_form")
 
 
 def newsletter_params(config: dict):
-    """site.json's "newsletter" as the params both themes render the
+    """site.toml's "newsletter" as the params both themes render the
     signup band from, or None when there is none to render. A partial
     entry is a mistake worth hearing about rather than a band quietly
     missing from the built site, so what it lacks is named."""
@@ -1055,7 +1067,7 @@ def newsletter_params(config: dict):
         return None
     missing = [key for key in NEWSLETTER_KEYS if not entry.get(key)]
     if missing:
-        print("newsletter band skipped: site.json's \"newsletter\" is "
+        print("newsletter band skipped: site.toml's \"newsletter\" is "
               "missing " + ", ".join(missing), file=sys.stderr)
         return None
     params = {key: str(entry[key]) for key in NEWSLETTER_KEYS}

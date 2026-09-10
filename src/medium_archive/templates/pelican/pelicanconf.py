@@ -5,98 +5,63 @@
 #
 # What this site *is* -- its name, its address, the marks in its
 # masthead, the blurb on its landing page, the line under every page --
-# is site.json beside this file, read below and mapped onto Pelican's
-# settings one key at a time. That file is the archive's own
-# site/site.json resolved for this site: the images it names are the
-# copies this site carries, and what the exporter works out from
-# several keys at once (the profile list, the masthead link's label) is
-# written out as what it came to. Edit it, and nothing here has to be
-# touched. The names tags and authors are shown under are the same
-# arrangement one directory down, in data/*.json.
+# is site.toml beside this file, read below and mapped onto Pelican's
+# settings one key at a time. Every key there carries what it is for,
+# written above it in the file itself, so nothing here has to explain
+# one; edit it, and nothing here has to be touched. The names tags and
+# authors are shown under are the same arrangement one directory down,
+# in data/*.json.
 
 import datetime as _datetime
 import json as _json
 import os as _os
+import tomllib as _tomllib
 
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
 
 
 def _site():
-    """site.json beside this config: everything about this particular
-    site. Missing is fatal rather than defaulted, because a site with
-    no name and no address is not one this config should guess at."""
-    with open(_os.path.join(_HERE, "site.json"), encoding="utf-8") as fh:
-        return _json.load(fh)
+    """site.toml beside this config: everything about this particular
+    site, every key documented in the file itself. Missing is fatal
+    rather than defaulted, because a site with no name and no address
+    is not one this config should guess at."""
+    with open(_os.path.join(_HERE, "site.toml"), "rb") as fh:
+        return _tomllib.load(fh)
 
 
 _SITE = _site()
 
 # --------------------------------------------------------------- the site
-# One line per key of site.json. Nothing below this block reads that
-# file: this is the whole of what the site's own data reaches.
+# One line per key of site.toml, which is where each of them is
+# documented. Nothing below this block reads that file: this is the
+# whole of what the site's own data reaches. A key it does not set is
+# absent, which every read below takes as unset.
 SITENAME = _SITE["title"]
 SITESUBTITLE = _SITE.get("description") or ""
-# the address this site is served from, without the trailing slash
-# Pelican does not want: what every absolute link is built against --
-# the feeds, the redirect stubs, the Open Graph tags, and the share
-# links a reader hands to LinkedIn or Facebook
 SITEURL = (_SITE.get("base_url") or "").rstrip("/")
-# the language of the pages, as <html lang> and in the feeds
 DEFAULT_LANG = _SITE.get("locale") or "en"
-# the small round mark beside the site's name in the header, and the
-# publisher's logo in every page's structured data
 AVATAR = _SITE.get("avatar")
 FAVICON = _SITE.get("favicon")
-# a masthead logo that stands in for the site's name -- a wordmark, the
-# way jupyter.org's navbar carries its rectangle logo -- and the same
-# mark drawn for the dark palette; with one set the header shows it
-# instead of the avatar and the name
 LOGO = _SITE.get("logo")
 LOGO_DARK = _SITE.get("logo_dark")
-# where the masthead points when the mark on it stands for something
-# larger than the blog, as {"url": ..., "label": ...} -- the address,
-# and the name the link reads under; null for the site's own home
 LOGO_LINK = _SITE.get("logo_link")
-# a site-wide banner above the header: an http(s) URL the theme fetches
-# client-side (empty content hides the banner, like Sphinx themes' html
-# announcement option), or literal HTML
 ANNOUNCEMENT = _SITE.get("announcement")
-# the landing-page blurb. It is Markdown, like the hugo site's
-# content/_index.md, and is rendered here because Jinja has no Markdown
-# filter of its own; index.html emits it. The rendering waits for the
-# reader's parser, at the end of this file, so that the blurb is read
+# the landing-page blurb and the footer line are Markdown, like the
+# hugo site's content/_index.md, and are rendered here because Jinja
+# has no Markdown filter of its own. The rendering waits for the
+# reader's parser, at the end of this file, so that each is read
 # exactly as a post is.
 _INTRO_MD = _SITE.get("intro")
-# the line under every page, Markdown like the blurb above and rendered
-# with it below. `{year}` in it becomes the year the site is built, so
-# a copyright notice stays current the way jupyter.org's own footer does.
 _FOOTER_MD = _SITE.get("footer")
-# keep search engines off this deployment (a preview): a noindex robots
-# tag on every page, and a robots.txt that disallows all
 NOINDEX = bool(_SITE.get("noindex"))
-# what this site does about old inbound links: "stubs" is a
-# meta-refresh stub page at every old path, which works on any static
-# host and is the only mechanism GitHub Pages has; "file" is a
-# `_redirects` file at the site root, which Netlify, Cloudflare Pages
-# and their imitators answer with a real HTTP 301 and GitHub Pages
-# ignores; "both" is both, "none" neither. redirects.csv, the map both
-# are rendered from, is written by the exporter either way.
+# "stubs", "file", "both" or "none" (see site.toml), as the two
+# switches the embedded plugin reads
 _REDIRECTS = _SITE.get("redirects") or "both"
 REDIRECT_STUBS = _REDIRECTS in ("both", "stubs")
 REDIRECT_FILE = _REDIRECTS in ("both", "file")
-# the publication's @handle, credited on links shared to X/Twitter
 TWITTER = _SITE.get("twitter")
-# the publication's addresses elsewhere (the X/Twitter profile the
-# handle above names among them): the Organization's sameAs in every
-# page's structured data
 PROFILES = _SITE.get("profiles") or []
-# the heading and HubSpot form ids of the signup band at the foot of
-# every page, or null for no band
 NEWSLETTER = _SITE.get("newsletter")
-# the og:image of a page with no cover of its own, and its pixel size,
-# which the theme has no image pipeline to measure; and the size the
-# card covers were baked to (null when they kept their source size,
-# the exporter having been run without Pillow)
 SHARE_IMAGE = _SITE.get("share_image")
 SHARE_IMAGE_SIZE = _SITE.get("share_image_size")
 COVER_SIZE = _SITE.get("cover_size")
@@ -168,7 +133,7 @@ CATEGORY_SAVE_AS = ""           # the category axis stays unused
 # file rather than in it, the same three files the hugo site reads
 # through hugo.Data: this config is machinery, while a name or a
 # profile is exactly what a checked-in copy of a site corrects by hand
-# -- site.json above and these three are the whole of what such a copy
+# -- site.toml above and these three are the whole of what such a copy
 # has to touch. They are read here, at config time, so the rest of this
 # file and the site plugin below see ordinary Python dicts.
 _DATA_DIR = _os.path.join(_HERE, "data")

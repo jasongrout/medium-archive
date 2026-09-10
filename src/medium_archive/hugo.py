@@ -18,7 +18,7 @@ themes are written in, and the one the pelican site writes, so a field
 is read and hand-edited the same way in either site. Tags and authors
 feed Hugo's taxonomies, which give the tag/author listing pages and
 per-term RSS feeds. Every old inbound path (Medium slug+id, /p/<id>,
-Ghost-era) is carried by whichever redirect mechanism site.json's
+Ghost-era) is carried by whichever redirect mechanism site.toml's
 "redirects" asks for (see sites.REDIRECT_MODES): as an alias, which
 Hugo emits a redirect stub for and which works on any static host, as
 a `_redirects` file for the hosts that turn one into HTTP 301s, or as
@@ -26,7 +26,7 @@ both. Hugo's own sitemap.xml (page lastmod from the post's updated
 date) is joined by a robots.txt naming it, and the theme's pages carry the metadata search engines and
 share targets read (see templates/README.md): the structured data's
 author and publisher profiles come from data/authors.json (the Medium
-profile of every byline) and site.json's "profiles"/"twitter", the
+profile of every byline) and site.toml's "profiles"/"twitter", the
 og:image of a page with no cover from its "share_image", and a post
 that declared a canonical on another host (Medium's "originally
 published at") carries it as `canonical` in its front matter; the
@@ -66,10 +66,10 @@ share image, `noindex`, the publication's handle and profiles), and
 hugo.toml the machinery -- the taxonomies, the related-posts index,
 the paginator, Goldmark and Chroma -- plus the address, name and
 language Hugo takes only at the root of its configuration. That is the
-same split the pelican site makes between its site.json and its
+same split the pelican site makes between its site.toml and its
 generated pelicanconf.py, in the file Hugo's own conventions put it
 in. Hugo reads a config directory in preference to a root config file,
-so there is one place to look. site.json's optional `hugo` section
+so there is one place to look. site.toml's optional `hugo` section
 tunes what is written: `locale`, `avatar`, `favicon`, `logo` and
 `logo_dark` (overriding the top-level keys), and `params` merged last
 into params.toml.
@@ -79,6 +79,7 @@ import json
 import sys
 
 from .paths import archive_dir, site_dir, site_inputs
+from .siteconf import documented_toml
 from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     caption_text, clean_site, copy_site_asset,
                     export_content, fill_template, front_matter_yaml,
@@ -192,28 +193,29 @@ def front_matter(url: str, post: dict, cover: str | None = None,
     return front_matter_yaml(front)
 
 
-def _toml_params(params: dict) -> str:
-    """The body of config/_default/params.toml: flat keys first, dict
-    values as tables whose dict entries render as inline tables. The
-    file's name is what makes these Hugo's [params], so no key is
-    prefixed and no table header names one. Values go through JSON,
-    whose scalar/list syntax TOML shares."""
-    j = lambda v: json.dumps(v, ensure_ascii=False)
-    flat, tables = [], []
-    for key, value in params.items():
-        if isinstance(value, dict):
-            rows = [f"[{key}]"]
-            for name, item in value.items():
-                if isinstance(item, dict):
-                    inner = ", ".join(f"{k} = {j(v)}" for k, v in item.items())
-                    rows.append(f"{name} = {{ {inner} }}")
-                else:
-                    rows.append(f"{name} = {j(item)}")
-            tables.append("\n".join(rows))
-        else:
-            flat.append(f"{key} = {j(value)}")
-    # flat keys before the first table header, as TOML requires
-    return "\n\n".join(([("\n".join(flat))] if flat else []) + tables)
+# The three keys Hugo takes at the root of its configuration rather
+# than as params, and so writes into hugo.toml instead: the site's
+# address, its name and its language. params.toml documents the rest.
+HUGO_ROOT_KEYS = ("base_url", "title", "locale")
+
+# Keys this site resolves to a different path from the pelican site
+# that siteconf's examples are written for: its images sit under
+# static/ and assets/ rather than inside a theme, so what params.toml
+# shows of an unset one has to be what this exporter would write.
+HUGO_EXAMPLES = {
+    "avatar": "img/avatar.svg",
+    "favicon": "favicon.svg",
+    "logo": "img/logo.svg",
+    "logo_dark": "img/logo-dark.svg",
+    "share_image": "img/share.png",
+}
+
+# What params.toml has no key for at all: the landing-page blurb is
+# content/_index.md on this site, and the two image sizes and the
+# redirect mode are things the pelican config needs told and Hugo works
+# out or is given elsewhere (its own image pipeline; aliases in each
+# post's front matter, or static/_redirects).
+HUGO_OMITTED = ("intro", "share_image_size", "cover_size", "redirects")
 
 
 def build_site(root):
@@ -222,7 +224,7 @@ def build_site(root):
     manifest, config = load_site_inputs(root)
     stems = page_stems(manifest)
     hugo_config = config.get("hugo", {})
-    mode = redirect_mode(config)        # site.json "redirects"
+    mode = redirect_mode(config)        # site.toml "redirects"
     site = site_dir(root, "hugo")
     clean_site(site, keep=("public", "resources"))
 
@@ -277,16 +279,17 @@ def build_site(root):
     # sites.write_data_files).
     write_data_files(site, manifest, archive)
 
-    params = {"description": config.get("description", "")}
-    # "footer": the line under every page, Markdown, with `{year}` the
-    # year of the build (baseof.html renders it); without it the footer
-    # carries the site's description, as it always has
+    params = {}
+    if config.get("description"):
+        params["description"] = config["description"]
+    # without a footer line the footer carries the site's description,
+    # as it always has (baseof.html)
     if config.get("footer"):
         params["footer"] = config["footer"]
-    # "avatar" (site.json top level, or hugo section): a hand-picked site
-    # logo, shown in the header; "favicon" likewise: the tab icon, at the
-    # site root so browsers that ask for /favicon.ico by convention are
-    # covered when it is an .ico
+    # every image key may be set in site.toml's [hugo] section instead,
+    # to give this site a different mark from the pelican one. The
+    # favicon goes to the site root, so browsers that ask for
+    # /favicon.ico by convention are covered when it is an .ico.
     avatar = copy_site_asset(
         inputs, hugo_config.get("avatar") or config.get("avatar"),
         site / "static" / "img", "avatar")
@@ -297,10 +300,6 @@ def build_site(root):
         site / "static", "favicon")
     if favicon:
         params["favicon"] = favicon
-    # "logo" (site.json top level, or hugo section): a masthead logo
-    # that stands in for the site's name -- a wordmark, the way
-    # jupyter.org's navbar carries its rectangle logo -- with
-    # "logo_dark" the same mark drawn for the dark palette
     logo = copy_site_asset(
         inputs, hugo_config.get("logo") or config.get("logo"),
         site / "static" / "img", "logo")
@@ -311,36 +310,26 @@ def build_site(root):
             site / "static" / "img", "logo-dark")
         if logo_dark:
             params["logo_dark"] = f"img/{logo_dark}"
-        # "logo_link": where the mark points when it stands for
-        # something larger than the blog (the Jupyter blog's Jupyter
-        # mark, and jupyter.org); unset, the masthead points at the
-        # site's own home, as it does without a logo at all
+        # read only where there is a logo to carry it, as the dark
+        # mark is (see sites.masthead_link)
         link = masthead_link(config)
         if link:
             params["logo_link"] = link
-    # "announcement": a site-wide banner above the header -- an http(s)
-    # URL the theme fetches client-side (empty content hides the banner,
-    # like Sphinx themes' html announcement option), or literal HTML
     if config.get("announcement"):
         params["announcement"] = config["announcement"]
-    # "noindex": keep search engines off this deployment (a preview);
-    # "twitter": the publication's @handle, credited on shared links
     if config.get("noindex"):
         params["noindex"] = True
     if config.get("twitter"):
         params["twitter"] = config["twitter"]
-    # "profiles" (+ the twitter handle): the publication's addresses
-    # elsewhere, the Organization's sameAs in the structured data
+    # the twitter handle's own profile joins the list here
     if site_profiles(config):
         params["profiles"] = site_profiles(config)
-    # "newsletter": the signup band at the foot of every page (heading
-    # plus the HubSpot form's ids -- see sites.newsletter_params)
+    # see sites.newsletter_params
     newsletter = newsletter_params(config)
     if newsletter:
         params["newsletter"] = newsletter
-    # "share_image": the og:image of every page without a cover of its
-    # own (listings, posts with no usable image), under assets/ so the
-    # theme can read its dimensions
+    # under assets/, so the theme's own image pipeline can read its
+    # dimensions rather than being told them
     share = copy_site_asset(inputs, config.get("share_image"),
                             site / "assets" / "img", "share")
     if share:
@@ -350,12 +339,13 @@ def build_site(root):
     # this site says about itself and how it is built are separate
     # files: params.toml is the site's data, hand-editable and the only
     # one a checked-in copy of the site has to touch for its own
-    # furniture; hugo.toml is the machinery, plus the three keys Hugo
-    # takes at the root of its configuration and nowhere else -- its
-    # address, its name and its language. Hugo reads a config directory
-    # in preference to a root config file, so nothing else in the site
-    # is a second place to look. The pelican site splits the same two
-    # apart the same way (site.json and pelicanconf.py).
+    # furniture, and every key in it carries what it is for; hugo.toml
+    # is the machinery, plus the three keys Hugo takes at the root of
+    # its configuration and nowhere else -- its address, its name and
+    # its language. Hugo reads a config directory in preference to a
+    # root config file, so nothing else in the site is a second place
+    # to look. The pelican site splits the same two apart the same way
+    # (site.toml and pelicanconf.py).
     config_dir = site / "config" / "_default"
     config_dir.mkdir(parents=True, exist_ok=True)
     (config_dir / "hugo.toml").write_text(fill_template(
@@ -365,8 +355,15 @@ def build_site(root):
         locale=json.dumps(hugo_config.get("locale")
                           or config.get("locale") or "en"),
     ), encoding="utf-8")
+    # every key under its own documentation, an unset one commented
+    # out beside an example of it set, from the same table the pelican
+    # site's site.toml is written from (siteconf.SITE_KEYS) -- so the
+    # two engines cannot come to describe the same key differently
     (config_dir / "params.toml").write_text(fill_template(
-        "hugo/params.toml.tmpl", params=_toml_params(params)), encoding="utf-8")
+        "hugo/params.toml.tmpl",
+        params=documented_toml(params, examples=HUGO_EXAMPLES,
+                               omit=HUGO_ROOT_KEYS + HUGO_OMITTED)),
+        encoding="utf-8")
     write_templates(site, TEMPLATES)
     new_path = lambda stem: f"/posts/{stem}/"
     # the map itself, whichever mechanism serves it: what a redirect

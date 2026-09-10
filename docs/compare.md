@@ -26,7 +26,7 @@ markdown 3.10.3, pillow 12.3.0, pagefind 1.5.2, gifsicle 1.94.
 
 `base_url` is pointed at a localhost port per engine so absolute links,
 share URLs and Open Graph tags resolve while both sites are served and
-driven in headless Chromium. `site/site.json` is restored afterwards; only
+driven in headless Chromium. `site/site.toml` is restored afterwards; only
 this file is committed.
 
 ## What the two sites have in common

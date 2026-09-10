@@ -120,7 +120,7 @@ def test_seo_analysis_is_opt_in(tmp_path):
         "title is 63 chars; a search result shows about 60",
         "description is 200 chars; a search result shows about 160",
         "image without alt text",
-        "no image a card cover or a share preview could use (site.json \"share_image\" stands in)"]
+        "no image a card cover or a share preview could use (site.toml \"share_image\" stands in)"]
     assert "images/bare.png" in warnings[2]
     # a captioned figure's image gets its alt from the caption
     assert not any("captioned" in w for w in warnings)

@@ -28,19 +28,22 @@ as they are. `pagefind` (`npm install -g pagefind`) fills the
 
 | file | what it holds |
 |------|---------------|
-| `site.json` | everything the pages say about themselves: the site's name, its address, the marks in its masthead and where they point, the landing-page blurb, the line under every page, the banner, the newsletter band, the share image |
+| `site.toml` | everything the pages say about themselves: the site's name, its address, the marks in its masthead and where they point, the landing-page blurb, the line under every page, the banner, the newsletter band, the share image |
 | `data/tags.json` | tag slug → the name the tag is shown under |
 | `data/authornames.json` | author slug → the name they are shown under |
 | `data/authors.json` | author name → their profile address, which the structured data names as theirs |
 | `content/posts/<slug>/index.md` | the posts, with their images beside them |
 | `theme/` | the templates and the stylesheet: how the pages look |
-| `pelicanconf.py` | machinery — the CommonMark reader, the URL scheme, the feeds, and the plugins. It reads `site.json` and holds no site data of its own |
+| `pelicanconf.py` | machinery — the CommonMark reader, the URL scheme, the feeds, and the plugins. It reads `site.toml` and holds no site data of its own |
 
-`site.json` lists every key it can carry, unset ones as `null`, so it
-is also the list of what there is to set. The address it names,
-`base_url`, is what every absolute link is built from — the feeds, the
-redirect stubs, the Open Graph tags, the share links — so set it to the
-domain the site is actually served from.
+`site.toml` lists every key it can carry, each under a comment saying
+what it is for, and the ones this site does not set commented out
+beside an example of them set — so it is also the list of what there is
+to set. Nothing in `pelicanconf.py` explains any of them; that file is
+machinery, and every export overwrites it. The address `site.toml`
+names, `base_url`, is what every absolute link is built from — the
+feeds, the redirect stubs, the Open Graph tags, the share links — so
+set it to the domain the site is actually served from.
 
 ## Write a post
 
@@ -85,7 +88,7 @@ The body, as CommonMark.
 - An image needs the `{attach}` prefix, which is what publishes the
   file beside the page and rewrites the link to it.
 - `cover:` is the card image and the picture a share of the page
-  carries. The covers here were baked to the size `site.json`'s
+  carries. The covers here were baked to the size `site.toml`'s
   `cover_size` names, and the pages declare that size to share targets,
   so either crop a new cover to it or drop that key.
 - A png or webp body image is treated as line art and served whole,
@@ -98,7 +101,7 @@ The body, as CommonMark.
 
 `medium-archive pelican` rewrites every file here except `output/`, so
 until this site is a repository of its own, corrections belong upstream
-in the archive: site-wide settings in its `site/site.json`, tag names
+in the archive: site-wide settings in its `site/site.toml`, tag names
 in its `archive/tags.json`, a byline in the post itself. Once it is a
 repository of its own, this is the only copy, and the files here are
 the ones to edit.

@@ -1,0 +1,119 @@
+# What the built sites say about themselves. This file is hand-written
+# and versioned beside the archive: it is the one exporter input that
+# is not derived from raw/, and every exporter reads it (`medium-archive
+# hugo`, `pelican`, `myst`), each resolving it into its own engine's
+# config. Every key it can carry is below, the unset ones commented out
+# beside an example of them set.
+#
+# The images it names -- the avatar, the logo, the favicon, the share
+# image -- are named relative to this file and live beside it, so the
+# directory moves as one.
+
+# the publication's name: the masthead beside the avatar (unless a logo
+# stands in for it), the end of every page's title, and the title of
+# the feeds
+title = "Jupyter Blog"
+
+# one line on what the publication is: under the name in the masthead,
+# in the feeds, and the description a search result or a shared link is
+# summarised with
+description = "The Project Jupyter blog: news, releases, and community stories, archived from blog.jupyter.org."
+
+# the address the site is served from, without a trailing slash. Every
+# absolute link is built against it -- the feeds, the redirect stubs,
+# the Open Graph tags, and the share links a reader hands to LinkedIn
+# or Facebook -- so set it before deploying, or all of them point at
+# somebody else's domain.
+# base_url = "https://blog.jupyter.org"
+
+# the language of the pages, as <html lang> and in the feeds; "en"
+# without one
+# locale = "en"
+
+# the landing-page blurb, Markdown: the paragraph above the first row
+# of cards
+intro = "News, release announcements, and community stories from [Project Jupyter](https://jupyter.org)"
+
+# the line under every page, Markdown. `{year}` in it becomes the year
+# the site is built, so a copyright notice stays current.
+footer = "The Jupyter® and Jupyter Logo® trademarks are registered with the U.S. Patent & Trademark Office by [LF Charities](https://lf-charities.org/). © {year}"
+
+# the small round mark beside the site's name in the header, and the
+# publisher's logo in every page's structured data
+avatar = "avatar.svg"
+
+# the browser-tab icon
+favicon = "favicon.svg"
+
+# a masthead logo that stands in for the site's name -- a wordmark, the
+# way jupyter.org's navbar carries its rectangle logo. With one set the
+# header shows it instead of the avatar and the name.
+logo = "logo.svg"
+
+# the same mark drawn for the dark palette
+logo_dark = "logo-dark.svg"
+
+# where the masthead points when the mark on it stands for something
+# larger than the blog. Unset, it points at the site's own home; the
+# exporters label the link with the address's host, since the site's
+# own title would promise a reader the blog and hand them elsewhere.
+logo_link = "https://jupyter.org"
+
+# a site-wide banner above the header: an http(s) URL the theme fetches
+# client-side (empty content hides the banner, like Sphinx themes' html
+# announcement option), or literal HTML
+announcement = "https://jupyter.org/assets/banner.html"
+
+# the publication's @handle, credited on links shared to X/Twitter. Its
+# profile joins "profiles" below in every page's structured data.
+twitter = "@projectjupyter"
+
+# the publication's other addresses, the Organization's sameAs in every
+# page's structured data
+# profiles = ["https://jupyter.org", "https://fosstodon.org/@ProjectJupyter"]
+
+# an image beside this file, the og:image of every page that has no
+# cover of its own. Without it such a page is shared without a picture.
+# share_image = "share.png"
+
+# what the sites do about old inbound links: "stubs" is a meta-refresh
+# page at every old path, which works on any static host and is the
+# only mechanism GitHub Pages has; "file" is a `_redirects` file at the
+# site root, which Netlify, Cloudflare Pages and their imitators answer
+# with a real HTTP 301 and GitHub Pages ignores; "both" is both (the
+# default), "none" neither. redirects.csv, the map both are rendered
+# from, is written either way.
+redirects = "stubs"
+
+# keep search engines off a deployment (a preview, which would
+# otherwise be indexed as a copy of the real site): a noindex robots
+# tag on every page, and a robots.txt that disallows all
+# noindex = true
+
+# the signup band at the foot of every page: its heading, and the ids
+# of the HubSpot form it embeds, named the way HubSpot names them.
+# hubspot_region is optional -- "na1", HubSpot's own default, without
+# one. Unset the section and there is no band.
+[newsletter]
+heading = "Subscribe for updates, event info, webinars, and the latest community news"
+hubspot_portal = "8112310"
+hubspot_form = "3a79d744-5260-4a98-b069-39defccc8f42"
+hubspot_region = "na1"
+
+# How far the sites' display copies of an image may be scaled down.
+# raw/ and posts/ keep the archival originals whatever this says; a
+# photograph past a cap is resized to it (longest edge) on its way into
+# a site, and 0 leaves that kind untouched. Line art -- the charts and
+# screenshots most of this archive's PNGs are -- is exempt from
+# still_max_edge whatever it is set to. Unset, the defaults are
+# 1600 (still) and 1000 (animated).
+# [images]
+# still_max_edge = 1600
+# animated_max_edge = 1000
+
+# Anything only the hugo site should differ in: "locale", and the image
+# keys ("avatar", "logo", "logo_dark", "favicon"), each overriding the
+# top-level key of the same name, to give that site a different mark
+# from the pelican one. [hugo.params] on top of it is written into that
+# engine's own params.toml as it stands.
+[hugo]

@@ -130,7 +130,7 @@ def seo_warnings(front: dict, body: str, post_dir: Path) -> list:
     from .sites import pick_cover       # sites imports this module
     if not pick_cover(front, post_dir):
         warnings.append("no image a card cover or a share preview could "
-                        "use (site.json \"share_image\" stands in)")
+                        "use (site.toml \"share_image\" stands in)")
     return warnings
 
 
