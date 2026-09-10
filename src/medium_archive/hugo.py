@@ -3,9 +3,17 @@ converted archive. Same reproducibility contract as the myst step (see
 sites.py); render with `hugo` or `hugo server` inside site-hugo/
 (https://gohugo.io).
 
-Each post becomes a Hugo leaf bundle, content/posts/<stem>/index.md with
-its images beside it, so the bundle directory name is the page URL
-(/posts/<stem>/). The <figure>/<figcaption> shells convert writes
+Each post becomes a Hugo leaf bundle,
+content/posts/<year>/<stem>/index.md with its images beside it, filed
+under the year it was published in and served at /posts/<year>/<stem>/.
+Twelve directories of about thirty beat one of several hundred, and an
+address carries the year, so a reader can date a post before opening
+it. The year in the address is the year of the post's own date
+([permalinks.page] in hugo.toml), not of the directory it sits in, so
+an address states when a post was published even if its file is filed
+under the wrong year. Each year directory is a section, and its page
+is the year listing a trimmed post URL lands on
+(layouts/posts/section.html). The <figure>/<figcaption> shells convert writes
 around captioned images become calls to a figure shortcode the
 exporter ships with every site (see figure_shortcodes), so the
 rendered page carries the same markup Medium served -- a <figure>
@@ -87,7 +95,7 @@ from .sites import (Covers, ImagePlacer, author_slug, canonical_for,
                     export_content, fill_template, front_matter_yaml,
                     load_site_inputs, masthead_link, newsletter_params,
                     report_stale_pages,
-                    old_paths, page_stems, quote_arg,
+                    old_paths, page_paths, page_stems, post_year, quote_arg,
                     redirect_mode, redirect_rules, redirects_file,
                     rewrite_figures, site_profiles, wants_redirect_stubs,
                     wants_redirects_file, write_data_files,
@@ -122,6 +130,7 @@ TEMPLATES = {
     # one listing layout for the post section and for a tag's or an
     # author's page; the terms index has its own
     "layouts/section.html": "hugo/layouts/section.html",
+    "layouts/posts/section.html": "hugo/layouts/posts/section.html",
     "layouts/term.html": "hugo/layouts/section.html",
     "layouts/taxonomy.html": "hugo/layouts/taxonomy.html",
     "layouts/archives.html": "hugo/layouts/archives.html",
@@ -278,6 +287,14 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
                            "build": {"render": "never",
                                      "list": "never"}}),
         encoding="utf-8")
+    # Each content/posts/<year>/ is a section of its own, and its page
+    # is the year listing a trimmed post URL lands on
+    # (layouts/posts/section.html). `build` above does not cascade, so
+    # suppressing /posts/ leaves these rendered; the title is the bare
+    # year, which the template reads and the browser tab shows.
+    for year in sorted({post_year(p) for p in manifest.values()}):
+        (site / "content" / "posts" / year / "_index.md").write_text(
+            front_matter_yaml({"title": year}), encoding="utf-8")
     # data/tags.json, data/authornames.json and data/authors.json: the
     # slug-to-name maps the term content adapters build the tag and
     # author pages from, and the byline profiles the structured data
@@ -372,7 +389,7 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
                                omit=HUGO_ROOT_KEYS + HUGO_OMITTED)),
         encoding="utf-8")
     write_templates(site, TEMPLATES)
-    new_path = lambda stem: f"/posts/{stem}/"
+    new_path = page_paths(manifest, stems).__getitem__
     # the map itself, whichever mechanism serves it: what a redirect
     # rule set built anywhere else is built from
     write_redirects_csv(site, manifest, stems, new_path)
@@ -383,7 +400,9 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
         (site / "static" / "_redirects").write_text(
             redirects_file(redirect_rules(manifest, stems, new_path)),
             encoding="utf-8")
-    report_stale_pages(site / "content" / "posts", set(stems.values()))
+    report_stale_pages(site / "content" / "posts",
+                       {f"{post_year(p)}/{stems[url]}"
+                        for url, p in manifest.items()}, nested=True)
     print(f"hugo done: {pages}/{len(manifest)} pages -> {site}", file=sys.stderr)
     print(f"render it with: cd {site} && hugo server   (or: hugo; then "
           "`pagefind --site public` for search)", file=sys.stderr)

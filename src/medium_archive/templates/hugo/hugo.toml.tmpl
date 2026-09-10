@@ -26,6 +26,16 @@ pagerSize = 24
 [services.rss]
 limit = 20
 
+# Posts are filed a year deep (content/posts/<year>/<slug>/) and served
+# at /posts/<year>/<slug>/. The year in the address is `:year`, the year
+# of the post's own date, rather than the directory it happens to sit
+# in, so an address always states when a post was published -- the same
+# rule the pelican site's ARTICLE_URL follows. The year sections
+# themselves keep their default address, /posts/<year>/, which is the
+# year page a trimmed post URL lands on.
+[permalinks.page]
+posts = "/posts/:year/:slug/"
+
 [taxonomies]
 tag = "tags"
 author = "authors"

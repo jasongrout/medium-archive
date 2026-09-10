@@ -58,7 +58,8 @@ def _write_redirects(pelican_obj):
 # the archive's updated date, else the post date). Collected once the
 # articles are read, written after the build beside a robots.txt that
 # names the sitemap -- what WordPress serves on its own and Hugo
-# generates for its site. Search results, paginated listings and the
+# generates for its site. The year pages are in it, as Hugo's year
+# sections are in Hugo's; search results, paginated listings and the
 # redirect stubs stay out, as they do from Hugo's.
 _SITEMAP = []
 
@@ -74,6 +75,15 @@ def _collect_sitemap(article_generator):
         _SITEMAP.append((tag.url, None))
     for author, _ in g.authors:
         _SITEMAP.append((author.url, None))
+    # the year pages, /posts/<year>/, named through the config's own
+    # scheme rather than a second spelling of it. Hugo lists its year
+    # sections in its sitemap without being asked, so leaving these out
+    # is the one thing that would part the two sites' sitemaps.
+    first = {}
+    for article in g.articles:
+        first.setdefault(article.date.strftime("%Y"), article.date)
+    for year in sorted(first, reverse=True):
+        _SITEMAP.append((YEAR_ARCHIVE_URL.format(date=first[year]), None))
     for url in (TAGS_URL, AUTHORS_URL, ARCHIVES_URL):
         _SITEMAP.append((url, None))
 
@@ -149,7 +159,7 @@ def _prioritize_first_images(pelican_obj):
     img_re = re.compile(IMG_TAG, re.I)
     pages = 0
     for page in glob.glob(os.path.join(pelican_obj.output_path,
-                                       "posts", "*", "index.html")):
+                                       "posts", "*", "*", "index.html")):
         with open(page, encoding="utf-8") as fh:
             html = fh.read()
         m = next((m for m in img_re.finditer(html)
@@ -275,7 +285,7 @@ def _optimize_article_images(pelican_obj):
         return bare[:-len(end)] + extra + end
 
     for page in glob.glob(os.path.join(pelican_obj.output_path,
-                                       "posts", "*", "index.html")):
+                                       "posts", "*", "*", "index.html")):
         with open(page, encoding="utf-8") as fh:
             html = fh.read()
         rewritten = tag_re.sub(rewrite, html)
@@ -426,6 +436,21 @@ def _check_slugs(article_generator):
         if os.path.basename(os.path.dirname(a.relative_source_path)) != a.slug)
     for line in renamed:
         print(f"slug: {line}")
+    # A post is filed under a year and served under the year of its
+    # `date:`, and the two are meant to agree. They part when a draft
+    # written in one year is published in the next and its directory
+    # never moved -- the file stays under 2026/ while the address says
+    # 2027/, which is right (the address states when it was published)
+    # and confusing (the tree no longer sorts the way it reads). Say so;
+    # moving the directory is the fix, and nothing here is broken enough
+    # to stop the build over.
+    misfiled = sorted(
+        f"{a.relative_source_path} is served at /{a.url}"
+        for a in article_generator.articles
+        if getattr(a, "diryear", None)
+        and str(a.diryear) != a.date.strftime("%Y"))
+    for line in misfiled:
+        print(f"year: {line}")
     clashes = sorted((page, sorted(paths))
                      for page, paths in pages.items() if len(paths) > 1)
     if clashes:

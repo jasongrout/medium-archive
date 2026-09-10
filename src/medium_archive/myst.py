@@ -91,7 +91,7 @@ def myst_slug(stem: str) -> str:
 
 
 def page_paths(manifest: dict, stems: dict) -> dict:
-    """stem -> the site-relative path mystmd will serve the page at:
+    """url -> the site-relative path mystmd will serve the page at:
     myst_slug of the filename, with colliding slugs numbered -1, -2, ...
     in the order mystmd loads the pages -- the toc order write_myst_yml
     emits, after the landing and archive pages (whose slugs are seeded so
@@ -106,7 +106,7 @@ def page_paths(manifest: dict, stems: dict) -> dict:
                 slug = f"{slug}-{seen[slug] - 1}"
             else:
                 seen[slug] = 1
-            paths[stems[url]] = f"/{slug}"
+            paths[url] = f"/{slug}"
     return paths
 
 
@@ -196,7 +196,7 @@ def rewrite_body(markdown: str, links: LinkMap, prefix: str) -> str:
         hit = links.page_for(url)
         if hit is None:
             return None
-        d, stem, frag = hit
+        d, stem, _year, frag = hit
         return f"{prefix}{d}/{stem}.md" + (f"#{frag}" if frag else "")
     return _rewrite(myst_figures(markdown), target_for, escape_prose)
 

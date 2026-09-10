@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="page-title">Archives</h1>
 {% for year, year_articles in dates | groupby("date.year") | reverse %}
-<h2>{{ year }}</h2>
+<h2><a href="{{ SITEURL }}/posts/{{ year }}/">{{ year }}</a></h2>
 <ul class="archives">
 {% for article in year_articles %}<li><time>{{ article.date.strftime("%Y-%m-%d") }}</time> <a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></li>
 {% endfor %}</ul>

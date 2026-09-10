@@ -123,7 +123,7 @@ def test_hugo_site(project):
     cfg["favicon"] = "icon.svg"
     write_site(project, cfg)
     site = build(hugo, project)
-    page = site / "content/posts/second-post/index.md"
+    page = site / "content/posts/2021/second-post/index.md"
     front = page_front(page)
     assert front["title"] == "Second Post"
     assert front["tags"] == ["example"] and front["authors"] == ["ada-lovelace"]
@@ -133,7 +133,7 @@ def test_hugo_site(project):
     first = post_front(site, "first-post")
     assert "/2015/06/01/first-post" in first["aliases"]
     # in-publication links point at the new page URLs
-    assert "](/posts/second-post/)" in (site / "content/posts/first-post/index.md").read_text()
+    assert "](/posts/2021/second-post/)" in (site / "content/posts/2020/first-post/index.md").read_text()
     config = hugo_config(site)
     assert 'baseURL = "https://blog.example.org/"' in config
     assert 'author = "authors"' in config
@@ -154,7 +154,7 @@ def test_hugo_site(project):
     assert (site / "layouts/archives.html").exists()
     assert page_front(site / "content/archives.md")["layout"] == "archives"
     assert "Welcome." in (site / "content/_index.md").read_text()
-    assert (site / "redirects.csv").read_text().count("/posts/first-post/") == 3
+    assert (site / "redirects.csv").read_text().count("/posts/2020/first-post/") == 3
 
 
 def test_hugo_front_matter_is_yaml(project):
@@ -166,7 +166,7 @@ def test_hugo_front_matter_is_yaml(project):
     reads as a timestamp are quoted as the specification requires and
     read back as the strings they are."""
     site = build(hugo, project)
-    text = (site / "content/posts/second-post/index.md").read_text()
+    text = (site / "content/posts/2021/second-post/index.md").read_text()
     assert text.startswith("---\ntitle:")
     body = text.split("---\n", 2)[2]
     assert not body.lstrip().startswith("title:")
@@ -203,7 +203,7 @@ def test_hugo_page_keeps_caption_in_its_figure(project):
     site = build(hugo, captioned_archive(project))
     # the shell becomes a call to the shipped figure shortcode, the
     # caption as inner content so its Markdown still renders
-    page = (site / "content/posts/captioned-post/index.md").read_text()
+    page = (site / "content/posts/2022/captioned-post/index.md").read_text()
     assert ('{{< figure src="images/001-fig.gif" alt="Alt text" >}}'
             "The caption, with a [link](https://example.com)."
             "{{< /figure >}}") in page
@@ -220,10 +220,20 @@ def page_front(path):
     return yaml.safe_load(front)
 
 
+def post_page(site, stem):
+    """A post's page in a hugo or pelican site. The tree is
+    content/posts/<year>/<stem>/, so a test with nothing to say about
+    the filing names the stem and lets the year be found; the ones that
+    are about it name the year outright."""
+    hits = sorted((site / "content" / "posts").glob(f"*/{stem}/index.md"))
+    assert len(hits) == 1, f"{stem}: {hits}"
+    return hits[0]
+
+
 def post_front(site, stem):
-    """The front matter of a site's posts/<stem>/ page -- hugo's and
-    pelican's alike, which is the point of them sharing the format."""
-    return page_front(site / f"content/posts/{stem}/index.md")
+    """The front matter of a site's post page -- hugo's and pelican's
+    alike, which is the point of them sharing the format."""
+    return page_front(post_page(site, stem))
 
 
 def config_namespace(site):
@@ -256,7 +266,7 @@ def test_pelican_page_writes_the_figure_directive(project):
     are raw, so a raw <figure> in the content would show the caption's
     Markdown to the reader."""
     site = build(pelican, captioned_archive(project))
-    page = (site / "content/posts/captioned-post/index.md").read_text()
+    page = (site / "content/posts/2022/captioned-post/index.md").read_text()
     assert ('::: figure src="{attach}images/001-fig.gif" alt="Alt text"\n'
             "The caption, with a [link](https://example.com).\n"
             ":::") in page
@@ -295,7 +305,7 @@ def test_the_front_matter_is_yaml_the_reader_reads_back(project):
     first blank line."""
     site = build(pelican, project)
     namespace, _ = config_parser(site)
-    text = (site / "content/posts/second-post/index.md").read_text()
+    text = (site / "content/posts/2021/second-post/index.md").read_text()
     front, body = namespace["_split_front_matter"](text)
     assert yaml.safe_load(front)["title"] == "Second Post"
     assert not body.lstrip().startswith("title:")
@@ -432,7 +442,7 @@ def test_hugo_site_config_and_front_matter(project, capsys):
     # and are copied in unchanged
     assert front["cover"] == "images/cover.jpg"
     assert "images" not in front
-    assert (site / "content/posts/second-post/images/cover.jpg"
+    assert (site / "content/posts/2021/second-post/images/cover.jpg"
             ).read_bytes() == b"PNG"
     assert front["authors"] == ["ada-lovelace"]
     assert "author" not in front                # the taxonomy is the byline
@@ -786,7 +796,7 @@ def test_pelican_site(project):
     cfg["favicon"] = "icon.svg"
     write_site(project, cfg)
     site = build(pelican, project)
-    text = (site / "content/posts/second-post/index.md").read_text()
+    text = (site / "content/posts/2021/second-post/index.md").read_text()
     front = post_front(site, "second-post")
     assert front["title"] == "Second Post"
     assert front["date"] == "2021-03-01 10:00"
@@ -797,7 +807,10 @@ def test_pelican_site(project):
     assert "]({attach}images/001-pic.png)" in text
     assert "![fenced](images/lit.png)" in text
     config = (site / "pelicanconf.py").read_text()
-    assert 'ARTICLE_URL = "posts/{slug}/"' in config
+    # the year in the address is the post's own date, not the directory
+    # it sits in, and /posts/<year>/ answers with that year's posts
+    assert 'ARTICLE_URL = "posts/{date:%Y}/{slug}/"' in config
+    assert 'YEAR_ARCHIVE_SAVE_AS = "posts/{date:%Y}/index.html"' in config
     assert "FEED_MAX_ITEMS = 20" in config
     assert 'THEME = "theme"' in config
     assert '"search.html": "search/index.html"' in config
@@ -836,6 +849,46 @@ def _fake_article(source_path, slug):
                            url=f"posts/{slug}/")
 
 
+def test_posts_are_filed_and_served_under_their_publish_year(project):
+    """The tree is content/posts/<year>/<slug>/ on both engines, the
+    year being the one in the post's date. Twelve directories of about
+    thirty beat one of several hundred, and an address dates a post
+    before a reader opens it."""
+    for module in (hugo, pelican):
+        site = build(module, project)
+        root = site / "content" / "posts"
+        assert sorted(d.name for d in root.iterdir() if d.is_dir()) == \
+            ["2020", "2021"]                          # the fixture's two years
+        assert (root / "2020" / "first-post" / "index.md").exists()
+        assert (root / "2021" / "second-post" / "index.md").exists()
+        # a link from one post to another carries the year too
+        assert "](/posts/2021/second-post/)" in \
+            (root / "2020" / "first-post" / "index.md").read_text()
+        # and so does every row of the redirect map
+        rows = (site / "redirects.csv").read_text().splitlines()[1:]
+        assert rows and all(re.match(r"^[^,]+,/posts/\d{4}/[^/,]+/,", r)
+                            for r in rows), rows
+
+
+def test_a_year_page_answers_a_trimmed_post_url(project):
+    """/posts/<year>/ is an address a reader reaches by trimming a
+    post's, so both engines answer it with that year's posts rather
+    than a 404 -- pelican through a period archive, hugo through the
+    section each year directory already is."""
+    pelican_site = build(pelican, project)
+    config = (pelican_site / "pelicanconf.py").read_text()
+    assert 'YEAR_ARCHIVE_URL = "posts/{date:%Y}/"' in config
+    assert (pelican_site / "theme/templates/period_archives.html").exists()
+
+    hugo_site = build(hugo, project)
+    for year in ("2020", "2021"):
+        index = hugo_site / "content" / "posts" / year / "_index.md"
+        assert page_front(index)["title"] == year
+    assert (hugo_site / "layouts/posts/section.html").exists()
+    # the year in a hugo address is the post's date, not its directory
+    assert 'posts = "/posts/:year/:slug/"' in hugo_config(hugo_site)
+
+
 def test_a_post_directory_names_the_page_it_serves(project):
     """The config reads a post's directory name as its slug, so a post
     written by hand needs no slug of its own; a post that carries one is
@@ -845,11 +898,16 @@ def test_a_post_directory_names_the_page_it_serves(project):
     namespace = config_namespace(site)
 
     # every exported post's directory name is the slug its front matter
-    # carries, so the two routes agree on every page of the site
-    for post in sorted((site / "content/posts").iterdir()):
+    # carries and its parent is the year it was published in, so the two
+    # routes agree on every page of the site
+    posts = sorted(d for year in (site / "content/posts").iterdir()
+                   if year.is_dir() for d in year.iterdir() if d.is_dir())
+    assert posts
+    for post in posts:
         match = re.match(namespace["PATH_METADATA"],
-                         f"posts/{post.name}/index.md")
+                         f"posts/{post.parent.name}/{post.name}/index.md")
         assert match and match.group("slug") == post.name
+        assert match.group("diryear") == post.parent.name
 
     check = namespace["_check_slugs"]
     check(SimpleNamespace(articles=[_fake_article("posts/a-post/index.md",
@@ -1649,10 +1707,10 @@ def test_the_subtitle_reaches_every_post_page(tmp_path):
 
     for module in (hugo, pelican):
         site = build(module, tmp_path)
-        page = (site / "content/posts/first-post/index.md").read_text()
+        page = (site / "content/posts/2020/first-post/index.md").read_text()
         line = next(l for l in page.split("\n") if l.startswith("subtitle:"))
         # the links survive, and the in-publication one points at its page
-        assert "[the sequel](/posts/second-post/)" in line
+        assert "[the sequel](/posts/2021/second-post/)" in line
         assert "[the docs](https://example.org/docs)" in line
         # and the body is the body alone
         assert page.split("\n---\n", 1)[1].strip() == "Body."
@@ -1718,8 +1776,8 @@ def test_a_site_is_rebuilt_in_place(project, tmp_path):
 
     assert (out / "CNAME").read_text() == "blog.example.org\n"
     assert (out / ".git").is_dir()
-    assert (out / "content/posts/first-post/index.md").exists()
-    assert (out / "content/posts/second-post/images/001-pic.png").exists()
+    assert (out / "content/posts/2020/first-post/index.md").exists()
+    assert (out / "content/posts/2021/second-post/images/001-pic.png").exists()
 
 
 def test_clean_keeps_the_repository_and_what_it_ignores(project, tmp_path):
@@ -1732,7 +1790,7 @@ def test_clean_keeps_the_repository_and_what_it_ignores(project, tmp_path):
     git_init(out)
     (site / "output").mkdir()
     (site / "output" / "index.html").write_text("built")
-    stale = site / "content/posts/deleted-post"
+    stale = site / "content/posts/2020/deleted-post"
     stale.mkdir(parents=True)
     (stale / "index.md").write_text("a post the archive no longer has\n")
     (site / "CNAME").write_text("blog.example.org\n")
@@ -1743,7 +1801,7 @@ def test_clean_keeps_the_repository_and_what_it_ignores(project, tmp_path):
     assert (site / "output" / "index.html").read_text() == "built"
     assert (site / ".git").is_dir()
     assert not (site / "CNAME").exists()  # tracked or not, it is not ignored
-    assert (site / "content/posts/first-post/index.md").exists()
+    assert (site / "content/posts/2020/first-post/index.md").exists()
 
 
 def test_clean_outside_a_repository_keeps_the_build_output(project, tmp_path):
@@ -1754,7 +1812,7 @@ def test_clean_outside_a_repository_keeps_the_build_output(project, tmp_path):
     site = build(hugo, project, out=out)
     (site / "public").mkdir()
     (site / "public" / "index.html").write_text("built")
-    stale = site / "content/posts/deleted-post"
+    stale = site / "content/posts/2020/deleted-post"
     stale.mkdir(parents=True)
 
     build(hugo, project, out=out, clean=True)
@@ -1773,7 +1831,7 @@ def test_clean_inside_a_repository_that_ignores_the_site(project, tmp_path):
     site = build(hugo, project, out=tmp_path / "site-hugo")
     (site / "public").mkdir()
     (site / "public" / "index.html").write_text("built")
-    stale = site / "content/posts/deleted-post"
+    stale = site / "content/posts/2020/deleted-post"
     stale.mkdir(parents=True)
 
     build(hugo, project, out=site, clean=True)
@@ -1787,7 +1845,7 @@ def test_a_page_the_archive_lost_is_reported(project, capsys):
     so a page whose post has left the archive would go on being served
     unsaid. Every exporter names them, and what removes them."""
     site = build(pelican, project)
-    (site / "content/posts/deleted-post").mkdir(parents=True)
+    (site / "content/posts/2020/deleted-post").mkdir(parents=True)
     capsys.readouterr()
 
     build(pelican, project)
@@ -1803,7 +1861,7 @@ def test_rebuilding_relinks_an_image_git_replaced(project, tmp_path):
     the image cache's own copy under its content-addressed name."""
     out = tmp_path / "published"
     site = build(pelican, project, out=out)
-    placed = site / "content/posts/second-post/images/001-pic.png"
+    placed = site / "content/posts/2021/second-post/images/001-pic.png"
     original = archive_dir(project) / "posts/2021-03-01-second-post/images/001-pic.png"
     assert placed.stat().st_ino == original.stat().st_ino
 
@@ -1873,7 +1931,7 @@ def test_photographs_capped_into_display_copies(tmp_path):
 
     src = make_image_post(tmp_path)
     site = build(hugo, tmp_path)
-    placed = site / "content/posts/picture-post/images"
+    placed = site / "content/posts/2022/picture-post/images"
     # a photograph is capped and encoded lossily, whatever it arrived as
     with Image.open(placed / "big.jpg") as im:
         assert max(im.size) == 1600 and im.format == "JPEG"
@@ -1881,14 +1939,14 @@ def test_photographs_capped_into_display_copies(tmp_path):
     assert (placed / "big.jpg").stat().st_size < (src / "big.png").stat().st_size
     assert (placed / "small.jpg").stat().st_size < (src / "small.png").stat().st_size
     # the page follows the images it actually got
-    page = (site / "content/posts/picture-post/index.md").read_text()
+    page = (site / "content/posts/2022/picture-post/index.md").read_text()
     assert "![big](images/big.jpg)" in page
     # an unreadable file passes through as a hard link
     assert (placed / "junk.png").read_bytes() == b"PNG"
     assert (placed / "junk.png").stat().st_ino == (src / "junk.png").stat().st_ino
     # the display copy is built once and shared across exporters
     pelican_site = build(pelican, tmp_path)
-    assert (pelican_site / "content/posts/picture-post/images/big.jpg"
+    assert (pelican_site / "content/posts/2022/picture-post/images/big.jpg"
             ).stat().st_ino == (placed / "big.jpg").stat().st_ino
     # caps are configurable, 0 leaves stills alone entirely
     write_site(tmp_path, 
@@ -1905,7 +1963,7 @@ def test_line_art_keeps_every_pixel(tmp_path):
 
     src = make_image_post(tmp_path)
     site = build(hugo, tmp_path)
-    placed = site / "content/posts/picture-post/images"
+    placed = site / "content/posts/2022/picture-post/images"
     assert not (placed / "chart.png").exists()
     with Image.open(src / "chart.png") as before, \
             Image.open(placed / "chart.webp") as after:
@@ -1914,7 +1972,7 @@ def test_line_art_keeps_every_pixel(tmp_path):
                                          after.convert("RGB")).getbbox()
     assert (placed / "chart.webp").stat().st_size < (
         src / "chart.png").stat().st_size
-    page = (site / "content/posts/picture-post/index.md").read_text()
+    page = (site / "content/posts/2022/picture-post/index.md").read_text()
     assert "![chart](images/chart.webp)" in page
 
 
@@ -1944,19 +2002,19 @@ def test_animated_gifs_placed_as_video(tmp_path):
 
     src = make_image_post(tmp_path, gif_bytes=True)
     site = build(hugo, tmp_path)
-    placed = site / "content/posts/picture-post/images"
+    placed = site / "content/posts/2022/picture-post/images"
     assert not (placed / "anim.gif").exists()
     assert (placed / "anim.mp4").stat().st_size < (
         src / "anim.gif").stat().st_size
     with Image.open(placed / "anim-poster.webp") as im:
         assert im.size == (1104, 828)      # 1600x1200, capped
-    page = (site / "content/posts/picture-post/index.md").read_text()
+    page = (site / "content/posts/2022/picture-post/index.md").read_text()
     assert "![a screen recording](images/anim.mp4)" in page
     # built once and shared: the pelican site links the same clip and
     # the same poster
     pelican_site = build(pelican, tmp_path)
     for name in ("anim.mp4", "anim-poster.webp"):
-        assert (pelican_site / "content/posts/picture-post/images" / name
+        assert (pelican_site / "content/posts/2022/picture-post/images" / name
                 ).stat().st_ino == (placed / name).stat().st_ino
 
 
@@ -1971,7 +2029,7 @@ def test_animated_gifs_capped_via_gifsicle(tmp_path):
     write_site(tmp_path,
                {"title": "Pics", "images": {"animated_format": "gif"}})
     site = build(hugo, tmp_path)
-    placed = site / "content/posts/picture-post/images/anim.gif"
+    placed = site / "content/posts/2022/picture-post/images/anim.gif"
     with Image.open(placed) as im:
         assert max(im.size) == 1104 and im.n_frames == 3
     assert placed.stat().st_size < (src / "anim.gif").stat().st_size
@@ -2208,9 +2266,9 @@ def test_crawl_files(project):
     search = page_front(hugo_site / "content/search.md")
     assert search["noindex"] is True and search["sitemap"] == {"disable": True}
     redirects = (hugo_site / "static/_redirects").read_text().splitlines()
-    assert "/first-post-aaa111aaa111 /posts/first-post/ 301" in redirects
-    assert "/2015/06/01/first-post /posts/first-post/ 301" in redirects
-    assert "/p/bbb222bbb222 /posts/second-post/ 301" in redirects
+    assert "/first-post-aaa111aaa111 /posts/2020/first-post/ 301" in redirects
+    assert "/2015/06/01/first-post /posts/2020/first-post/ 301" in redirects
+    assert "/p/bbb222bbb222 /posts/2021/second-post/ 301" in redirects
     assert all(line.endswith(" 301") for line in redirects)
     baseof = (hugo_site / "layouts/baseof.html").read_text()
     assert 'name="robots"' in baseof and "max-image-preview:large" in baseof
@@ -2631,8 +2689,8 @@ def test_hugo_does_not_publish_the_posts_section_page(project):
     section = page_front(site / "content/posts/_index.md")
     assert section["build"] == {"render": "never", "list": "never"}
     # the posts are untouched: the section's own page is all that goes
-    assert (site / "content/posts/second-post/index.md").exists()
-    assert (site / "content/posts/first-post/index.md").exists()
+    assert (site / "content/posts/2021/second-post/index.md").exists()
+    assert (site / "content/posts/2020/first-post/index.md").exists()
 
 
 def test_figure_alt_text_cannot_end_its_own_tag(project):
@@ -2713,7 +2771,7 @@ def test_redirects_default_to_both_mechanisms(project, tmp_path):
 
     pelican_site = build(pelican, project)
     rules, stubs = run_pelican_redirects(pelican_site, tmp_path)
-    assert "/p/aaa111aaa111 /posts/first-post/ 301" in rules
+    assert "/p/aaa111aaa111 /posts/2020/first-post/ 301" in rules
     assert "p/aaa111aaa111" in stubs
 
 
@@ -2741,13 +2799,13 @@ def test_redirects_file_only_leaves_no_stub_pages(project, tmp_path):
     set_redirects(project, "file")
     hugo_site = build(hugo, project)
     assert "aliases" not in post_front(hugo_site, "first-post")
-    assert "/p/aaa111aaa111 /posts/first-post/ 301" in (
+    assert "/p/aaa111aaa111 /posts/2020/first-post/ 301" in (
         hugo_site / "static/_redirects").read_text()
 
     pelican_site = build(pelican, project)
     assert config_namespace(pelican_site)["REDIRECT_STUBS"] is False
     rules, stubs = run_pelican_redirects(pelican_site, tmp_path)
-    assert "/p/aaa111aaa111 /posts/first-post/ 301" in rules
+    assert "/p/aaa111aaa111 /posts/2020/first-post/ 301" in rules
     assert stubs == []
 
 

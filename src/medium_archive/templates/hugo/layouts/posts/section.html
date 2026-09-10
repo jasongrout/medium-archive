@@ -1,0 +1,14 @@
+{{/* One year's posts, at /posts/<year>/ -- the address a reader reaches
+     by trimming a post's own. Each content/posts/<year>/ directory is a
+     section, so Hugo publishes this page for every year the archive
+     holds; the chronological list is archives.html's, and the pelican
+     site's period_archives.html renders the same markup, so the two
+     sites' year pages agree. Posts themselves are served from
+     page.html; only the year's own page comes through here. */}}
+{{ define "main" }}
+<h1 class="page-title">Posts from {{ .Title }}</h1>
+<ul class="archives">
+{{ range .RegularPages.ByDate.Reverse }}<li><time>{{ .Date.Format "2006-01-02" }}</time> <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+{{ end }}</ul>
+<p><a href="{{ "/archives/" | relURL }}">All posts by year</a></p>
+{{ end }}

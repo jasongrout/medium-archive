@@ -30,7 +30,7 @@ without it the page loads and finds nothing.
 | `data/tags.json` | tag slug → the name the tag is shown under |
 | `data/authornames.json` | author slug → the name they are shown under |
 | `data/authors.json` | author name → their profile address, which the structured data names as theirs |
-| `content/posts/<slug>/index.md` | the posts, with their images beside them |
+| `content/posts/<year>/<slug>/index.md` | the posts, filed under the year they were published in, with their images beside them |
 | `layouts/`, `static/`, `assets/` | the templates, the stylesheet and the site's images: how the pages look |
 
 `baseURL` in `hugo.toml` is what every absolute link is built from —
@@ -39,15 +39,21 @@ so set it to the domain the site is actually served from.
 
 ## Write a post
 
-A post is a leaf bundle: a directory under `content/posts/` holding an
-`index.md`, with its images beside it. The directory name is the page's
-URL, `/posts/<directory>/`.
+A post is a leaf bundle: a directory under `content/posts/<year>/`
+holding an `index.md`, with its images beside it. The page is served at
+`/posts/<year>/<directory>/`, where the year is the year of the post's
+`date` — not of the directory it sits in, so a draft written in one
+year and published in the next gets the right address either way.
 
 ```
-content/posts/a-new-post/
+content/posts/2026/a-new-post/
   index.md
   images/diagram.png
 ```
+
+Each `content/posts/<year>/` is a section, and its page is the year
+listing at `/posts/<year>/` — what a reader gets by trimming a post's
+address. It is built from the posts; there is nothing to write.
 
 ```markdown
 ---

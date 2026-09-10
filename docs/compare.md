@@ -29,6 +29,15 @@ share URLs and Open Graph tags resolve while both sites are served and
 driven in headless Chromium. `site/site.toml` is restored afterwards; only
 this file is committed.
 
+> **The address counts below predate the year-nested URL scheme.** They
+> were measured when posts were served at `/posts/<slug>/`; posts are
+> now filed and served under their publish year, at
+> `/posts/<year>/<slug>/`, and each site gained a year listing page per
+> year of the archive. The counts have not been re-measured, since
+> doing so needs both engines installed. Nothing in the comparison's
+> conclusion turns on them: the change is the same on both sides, and
+> the two sites still serve identical address sets.
+
 ## What the two sites have in common
 
 | | Hugo | Pelican |

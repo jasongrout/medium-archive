@@ -233,6 +233,18 @@ with none stored, the system scheme decides. The theme provides:
   by slug, so `/tags/<tag>/` and `/authors/<author>/` are the same on
   either engine and a byline's accents and punctuation stay out of the
   URL while the page still shows the name in full.
+- Posts filed and served under the year they were published in:
+  `/posts/<year>/<slug>/`. An address dates a post before a reader
+  opens it, and `content/posts/` is twelve directories of about thirty
+  rather than one of several hundred. The year is the year of the
+  post's own date, not of the directory it sits in, so a draft written
+  in one year and published in the next is addressed correctly either
+  way; the build says so when the two disagree. `/posts/<year>/` is a
+  page of its own listing that year -- what a reader gets by trimming
+  a post's address, and what the year headings on `/archives/` link
+  to. Slugs are cut to 55 characters at a word boundary, long enough
+  to say what a post is and short enough to read in an address bar; a
+  name has only to be unique within its year.
 - Article pages, tag and author card listings, and chip indexes
   sortable by name or by post count.
 - An optional header logo and browser-tab icon: `site.toml`'s

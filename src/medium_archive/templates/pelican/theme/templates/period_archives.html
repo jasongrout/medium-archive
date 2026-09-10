@@ -1,0 +1,17 @@
+{# One year's posts, at /posts/<year>/ -- the address a reader reaches
+   by trimming a post's own. Pelican renders this for every year that
+   has posts (YEAR_ARCHIVE_SAVE_AS in the generated config), handing it
+   that year's articles as `dates` and the period itself as `period`, a
+   tuple whose first element is the year. The chronological list is
+   archives.html's, so a year page and the whole archive read the same
+   way; the hugo site's year page renders from the same markup. #}
+{% extends "base.html" %}
+{% set year = period[0] %}
+{% block name %}{{ year }}{% endblock %}
+{% block content %}
+<h1 class="page-title">Posts from {{ year }}</h1>
+<ul class="archives">
+{% for article in dates %}<li><time>{{ article.date.strftime("%Y-%m-%d") }}</time> <a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></li>
+{% endfor %}</ul>
+<p><a href="{{ SITEURL }}/{{ ARCHIVES_URL }}">All posts by year</a></p>
+{% endblock %}

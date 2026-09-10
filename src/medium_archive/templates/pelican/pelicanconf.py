@@ -103,6 +103,17 @@ THEME = "theme"
 ARTICLE_PATHS = ["posts"]
 STATIC_PATHS = ["posts"]        # colocated images, placed via {attach}
 PAGE_PATHS = []
+# Posts are filed a year deep -- content/posts/<year>/<slug>/index.md --
+# and served at /posts/<year>/<slug>/. Twelve directories of about
+# thirty beat one of several hundred, and an address carries the year
+# so a reader can date a post before opening it.
+#
+# The two years are not the same year. The directory's is where the
+# file is filed; the URL's is `{date:%Y}` below, read from the post's
+# own `date:`, so an address always states the year a post was
+# published even if its file is filed under the wrong one. The site
+# plugin reports a post whose two disagree.
+#
 # A post's directory name is its slug, so a post written by hand need
 # not repeat it in its front matter: pelican reads the path's metadata
 # before the post's own, which leaves the directory name a default a
@@ -111,10 +122,16 @@ PAGE_PATHS = []
 # rather than slugified, so name a directory the way its URL should
 # read; the site plugin below reports the posts whose two differ, and
 # stops the build on two posts that would write the same page.
-PATH_METADATA = r"posts/(?P<slug>[^/]+)/"
+PATH_METADATA = r"posts/(?P<diryear>\d{4})/(?P<slug>[^/]+)/"
 # directory-style URLs throughout, matching the hugo build's scheme
-ARTICLE_URL = "posts/{slug}/"
-ARTICLE_SAVE_AS = "posts/{slug}/index.html"
+ARTICLE_URL = "posts/{date:%Y}/{slug}/"
+ARTICLE_SAVE_AS = "posts/{date:%Y}/{slug}/index.html"
+# /posts/<year>/ is an address a reader reaches by trimming a post's,
+# so it answers with that year's posts rather than a 404
+# (period_archives.html). Months and days are not addresses here: the
+# URL stops at the year, so nothing below it would ever be linked.
+YEAR_ARCHIVE_URL = "posts/{date:%Y}/"
+YEAR_ARCHIVE_SAVE_AS = "posts/{date:%Y}/index.html"
 TAG_URL = "tags/{slug}/"
 TAG_SAVE_AS = "tags/{slug}/index.html"
 TAGS_URL = "tags/"
