@@ -106,6 +106,7 @@ Canonical: header; the Medium copy is never a page's canonical.
 
 import re
 import sys
+from pathlib import Path
 
 from .paths import archive_dir, site_dir, site_inputs
 from .sites import (COVER_SIZE, Covers, ImagePlacer, author_slug,
@@ -196,14 +197,18 @@ def _one_line(value: str) -> str:
     return " ".join(value.split())    # front matter holds no newlines
 
 
-def build_site(root):
+def build_site(root, site=None, force=False):
     archive = archive_dir(root)
     inputs = site_inputs(root)
     manifest, config = load_site_inputs(root)
     stems = page_stems(manifest)
     mode = redirect_mode(config)        # site.toml "redirects"
-    site = site_dir(root, "pelican")
-    clean_site(site, keep=("output",))
+    # site-pelican/ beside the archive, or wherever --site-out sends it
+    # -- the site is self-contained, so it builds as happily inside a
+    # repository of its own as beside the archive it came from
+    site = Path(site) if site else site_dir(root, "pelican")
+    clean_site(site, keep=("output",), expect=("pelicanconf.py", "content"),
+               force=force)
     (site / "content").mkdir(parents=True)
     covers = Covers(archive, manifest)
 
@@ -324,4 +329,4 @@ def build_site(root):
 
 
 def cmd_pelican(args):
-    build_site(args.out)
+    build_site(args.out, args.site_out, args.force)

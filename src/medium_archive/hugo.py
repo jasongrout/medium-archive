@@ -77,6 +77,7 @@ into params.toml.
 
 import json
 import sys
+from pathlib import Path
 
 from .paths import archive_dir, site_dir, site_inputs
 from .siteconf import documented_toml
@@ -218,15 +219,17 @@ HUGO_EXAMPLES = {
 HUGO_OMITTED = ("intro", "share_image_size", "cover_size", "redirects")
 
 
-def build_site(root):
+def build_site(root, site=None, force=False):
     archive = archive_dir(root)
     inputs = site_inputs(root)
     manifest, config = load_site_inputs(root)
     stems = page_stems(manifest)
     hugo_config = config.get("hugo", {})
     mode = redirect_mode(config)        # site.toml "redirects"
-    site = site_dir(root, "hugo")
-    clean_site(site, keep=("public", "resources"))
+    # site-hugo/ beside the archive, or wherever --site-out sends it
+    site = Path(site) if site else site_dir(root, "hugo")
+    clean_site(site, keep=("public", "resources"),
+               expect=("config", "content"), force=force)
 
     (site / "content").mkdir(parents=True)
     (site / "content" / "_index.md").write_text(
@@ -383,4 +386,4 @@ def build_site(root):
 
 
 def cmd_hugo(args):
-    build_site(args.out)
+    build_site(args.out, args.site_out, args.force)

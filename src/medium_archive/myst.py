@@ -291,7 +291,7 @@ def write_archive(site: Path, manifest: dict, stems: dict):
     (site / "archive.md").write_text("\n".join(lines), encoding="utf-8")
 
 
-def build_site(root: Path) -> Path:
+def build_site(root: Path, site=None, force=False) -> Path:
     archive = archive_dir(root)
     manifest, config = load_site_inputs(root)
     names = tag_names(manifest, archive)
@@ -299,8 +299,10 @@ def build_site(root: Path) -> Path:
     links = LinkMap(manifest, stems)
     # Rebuild from scratch, but keep mystmd's _build/ (its template cache
     # and rendered output) so regenerating doesn't force a re-download.
-    site = site_dir(root, "myst")
-    clean_site(site, keep=("_build",))
+    # site-myst/ beside the archive, or wherever --site-out sends it.
+    site = Path(site) if site else site_dir(root, "myst")
+    clean_site(site, keep=("_build",), expect=("myst.yml", "posts"),
+               force=force)
     (site / "posts").mkdir(parents=True)
     covers = Covers(archive, manifest, shown_as="gallery covers")
     placer = ImagePlacer(root, config)
@@ -338,4 +340,4 @@ def build_site(root: Path) -> Path:
 
 
 def cmd_myst(args):
-    build_site(args.out)
+    build_site(args.out, args.site_out, args.force)

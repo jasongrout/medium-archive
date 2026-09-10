@@ -1159,14 +1159,44 @@ def first_image(markdown: str) -> str | None:
     return None
 
 
-def clean_site(site: Path, keep=()):
+# What a rebuild never deletes: a site built into a repository of its
+# own (--site-out) keeps its history, the rules that describe it as a
+# repository, and the workflows that deploy it -- none of them the
+# exporter's to write or to throw away. (.gitignore is on the list for
+# the site that carries a hand-written one; the hugo and pelican sites
+# write their own over it either way.)
+VCS_KEEP = (".git", ".gitignore", ".gitattributes", ".github")
+
+
+def clean_site(site: Path, keep=(), expect=(), force=False):
     """Delete a site directory's generated content, keeping the
     generator's own build output and caches (cheap to keep, expensive or
-    network-bound to recreate)."""
-    if site.exists():
-        for child in site.iterdir():
-            if child.name not in keep:
-                shutil.rmtree(child) if child.is_dir() else child.unlink()
+    network-bound to recreate), and whatever version control the
+    directory carries: a site kept as its own git repository (the
+    exporters' --site-out) is rebuilt in place, and its history, its
+    ignore rules and the workflows that deploy it are not this step's
+    to delete.
+
+    `expect` names entries the exporter's own previous run leaves at the
+    top of the site. A directory holding other people's files and none
+    of those is not this site: a mistyped --site-out, or a directory
+    that was meant to be somewhere else. It is refused rather than
+    emptied, unless the caller was told to overwrite it anyway (force).
+    """
+    if not site.exists():
+        return
+    children = [c for c in site.iterdir()
+                if c.name not in keep and c.name not in VCS_KEEP]
+    if (children and not force
+            and not any(c.name in expect for c in children)):
+        sys.exit(
+            f"refusing to empty {site}: it holds files this step did not "
+            f"write and none of {', '.join(expect)}, so it does not look "
+            "like a site this step generated. Point --site-out at an "
+            "empty or generated directory, or pass --force to overwrite "
+            "this one.")
+    for child in children:
+        shutil.rmtree(child) if child.is_dir() else child.unlink()
 
 
 def front_matter_yaml(fields: dict) -> str:

@@ -106,6 +106,12 @@ Notes:
     Stale entries (changing no post) abort a full convert run; `stats
     --tags` lists every tag with its post count as the worklist for
     curating the file.
+  * Site output: each exporter builds into <out>/site-<generator>/, a
+    throwaway rebuilt from scratch on every run. --site-out DIR builds it
+    somewhere else instead -- a checkout of the published site's own
+    repository, say, whose .git/, .gitignore, .gitattributes and .github/
+    the rebuild keeps, so a run reads as a working-tree diff. A directory
+    holding files the step did not write is refused (--force overrides).
   * The archive layout is documented in the README.md written into archive/.
 Progress is written to stderr.
 """
@@ -205,6 +211,30 @@ def add_convert_args(p):
                    help="delete archive/posts/ before converting")
 
 
+def add_site_args(p, generator: str):
+    """What every exporter takes: where the site it generates goes.
+
+    The default, <out>/site-<generator>/, is a throwaway beside the
+    archive: rebuilt from scratch each run and left out of the
+    archive's version control. --site-out builds the same site
+    somewhere else, which is how it is kept as a repository of its own
+    -- a checkout of the published site is rebuilt in place, its
+    .git/, .gitattributes, .github/ and .gitignore untouched, so what
+    the run changed is a working-tree diff to read and commit."""
+    p.add_argument("--site-out", type=Path, default=None, metavar="DIR",
+                   help=f"build the site in DIR instead of "
+                        f"<out>/site-{generator}/, e.g. in a checkout of "
+                        "the published site's own repository; DIR is "
+                        "rebuilt from scratch, keeping its .git/, "
+                        ".gitignore, .gitattributes and .github/")
+    p.add_argument("--force", action="store_true",
+                   help="rebuild --site-out DIR even though it holds files "
+                        "this step did not write; without it a directory "
+                        f"that does not look like a generated {generator} "
+                        "site (a mistyped path) is refused rather than "
+                        "emptied")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -255,7 +285,7 @@ def main():
                        help="skip image downloads (convert will keep the "
                             "original, likely dead, URLs)")
     add_convert_args(parser("convert", help="convert archive/raw/ into archive/posts/"))
-    parser("myst", help="build a MyST (mystmd) site in site-myst/ "
+    add_site_args(parser("myst", help="build a MyST (mystmd) site in site-myst/ "
                         "from the converted posts: one page per post, a "
                         "chronological "
                         "landing page, a year-grouped table of contents, "
@@ -265,8 +295,8 @@ def main():
                         "description, landing-page intro) comes from an "
                         "optional hand-written site/site.toml. Render with "
                         "`myst start` or `myst build --html` inside site-myst/ "
-                        "(https://mystmd.org)")
-    parser("hugo", help="build a Hugo site in site-hugo/ from the "
+                        "(https://mystmd.org)"), "myst")
+    add_site_args(parser("hugo", help="build a Hugo site in site-hugo/ from the "
                         "converted posts: a self-contained card-grid blog "
                         "theme (cover-image cards, paginated home, "
                         "tag/author card listings with per-term RSS), old "
@@ -277,8 +307,8 @@ def main():
                         "`hugo` for full-text search with highlighted "
                         "in-context excerpts), and a redirect map. Render with "
                         "`hugo server` inside site-hugo/ "
-                        "(https://gohugo.io)")
-    parser("pelican", help="build a Pelican site in site-pelican/ "
+                        "(https://gohugo.io)"), "hugo")
+    add_site_args(parser("pelican", help="build a Pelican site in site-pelican/ "
                            "from the converted posts, with the same "
                            "card-grid theme as the hugo step: cover-image "
                            "cards (640x360 thumbnails when pillow is "
@@ -295,7 +325,7 @@ def main():
                            "Hugo emits for aliases). Render with `pelican -l` "
                            "inside site-pelican/ "
                            "(https://getpelican.com; `pip install pelican "
-                           "markdown-it-py mdit-py-plugins pyyaml pillow`)")
+                           "markdown-it-py mdit-py-plugins pyyaml pillow`)"), "pelican")
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
                         "offline; differences print as a unified patch on stdout "
