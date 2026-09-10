@@ -827,6 +827,52 @@ def test_pelican_site(project):
     assert "VARIANT_WIDTHS = (480, 736, 1104)" in config
 
 
+def _fake_article(source_path, slug):
+    """An article as _check_slugs reads one: pelican computes save_as and
+    url from ARTICLE_SAVE_AS/ARTICLE_URL and the slug."""
+    return SimpleNamespace(slug=slug, relative_source_path=source_path,
+                           save_as=f"posts/{slug}/index.html",
+                           url=f"posts/{slug}/")
+
+
+def test_a_post_directory_names_the_page_it_serves(project):
+    """The config reads a post's directory name as its slug, so a post
+    written by hand needs no slug of its own; a post that carries one is
+    served under it instead, which the build reports rather than
+    refuses. Two posts writing the same page is the error."""
+    site = pelican.build_site(project)
+    namespace = config_namespace(site)
+
+    # every exported post's directory name is the slug its front matter
+    # carries, so the two routes agree on every page of the site
+    for post in sorted((site / "content/posts").iterdir()):
+        match = re.match(namespace["PATH_METADATA"],
+                         f"posts/{post.name}/index.md")
+        assert match and match.group("slug") == post.name
+        assert post_front(site, post.name)["slug"] == post.name
+
+    check = namespace["_check_slugs"]
+    check(SimpleNamespace(articles=[_fake_article("posts/a-post/index.md",
+                                                  "a-post")],
+                          translations=[]))
+
+    # a directory renamed under a post that keeps its URL: reported,
+    # and the build goes on
+    check(SimpleNamespace(
+        articles=[_fake_article("posts/renamed/index.md", "a-post")],
+        translations=[]))
+
+    # two posts writing one page: named, both of them, and the build stops
+    with pytest.raises(SystemExit) as stop:
+        check(SimpleNamespace(
+            articles=[_fake_article("posts/a-post/index.md", "a-post"),
+                      _fake_article("posts/another-dir/index.md", "a-post")],
+            translations=[]))
+    assert "posts/a-post/index.html" in str(stop.value)
+    assert "posts/a-post/index.md" in str(stop.value)
+    assert "posts/another-dir/index.md" in str(stop.value)
+
+
 def test_theme_picker_and_dark_scheme(project):
     hugo_site = hugo.build_site(project)
     pelican_site = pelican.build_site(project)

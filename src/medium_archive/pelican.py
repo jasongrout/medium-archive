@@ -28,8 +28,14 @@ the figure directive below.
 
 Each post becomes content/posts/<stem>/index.md with its images beside
 it; image references are rewritten to Pelican's `{attach}` form so the
-files publish next to the article at /posts/<stem>/. Body images load
-lazily (the reader marks every image in an article's body) and are
+files publish next to the article at /posts/<stem>/. The stem is the
+page's URL slug: the generated config reads a post's directory name as
+its slug (PATH_METADATA), so a post written by hand later needs none
+of its own, and the posts written here carry one only because the
+exporter writes what it named the directory. A post whose two differ
+is one deliberately served elsewhere, and the site plugin reports it;
+two posts that would write the same page stop the build. Body images
+load lazily (the reader marks every image in an article's body) and are
 served responsively: after each build the embedded plugin
 encodes webp variants of every still body image at the same widths as
 the hugo theme's render hook (480/736/1104, never upscaled,
