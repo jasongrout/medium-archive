@@ -701,6 +701,76 @@ Feeds and sharing:
   the feed when it was added, and whether the feed's cleaner block
   structure was the reason is worth confirming before swapping them.
 
+- Ship the archive's animated gifs as video rather than as gifs. The
+  reference archive's 228 gifs are 609 MB of the pelican site's 670 MB
+  of images -- the whole of the rest of the site, posts and theme and
+  every still, is 61 MB -- which is what a site kept as a git
+  repository of its own (`--out`) commits and carries forever. Every
+  one of them was transcoded and measured in 2026-09, at the 1104 px
+  cap `ANIMATED_MAX_EDGE` already resizes animations to:
+
+  | target | size | of 609 MB |
+  |--------|------|-----------|
+  | gif, as placed today without gifsicle | 609 MB | 100% |
+  | h264 mp4 (`-crf 26 -preset veryfast`, yuv420p) | 88.2 MB | 14.5% |
+  | animated webp (libwebp `-q:v 60`), 15-gif sample | -- | 31% (mp4 was 20% on the same sample) |
+
+  All 228 encoded in 5.7 minutes with no failures, and the five
+  largest -- screen recordings of 300 to 2200 frames -- land between
+  1.7% and 4.6% of their original size. The site's images would go
+  from 670 MB to about 150 MB.
+
+  Video, not animated webp: webp came out about 1.5x larger than mp4
+  on the same sample and slower to encode, and Pillow's own animated
+  webp writer is worse still (on an 851-frame screencast: 70% of the
+  original at lossy q60, 103% at q80, 270% lossless), because it
+  expands every frame to full RGBA and throws away exactly what gif's
+  per-frame deltas were doing. Screen recordings are what inter-frame
+  video codecs are for. h264 in mp4 needs no second format: it plays
+  everywhere the sites are read, `playsinline` included.
+
+  Transparency is not an obstacle here, though the obvious check says
+  it is: 141 of the 228 declare a transparency index, and none has a
+  single transparent pixel in its composited first frame. Gif uses the
+  transparent index to mean "unchanged since the previous frame", so
+  `"transparency" in im.info` is close to meaningless for an
+  animation; the real question is alpha on the composited frame, and
+  by that question nothing in this archive needs it. A gif that does
+  should keep its format (or take webp), and the test has to be the
+  composited one.
+
+  What it takes, cheapest first:
+
+  - `ImagePlacer`: a gif -> mp4 branch beside `_resize_gif`, with
+    ffmpeg optional exactly as gifsicle is now -- missing, the gif is
+    placed unchanged with a note in the summary. The cache is already
+    content-addressed, `place()` already returns a copy under a new
+    extension and the exporters already rewrite the page's reference
+    from it, and the existing "the copy did not pay off" rule covers
+    the 4 of 228 that come out no smaller as mp4.
+  - myst: nothing. mystmd renders `![](x.mp4)` as a `<video>`, which
+    `myst_figures` already relies on for Giphy clips.
+  - hugo: a video branch in `layouts/_partials/post-image.html`, which
+    the render hook and the figure shortcode share, so one edit covers
+    a captioned and a bare clip.
+  - pelican: the image pass in `site_plugin.py` swaps
+    `<img src="....mp4">` for a `<video>`. `VARIANT_SUFFIXES` is
+    `.jpg`/`.jpeg`, so the srcset ladder already skips it.
+
+  `convert` already writes `<video src="..." autoplay loop muted
+  playsinline>` for Giphy clips (and `lint` knows it as `VIDEO_RE`), so
+  the markup is the archive's own pattern, not a new one.
+
+  Left to decide: whether to write a poster frame beside each clip
+  (one small jpeg, which is also what a feed reader shows -- readers
+  commonly drop a `<video>` where they would have shown the gif);
+  whether `-crf`/`-preset` belong in `site.toml`'s `[images]` beside
+  the size caps; and whether gifsicle stays for the no-ffmpeg path or
+  goes. Worth having either way: an autoplaying `<video>` can honour
+  `prefers-reduced-motion`, which a gif cannot, and `raw/` and
+  `posts/` keep the original gif regardless -- this is display-copy
+  work, not archive work.
+
 Archive-specific follow-ups (posts whose images still need fetching,
 hand-correction candidates) live in each archive's own notes, alongside
 its `fixups/`.
