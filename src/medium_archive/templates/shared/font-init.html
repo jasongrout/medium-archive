@@ -3,8 +3,8 @@
   try {
     var font = localStorage.getItem("font");
     if (font === "sans" || font === "system-ui" || font === "inter" ||
-        font === "source-sans" || font === "georgia" ||
-        font === "ibm-plex-sans" || font === "ibm-plex-serif")
+        font === "source-sans" || font === "ibm-plex-sans" ||
+        font === "ibm-plex-serif")
       document.documentElement.setAttribute("data-font", font);
   } catch (e) {}
 })();

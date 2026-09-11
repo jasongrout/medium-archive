@@ -44,9 +44,9 @@
    data-font on <html>, persisted like the theme choice): Source Serif,
    the superfamily Medium set the publication in and the default here
    with no attribute pinned, the jupyter.org Helvetica stack the site
-   launched with, the reader's own platform UI font, Inter, Georgia,
-   the one serif here every platform already has, and Source Sans and
-   the IBM Plex superfamily, offered as both a sans and a serif face.
+   launched with, the reader's own platform UI font, Inter, and
+   Source Sans and the IBM Plex superfamily, offered as both a sans
+   and a serif face.
 
    --body-font is what the page is set in and --mono what its code
    is, so a choice swaps both by redefining them; the rules downstream
@@ -54,15 +54,13 @@
    --body-font under every choice, so they read sans regardless: a
    superfamily's sans choice (Source Sans, IBM Plex Sans) points
    --body-font at its own sans face, so the whole page, article
-   included, runs in it; a serif choice (the default Source Serif,
-   IBM Plex Serif, Georgia) leaves --body-font on a sans face and
+   included, runs in it; its serif sibling (the default Source Serif,
+   IBM Plex Serif) leaves --body-font on that same sans face and
    points only the article's running text (further down) at the serif
    instead. --mono follows to whichever face the choice ships one
-   under: the superfamilies' own mono, or, for System UI and any
+   under: the superfamilies' own mono or, for System UI and any
    choice with no mono face of its own (Helvetica, Inter), the
-   platform's default --system-mono stack. Georgia, a face with no
-   family around it, borrows Source Sans and Source Code Pro for both
-   roles (see --georgia). */
+   platform's default --system-mono stack. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
                      Helvetica, Arial, sans-serif;
@@ -93,23 +91,6 @@
                         Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
                        Menlo, Consolas, monospace;
-        /* Georgia is the one choice here that downloads nothing:
-           Matthew Carter drew it for the screen, and every desktop and
-           mobile platform has shipped it for decades, so it paints from
-           the reader's own disk on the first frame with no swap behind
-           it. It is already the first fallback under --source-serif,
-           which is half of why it is worth offering on its own -- a
-           reader whose webfonts never arrived is reading the default in
-           Georgia regardless -- and it is a different serif from the
-           other two besides: sturdier, with a larger x-height, and set
-           with text figures (numerals that sit on and below the
-           baseline), which read as part of a sentence rather than as
-           data. Cambria behind it is the same brief a generation later,
-           for a machine that has it and not Georgia. Having no sans or
-           mono sibling of its own, the choice takes Source Sans and
-           Source Code Pro, the pair the default already sets headings,
-           chrome and code in. */
-        --georgia: Georgia, Cambria, "Times New Roman", Times, serif;
         --ibm-plex-sans: "IBM Plex Sans", "Helvetica Neue", Helvetica,
                          Arial, sans-serif;
         --ibm-plex-serif: "IBM Plex Serif", Georgia, Cambria,
@@ -126,8 +107,6 @@
 :root[data-font="inter"] { --body-font: var(--inter); --mono: var(--system-mono); }
 :root[data-font="source-sans"] { --body-font: var(--source-sans);
                                  --mono: var(--source-code); }
-:root[data-font="georgia"] { --body-font: var(--source-sans);
-                             --mono: var(--source-code); }
 :root[data-font="ibm-plex-sans"] { --body-font: var(--ibm-plex-sans);
                                    --mono: var(--ibm-plex-mono); }
 :root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
@@ -350,7 +329,7 @@ a:hover { text-decoration-line: underline; }
 .font-picker[hidden], .link-picker[hidden] { display: none; }
 /* The select names the choice it is on and sets that name in the
    family it names, so it both says and shows what you are reading: a
-   dropdown, not the theme button's cycling pill, since eight choices
+   dropdown, not the theme button's cycling pill, since seven choices
    are too many to cycle one click at a time. Each <option> carries
    the family it offers as its own inline style, so the open list
    previews every choice; the select's own font-family is set from
@@ -362,9 +341,9 @@ a:hover { text-decoration-line: underline; }
    hover" -- with the longest font name well inside it.
    appearance: none drops the UA's own arrow so the picker draws just
    the one beside it; -webkit-appearance covers Safari, which
-   appearance alone does not clear on a <select>. The shadow matches the card and post
-   panels, so the picker reads as floating over the page rather than
-   as part of it. */
+   appearance alone does not clear on a <select>. The shadow matches
+   the card and post panels, so the picker reads as floating over the
+   page rather than as part of it. */
 .font-picker select, .link-picker select {
                       display: block; width: 13rem; height: 2.1rem;
                       padding: 0 1.9rem 0 .9rem; border: 1px solid var(--line);
@@ -632,13 +611,13 @@ a:hover { text-decoration-line: underline; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
-/* The three serif choices are the only ones that set the article in
+/* The two serif choices are the only ones that set the article in
    something other than --body-font, so they are the only ones with
    rules here. Only the running text is serif -- Medium keeps its
    headings, byline, captions and chrome in a sans -- so those pieces
-   opt back out to --body-font, which under each choice is the sans
-   face that choice pairs its serif with. Medium's -0.004rem tracking
-   is not reproduced: it works out to 0.064px per character, which no reader
+   opt back out to --body-font, which under either choice is that
+   superfamily's own sans face. Medium's -0.004rem tracking is not
+   reproduced: it works out to 0.064px per character, which no reader
    can see, and leaving it off keeps every choice on the browser's
    default tracking. Source Serif is the default -- no data-font
    pinned -- so its rule matches :not([data-font]) rather than an
@@ -656,12 +635,6 @@ a:hover { text-decoration-line: underline; }
 :root[data-font="ibm-plex-serif"] .post-meta,
 :root[data-font="ibm-plex-serif"] .post-share,
 :root[data-font="ibm-plex-serif"] .post figcaption { font-family: var(--body-font); }
-:root[data-font="georgia"] .post { font-family: var(--georgia); }
-:root[data-font="georgia"] .post :is(h1, h2, h3, h4, h5, h6),
-:root[data-font="georgia"] .post-subtitle,
-:root[data-font="georgia"] .post-meta,
-:root[data-font="georgia"] .post-share,
-:root[data-font="georgia"] .post figcaption { font-family: var(--body-font); }
 
 /* The share bar, carried twice by a post: under the byline, where a
    reader decides whether to read, and at the foot, where they have.
