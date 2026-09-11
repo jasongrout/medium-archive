@@ -81,12 +81,56 @@ jobs:
       # the animated gifs, and the webp and jpeg re-encodes of the
       # stills. A cold cache costs ~20 min on a four-core runner;
       # restored, it costs nothing.
+      #
+      # The key names both halves of what fills the cache -- how the
+      # copies are made, and what they are made from -- because a cache
+      # action saves nothing on an exact hit. A key that stays put while
+      # the copies change therefore reads as a hit over copies that are
+      # no longer there: every one is rebuilt, and the run, having
+      # "hit", stores none of them -- on that run or on any run after
+      # it. Keying on archive/posts.json alone missed both halves. The
+      # move to video (#89) changed what every clip comes out as while
+      # the manifest sat still, and each of the four runs after it spent
+      # ~20 min rebuilding 228 clips and threw them away; a post fetched
+      # without regenerating the manifest did the same for one post's
+      # images.
+      - name: Name the image cache for what fills it
+        id: imgcache
+        run: |
+          # The directory the placer reads carries the cache scheme,
+          # the size caps and the encode settings -- everything that
+          # decides what a copy comes out as. It is asked of a real
+          # placer rather than spelled out here, which would be the
+          # same drift one file further away.
+          id=$(python - <<'EOF'
+          from pathlib import Path
+          from medium_archive.paths import site_config
+          from medium_archive.siteconf import load_toml
+          from medium_archive.sites import ImagePlacer
+          cfg = site_config(Path("site"))
+          print(ImagePlacer(Path(".image-cache"),
+                            load_toml(cfg) if cfg.exists() else {}).cache.name)
+          EOF
+          )
+          # and the archive those copies are made from -- a tree lookup
+          # rather than a hash of 2114 files, and it moves for an image
+          # refetched in place as surely as for a new post
+          archive=$(git rev-parse HEAD:archive)
+          # both assigned before they are written, so that a command
+          # which fails stops the step: `echo "id=$(...)" >> $GITHUB_OUTPUT`
+          # would report echo's own success, leave the value empty, and
+          # key every scheme alike under image-cache--<tree>.
+          { echo "id=$id"; echo "archive=$archive"; } >> "$GITHUB_OUTPUT"
+
       - name: Restore the display-copy image cache
         uses: actions/cache@v4
         with:
           path: .image-cache
-          key: image-cache-${{ hashFiles('archive/posts.json') }}
-          restore-keys: image-cache-
+          key: image-cache-${{ steps.imgcache.outputs.id }}-${{ steps.imgcache.outputs.archive }}
+          # the fallback stops at this scheme: a cache another one wrote
+          # holds nothing this run will read, so restoring it spends
+          # hundreds of megabytes to look in the wrong directory.
+          restore-keys: image-cache-${{ steps.imgcache.outputs.id }}-
 
       - name: Rebuild archive/posts/ from archive/raw/
         run: medium-archive convert
@@ -126,7 +170,19 @@ jobs:
       # The artifact tar needs a few GB of scratch space; drop what the
       # deployment no longer references before it is created.
       - name: Free runner disk before the artifact step
-        run: rm -rf .git archive/raw archive/posts site-myst site-hugo site-pelican
+        env:
+          SCHEME: ${{ steps.imgcache.outputs.id }}
+        run: |
+          rm -rf .git archive/raw archive/posts site-myst site-hugo site-pelican
+          # and, from the cache this run may be about to save, every
+          # scheme directory but the one it filled: a cache restored
+          # across a scheme change carries the generation before it, and
+          # a full set of display copies is re-uploaded and restored on
+          # every run for as long as the key keeps hitting.
+          if [ -d .image-cache ]; then
+            find .image-cache -mindepth 1 -maxdepth 1 -type d \
+                 ! -name "$SCHEME" -exec rm -rf {} +
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
