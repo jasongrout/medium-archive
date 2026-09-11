@@ -3600,5 +3600,15 @@
     "fetched_at": "2026-09-04T13:53:44+00:00",
     "images": 4,
     "in_feed": true
+  },
+  "https://blog.jupyter.org/jupyterhub-6-0-df28f06ea3ed": {
+    "medium_id": "df28f06ea3ed",
+    "title": "JupyterHub 6.0",
+    "published": "2026-09-11T08:54:07Z",
+    "sitemap_date": "2026-09-11T08:54:08+00:00",
+    "found_via": "feed",
+    "fetched_at": "2026-09-11T09:48:52+00:00",
+    "images": 2,
+    "in_feed": true
   }
 }

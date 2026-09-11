@@ -10240,5 +10240,32 @@
     ],
     "body_source": "state",
     "dir": "posts/2026-09-04-mark-your-calendars-jupyter-day-2026-is-coming-to-san-jose"
+  },
+  "https://blog.jupyter.org/jupyterhub-6-0-df28f06ea3ed": {
+    "title": "JupyterHub 6.0",
+    "subtitle": "",
+    "authors": [
+      {
+        "name": "Serena Bonaretti",
+        "url": "https://medium.com/@serena.bonaretti"
+      }
+    ],
+    "date": "2026-09-11T08:54:07Z",
+    "updated": "2026-09-11T08:54:07Z",
+    "original_url": "https://blog.jupyter.org/jupyterhub-6-0-df28f06ea3ed",
+    "original_path": "/jupyterhub-6-0-df28f06ea3ed",
+    "medium_id": "df28f06ea3ed",
+    "slug": "jupyterhub-6-0",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "By Serena Bonaretti and Min Ragan-Kelley",
+    "tags": [
+      "jupyterhub"
+    ],
+    "images": [
+      "images/001-1_l3xTI5FmlszK3So0jg0-YA.png"
+    ],
+    "body_source": "state",
+    "dir": "posts/2026-09-11-jupyterhub-6-0"
   }
 }
