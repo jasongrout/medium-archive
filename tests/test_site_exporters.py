@@ -941,6 +941,12 @@ def test_theme_picker_and_dark_scheme(project):
     assert "@media (prefers-color-scheme: dark)" in css
     assert ':root:not([data-theme="light"])' in css
     assert ".theme-picker" in css
+    # a serif choice sets the article's running text alone, leaving
+    # headings and chrome on the sans --body-font names: the default
+    # (no data-font pinned) and the one choice that pins one
+    for choice, face in ((":not([data-font])", "source-serif"),
+                         ('[data-font="ibm-plex-serif"]', "ibm-plex-serif")):
+        assert f":root{choice} .post {{ font-family: var(--{face}); }}" in css
     # the link default is "ink-accent", so it is the state with no
     # data-link attribute; every other choice pins one
     assert ":root:not([data-link]) a:hover" in css
@@ -959,8 +965,7 @@ def test_theme_picker_and_dark_scheme(project):
         for choice in ("light", "system", "dark"):
             assert f'data-set-theme="{choice}"' in text, base
         for choice in ("sans", "system-ui", "inter", "source-sans",
-                       "source-serif", "atkinson", "ibm-plex-sans",
-                       "ibm-plex-serif"):
+                       "source-serif", "ibm-plex-sans", "ibm-plex-serif"):
             assert f'<option value="{choice}"' in text, base
         for choice in ("ink", "ink-accent", "petrol-aaa", "link-blue",
                        "browser"):
@@ -972,8 +977,7 @@ def test_theme_picker_and_dark_scheme(project):
         # platform's own is a webfont: unlinked, those choices degrade to
         # their fallbacks silently, looking like a styling bug rather than
         # a missing file
-        for family in ("Atkinson+Hyperlegible+Next", "Atkinson+Hyperlegible+Mono",
-                       "IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
+        for family in ("IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
                        "Inter", "Source+Serif+4", "Source+Sans+3",
                        "Source+Code+Pro"):
             assert f"family={family}" in text, (base, family)

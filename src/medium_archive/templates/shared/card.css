@@ -44,8 +44,7 @@
    data-font on <html>, persisted like the theme choice): Source Serif,
    the superfamily Medium set the publication in and the default here
    with no attribute pinned, the jupyter.org Helvetica stack the site
-   launched with, the reader's own platform UI font, Inter, Atkinson
-   Hyperlegible Next as a standalone sans picked for its own look, and
+   launched with, the reader's own platform UI font, Inter, and
    Source Sans and the IBM Plex superfamily, offered as both a sans
    and a serif face.
 
@@ -59,9 +58,9 @@
    IBM Plex Serif) leaves --body-font on that same sans face and
    points only the article's running text (further down) at the serif
    instead. --mono follows to whichever face the choice ships one
-   under: the superfamilies' own mono, Atkinson Hyperlegible Mono,
-   or, for System UI and any choice with no mono face of its own
-   (Helvetica, Inter), the platform's default --system-mono stack. */
+   under: the superfamilies' own mono or, for System UI and any
+   choice with no mono face of its own (Helvetica, Inter), the
+   platform's default --system-mono stack. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
                      Helvetica, Arial, sans-serif;
@@ -92,19 +91,6 @@
                         Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
                        Menlo, Consolas, monospace;
-        /* Atkinson Hyperlegible Next is the Braille Institute's
-           redrawing of the original: the same legibility-first design
-           -- letterforms pulled apart so the pairs a low-vision reader
-           confuses (I l 1, O 0, b d) cannot be mistaken for each other
-           -- now cut as a variable face over a 200-800 weight axis
-           rather than the original's static regular and bold, with a
-           matching mono on the same axis. The original stays behind
-           it for a reader who has that installed locally but not the
-           new one, the way Source Sans keeps its Pro predecessor. */
-        --atkinson: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible",
-                    "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --atkinson-mono: "Atkinson Hyperlegible Mono", ui-monospace,
-                         SFMono-Regular, Menlo, Consolas, monospace;
         --ibm-plex-sans: "IBM Plex Sans", "Helvetica Neue", Helvetica,
                          Arial, sans-serif;
         --ibm-plex-serif: "IBM Plex Serif", Georgia, Cambria,
@@ -121,8 +107,6 @@
 :root[data-font="inter"] { --body-font: var(--inter); --mono: var(--system-mono); }
 :root[data-font="source-sans"] { --body-font: var(--source-sans);
                                  --mono: var(--source-code); }
-:root[data-font="atkinson"] { --body-font: var(--atkinson);
-                              --mono: var(--atkinson-mono); }
 :root[data-font="ibm-plex-sans"] { --body-font: var(--ibm-plex-sans);
                                    --mono: var(--ibm-plex-mono); }
 :root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
@@ -345,21 +329,21 @@ a:hover { text-decoration-line: underline; }
 .font-picker[hidden], .link-picker[hidden] { display: none; }
 /* The select names the choice it is on and sets that name in the
    family it names, so it both says and shows what you are reading: a
-   dropdown, not the theme button's cycling pill, since eight choices
+   dropdown, not the theme button's cycling pill, since seven choices
    are too many to cycle one click at a time. Each <option> carries
    the family it offers as its own inline style, so the open list
    previews every choice; the select's own font-family is set from
    script on every change, so the closed box previews the current one
-   too. A fixed width holds the box steady as the choice changes --
-   sized to "Atkinson Hyperlegible Next", the longest name, in its
-   own face, since that is the one case where the box has to hold it
-   -- which would otherwise resize the floating picker on every
-   change. appearance: none drops the UA's own arrow so the picker
-   draws just the one
-   beside it; -webkit-appearance covers Safari, which appearance alone
-   does not clear on a <select>. The shadow matches the card and post
-   panels, so the picker reads as floating over the page rather than
-   as part of it. */
+   too. A fixed width holds the box steady as the choice changes,
+   which would otherwise resize the floating picker on every one; the
+   two pickers share the width, so it is sized to the longest label
+   either of them offers -- the link picker's "Ink rule, orange
+   hover" -- with the longest font name well inside it.
+   appearance: none drops the UA's own arrow so the picker draws just
+   the one beside it; -webkit-appearance covers Safari, which
+   appearance alone does not clear on a <select>. The shadow matches
+   the card and post panels, so the picker reads as floating over the
+   page rather than as part of it. */
 .font-picker select, .link-picker select {
                       display: block; width: 13rem; height: 2.1rem;
                       padding: 0 1.9rem 0 .9rem; border: 1px solid var(--line);

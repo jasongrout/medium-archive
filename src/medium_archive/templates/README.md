@@ -44,8 +44,8 @@ These embed verbatim in both engines' pages, so they must carry no
   default family first. A stored choice pins `data-font` on `<html>`;
   no attribute means Source Serif, the default (see `card.css`).
 - `font-picker.html` is the body-font switch: a `<select>`, not a
-  button like the theme picker, since it offers eight choices, too many
-  to cycle one click at a time. It floats fixed at the page's
+  button like the theme picker, since it offers seven choices, too
+  many to cycle one click at a time. It floats fixed at the page's
   bottom-right corner instead of sitting beside the theme button in
   the header (`card.css`), so it stays reachable once a long article
   has scrolled the header away; it is spliced in once, near the end of
@@ -57,24 +57,22 @@ These embed verbatim in both engines' pages, so they must carry no
   The choice persists per browser, like the theme picker's. It exists
   to let reviewers compare candidate typography before the blog
   settles on one: Source Serif, the superfamily Medium set the
-  publication in and this picker's default, the jupyter.org
-  Helvetica stack the site launched with, the reader's own platform
-  UI font, Inter, Atkinson Hyperlegible Next as a standalone sans
-  picked for its own look, and Source Sans and the IBM Plex
-  superfamily as both a sans and a serif face. Headings and chrome
-  stay sans under every choice: a superfamily's sans option ("Source
-  Sans", "IBM Plex Sans") runs the whole page, article included, in
-  its own sans and mono faces; its serif sibling (the default "Source
-  Serif", "IBM Plex Serif") keeps headings and chrome on that same
-  sans face, as Medium did, and points only the article's running
-  text at the serif face instead, with the superfamily's own mono
-  still under its code. A
+  publication in and this picker's default, the jupyter.org Helvetica
+  stack the site launched with, the reader's own platform UI font,
+  Inter, and Source Sans and the IBM Plex superfamily as both a sans
+  and a serif face. Headings and chrome stay sans under every choice:
+  a superfamily's sans option ("Source Sans", "IBM Plex Sans") runs
+  the whole page, article included, in its own sans and mono faces;
+  its serif sibling (the default "Source Serif", "IBM Plex Serif")
+  keeps headings and chrome on that same sans face, as Medium did,
+  and points only the article's running text at the serif face
+  instead, with the superfamily's own mono still under its code. A
   choice's code follows its own mono face wherever it has one (the
-  superfamilies', Atkinson Hyperlegible Mono); System UI's is the
-  platform's own ui-monospace stack, and a choice with no mono face of
-  its own (Helvetica, Inter) falls back to that same platform stack.
+  superfamilies'); System UI's is the platform's own ui-monospace
+  stack, and a choice with no mono face of its own (Helvetica, Inter)
+  falls back to that same platform stack.
   The article's reading size belongs to `.post` rather than to any one
-  choice, so the eight differ in family alone. The losing styles, and
+  choice, so the seven differ in family alone. The losing styles, and
   the picker with them, come out once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
