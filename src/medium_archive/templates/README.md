@@ -57,22 +57,24 @@ These embed verbatim in both engines' pages, so they must carry no
   The choice persists per browser, like the theme picker's. It exists
   to let reviewers compare candidate typography before the blog
   settles on one: Source Serif, the superfamily Medium set the
-  publication in and this picker's default, the jupyter.org
-  Helvetica stack the site launched with, the reader's own platform
-  UI font, Inter, Atkinson Hyperlegible Next as a standalone sans
-  picked for its own look, and Source Sans and the IBM Plex
-  superfamily as both a sans and a serif face. Headings and chrome
-  stay sans under every choice: a superfamily's sans option ("Source
-  Sans", "IBM Plex Sans") runs the whole page, article included, in
-  its own sans and mono faces; its serif sibling (the default "Source
-  Serif", "IBM Plex Serif") keeps headings and chrome on that same
-  sans face, as Medium did, and points only the article's running
-  text at the serif face instead, with the superfamily's own mono
-  still under its code. A
+  publication in and this picker's default, the jupyter.org Helvetica
+  stack the site launched with, the reader's own platform UI font,
+  Inter, Georgia -- the one choice that downloads nothing, since every
+  platform ships it, and already the first fallback under Source Serif
+  -- and Source Sans and the IBM Plex superfamily as both a sans and a
+  serif face. Headings and chrome stay sans under every choice: a
+  superfamily's sans option ("Source Sans", "IBM Plex Sans") runs the
+  whole page, article included, in its own sans and mono faces; a
+  serif option (the default "Source Serif", "IBM Plex Serif",
+  "Georgia") keeps headings and chrome on a sans face, as Medium did,
+  and points only the article's running text at the serif face
+  instead, with that sans face's own mono still under its code. A
   choice's code follows its own mono face wherever it has one (the
-  superfamilies', Atkinson Hyperlegible Mono); System UI's is the
-  platform's own ui-monospace stack, and a choice with no mono face of
-  its own (Helvetica, Inter) falls back to that same platform stack.
+  superfamilies'); System UI's is the platform's own ui-monospace
+  stack, and a choice with no mono face of its own (Helvetica, Inter)
+  falls back to that same platform stack. Georgia, a face with no
+  family around it, borrows Source Sans and Source Code Pro for both
+  roles.
   The article's reading size belongs to `.post` rather than to any one
   choice, so the eight differ in family alone. The losing styles, and
   the picker with them, come out once that is decided.
