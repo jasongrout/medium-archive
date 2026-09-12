@@ -77,6 +77,12 @@ These embed verbatim in both engines' pages, so they must carry no
   platform's own ui-monospace stack, and a choice with no mono face of
   its own (Helvetica, Inter, Merriweather) falls back to that same
   platform stack.
+  The list is ordered by what the choice does to the article rather
+  than by name: the faces that set its running text in a serif come
+  first, the default "Source Serif" at the top, then the ones that
+  leave it sans, alphabetically. So the comparison the picker exists
+  for -- one serif against another -- runs down an unbroken run of
+  neighbours.
   The article's reading size belongs to `.post` rather than to any one
   choice, so the nine differ in family alone. The losing styles, and
   the picker with them, come out once that is decided.

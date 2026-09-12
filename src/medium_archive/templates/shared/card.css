@@ -203,28 +203,27 @@ a:hover { text-decoration-line: underline; }
    the body grays hold, "link-blue" at 5.5:1 on the card, 3.1:1 against the
    body ink where the AAA one is 2.4:1 -- the separation that decides
    whether a link reads as a link or as dark text. The dark values sit
-   at ~7:1 on the dark cards. Both tune the rule, where the default
-   leaves it to the browser: a 1px rule dropped clear of the baseline,
-   so text-decoration-skip-ink cuts small nicks around the descenders
-   rather than long gaps. (Source Serif 4's own underline sits at
-   -0.05em, where its descenders at -0.25em break the line into
-   pieces and a thin rule reads thinner still.) */
+   at ~7:1 on the dark cards. Both state the rule's weight, where the
+   default leaves it to the browser -- 1px at every size, so the rule
+   stays a hairline under a heading-sized link as well as under body
+   text -- and leave its position alone: the browser's own offset is
+   what every other choice draws at, and the blues read against them
+   at the same height. */
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
                                 --rule-w: 1px; }
 :root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe;
                                --rule-w: 1px; }
 :root[data-link="petrol-aaa"] a, :root[data-link="link-blue"] a {
-                               text-decoration-thickness: var(--rule-w);
-                               text-underline-offset: .15em; }
+                               text-decoration-thickness: var(--rule-w); }
 /* Both take the default's hover as well: the rule turns the accent
    under the pointer, at the same heavier-of-2px-and-the-rest-rule
    weight, so a link says which one the pointer is on the same way
    under every choice that draws a rule of its own. Their rest rule is
    1px at every size, so that maximum is 2px throughout. The word keeps
-   its blue and the rule keeps the offset the rest state gave it, so
-   the hover moves nothing and recolours nothing that carries
-   letterforms -- the contrast each choice was picked for is the
-   text's, at rest and hovered alike. */
+   its blue and the rule keeps the browser's position, so the hover
+   moves nothing and recolours nothing that carries letterforms -- the
+   contrast each choice was picked for is the text's, at rest and
+   hovered alike. */
 :root[data-link="petrol-aaa"] a:hover, :root[data-link="link-blue"] a:hover {
                                text-decoration-color: var(--accent);
                                text-decoration-thickness: max(2px, var(--rule-w)); }
