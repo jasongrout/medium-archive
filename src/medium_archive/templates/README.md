@@ -144,6 +144,10 @@ These embed verbatim in both engines' pages, so they must carry no
   its box holds the smaller measure the padding and the dismiss button
   are drawn in ems against, and the wrapper holds the announcement's
   own 18px, so the banner stands the same 43.8px tall as that one.
+  The family is this site's, not that one's: the banner and its
+  dismiss x are set in `--body-font`, the sans the headings and chrome
+  take, so the announcement follows the font choice in force rather
+  than standing in a stack of its own (`card.css`).
 - `share-icons.html` is the five share marks as one hidden `<symbol>`
   sprite the post pages `<use>`: LinkedIn's, Facebook's, Bluesky's and
   Mastodon's own logomarks (Simple Icons' reproductions, at their 24x24
