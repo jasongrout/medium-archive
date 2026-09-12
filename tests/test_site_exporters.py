@@ -952,6 +952,23 @@ def test_theme_picker_and_dark_scheme(project):
     # rule the link already carries, so it never thins that rule
     assert css.count("max(2px, var(--rule-w))") == 2
     assert "--rule-w: .1em;" in css
+    # every font choice is set at one apparent size, so the picker
+    # compares faces rather than sizes: each role states the x-height
+    # of the default's own face, so the default is the choice nothing
+    # moves under -- .486 (Source Sans 3 and Source Code Pro) for the
+    # chrome and the code, .475 (Source Serif 4) for the article
+    assert "font: 1rem/1.65 var(--body-font); font-size-adjust: .486; }" in css
+    assert "line-height: 1.6; font-size-adjust: .475;" in css
+    assert ".post figcaption { font-size-adjust: .486; }" in css
+    # the shorthand resets font-size-adjust, so a later one would drop
+    # a rule's text back to its own x-height: the only shorthands in
+    # the sheet are body's, which restates the property after it, and
+    # the two that inherit every longhand wholesale
+    rules = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    shorthands = re.findall(r"(?<![-\w])font:\s*([^;]+);([^}]*)}", rules)
+    assert len(shorthands) == 4
+    for face, rest in shorthands:
+        assert face == "inherit" or "font-size-adjust" in rest, face
     assert (pelican_site / "theme/static/css/style.css").read_text() == css
     for base in (hugo_site / "layouts/baseof.html",
                  pelican_site / "theme/templates/base.html"):

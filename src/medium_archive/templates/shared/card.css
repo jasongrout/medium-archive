@@ -145,8 +145,44 @@
                                     --mono: var(--ibm-plex-mono); }
 :root[data-font="merriweather"] { --body-font: var(--merriweather-sans);
                                   --mono: var(--system-mono); }
+/* Every choice is set at the same apparent size, so the picker
+   compares faces rather than sizes. font-size sets the em box, not the
+   letters, and the candidates fill that box very differently: at one
+   font-size Merriweather's lowercase is 0.555em tall against Source
+   Serif's 0.475, so it reads a size and a half larger with no size
+   having changed. font-size-adjust names the x-height the text is to
+   be set at as a fraction of font-size and the browser scales the face
+   to hit it; apparent size follows the x-height, running prose being
+   nearly all lowercase.
+
+   The default is the reference, role by role, so it is the one choice
+   nothing moves under: .486 is Source Sans 3's own x-height and Source
+   Code Pro's alike (the pair is drawn to one), so the chrome and the
+   code of the default render exactly as they did, and the .475 on
+   .post further down is Source Serif 4's. What shifts is only the used
+   font-size a face is drawn at -- the computed font-size stays put, so
+   line-height, every em length and every rem length are the values
+   they always were. Leading therefore holds at 32px in the column
+   under every choice while the letters hold at one x-height, and it is
+   that pairing which decides a column's texture: resizing each face by
+   hand would have moved the two together and settled nothing. Line
+   length still moves with a face's set width, which is a proportion of
+   the face rather than its size.
+
+   It is stated here rather than on :root because the font shorthand on
+   the next line would reset it: font-size-adjust is one of the
+   longhands font sets, so a bare `font:` puts it back to none for
+   everything below. Declaring it after the shorthand, in the same
+   rule, is what makes it stick.
+
+   A face with an optical-size axis lands a hair off the target --
+   measured in Chromium, Merriweather at 9.53px against the 9.50 asked
+   for -- because the axis moves the x-height as the size the browser
+   picked changes, and the browser does not iterate. Where the property
+   is unsupported it is ignored and each face is drawn at its own
+   x-height, as before. */
 body { margin: 0; background: var(--bg); color: var(--ink);
-       font: 1rem/1.65 var(--body-font); }
+       font: 1rem/1.65 var(--body-font); font-size-adjust: .486; }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
 /* A link is a word and its rule, both in whichever colour the choice
    in force names; the rule keeps the browser's own weight and position
@@ -203,28 +239,27 @@ a:hover { text-decoration-line: underline; }
    the body grays hold, "link-blue" at 5.5:1 on the card, 3.1:1 against the
    body ink where the AAA one is 2.4:1 -- the separation that decides
    whether a link reads as a link or as dark text. The dark values sit
-   at ~7:1 on the dark cards. Both tune the rule, where the default
-   leaves it to the browser: a 1px rule dropped clear of the baseline,
-   so text-decoration-skip-ink cuts small nicks around the descenders
-   rather than long gaps. (Source Serif 4's own underline sits at
-   -0.05em, where its descenders at -0.25em break the line into
-   pieces and a thin rule reads thinner still.) */
+   at ~7:1 on the dark cards. Both state the rule's weight, where the
+   default leaves it to the browser -- 1px at every size, so the rule
+   stays a hairline under a heading-sized link as well as under body
+   text -- and leave its position alone: the browser's own offset is
+   what every other choice draws at, and the blues read against them
+   at the same height. */
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
                                 --rule-w: 1px; }
 :root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe;
                                --rule-w: 1px; }
 :root[data-link="petrol-aaa"] a, :root[data-link="link-blue"] a {
-                               text-decoration-thickness: var(--rule-w);
-                               text-underline-offset: .15em; }
+                               text-decoration-thickness: var(--rule-w); }
 /* Both take the default's hover as well: the rule turns the accent
    under the pointer, at the same heavier-of-2px-and-the-rest-rule
    weight, so a link says which one the pointer is on the same way
    under every choice that draws a rule of its own. Their rest rule is
    1px at every size, so that maximum is 2px throughout. The word keeps
-   its blue and the rule keeps the offset the rest state gave it, so
-   the hover moves nothing and recolours nothing that carries
-   letterforms -- the contrast each choice was picked for is the
-   text's, at rest and hovered alike. */
+   its blue and the rule keeps the browser's position, so the hover
+   moves nothing and recolours nothing that carries letterforms -- the
+   contrast each choice was picked for is the text's, at rest and
+   hovered alike. */
 :root[data-link="petrol-aaa"] a:hover, :root[data-link="link-blue"] a:hover {
                                text-decoration-color: var(--accent);
                                text-decoration-thickness: max(2px, var(--rule-w)); }
@@ -261,11 +296,16 @@ a:hover { text-decoration-line: underline; }
    the site's own paragraph rule). .announcement-content carries the
    18px here instead of a <p> rule, so an announcement that is bare
    text rather than markup reads at that same size; the script wraps
-   whatever the source gives in it. */
+   whatever the source gives in it. The banner restates the chrome's
+   x-height after its shorthand for the reason body does: the
+   shorthand is one of the two places a `font:` would otherwise hand
+   the text back to whatever x-height the chosen face happens to
+   have. */
 .announcement { position: relative; background: var(--accent); color: #fff;
                 text-shadow: 0 0 4px #000;
                 text-align: center;
                 font: 400 .875rem/1.42857143 var(--body-font);
+                font-size-adjust: .486;
                 padding: .6em 2.5em; }
 .announcement[hidden] { display: none; }
 .announcement-content { font-size: 1.125rem; line-height: 1.5; }
@@ -441,10 +481,18 @@ a:hover { text-decoration-line: underline; }
    sits here, on the column itself, not with any one font choice: at
    this size the picker's choices differ only in family, which is what
    the picker is for, and running text wants the larger size whichever
-   family wins. Headings and byline keep their own scale below. */
+   family wins. Headings and byline keep their own scale below.
+
+   The x-height the column is set at sits here for the same reason:
+   .475 is Source Serif 4's own, so the article under the default is
+   untouched and every other choice is scaled to read at that same
+   size. One number serves all nine, serif choices and sans alike --
+   splitting it would put the article's apparent size back where the
+   normalization took it from. The pieces that opt out to --body-font
+   take the chrome's reference instead, below. */
 .post { background: var(--card); border-radius: 8px; margin: 2rem auto 3rem;
         padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem); max-width: 52rem;
-        font-size: 1.25rem; line-height: 1.6;
+        font-size: 1.25rem; line-height: 1.6; font-size-adjust: .475;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
 /* Headings set their own leading. .post carries line-height 1.6 for
@@ -550,7 +598,13 @@ a:hover { text-decoration-line: underline; }
    is 81 columns; a wider column was tried for a few more and read as
    too wide. An em size would have followed the 20px reading size up
    to 18px and 66 columns. The code inside a block inherits, so it
-   does not step down again. */
+   does not step down again. Those 81 columns are what the default's
+   own mono holds; under another choice the count moves with both that
+   mono's set width and the used size x-height normalization (up by
+   body) draws it at -- measured in Chromium, 82 columns for Source
+   Code Pro, 87 for IBM Plex Mono, 79 for Atkinson Hyperlegible Mono.
+   The block scrolls either way, and code that reads at one size
+   across the choices is worth more here than a fixed column count. */
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-family: var(--mono);
             font-size: .875rem; line-height: 1.4; }
@@ -679,6 +733,15 @@ a:hover { text-decoration-line: underline; }
 :root[data-font="merriweather"] .post-meta,
 :root[data-font="merriweather"] .post-share,
 :root[data-font="merriweather"] .post figcaption { font-family: var(--body-font); }
+/* The same pieces, plus the code, take the chrome's x-height back
+   from the column's: they are set in --body-font and --mono, not in
+   the article's face, so .486 is the reference that leaves them where
+   the default draws them. This one needs no per-choice rules -- a
+   reference belongs to the role, and the role is the same under all
+   nine -- so it states the selectors once. */
+.post :is(h1, h2, h3, h4, h5, h6, code, pre, kbd, samp),
+.post-subtitle, .post-meta, .post-share,
+.post figcaption { font-size-adjust: .486; }
 
 /* The share bar, carried twice by a post: under the byline, where a
    reader decides whether to read, and at the foot, where they have.
