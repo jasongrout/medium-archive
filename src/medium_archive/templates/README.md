@@ -84,7 +84,26 @@ These embed verbatim in both engines' pages, so they must carry no
   for -- one serif against another -- runs down an unbroken run of
   neighbours.
   The article's reading size belongs to `.post` rather than to any one
-  choice, so the nine differ in family alone. The losing styles, and
+  choice, so the nine differ in family alone -- and `font-size-adjust`
+  makes that literal. `font-size` sets the em box, not the letters, and
+  the candidates fill it very differently (Merriweather's lowercase is
+  0.555em against Source Serif's 0.475), so at one size they read as
+  different sizes and the picker compares sizes instead of faces. Each
+  role therefore names the x-height it is set at, taking the default's
+  own face as the reference so the default renders exactly as it did:
+  `.486` on `body` (Source Sans 3, and Source Code Pro with it) for
+  chrome and code, `.475` on `.post` (Source Serif 4) for the article,
+  with the article's sans pieces opting back to `.486`. Only the used
+  font-size moves; the computed one does not, so `line-height` and
+  every `em`/`rem` length stay as they were -- leading holds at 32px in
+  the column under all nine while the letters hold at one x-height.
+  Measured in Chromium: article x-height 9.50px under every choice
+  (9.53 for Merriweather, 9.63 for Inter, whose optical-size axes shift
+  the x-height as the browser rescales them), against 9.50-11.11px
+  before. Line length still moves with a face's set width, which is a
+  proportion of the face rather than its size. `font-size-adjust` must
+  be stated after the `font` shorthand in the `body` rule: the
+  shorthand resets it. The losing styles, and
   the picker with them, come out once that is decided.
   `card.css` states the choices as `--body-font` / `--mono`, so a new
   candidate is a `:root[data-font=...]` block redefining those rather
