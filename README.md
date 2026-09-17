@@ -1,4 +1,6 @@
-# medium-archive
+# Archive of the Jupyter Blog: blog.jupyter.org on Medium
+
+**Disclaimer: this repo code and documentation is almost entirely generated from guided Claude sessions**
 
 Archive a Medium publication as raw HTML plus a Markdown conversion, to
 support migrating a blog off Medium.
