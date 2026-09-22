@@ -2279,10 +2279,10 @@ def test_multiple_authors_reach_both_sites(tmp_path):
     assert "author" not in front("duet")
     assert "authors" not in front("solo")
     assert "capitalizeListTitles = false" in hugo_config(site)
+    # the feed, the card's byline and the post page's all walk the
+    # taxonomy terms, so each shows the author's name, not the slug
     text = (site / "layouts/rss.xml").read_text()
-    assert ".Params.authors" in text and ".Params.author " not in text
-    # the card's byline links each author to their listing, like the
-    # post page's, so both walk the taxonomy terms rather than the names
+    assert '.GetTerms "authors"' in text and ".Params.author" not in text
     for layout in ("layouts/_partials/card.html", "layouts/page.html"):
         text = (site / layout).read_text()
         assert '.GetTerms "authors"' in text and ".Params.author" not in text, layout
@@ -2423,6 +2423,22 @@ def test_page_metadata_search_engines_read(project):
     assert "output_file" in heads["pelican"]
     assert ('<link rel="canonical" href="{{ article.canonical if article '
             'and article.canonical else page_url }}">') in heads["pelican"]
+
+
+def test_hugo_article_metadata_and_feed_bylines(project):
+    """The /posts/ and /posts/<year>/ sections share the posts' Type, so
+    the article tags and the BlogPosting are limited to regular pages;
+    and a feed names each author by the term's title, as pelican's
+    feeds do, not by the slug in front matter."""
+    hugo_site = build(hugo, project)
+    baseof = (hugo_site / "layouts/baseof.html").read_text()
+    assert '{{ $post := and .IsPage (eq .Type "posts") }}' in baseof
+    ld = (hugo_site / "layouts/_partials/jsonld.html").read_text()
+    assert '{{- if and $p.IsPage (eq $p.Type "posts") -}}' in ld
+    rss = (hugo_site / "layouts/rss.xml").read_text()
+    assert ('{{ range .GetTerms "authors" }}<dc:creator>{{ .LinkTitle }}'
+            '</dc:creator>{{ end }}') in rss
+    assert ".Params.authors" not in rss
 
 
 def _graph_source(engine_site, engine):
