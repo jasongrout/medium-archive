@@ -29,9 +29,8 @@ as they are. `pagefind` (`npm install -g pagefind`) fills the
 | file | what it holds |
 |------|---------------|
 | `site.toml` | everything the pages say about themselves: the site's name, its address, the marks in its masthead and where they point, the landing-page blurb, the line under every page, the banner, the newsletter band, the share image |
-| `data/tags.json` | tag slug → the name the tag is shown under |
-| `data/authornames.json` | author slug → the name they are shown under |
-| `data/authors.json` | author name → their profile address, which the structured data names as theirs |
+| `data/tags.yaml` | tag slug → the name the tag is shown under |
+| `data/authors.yaml` | author slug → the name they are shown under and, optionally, their profile address, which the structured data names as theirs |
 | `content/posts/<year>/<slug>/index.md` | the posts, filed under the year they were published in, with their images beside them |
 | `theme/` | the templates and the stylesheet: how the pages look |
 | `pelicanconf.py` | machinery — the CommonMark reader, the URL scheme, the feeds, and the plugins. It reads `site.toml` and holds no site data of its own |
@@ -104,7 +103,7 @@ The body, as CommonMark.
   is nothing to write.
 - `authors` and `tags` are slugs, not names, so that their URLs are
   exact whatever the name holds; the name each is shown under comes
-  from `data/authornames.json` and `data/tags.json`. A slug missing
+  from `data/authors.yaml` and `data/tags.yaml`. A slug missing
   from those files is shown as the slug itself.
 - Dates are `YYYY-MM-DD HH:MM`, read as UTC. `modified:` is the same
   shape and is what the sitemap reports as the page's last change.

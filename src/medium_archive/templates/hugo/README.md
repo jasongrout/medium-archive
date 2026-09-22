@@ -27,9 +27,8 @@ without it the page loads and finds nothing.
 | `config/_default/params.toml` | what the pages say about themselves: the marks in the masthead and where they point, the banner, the line under every page, the newsletter band, the share image, the publication's handle and profiles |
 | `config/_default/hugo.toml` | the site's address, name and language, which Hugo reads only at the root of its configuration — and below them the machinery: the taxonomies, the related-posts index, the paginator, Goldmark and Chroma |
 | `content/_index.md` | the landing page's blurb |
-| `data/tags.json` | tag slug → the name the tag is shown under |
-| `data/authornames.json` | author slug → the name they are shown under |
-| `data/authors.json` | author name → their profile address, which the structured data names as theirs |
+| `data/tags.yaml` | tag slug → the name the tag is shown under |
+| `data/authors.yaml` | author slug → the name they are shown under and, optionally, their profile address, which the structured data names as theirs |
 | `content/posts/<year>/<slug>/index.md` | the posts, filed under the year they were published in, with their images beside them |
 | `layouts/`, `static/`, `assets/` | the templates, the stylesheet and the site's images: how the pages look |
 
@@ -75,7 +74,7 @@ The body, as Markdown.
 
 - `authors` and `tags` are slugs, not names, so that their URLs are
   exact whatever the name holds; the name each is shown under comes
-  from `data/authornames.json` and `data/tags.json`, which the term
+  from `data/authors.yaml` and `data/tags.yaml`, which the term
   pages take their titles from. A slug missing from those files still
   gets its term page; it is shown as the slug itself.
 - `lastmod:` is what the sitemap reports as the page's last change.

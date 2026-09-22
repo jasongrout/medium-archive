@@ -1312,29 +1312,47 @@ def author_slug(name: str) -> str:
     return ascii_slug(name)
 
 
-def author_names(manifest: dict) -> dict:
-    """Author slug -> the name a site shows them under, the authors'
-    counterpart of tag_names. The first spelling seen for a slug wins."""
-    names = {}
+def author_entries(manifest: dict) -> dict:
+    """Author slug -> what a site shows for that byline: the name, and
+    the profile address the archive knows for them (the Medium profile
+    the bylines carry), which the Person structured data on posts and
+    author pages names as their sameAs. The authors' counterpart of
+    tag_names, with the profile in the same entry as the name because
+    both are one byline's, and correcting one by hand means finding the
+    other. The first spelling and the first address seen for a slug
+    win; an author with no profile is an entry with a name alone."""
+    entries = {}
     for p in manifest.values():
         for a in p.get("authors") or []:
             slug = author_slug(a["name"])
-            if slug and slug not in names:
-                names[slug] = a["name"]
-    return dict(sorted(names.items()))
+            if not slug:
+                continue
+            entry = entries.setdefault(slug, {"name": a["name"]})
+            if a.get("url") and "url" not in entry:
+                entry["url"] = a["url"]
+    return dict(sorted(entries.items()))
 
 
-def author_links(manifest: dict) -> dict:
-    """Author name -> the profile address the archive knows for them
-    (the Medium profile, from the posts' bylines), for the sameAs of
-    the Person structured data on posts and author pages. The first
-    address seen for a name wins."""
-    links = {}
-    for p in manifest.values():
-        for a in p.get("authors") or []:
-            if a.get("url") and a["name"] not in links:
-                links[a["name"]] = a["url"]
-    return dict(sorted(links.items()))
+DATA_HEADERS = {
+    "tags.yaml": """\
+# Tag slug -> the name the tag is shown under. A tag reaches the site
+# as its slug, so /tags/<slug>/ stays exact whatever the name holds;
+# this file is what a tag page, a card, the chip index and the per-tag
+# feed render. A slug missing here shows as the slug itself.
+""",
+    "authors.yaml": """\
+# Author slug -> the byline it is shown as. Each entry carries:
+#
+#   <slug>:
+#     name: the name the author is shown under -- the author page and
+#           its title, every byline, the chip index, the per-author feed
+#     url:  their profile elsewhere (optional), which the structured
+#           data on posts and on their author page names as their sameAs
+#
+# A byline reaches the site as its slug, so /authors/<slug>/ is exact
+# whatever the name holds; a slug missing here shows as the slug itself.
+""",
+}
 
 
 def site_data(manifest: dict, archive: Path) -> dict:
@@ -1350,27 +1368,37 @@ def site_data(manifest: dict, archive: Path) -> dict:
     title, the chip index, the per-term feed), which a directory per
     term could not.
 
+    One file per taxonomy, not one per field: everything a site shows
+    for a byline -- the name and the profile -- is that byline's one
+    entry in authors.yaml, so a correction is made in one place rather
+    than hunted across two files keyed differently. YAML, and each file
+    under a header saying what its entries mean, because these are the
+    files a checked-in site edits by hand; the archive's own inputs
+    stay as they are.
+
     Tags and authors reach both engines as slugs, so a term and its
     /tags/<slug>/ or /authors/<slug>/ URL are exactly the archive's
     rather than whatever each engine's slugify would make of "C++" or
     of an accented byline (see tags.py and author_slug); these maps
     carry the spaces, capitals, accents and punctuation that only the
-    rendered name needs. The author profiles are keyed by that rendered
-    name, which is what a byline reads as in the structured data."""
-    return {"tags.json": tag_names(manifest, archive),
-            "authornames.json": author_names(manifest),
-            "authors.json": author_links(manifest)}
+    rendered name needs. Both files are keyed by that slug, the term's
+    identity in either engine."""
+    return {"tags.yaml": tag_names(manifest, archive),
+            "authors.yaml": author_entries(manifest)}
 
 
 def write_data_files(site: Path, manifest: dict, archive: Path) -> dict:
-    """Write site_data's maps as <site>/data/*.json, sorted so a diff
-    between two builds shows only what the archive changed."""
+    """Write site_data's maps as <site>/data/*.yaml, each under the
+    header that says what its entries are, and sorted so a diff between
+    two builds shows only what the archive changed."""
     data = site_data(manifest, archive)
     (site / "data").mkdir(parents=True, exist_ok=True)
     for name, mapping in data.items():
         (site / "data" / name).write_text(
-            json.dumps(dict(sorted(mapping.items())), indent=2,
-                       ensure_ascii=False) + "\n", encoding="utf-8")
+            DATA_HEADERS[name] + yaml.safe_dump(
+                dict(sorted(mapping.items())), allow_unicode=True,
+                default_flow_style=False, sort_keys=True, width=10 ** 6),
+            encoding="utf-8")
     return data
 
 

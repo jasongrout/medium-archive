@@ -6,7 +6,8 @@
    by @id from the rest; a BreadcrumbList names the page's place (home,
    then the tag or author index for a term page, then the page); a post
    adds its BlogPosting, the block Medium (as SocialMediaPosting)
-   carries, with each author's profile (AUTHOR_LINKS) as sameAs; an
+   carries, with each author's profile (AUTHOR_LINKS, keyed by the
+   author's slug, as data/authors.yaml is) as sameAs; an
    author page is a ProfilePage whose main entity is that Person. Built
    as dicts and serialized by tojson, which escapes every value for a
    <script>. Reads base.html's page_url, page_title, is_home, og_image
@@ -52,7 +53,7 @@
 {% set authors = [] %}
 {% for a in article.authors %}
 {% set person = {"@type": "Person", "name": a.name, "url": SITEURL ~ "/" ~ a.url} %}
-{% if AUTHOR_LINKS.get(a.name) %}{% set _ = person.update({"sameAs": [AUTHOR_LINKS[a.name]]}) %}{% endif %}
+{% if AUTHOR_LINKS.get(a.slug) %}{% set _ = person.update({"sameAs": [AUTHOR_LINKS[a.slug]]}) %}{% endif %}
 {% set _ = authors.append(person) %}
 {% endfor %}
 {% if authors %}{% set _ = ld.update({"author": authors}) %}{% endif %}
@@ -60,7 +61,7 @@
 {% set _ = graph.append(ld) %}
 {% elif author %}
 {% set person = {"@type": "Person", "name": author.name, "url": page_url} %}
-{% if AUTHOR_LINKS.get(author.name) %}{% set _ = person.update({"sameAs": [AUTHOR_LINKS[author.name]]}) %}{% endif %}
+{% if AUTHOR_LINKS.get(author.slug) %}{% set _ = person.update({"sameAs": [AUTHOR_LINKS[author.slug]]}) %}{% endif %}
 {% set _ = graph.append({"@type": "ProfilePage", "@id": page_url, "url": page_url, "isPartOf": {"@id": site_id}, "mainEntity": person}) %}
 {% endif %}
 <script type="application/ld+json">{{ {"@context": "https://schema.org", "@graph": graph}|tojson }}</script>

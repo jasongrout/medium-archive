@@ -333,14 +333,15 @@ section and a term's page share `section.html`, written to the site as
   config directory in preference to a root config file, so there is one
   place to look.
 - `content/tags/_content.gotmpl` is a content adapter: it creates one
-  term page per entry of `data/tags.json` (tag slug -> display name,
+  term page per entry of `data/tags.yaml` (tag slug -> display name,
   written by `sites.write_data_files`), so the tag pages, cards, chip
   index and per-tag feeds all show a tag's name while its URL stays
   the slug -- and a checked-in copy of the site renames a tag by
   editing that one data file.
 - `content/authors/_content.gotmpl` is the same adapter for authors,
-  over `data/authornames.json` (author slug -> name, from the same
-  writer). Bylines need it more than tags do: a name left as the term
+  over `data/authors.yaml` (author slug -> an entry holding the name
+  and the profile, from the same writer; the adapter takes the name).
+  Bylines need it more than tags do: a name left as the term
   puts its accents and punctuation into the path, and the pelican site
   folds the same name to ASCII, so without it the two engines serve one
   author at two different addresses.
@@ -371,7 +372,7 @@ section and a term's page share `section.html`, written to the site as
   and the `WebSite` (the search page as its `SearchAction`) on every
   page, referenced by `@id` from a `BreadcrumbList` placing the page,
   a post's `BlogPosting` (headline, dates, authors with their profile
-  from `data/authors.json` (read through `hugo.Data`) as `sameAs`, cover with dimensions,
+  from `data/authors.yaml` (read through `hugo.Data`) as `sameAs`, cover with dimensions,
   keywords) and an author page's `ProfilePage`. Built as dicts and
   jsonified so every value is escaped for a `<script>`.
 - `layouts/_partials/related.html` closes a post page with up to three
@@ -433,16 +434,17 @@ section and a term's page share `section.html`, written to the site as
   `(c)`/`(tm)`/`(r)` substitutions are the exception, left off because
   Goldmark has no equivalent and this publication writes `501(c)(3)`.
   The config also reads the site's data files from beside itself:
-  `TAG_DISPLAY` and `AUTHOR_DISPLAY` from `data/tags.json` and
-  `data/authornames.json`, the slug-to-name maps for tags and authors
-  (both reach Pelican as slugs so their URLs are exact; see `tags.py`
-  and `sites.author_slug`), and `AUTHOR_LINKS` from
-  `data/authors.json`. They are the same three files the hugo
+  `TAG_DISPLAY` from `data/tags.yaml`, the slug-to-name map for tags,
+  and `AUTHOR_DISPLAY` and `AUTHOR_LINKS` from the one entry per author
+  slug in `data/authors.yaml` (tags and authors both reach Pelican as
+  slugs so their URLs are exact; see `tags.py` and
+  `sites.author_slug`). They are the same two files the hugo
   site reads through `hugo.Data` -- `sites.write_data_files` writes
   them for both -- and they are kept out of the config because a name
   or a profile is what a checked-in copy of a site corrects by hand
-  while this file is generated; a missing one leaves the terms showing
-  as their slugs rather than failing the build. The config also renders
+  while this file is generated; they are YAML for that reason, and a
+  missing one leaves the terms showing as their slugs rather than
+  failing the build. The config also renders
   `INTRO`, site.toml's landing-page blurb, through the reader's own
   parser: `index.html` emits it into the same `.intro` block the hugo
   landing page uses, and Jinja has no Markdown filter to do it in the
@@ -456,8 +458,8 @@ section and a term's page share `section.html`, written to the site as
   the same way: shared tags, then author, then date; `article.html`
   reads `article.related_posts`), and the
   names tags and authors are shown under (from `TAG_DISPLAY` and
-  `AUTHOR_DISPLAY`, the config's reading of `data/tags.json` and
-  `data/authornames.json`, set on the `Tag` and `Author` objects so the
+  `AUTHOR_DISPLAY`, the config's reading of `data/tags.yaml` and
+  `data/authors.yaml`, set on the `Tag` and `Author` objects so the
   theme and the per-term feeds both pick them up; both reach Pelican as
   slugs, so their URLs match the hugo site's exactly). It refers to
   names the config defines (`SITEURL`, `PATH`, `TAG_DISPLAY`,
@@ -468,7 +470,8 @@ section and a term's page share `section.html`, written to the site as
 - `theme/templates/jsonld.html` is the hugo partial of the same name
   in Jinja, included by `base.html` after the page's address, name
   and share image are set; author profiles come from `AUTHOR_LINKS`
-  (the config's reading of `data/authors.json`) and the publisher's
+  (the config's reading of `data/authors.yaml`, keyed by author slug)
+  and the publisher's
   from `PROFILES`, which site.toml fills in directly.
 - `theme/templates/` is the Jinja theme. A tag page and an author page
   are the same page, and so are the two chip indexes, so each pair is

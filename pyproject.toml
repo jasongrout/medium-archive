@@ -14,8 +14,8 @@ dependencies = [
     "beautifulsoup4",
     "markdownify",
     "lxml",
-    # the hugo and pelican exporters write YAML front matter; the
-    # generated pelican config reads it back
+    # the hugo and pelican exporters write YAML front matter and the
+    # sites' data files; the generated pelican config reads both back
     "pyyaml",
 ]
 

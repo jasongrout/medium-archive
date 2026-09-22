@@ -364,7 +364,7 @@ with none stored, the system scheme decides. The theme provides:
     `BreadcrumbList` placing the page (home, the tag or author index,
     the page), the post's `BlogPosting` with each author's Medium
     profile as `sameAs` (from the bylines, through each site's
-    `data/authors.json`), and each author page as a `ProfilePage` of
+    `data/authors.yaml`), and each author page as a `ProfilePage` of
     that `Person`.
   - Per-post canonicals. Every page is its own canonical: the archive
     is the posts' home, and the Medium copy is never named as one. The
@@ -416,14 +416,16 @@ with none stored, the system scheme decides. The theme provides:
   to write a post -- and a `.gitignore` for the build output, so the
   directory stands on its own the moment it is taken out of the
   archive's project.
-- Three hand-editable data files, `data/tags.json`,
-  `data/authornames.json` and `data/authors.json`, written the same in
-  both sites: the name each tag and each author is shown under, and the
-  profile address of each byline. Tags and authors reach both engines
-  as slugs so their URLs are exact, and these files are where the
-  spaces, capitals, accents and punctuation of the rendered name live.
-  Hugo reads them through `hugo.Data`, the pelican config reads them
-  beside itself, so a checked-in site renames a tag or corrects a
+- Two hand-editable data files, `data/tags.yaml` and
+  `data/authors.yaml`, written the same in both sites: the name each
+  tag is shown under, and one entry per author slug holding the name
+  they are shown under and the profile address of that byline. Tags and
+  authors reach both engines as slugs so their URLs are exact, and
+  these files are where the spaces, capitals, accents and punctuation
+  of the rendered name live. They are YAML, each under a header saying
+  what its entries mean, because they are the files a site edits by
+  hand. Hugo reads them through `hugo.Data`, the pelican config reads
+  them beside itself, so a checked-in site renames a tag or corrects a
   profile by editing one small file -- and the new name reaches every
   place the engine renders that term (cards, the term page and its
   title, the chip index, the per-term feed) at once.
