@@ -1,13 +1,6 @@
-{{- /* One term page per entry in data/authors.yaml (author slug -> the
-       name they are shown under, and the profile the structured data
-       reads), the authors' counterpart of content/tags/_content.gotmpl.
-       Front matter carries the slug, so /authors/<slug>/ is the same
-       address the pelican site serves; the title is what every place
-       Hugo renders the term picks up -- cards, bylines, the author page
-       and its <title>, the chip index, the per-author feed. Left as
-       names, the terms would put a byline's accents and punctuation
-       straight into the path. An entry with no name is titled by its
-       slug, as an author missing from the file is. */ -}}
+{{- /* One term page per data/authors.yaml entry: the path stays the slug
+       (/authors/<slug>/), the title is the author's name, or the slug when
+       the entry has none. */ -}}
 {{ range $slug, $author := hugo.Data.authors }}
 {{ $.AddPage (dict "kind" "term" "path" $slug "title" (default $slug $author.name)) }}
 {{ end }}

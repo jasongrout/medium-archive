@@ -1,10 +1,6 @@
-{{- /* One term page per entry in data/tags.yaml (tag slug -> the name
-       it is shown under). The page's title is what every place Hugo
-       renders the term picks up -- cards, the tag page and its <title>,
-       the chip index, the per-tag feed -- while its path, and so the
-       /tags/<slug>/ URL, stays the slug the posts' front matter carries.
-       A tag missing from the map still gets its page from Hugo, titled
-       by its slug. To rename a tag, edit data/tags.yaml. */ -}}
+{{- /* One term page per data/tags.yaml entry: the path stays the slug
+       (/tags/<slug>/), the title is the tag's display name. A tag missing
+       from the file gets Hugo's default page, titled by its slug. */ -}}
 {{ range $slug, $name := hugo.Data.tags }}
 {{ $.AddPage (dict "kind" "term" "path" $slug "title" $name) }}
 {{ end }}

@@ -3,9 +3,8 @@
 {{- with $cover }}
 <a class="card-cover" href="{{ $.RelPermalink }}">
   {{- if and (eq .MediaType.MainType "image") (not (in (slice "gif" "svg") .MediaType.SubType)) -}}
-  {{- /* the exporter bakes covers to exactly 640x360 (crop or
-         letterbox by aspect -- see sites.make_cover_thumbnail); Fill
-         is the fallback when they kept their source size (no Pillow) */ -}}
+  {{- /* covers are baked to 640x360 (sites.make_cover_thumbnail); Fill
+         handles one left at its source size (no Pillow, or a failed bake) */ -}}
   {{- $thumb := . -}}
   {{- if or (ne .Width 640) (ne .Height 360) -}}{{- $thumb = .Fill "640x360 q75" -}}{{- end -}}
   <img src="{{ $thumb.RelPermalink }}" width="640" height="360" alt="" loading="lazy">
@@ -17,9 +16,6 @@
 <div class="card-body">
 {{ with .GetTerms "tags" }}<p class="card-tags">{{ range . }}<a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a> {{ end }}</p>{{ end }}
 <h2 class="card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-{{/* the curated description convert writes, as the pelican card
-     renders it; .Summary (Hugo's auto-summary of the body) is the
-     fallback for a post that has none */}}
 <p class="card-excerpt">{{ or .Description .Summary | plainify | truncate 150 }}</p>
 <p class="card-meta"><time>{{ .Date.Format "January 2, 2006" }}</time>{{ with .GetTerms "authors" }} · {{ range $i, $a := . }}{{ if $i }}, {{ end }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}</p>
 </div>

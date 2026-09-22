@@ -21,8 +21,9 @@
       {{ range .Params.authors }}<dc:creator>{{ . }}</dc:creator>{{ end }}
       <guid>{{ .Permalink }}</guid>
       <description>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }}</description>
-      {{- /* absolutize root-relative URLs against baseURL and the gif/svg
-             passthroughs' page-relative images/ against this post's URL */}}
+      {{- /* drop srcset/sizes (not rewritten); make root-relative URLs
+             absolute against baseURL, and page-relative images/ ones (raw
+             paths such as svg) against this post's URL */}}
       <content:encoded>{{ .Content | replaceRE ` (srcset|sizes)="[^"]*"` "" | replaceRE `(src|href)="(/[^"]*)"` (printf `$1="%s$2"` (strings.TrimSuffix "/" site.BaseURL)) | replaceRE `(src|href)="(images/[^"]*)"` (printf `$1="%s$2"` .Permalink) | html }}</content:encoded>
     </item>
     {{ end }}

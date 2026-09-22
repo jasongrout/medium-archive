@@ -1,16 +1,9 @@
-{{- /* Structured data for any page (ctx: page, image -- the share
-       image resource or "", url -- the page's own address): one
-       schema.org graph, the linked set WordPress's SEO plugins put on
-       every page rather than a lone node. The Organization (the
-       publisher: logo, its profiles elsewhere as sameAs) and the
-       WebSite (with the search page as its SearchAction) are on every
-       page and referenced by @id from the rest; a BreadcrumbList names
-       the page's place (home, then the tag or author index for a term
-       page, then the page); a post adds its BlogPosting, the block
-       Medium (as SocialMediaPosting) carries, with each author's
-       profile (data/authors.yaml) as sameAs; an author page is a
-       ProfilePage whose main entity is that Person. Built as dicts and
-       jsonified, so every value is escaped for a <script>. */ -}}
+{{- /* schema.org JSON-LD graph (ctx: page, image -- the share image
+       resource or "", url -- the page's address). Organization and
+       WebSite on every page, referenced by @id; a BreadcrumbList on all
+       but home; a BlogPosting on pages of type posts; a ProfilePage on
+       an author page. Built as dicts and jsonified so every value is
+       escaped for <script>. */ -}}
 {{- $p := .page -}}
 {{- $url := .url -}}
 {{- $stamp := "2006-01-02T15:04:05Z07:00" -}}
