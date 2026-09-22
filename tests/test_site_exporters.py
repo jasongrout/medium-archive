@@ -1145,7 +1145,7 @@ def test_plausible_analytics(project):
     # Plausible names this site's. Both themes emit it async and last
     # in the head, with Plausible's own queue stub beside it, so an
     # event fired before the script lands is queued rather than lost.
-    script = "https://plausible.io/js/pa-B75UO5--FNXYQSG7GBWkf.js"
+    script = "https://plausible.io/js/pa-test-script.js"
     cfg = read_site(project)
     cfg["plausible"] = script
     write_site(project, cfg)
