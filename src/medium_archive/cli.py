@@ -84,7 +84,10 @@ Notes:
     their archived code, YouTube and other known providers' embeds stay
     players, Giphy embeds become the fetched gif or clip, other iframes
     become links.
-  * Medium rate-limits and may serve a bot wall; fetch is resumable.
+  * Medium rate-limits and may serve a bot wall; fetch is resumable. A
+    403 falls back to the post's RSS body when it has one and otherwise
+    stops the run after three in a row, rather than one post at a time
+    -- see --cookies to get past a wall that persists.
   * Fixups: files in archive/fixups/ are applied to the in-memory raw
     sources by convert and compare, so authored defects -- a broken href
     in a capture, a typo, a mangled paragraph in an export -- can be
@@ -198,6 +201,20 @@ def add_fetch_args(p):
                         "2-3 s on 429s (default: 1.5)")
     p.add_argument("--no-images", action="store_true",
                    help="skip image downloads (convert will keep remote URLs)")
+    p.add_argument("--cookies", type=Path, metavar="FILE",
+                   help="cookies to send with every request, from a browser "
+                        "logged into Medium: a Netscape cookie jar (a "
+                        "'cookies.txt' browser-extension export) or a file "
+                        "holding one 'name=value; name=value' Cookie header "
+                        "line copied from devtools. Use this when Medium's "
+                        "edge answers 403 to a plain fetch (fetch reports "
+                        "this and stops after repeated refusals) -- pair "
+                        "with --user-agent set to that same browser's string, "
+                        "since the cookies are bound to it")
+    p.add_argument("--user-agent", metavar="STRING",
+                   help="override the User-Agent sent with every request "
+                        "(default: a current desktop Chrome string); match "
+                        "this to the browser --cookies came from")
 
 
 def add_convert_args(p):

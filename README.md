@@ -956,7 +956,23 @@ no longer lists, work through the steps in order:
   `convert` warns about.
 * Medium rate-limits and may serve a bot wall. A 429 is not retried:
   fetch reports it, with the server's `Retry-After` hint when sent, and
-  moves on. Raise `--delay` and re-run to resume.
+  moves on. Raise `--delay` and re-run to resume. A 403 is Cloudflare's
+  edge refusing the request before Medium sees it -- not a verdict on
+  that post -- so it is not retried either; fetch reports what the
+  response itself says (the edge that answered, its `cf-ray` id,
+  whether the body is an interactive challenge page) and falls back to
+  the post's RSS feed body when the feed has one (the ten or so most
+  recent posts), archiving it with no `page.html` and `page_blocked:
+  true` in `raw/index.json` so a later run knows to ask for the page
+  again. Three walled posts in a row without a feed fallback stop the
+  run outright -- that many is the whole session being walled off, not
+  one post being gone, and grinding through the rest wastes requests
+  against it. Recover with `--cookies FILE`: a Netscape cookie jar (a
+  `cookies.txt` browser-extension export) or a file holding one
+  `Cookie:` header line copied from devtools, from a browser that has
+  loaded Medium; pair it with `--user-agent` set to that browser's
+  string, since Cloudflare binds the cookies to it. Already-archived
+  posts are skipped on the re-run, so it resumes rather than restarts.
 
 ## Layout
 
