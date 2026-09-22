@@ -33,6 +33,10 @@ ENCODERS = {
     "aom_ll_c1_noscreen": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libaom-av1", "-cpu-used", "1", "-g", "9999", "-row-mt", "0",
         "-crf", "0", "-aom-params", "lossless=1", "-pix_fmt", "gbrp", o]),
+    "aom_ll_c2": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libaom-av1", "-cpu-used", "2", "-g", "9999", "-row-mt", "0",
+        "-crf", "0", "-aom-params", "lossless=1:tune-content=screen",
+        "-pix_fmt", "gbrp", o]),
     "aom_ll_c4": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libaom-av1", "-cpu-used", "4", "-g", "9999", "-row-mt", "0",
         "-crf", "0", "-aom-params", "lossless=1:tune-content=screen",

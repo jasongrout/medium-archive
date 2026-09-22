@@ -122,12 +122,28 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
    CRF 32 and the output is lossy. With `-crf 0` (with or without
    `lossless=1`) it is bit-exact. The brief's AV1 command is wrong on
    this point, and so were the first pilot's AV1 numbers.
-2. **`tune-content=screen` changed nothing measurable.** On the pilot
-   gif's first 20 frames at `-cpu-used 4`, the outputs were
-   byte-identical with no tune, `tune-content=screen`,
-   `screen-detection-mode=2`, and `enable-palette=1`. libaom 3.14
-   appears to detect screen content by itself. This still needs
-   confirming at `-cpu-used 1` on the full sample.
+2. **`tune-content=screen` changes nothing.** libaom 3.14 turns its
+   screen-content tools on by itself. With and without the tune, the
+   full pilot gif came out byte-identical at `-cpu-used 1` (555,167
+   bytes), as did its first 20 frames at `-cpu-used 4`. The tools do
+   help: on raw gbrp input at `-cpu-used 1`, turning off palette mode
+   (`enable-palette=0`) gave +4%, turning off intra block copy
+   (`enable-intrabc=0`) +5%, and both +10%. `aom_ll_c1_noscreen` is
+   therefore redundant.
+7. **libaom lossless is not reliably exact.** With `-crf 0`, the pilot
+   gif at `-cpu-used 4` came back with 10 pixels off by 1 in one channel
+   (9 in frame 24, 1 in frame 40), and at `-cpu-used 1` with 1 pixel
+   (frame 40). dav1d and libaom's own decoder agree, so the fault is in
+   the encoder. It is not ffmpeg's bgra-to-gbrp conversion, and not
+   palette mode or intra block copy: encoding from raw gbrp at a
+   constant 10 fps, `-cpu-used 4` still differed in 42 bytes with those
+   tools on or off, while `-cpu-used 1` was exact in all five tool
+   combinations. The gif's variable frame timing changes the encoder's
+   decisions (528,236 bytes from constant-rate raw input against
+   555,167 from the gif), and some paths hit the fault. Any AV1
+   intermediate would need every file verified, with a fallback for
+   files that fail. `-cpu-used 4` is dropped; `aom_ll_c2` is being
+   tested.
 3. **gif2webp 1.6 has no `-lossless` flag.** Lossless is its default.
    `-m 6 -q 100` was bit-exact on the pilot gif.
 4. **cjxl 0.12 rejects gifs that dispose partial frames to background**
@@ -157,12 +173,14 @@ frames, 25.3 s, 821,378 bytes.
 | gifsicle `-O3` | 788,532 | 96% | 0.5 | 0.12 | yes |
 | libvpx-vp9 lossless `-cpu-used 0` | 1,231,696 | 150% | 35 | 0.25 | yes |
 | ffv1 (intra only) | 3,344,058 | 407% | 1.2 | 1.32 | yes |
-| libaom lossless | not yet valid (finding 1) | | | | |
+| libaom lossless `-crf 0 -cpu-used 1` | 555,167 | 68% | 92 | 0.21 | no: 1 pixel off by 1 (finding 7) |
+| libaom lossless `-crf 0 -cpu-used 4` | 607,292 | 74% | 21 | 0.23 | no: 10 pixels off by 1 (finding 7) |
 | libaom `-crf 4` | 236,770 | 29% | 103 | 0.18 | no, PSNR unknown |
 | libx264rgb `-crf 4` | 562,054 | 68% | 18 | 0.21 | no, and larger than its lossless encode |
 
-On this file, x264rgb lossless beats x265 and webp, contrary to the
-brief's expectation. One file is not a sample.
+On this file, x264rgb lossless beats x265, webp and AV1, contrary to
+the brief's expectation that AV1 would win. One file is not a sample:
+the large-file run below tests whether that holds where the bytes are.
 
 ## Open questions
 
@@ -182,6 +200,10 @@ brief's expectation. One file is not a sample.
 
 ## Resume here
 
+0. Record the large-file run (in progress when this was written):
+   `2e432df402c8/013`, 17.6 MB, 101 frames at 1836x970, with
+   `aom_ll_c1`, `aom_ll_c2`, `x265_ll`, `x264rgb_ll`, `webp_ll` and
+   `gifsicle_O3`.
 1. Fix `psnr()` in `bench.py`. For example, decode both files to rgb24
    frames and compare frames paired by the merged timeline, in Python.
 2. Get animated JPEG XL working: pass ffmpeg `libjxl_anim` an explicit
@@ -196,7 +218,7 @@ brief's expectation. One file is not a sample.
    delays); and the size quantiles `2e432df402c8/009` (p10),
    `8096b8b223d0/007` (p25), `388d05e03442/002` (p50),
    `03e6b78bacc0/003` (p75), `cda20dc15a21/005` (p90). Encoders:
-   `aom_ll_c1`, `aom_ll_c1_noscreen`, `aom_ll_c4`, `x264rgb_ll`,
+   `aom_ll_c1`, `aom_ll_c2`, `x264rgb_ll`,
    `x265_ll`, `webp_ll`, `webp_ll_min`, `jxl_ll_e9`, `gifsicle_O3`,
    `aom_crf4`, `x264rgb_crf4` (drop `vp9_ll` and `ffv1`, which lost
    badly). Expect hours for AV1 `-cpu-used 1` on the largest files.
