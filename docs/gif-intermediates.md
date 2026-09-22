@@ -130,20 +130,6 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
    (`enable-palette=0`) gave +4%, turning off intra block copy
    (`enable-intrabc=0`) +5%, and both +10%. `aom_ll_c1_noscreen` is
    therefore redundant.
-7. **libaom lossless is not reliably exact.** With `-crf 0`, the pilot
-   gif at `-cpu-used 4` came back with 10 pixels off by 1 in one channel
-   (9 in frame 24, 1 in frame 40), and at `-cpu-used 1` with 1 pixel
-   (frame 40). dav1d and libaom's own decoder agree, so the fault is in
-   the encoder. It is not ffmpeg's bgra-to-gbrp conversion, and not
-   palette mode or intra block copy: encoding from raw gbrp at a
-   constant 10 fps, `-cpu-used 4` still differed in 42 bytes with those
-   tools on or off, while `-cpu-used 1` was exact in all five tool
-   combinations. The gif's variable frame timing changes the encoder's
-   decisions (528,236 bytes from constant-rate raw input against
-   555,167 from the gif), and some paths hit the fault. Any AV1
-   intermediate would need every file verified, with a fallback for
-   files that fail. `-cpu-used 4` is dropped; `aom_ll_c2` is being
-   tested.
 3. **gif2webp 1.6 has no `-lossless` flag.** Lossless is its default.
    `-m 6 -q 100` was bit-exact on the pilot gif.
 4. **cjxl 0.12 rejects gifs that dispose partial frames to background**
@@ -159,6 +145,20 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
 6. **MKV preserved the gif's timing exactly**, last frame included
    (`max_ms_diff` 0), for every lossless video encode. The brief's
    `-fps_mode passthrough` + MKV approach works.
+7. **libaom lossless is not reliably exact.** With `-crf 0`, the pilot
+   gif at `-cpu-used 4` came back with 10 pixels off by 1 in one channel
+   (9 in frame 24, 1 in frame 40), and at `-cpu-used 1` with 1 pixel
+   (frame 40). dav1d and libaom's own decoder agree, so the fault is in
+   the encoder. It is not ffmpeg's bgra-to-gbrp conversion, and not
+   palette mode or intra block copy: encoding from raw gbrp at a
+   constant 10 fps, `-cpu-used 4` still differed in 42 bytes with those
+   tools on or off, while `-cpu-used 1` was exact in all five tool
+   combinations. The gif's variable frame timing changes the encoder's
+   decisions (528,236 bytes from constant-rate raw input against
+   555,167 from the gif), and some paths hit the fault. Any AV1
+   intermediate would need every file verified, with a fallback for
+   files that fail. `-cpu-used 4` is dropped; `aom_ll_c2` is being
+   tested.
 
 ### Pilot numbers (one file, not a conclusion)
 
