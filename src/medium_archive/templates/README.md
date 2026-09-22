@@ -300,6 +300,17 @@ These embed verbatim in both engines' pages, so they must carry no
   markup is emitted hidden and shown here, once the embed has loaded:
   a reader whose extension blocks it, or whose form has been deleted,
   is never left with a heading offering a form that will not arrive.
+- `plausible.html` is the queue stub of the analytics snippet
+  (site.toml `"plausible"`), the half of it that is the same for every
+  site. The other half is the script tag itself, whose address names
+  the site being counted, so it stays with each base template beside
+  the `@include`: both emit it last in the head and `async`, after
+  everything a page needs to render, and neither emits anything at all
+  where no script is configured -- unset, the pages carry no
+  third-party script. The stub is what makes `plausible(...)` callable
+  before that script lands: calls made meanwhile queue on
+  `plausible.q` and run when it does. It is Plausible's own published
+  snippet, kept verbatim so it can be compared with theirs.
 - `card.css` is the card-grid look, written as both the hugo theme's
   and the pelican theme's stylesheet.
 

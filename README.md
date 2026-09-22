@@ -294,6 +294,14 @@ with none stored, the system scheme decides. The theme provides:
   re-passed whenever the reader changes the theme or the font; the band
   stays hidden unless the embed loads, so a blocked script leaves no
   heading promising a form.
+- Optional privacy-friendly analytics, from `site.toml`'s
+  `"plausible"`: the address of the counting script
+  [Plausible](https://plausible.io) names the site's, loaded `async`
+  at the end of every page's head, with the queue stub that lets a
+  custom event be fired before it lands. Unset, the pages carry no
+  analytics and no third-party script at all. The preview workflow
+  drops the key before it builds, so three preview copies of the
+  archive are never counted against the real site.
 - Click-to-zoom body images. Clicking an image (or pressing Enter on
   it) whose original holds more detail than the article column shows
   opens it full size in a modal. This is the one Medium reading
@@ -671,6 +679,7 @@ documentation for the input, in one place.
 | `newsletter` | the signup band at the foot of every page, a `[newsletter]` table of `heading`, `hubspot_portal`, `hubspot_form` and `hubspot_region`. The heading and the first two ids are required (a partial entry is reported and the band left out); the region defaults to `"na1"` |
 | `redirects` | which mechanism carries old inbound links: `"stubs"` (a meta-refresh page at every old path -- any static host, and the only mechanism GitHub Pages has), `"file"` (a `_redirects` file at the site root -- Netlify, Cloudflare Pages and their imitators, a real HTTP 301, and nothing on GitHub Pages), `"both"` (the default, for a host not yet chosen) or `"none"` (redirects configured elsewhere). `redirects.csv` is written whichever it is. See [Redirects and feeds](#redirects-and-feeds) |
 | `noindex` | `true` keeps search engines off the whole deployment (a `noindex` robots tag on every page, a `robots.txt` that disallows all): for previews and staging, which would otherwise be indexed as a copy of the real site |
+| `plausible` | privacy-friendly analytics: the address of the counting script Plausible names this site's (`"https://plausible.io/js/pa-XXXX.js"`), loaded `async` at the end of every page's head together with the queue stub Plausible publishes beside it. Unset, the pages carry no analytics and no third-party script; the preview workflow drops the key, so a preview deployment counts nothing |
 | `twitter` | the publication's `@handle`, credited on links shared to X/Twitter (`twitter:site`), and its X profile in the `Organization`'s `sameAs` |
 | `profiles` | the publication's addresses elsewhere (a GitHub organization, a Mastodon account, ...), the `Organization`'s `sameAs` in every page's structured data |
 | `share_image` | archive-relative raster (1200×630 is the usual size) used as `og:image` on every page without a cover of its own |

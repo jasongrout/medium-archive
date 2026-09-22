@@ -1031,7 +1031,7 @@ def test_theme_picker_and_dark_scheme(project):
                  "link-init", "link-picker", "term-sort", "announcement",
                  "nav-current", "image-zoom", "code-copy",
                  "clip-motion", "heading-anchor", "feed-icon", "share-icons",
-                 "newsletter"):
+                 "newsletter", "plausible"):
         snippet = sites.template_text(f"shared/{name}.html")
         assert "{{" not in snippet and "{%" not in snippet
     # without an avatar or announcement the site's data leaves the key
@@ -1152,6 +1152,51 @@ def test_newsletter_band_absent_or_incomplete(project, capsys):
     build(hugo, project)
     err = capsys.readouterr().err
     assert "hubspot_portal" in err and "hubspot_form" in err
+
+
+def test_plausible_analytics(project):
+    # site.toml's "plausible" is the address of the counting script
+    # Plausible names this site's. Both themes emit it async and last
+    # in the head, with Plausible's own queue stub beside it, so an
+    # event fired before the script lands is queued rather than lost.
+    script = "https://plausible.io/js/pa-test-script.js"
+    cfg = read_site(project)
+    cfg["plausible"] = script
+    write_site(project, cfg)
+    hugo_site = build(hugo, project)
+    pelican_site = build(pelican, project)
+    assert f'plausible = "{script}"' in hugo_config(hugo_site)
+    assert pelican_data(pelican_site)["plausible"] == script
+    assert config_namespace(pelican_site)["PLAUSIBLE"] == script
+    # the address is the site's own, so the tag carrying it stays with
+    # each engine; the stub beside it is the shared snippet, spliced in
+    for base, src in ((hugo_site / "layouts/baseof.html", "{{ . }}"),
+                      (pelican_site / "theme/templates/base.html",
+                       "{{ PLAUSIBLE }}")):
+        text = base.read_text()
+        assert f'<script async src="{src}"></script>' in text, base
+        assert "(plausible.q=plausible.q||[]).push(arguments)" in text, base
+        assert "plausible.init()" in text, base
+        # last in the head: nothing a page needs to render waits on it
+        assert text.index("plausible.init()") < text.index("</head>"), base
+        assert (text.index("css/style.css")
+                < text.index('<script async src="')), base
+
+
+def test_plausible_analytics_absent(project):
+    # unset -- the default -- and the pages carry no analytics and no
+    # third-party script at all: the key is written commented out,
+    # beside an example of it set, and both themes guard the tag on it
+    hugo_site = build(hugo, project)
+    pelican_site = build(pelican, project)
+    assert "plausible" not in hugo_params(hugo_site)
+    assert "plausible" not in pelican_data(pelican_site)
+    assert config_namespace(pelican_site)["PLAUSIBLE"] is None
+    assert "# plausible = " in (pelican_site / "site.toml").read_text()
+    assert ('{{ with site.Params.plausible }}'
+            in (hugo_site / "layouts/baseof.html").read_text())
+    assert ('{% if PLAUSIBLE %}'
+            in (pelican_site / "theme/templates/base.html").read_text())
 
 
 def test_footer_line(project):

@@ -129,6 +129,11 @@ SITE_KEYS = (
      "redirects.csv, the map both are rendered from, is written either "
      "way.",
      "both"),
+    ("plausible",
+     "privacy-friendly analytics: the address of the counting script "
+     "Plausible names this site's, loaded on every page. Unset, the "
+     "pages carry no analytics and no third-party script at all.",
+     "https://plausible.io/js/pa-XXXXXXXXXXXXXXXXXXXXX.js"),
     ("logo_link",
      "where the masthead points when the mark on it stands for "
      "something larger than the blog -- the address, and the name the "

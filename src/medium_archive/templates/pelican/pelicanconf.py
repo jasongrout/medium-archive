@@ -65,6 +65,7 @@ REDIRECT_FILE = _REDIRECTS in ("both", "file")
 TWITTER = _SITE.get("twitter")
 PROFILES = _SITE.get("profiles") or []
 NEWSLETTER = _SITE.get("newsletter")
+PLAUSIBLE = _SITE.get("plausible")
 SHARE_IMAGE = _SITE.get("share_image")
 SHARE_IMAGE_SIZE = _SITE.get("share_image_size")
 COVER_SIZE = _SITE.get("cover_size")

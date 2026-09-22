@@ -90,6 +90,15 @@ redirects = "stubs"
 # tag on every page, and a robots.txt that disallows all
 # noindex = true
 
+# privacy-friendly analytics: the address of the counting script
+# Plausible names this site's, loaded on every page of the hugo and
+# pelican sites (the myst site is rendered by mystmd's own theme,
+# which takes no script of ours). Unset, the pages carry no analytics
+# and no third-party script at all. The preview workflow drops the key
+# before it builds, so the three preview copies of the archive are not
+# counted against the real site.
+plausible = "https://plausible.io/js/pa-B75UO5--FNXYQSG7GBWkf.js"
+
 # the signup band at the foot of every page: its heading, and the ids
 # of the HubSpot form it embeds, named the way HubSpot names them.
 # hubspot_region is optional -- "na1", HubSpot's own default, without
