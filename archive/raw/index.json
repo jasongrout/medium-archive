@@ -3610,5 +3610,15 @@
     "fetched_at": "2026-09-11T09:48:52+00:00",
     "images": 2,
     "in_feed": true
+  },
+  "https://blog.jupyter.org/notebooks-on-demand-nod-a-jupyterlab-extension-for-a-notebook-anywhere-bf1605913127": {
+    "medium_id": "bf1605913127",
+    "title": "Notebooks-On-Demand (Nod): A JupyterLab Extension for a Notebook Anywhere",
+    "published": "2026-09-22T00:37:12Z",
+    "sitemap_date": "2026-09-22T00:37:13+00:00",
+    "found_via": "feed",
+    "fetched_at": "2026-09-22T11:52:57+00:00",
+    "images": 6,
+    "in_feed": true
   }
 }
