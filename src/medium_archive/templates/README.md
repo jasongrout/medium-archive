@@ -44,7 +44,7 @@ These embed verbatim in both engines' pages, so they must carry no
   default family first. A stored choice pins `data-font` on `<html>`;
   no attribute means Source Serif, the default (see `card.css`).
 - `font-picker.html` is the body-font switch: a `<select>`, not a
-  button like the theme picker, since it offers nine choices, too many
+  button like the theme picker, since it offers ten choices, too many
   to cycle one click at a time. It floats fixed at the page's
   bottom-right corner instead of sitting beside the theme button in
   the header (`card.css`), so it stays reachable once a long article
@@ -61,7 +61,8 @@ These embed verbatim in both engines' pages, so they must carry no
   Helvetica stack the site launched with, the reader's own platform
   UI font, Inter, Atkinson Hyperlegible Next as a standalone sans
   picked for its own look, Source Sans and the IBM Plex
-  superfamily as both a sans and a serif face, and Merriweather, a
+  superfamily as both a sans and a serif face, Literata, a
+  screen-reading serif that comes on its own, and Merriweather, a
   serif drawn for screen reading with the sans drawn to sit beside
   it, Merriweather Sans, over its headings. Headings and chrome
   stay sans under every choice: a superfamily's sans option ("Source
@@ -71,12 +72,14 @@ These embed verbatim in both engines' pages, so they must carry no
   sans face, as Medium did, and points only the article's running
   text at the serif face instead, with the superfamily's own mono
   still under its code. "Merriweather" is that same serif shape with
-  its own pairing over the headings, and no mono of its own. A
-  choice's code follows its own mono face wherever it has one (the
-  superfamilies', Atkinson Hyperlegible Mono); System UI's is the
-  platform's own ui-monospace stack, and a choice with no mono face of
-  its own (Helvetica, Inter, Merriweather) falls back to that same
-  platform stack.
+  its own pairing over the headings, and no mono of its own.
+  "Literata" has neither sibling, so it moves the article's face and
+  nothing else, leaving the default's Source Sans over the chrome and
+  Source Code Pro under the code. A choice's code otherwise follows
+  its own mono face wherever it has one (the superfamilies', Atkinson
+  Hyperlegible Mono); System UI's is the platform's own ui-monospace
+  stack, and a choice with no mono face of its own (Helvetica, Inter,
+  Merriweather) falls back to that same platform stack.
   The list is ordered by what the choice does to the article rather
   than by name: the faces that set its running text in a serif come
   first, the default "Source Serif" at the top, then the ones that
@@ -84,7 +87,7 @@ These embed verbatim in both engines' pages, so they must carry no
   for -- one serif against another -- runs down an unbroken run of
   neighbours.
   The article's reading size belongs to `.post` rather than to any one
-  choice, so the nine differ in family alone -- and `font-size-adjust`
+  choice, so the ten differ in family alone -- and `font-size-adjust`
   makes that literal. `font-size` sets the em box, not the letters, and
   the candidates fill it very differently (Merriweather's lowercase is
   0.555em against Source Serif's 0.475), so at one size they read as
@@ -96,7 +99,7 @@ These embed verbatim in both engines' pages, so they must carry no
   with the article's sans pieces opting back to `.486`. Only the used
   font-size moves; the computed one does not, so `line-height` and
   every `em`/`rem` length stay as they were -- leading holds at 32px in
-  the column under all nine while the letters hold at one x-height.
+  the column under all ten while the letters hold at one x-height.
   Measured in Chromium: article x-height 9.50px under every choice
   (9.53 for Merriweather, 9.63 for Inter, whose optical-size axes shift
   the x-height as the browser rescales them), against 9.50-11.11px

@@ -47,8 +47,8 @@
    launched with, the reader's own platform UI font, Inter, Atkinson
    Hyperlegible Next as a standalone sans picked for its own look,
    Source Sans and the IBM Plex superfamily, offered as both a sans
-   and a serif face, and Merriweather, a serif offered with its own
-   sans over the headings.
+   and a serif face, Literata, a serif offered on its own, and
+   Merriweather, a serif offered with its own sans over the headings.
 
    --body-font is what the page is set in and --mono what its code
    is, so a choice swaps both by redefining them; the rules downstream
@@ -63,7 +63,10 @@
    under: the superfamilies' own mono, Atkinson Hyperlegible Mono,
    or, for System UI and any choice with no mono face of its own
    (Helvetica, Inter, Merriweather), the platform's default
-   --system-mono stack. */
+   --system-mono stack. Literata is the one exception: with neither
+   sibling it leaves both roles on the default's Source pair rather
+   than falling back to the platform, so the choice moves the
+   article's face alone. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
                      Helvetica, Arial, sans-serif;
@@ -113,6 +116,17 @@
                           "Times New Roman", Times, serif;
         --ibm-plex-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular,
                          Menlo, Consolas, monospace;
+        /* Literata is TypeTogether's screen-reading serif, drawn
+           for Google Play Books and given away with it: a sturdy,
+           slightly slabbed text face cut as a variable font over a
+           weight axis and the same kind of optical-size axis Source
+           Serif carries (opsz 7-72), which the browser drives itself.
+           It comes alone -- no sans sibling and no mono -- so it is
+           the one serif choice that changes the article's face and
+           nothing else, leaving Source Sans over the chrome and
+           Source Code Pro under the code. */
+        --literata: "Literata", Georgia, Cambria,
+                    "Times New Roman", Times, serif;
         /* Merriweather and Merriweather Sans are a serif drawn for
            screen reading and the sans drawn to sit beside it -- a
            pair rather than one family's two faces, so they are offered
@@ -143,6 +157,11 @@
                                    --mono: var(--ibm-plex-mono); }
 :root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
                                     --mono: var(--ibm-plex-mono); }
+/* Literata's roles are the default's, restated rather than left to
+   the bare :root above so the choice reads like the rest: only the
+   article moves, further down. */
+:root[data-font="literata"] { --body-font: var(--source-sans);
+                              --mono: var(--source-code); }
 :root[data-font="merriweather"] { --body-font: var(--merriweather-sans);
                                   --mono: var(--system-mono); }
 /* Every choice is set at the same apparent size, so the picker
@@ -486,7 +505,7 @@ a:hover { text-decoration-line: underline; }
    The x-height the column is set at sits here for the same reason:
    .475 is Source Serif 4's own, so the article under the default is
    untouched and every other choice is scaled to read at that same
-   size. One number serves all nine, serif choices and sans alike --
+   size. One number serves all ten, serif choices and sans alike --
    splitting it would put the article's apparent size back where the
    normalization took it from. The pieces that opt out to --body-font
    take the chrome's reference instead, below. */
@@ -703,12 +722,13 @@ a:hover { text-decoration-line: underline; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
-/* The three serif choices are the only ones that set the article in
+/* The four serif choices are the only ones that set the article in
    something other than --body-font, so they are the only ones with
    rules here. Only the running text is serif -- Medium keeps its
    headings, byline, captions and chrome in a sans -- so those pieces
    opt back out to --body-font, which under each choice is the sans
-   drawn for that serif. Medium's -0.004rem tracking is not
+   drawn for that serif, or, for Literata, which has none, the
+   default's Source Sans. Medium's -0.004rem tracking is not
    reproduced: it works out to 0.064px per character, which no reader
    can see, and leaving it off keeps every choice on the browser's
    default tracking. Source Serif is the default -- no data-font
@@ -727,6 +747,12 @@ a:hover { text-decoration-line: underline; }
 :root[data-font="ibm-plex-serif"] .post-meta,
 :root[data-font="ibm-plex-serif"] .post-share,
 :root[data-font="ibm-plex-serif"] .post figcaption { font-family: var(--body-font); }
+:root[data-font="literata"] .post { font-family: var(--literata); }
+:root[data-font="literata"] .post :is(h1, h2, h3, h4, h5, h6),
+:root[data-font="literata"] .post-subtitle,
+:root[data-font="literata"] .post-meta,
+:root[data-font="literata"] .post-share,
+:root[data-font="literata"] .post figcaption { font-family: var(--body-font); }
 :root[data-font="merriweather"] .post { font-family: var(--merriweather); }
 :root[data-font="merriweather"] .post :is(h1, h2, h3, h4, h5, h6),
 :root[data-font="merriweather"] .post-subtitle,
@@ -738,7 +764,7 @@ a:hover { text-decoration-line: underline; }
    the article's face, so .486 is the reference that leaves them where
    the default draws them. This one needs no per-choice rules -- a
    reference belongs to the role, and the role is the same under all
-   nine -- so it states the selectors once. */
+   ten -- so it states the selectors once. */
 .post :is(h1, h2, h3, h4, h5, h6, code, pre, kbd, samp),
 .post-subtitle, .post-meta, .post-share,
 .post figcaption { font-size-adjust: .486; }
