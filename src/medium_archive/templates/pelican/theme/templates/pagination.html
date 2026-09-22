@@ -1,6 +1,5 @@
-{# Hugo's built-in pager, recreated: «« « with a five-number window » »».
-   Page 1 of a direct template is "index.html"; serve it as its directory,
-   the way Hugo links the first page. #}
+{# «« « five-page window » »», matching Hugo's built-in pager. Links
+   drop a trailing "index.html". #}
 {% macro page_url(number) -%}
 {%- set u = articles_paginator.page(number).url -%}
 {{ SITEURL }}/{{ u[:-10] if u.endswith("index.html") else u }}

@@ -1,26 +1,13 @@
-{{- /* One body image (ctx: page, src, alt): the bundle resource with a
-       responsive variant ladder when it is a photograph, the raw path
-       otherwise. Shared by the image render hook and the figure
-       shortcode, so a captioned and a bare image carry the same markup.
-       Only photographs get the ladder: png and webp here are line art
-       the placer kept whole (see ImagePlacer), whose 9 px text does not
-       survive a 736 px variant, and an animated gif (one the placer
-       could not place as video) loses its frames through the image
-       pipeline. The post's first image (front
-       matter first_image, from the exporter) is the one most likely
-       on screen at load, so it is fetched eagerly and first, as
-       WordPress treats the first content image; every other one is
-       lazy.
-
-       An .mp4 here is what an animated gif was placed as (see
-       ImagePlacer): it renders as a clip the reader controls rather
-       than as a picture. The alt text becomes the aria-label, since
-       <video> has no alt attribute and the text alternative would
-       otherwise be dropped in the move from <img>; the poster the
-       placer wrote beside the clip is what the page shows until it is
-       played, and what gives the element its width and height, so the
-       layout cannot shift. Nothing is fetched until the reader (or
-       shared/clip-motion.html, where motion is welcome) asks for it. */ -}}
+{{- /* One body image (ctx: page, src, alt), shared by the image render
+       hook and the figure shortcode. Bundle images other than gif, png,
+       webp and svg get a resized webp srcset; png and webp from
+       ImagePlacer are mostly line art whose small text resizing would
+       blur, and resizing a gif drops its animation. Front matter
+       first_image loads with high priority, the rest lazily.
+       An .mp4 is an animated gif placed as a clip: the alt text becomes
+       aria-label (<video> has no alt), and the <name>-poster.webp beside
+       it supplies width and height so the layout does not shift.
+       shared/clip-motion.html handles autoplay. */ -}}
 {{- $img := .page.Resources.Get .src -}}
 {{- $alt := .alt -}}
 {{- $loading := cond (eq .src .page.Params.first_image) ` fetchpriority="high"` ` loading="lazy"` -}}

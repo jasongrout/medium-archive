@@ -1,9 +1,7 @@
-{{- /* A captioned body image, as the <figure>/<figcaption> Medium
-       served: the image through the same partial as the image render
-       hook (so it carries the same srcset ladder and dimensions), the
-       caption rendered inline -- links and emphasis, no <p> wrapper.
-       The caption arrives as inner content, which Hugo's built-in
-       figure shortcode would silently drop. */ -}}
+{{- /* Captioned body image: the image through post-image.html, like
+       the render hook, and the inner content as an inline caption (no
+       <p>). Replaces Hugo's built-in figure, which ignores inner
+       content. */ -}}
 <figure>
 {{ with .Get "link" }}<a href="{{ . }}">{{ end }}{{- partial "post-image.html" (dict "page" .Page "src" (.Get "src") "alt" (.Get "alt" | default "")) -}}{{ with .Get "link" }}</a>{{ end }}
 {{- with trim .Inner "\n" }}

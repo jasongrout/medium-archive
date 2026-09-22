@@ -1,11 +1,8 @@
 {{ define "main" }}
 <h1 class="page-title">Search</h1>
-{{- /* Pagefind's Component UI (its recommended integration since 1.5),
-       composed as input + summary + in-page results rather than the
-       searchbox dropdown, so results stay on the page -- scrollable and
-       findable with the browser's own search. The elements default to a
-       host-root /pagefind/ bundle, so under a subpath baseURL both the
-       bundle and the result links must be pointed at the deployment. */}}
+{{- /* Pagefind Component UI with in-page results. The elements assume a
+       /pagefind/ bundle at the host root, so bundle-path and base-url
+       point at this deployment for a subpath baseURL. */}}
 <link rel="stylesheet" href="{{ "pagefind/pagefind-component-ui.css" | relURL }}">
 <script type="module" src="{{ "pagefind/pagefind-component-ui.js" | relURL }}"></script>
 <div id="search">
@@ -35,8 +32,7 @@ window.addEventListener("load", function () {
     else url.searchParams.delete("q");
     history.replaceState(null, "", url);
   });
-  // the component renders its input after document load, past the
-  // window native autofocus can act in -- focus it ourselves
+  // the input is rendered after load, too late for native autofocus
   input.focus();
 });
 </script>

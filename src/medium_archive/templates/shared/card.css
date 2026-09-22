@@ -1,34 +1,21 @@
-/* Light is the default palette. The header picker pins an explicit
-   choice as data-theme on <html> (persisted in localStorage); with no
-   attribute, prefers-color-scheme decides -- the "system" setting. */
+/* Light palette by default. The theme picker pins data-theme on <html>;
+   with no attribute, prefers-color-scheme decides. */
 :root { --accent: #f37626; --ink: #1c1c1c;
-        /* text grays clear WCAG AAA (7:1) on both the page background
-           and the white cards */
+        /* text grays clear WCAG AAA (7:1) on both --bg and --card */
         --soft: #444444; --muted: #525252; --bg: #f4f4f4; --card: #ffffff;
         --line: #e2e2e2; --code-bg: #f6f6f6; --mark: #fbd6bc;
         --error-bg: #fef2f2; --error-line: #fecaca; --error-ink: #dc2626;
         --error-soft: #b91c1c;
-        /* The link colour the picker offers (see link-picker.html).
-           Every choice states a light value and a dark one; the palette
-           in force picks between them, so a choice itself carries no
-           scheme rules. currentColor is what the default and the "ink"
-           choice share, and the whole of the latter: the word keeps the
-           ink it inherits and the rule follows in that same ink, the
-           plainest link there is; the default ("ink-accent") is that
-           link with an accent rule on hover and nothing else. The
-           accent colours no choice's text -- at 2.83:1 on the white
-           card and 2.58:1 on the page it sits under the 3:1 a non-text
-           indicator wants, so it marks headings and chrome instead. */
+        /* Link choice (see link-picker.html): each choice sets a light
+           (-l) and dark (-d) value; the palette in force picks one.
+           The accent (2.83:1 on --card) is never link text. */
         --link-l: currentColor; --link-rule-l: currentColor;
         --link-d: currentColor; --link-rule-d: currentColor;
         --link: var(--link-l); --link-rule: var(--link-rule-l);
-        /* syntax colours for highlighted code: Primer's prettylights
-           light set (see the token rules) */
+        /* syntax colours: Primer's prettylights light set */
         --syn-keyword: #cf222e; --syn-string: #0a3069; --syn-comment: #6e7781;
         --syn-number: #0550ae; --syn-name: #6639ba; --syn-builtin: #953800;
-        /* which of the two masthead logos is the one on show (see
-           .site-logo): a palette value like the colours, so the pair
-           needs no scheme rule of its own */
+        /* which masthead logo shows (see .site-logo) */
         --logo-light: block; --logo-dark: none;
         color-scheme: light; }
 :root[data-theme="dark"] {
@@ -40,72 +27,23 @@
   }
 }
 * { box-sizing: border-box; }
-/* The typography choices the header's font picker offers (pinned as
-   data-font on <html>, persisted like the theme choice): Source Serif,
-   the superfamily Medium set the publication in and the default here
-   with no attribute pinned, the jupyter.org Helvetica stack the site
-   launched with, the reader's own platform UI font, Inter, Atkinson
-   Hyperlegible Next as a standalone sans picked for its own look,
-   Source Sans and the IBM Plex superfamily, offered as both a sans
-   and a serif face, Literata, a serif offered on its own, and
-   Merriweather, a serif offered with its own sans over the headings.
-
-   --body-font is what the page is set in and --mono what its code
-   is, so a choice swaps both by redefining them; the rules downstream
-   name the roles, never the families. Headings and chrome stay on
-   --body-font under every choice, so they read sans regardless: a
-   superfamily's sans choice (Source Sans, IBM Plex Sans) points
-   --body-font at its own sans face, so the whole page, article
-   included, runs in it; its serif sibling (the default Source Serif,
-   IBM Plex Serif) leaves --body-font on that same sans face and
-   points only the article's running text (further down) at the serif
-   instead. --mono follows to whichever face the choice ships one
-   under: the superfamilies' own mono, Atkinson Hyperlegible Mono,
-   or, for System UI and any choice with no mono face of its own
-   (Helvetica, Inter, Merriweather), the platform's default
-   --system-mono stack. Literata is the one exception: with neither
-   sibling it leaves both roles on the default's Source pair rather
-   than falling back to the platform, so the choice moves the
-   article's face alone. */
+/* Font choices (see font-picker.html), pinned as data-font on <html>;
+   no attribute is the Source Serif default. Each choice sets --body-font
+   (page, headings, chrome) and --mono (code). Serif choices keep a sans
+   --body-font and set only .post in the serif, further down. */
 :root { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
         --system-ui: system-ui, -apple-system, "Segoe UI", Roboto,
                      Helvetica, Arial, sans-serif;
         --system-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
                        monospace;
         --inter: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        /* Source Sans 3 and Source Serif 4 are the current generation
-           of Adobe's superfamily: the same text designs, redrawn as
-           variable faces, extending and replacing Source Sans Pro and
-           Source Serif Pro. Each keeps its Pro predecessor behind it
-           in the stack for a reader who has the older family installed
-           locally but not the new one. The mono is not renamed -- Source
-           Code Pro is itself the current face. */
+        /* each current face keeps its older name as a local fallback */
         --source-sans: "Source Sans 3", "Source Sans Pro",
                        "Helvetica Neue", Helvetica, Arial, sans-serif;
-        /* Source Serif 4 carries an optical-size axis besides (opsz
-           8-60), one the browser drives itself: font-optical-sizing is
-           auto by default, so serif text is drawn for the size it is
-           set at -- wider, more openly spaced and a touch sturdier as
-           it shrinks, narrower and more tightly set as it grows. The
-           article's running text at 1.25rem lands on the axis default
-           of 20, so it gets what a static face would have given it;
-           the axis earns its place on the sizes around it (a table's
-           .9em) and on any reading size the column might take later.
-           Source Sans 3 has no counterpart axis to match it with:
-           Adobe drew optical masters for the serif only. */
         --source-serif: "Source Serif 4", "Source Serif Pro", Georgia,
                         Cambria, "Times New Roman", Times, serif;
         --source-code: "Source Code Pro", ui-monospace, SFMono-Regular,
                        Menlo, Consolas, monospace;
-        /* Atkinson Hyperlegible Next is the Braille Institute's
-           redrawing of the original: the same legibility-first design
-           -- letterforms pulled apart so the pairs a low-vision reader
-           confuses (I l 1, O 0, b d) cannot be mistaken for each other
-           -- now cut as a variable face over a 200-800 weight axis
-           rather than the original's static regular and bold, with a
-           matching mono on the same axis. The original stays behind
-           it for a reader who has that installed locally but not the
-           new one, the way Source Sans keeps its Pro predecessor. */
         --atkinson: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible",
                     "Helvetica Neue", Helvetica, Arial, sans-serif;
         --atkinson-mono: "Atkinson Hyperlegible Mono", ui-monospace,
@@ -116,33 +54,13 @@
                           "Times New Roman", Times, serif;
         --ibm-plex-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular,
                          Menlo, Consolas, monospace;
-        /* Literata is TypeTogether's screen-reading serif, drawn
-           for Google Play Books and given away with it: a sturdy,
-           slightly slabbed text face cut as a variable font over a
-           weight axis and the same kind of optical-size axis Source
-           Serif carries (opsz 7-72), which the browser drives itself.
-           It comes alone -- no sans sibling and no mono -- so it is
-           the one serif choice that changes the article's face and
-           nothing else, leaving Source Sans over the chrome and
-           Source Code Pro under the code. */
         --literata: "Literata", Georgia, Cambria,
                     "Times New Roman", Times, serif;
-        /* Merriweather and Merriweather Sans are a serif drawn for
-           screen reading and the sans drawn to sit beside it -- a
-           pair rather than one family's two faces, so they are offered
-           as the one choice the pairing was for: the serif under the
-           article, its sans over the headings and chrome. Both are
-           variable now, and the serif carries the same optical-size
-           axis Source Serif does (opsz 18-144), which the browser
-           drives itself; its width axis is left at the default, so
-           only the weight is asked for besides. Neither face has a
-           mono sibling, so code takes the platform's stack. */
         --merriweather: "Merriweather", Georgia, Cambria,
                         "Times New Roman", Times, serif;
         --merriweather-sans: "Merriweather Sans", "Helvetica Neue",
                              Helvetica, Arial, sans-serif;
-        /* the default: Source Serif's own sans/mono pair, with the
-           serif face set on .post alone, further down */
+        /* the default (Source Serif) */
         --body-font: var(--source-sans);
         --mono: var(--source-code); }
 :root[data-font="sans"] { --body-font: var(--sans); --mono: var(--system-mono); }
@@ -157,169 +75,57 @@
                                    --mono: var(--ibm-plex-mono); }
 :root[data-font="ibm-plex-serif"] { --body-font: var(--ibm-plex-sans);
                                     --mono: var(--ibm-plex-mono); }
-/* Literata's roles are the default's, restated rather than left to
-   the bare :root above so the choice reads like the rest: only the
-   article moves, further down. */
 :root[data-font="literata"] { --body-font: var(--source-sans);
                               --mono: var(--source-code); }
 :root[data-font="merriweather"] { --body-font: var(--merriweather-sans);
                                   --mono: var(--system-mono); }
-/* Every choice is set at the same apparent size, so the picker
-   compares faces rather than sizes. font-size sets the em box, not the
-   letters, and the candidates fill that box very differently: at one
-   font-size Merriweather's lowercase is 0.555em tall against Source
-   Serif's 0.475, so it reads a size and a half larger with no size
-   having changed. font-size-adjust names the x-height the text is to
-   be set at as a fraction of font-size and the browser scales the face
-   to hit it; apparent size follows the x-height, running prose being
-   nearly all lowercase.
-
-   The default is the reference, role by role, so it is the one choice
-   nothing moves under: .486 is Source Sans 3's own x-height and Source
-   Code Pro's alike (the pair is drawn to one), so the chrome and the
-   code of the default render exactly as they did, and the .475 on
-   .post further down is Source Serif 4's. What shifts is only the used
-   font-size a face is drawn at -- the computed font-size stays put, so
-   line-height, every em length and every rem length are the values
-   they always were. Leading therefore holds at 32px in the column
-   under every choice while the letters hold at one x-height, and it is
-   that pairing which decides a column's texture: resizing each face by
-   hand would have moved the two together and settled nothing. Line
-   length still moves with a face's set width, which is a proportion of
-   the face rather than its size.
-
-   It is stated here rather than on :root because the font shorthand on
-   the next line would reset it: font-size-adjust is one of the
-   longhands font sets, so a bare `font:` puts it back to none for
-   everything below. Declaring it after the shorthand, in the same
-   rule, is what makes it stick.
-
-   A face with an optical-size axis lands a hair off the target --
-   measured in Chromium, Merriweather at 9.53px against the 9.50 asked
-   for -- because the axis moves the x-height as the size the browser
-   picked changes, and the browser does not iterate. Where the property
-   is unsupported it is ignored and each face is drawn at its own
-   x-height, as before. */
+/* font-size-adjust sets every choice at one x-height so the faces read
+   at the same size: .486 is Source Sans 3's and Source Code Pro's own,
+   so the default is unchanged (.post uses Source Serif 4's .475).
+   It must come after the `font` shorthand, which resets it to none. */
 body { margin: 0; background: var(--bg); color: var(--ink);
        font: 1rem/1.65 var(--body-font); font-size-adjust: .486; }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
-/* A link is a word and its rule, both in whichever colour the choice
-   in force names; the rule keeps the browser's own weight and position
-   unless the choice tunes them. */
 a { color: var(--link); text-decoration-line: underline;
     text-decoration-color: var(--link-rule);
  }
-/* Links that are components rather than words -- the site title and
-   nav, card covers and titles, tag pills, chips, page numbers, the
-   archive list -- carry no rule at rest; hovering shows the same rule.
-   They keep the ink they inherit under every link choice too: a card
-   title or a nav item is a piece of the page, not a link among words. */
+/* Component links: no underline at rest, inherited ink under every
+   link choice. */
 .site-title, .site-header nav a, .card-cover, .card-title a,
 .tag, .share-link, .chip, ul.pagination .page-link,
 .archives a { text-decoration-line: none; color: currentColor; }
 a:hover { text-decoration-line: underline; }
-/* "ink-accent" is the default, and it is the plain ink link with one
-   thing added: the rule turns the accent under the pointer. At rest it
-   is the ink link above, letter for letter and rule for rule, so the
-   page reads the same; the orange appears only on hover, where it
-   names the link the pointer is on rather than marking links in the
-   running text. The accent's 2.83:1 rules it out as link text but not
-   as a rule under one: a hover rule carries no letterforms and no
-   meaning of its own -- the link is already a link, underlined, in ink
-   that clears AAA -- so it is a non-text indicator on top of one that
-   stands without it, and the same orange the rest of the chrome hovers
-   in. It holds in both palettes: --accent is one value across the two,
-   and the rule's position stays the browser's. Being the default, it is
-   the state with no attribute; "ink" is the choice that drops the hover
-   accent, and needs no rules of its own to do it.
-
-   The hovered rule's weight is the heavier of 2px and the rule the
-   link already carries (--rule-w): 2px is a floor, so the hairline
-   under a byline or a page number thickens into an indicator, and it
-   is only a floor, so a rule already heavier than that is not thinned
-   on hover. The rest thickness here is the browser's own, which no
-   CSS value can name inside a max(), so --rule-w states what the
-   browser draws: Chromium rounds em/10 down to whole pixels (1px up to
-   19px text, 2px from 20px, 3px from 30px -- measured), and the
-   engines that take the font's own underline metric draw thinner than
-   that, so .1em is at or above what any of them puts under a word at
-   rest. Being the ceiling of a rounded-down value, it can land a pixel
-   over the rest rule on large text -- measured in Chromium, a link
-   goes 1px -> 2px at 13px text, 2px -> 2px at 20px and 3px -> 4px at
-   38px -- which is the direction a hover should err in anyway. A
-   choice that states a rest thickness of its own restates it in
-   --rule-w, and its hover follows that instead. */
+/* The default link choice ("ink-accent") is the state with no data-link:
+   the ink link with an accent underline on hover. The accent is fine
+   for a hover rule, a non-text indicator, though not for link text.
+   --rule-w approximates the browser's rest underline (Chromium: 1px per
+   10px of text, rounded down) so the hover rule is at least 2px and
+   never thinner than the rest rule. */
 :root { --rule-w: .1em; }
 :root:not([data-link]) a:hover { text-decoration-color: var(--accent);
                                  text-decoration-thickness: max(2px, var(--rule-w)); }
-/* The choices that colour the word as well as its rule. Both are the
-   accent's complement in OKLCH -- its hue is 48deg, so 228deg -- and a
-   step round towards a conventional link blue: "petrol-aaa" at the 7:1
-   the body grays hold, "link-blue" at 5.5:1 on the card, 3.1:1 against the
-   body ink where the AAA one is 2.4:1 -- the separation that decides
-   whether a link reads as a link or as dark text. The dark values sit
-   at ~7:1 on the dark cards. Both state the rule's weight, where the
-   default leaves it to the browser -- 1px at every size, so the rule
-   stays a hairline under a heading-sized link as well as under body
-   text -- and leave its position alone: the browser's own offset is
-   what every other choice draws at, and the blues read against them
-   at the same height. */
+/* Coloured link choices: "petrol-aaa" is 7:1 on --card, "link-blue"
+   5.5:1 (3.1:1 against --ink, so it reads as a link); both dark values
+   ~7:1. Each pins a 1px rule at every size. */
 :root[data-link="petrol-aaa"] { --link-l: #05607e; --link-d: #09b6ea;
                                 --rule-w: 1px; }
 :root[data-link="link-blue"] { --link-l: #046bb9; --link-d: #59adfe;
                                --rule-w: 1px; }
 :root[data-link="petrol-aaa"] a, :root[data-link="link-blue"] a {
                                text-decoration-thickness: var(--rule-w); }
-/* Both take the default's hover as well: the rule turns the accent
-   under the pointer, at the same heavier-of-2px-and-the-rest-rule
-   weight, so a link says which one the pointer is on the same way
-   under every choice that draws a rule of its own. Their rest rule is
-   1px at every size, so that maximum is 2px throughout. The word keeps
-   its blue and the rule keeps the browser's position, so the hover
-   moves nothing and recolours nothing that carries letterforms -- the
-   contrast each choice was picked for is the text's, at rest and
-   hovered alike. */
+/* same accent hover rule as the default */
 :root[data-link="petrol-aaa"] a:hover, :root[data-link="link-blue"] a:hover {
                                text-decoration-color: var(--accent);
                                text-decoration-thickness: max(2px, var(--rule-w)); }
-/* "browser" is the control the rest are read against: a link drawn the
-   way the browser draws one with no stylesheet at all, in LinkText,
-   the reader's own platform link colour in the scheme the palette has
-   declared. Visited links are left alone: VisitedText would land on
-   card titles and nav items too, which the reset above cannot
-   outrank. */
+/* "browser": the platform link colour. VisitedText is not used: it
+   would also hit card titles and nav items, which the reset above
+   cannot outrank. */
 :root[data-link="browser"] { --link-l: LinkText; --link-d: LinkText; }
 
-/* jupyter.org's .global-banner, box for box, so a shared announcement
-   file looks the same here as there: white on the accent with a soft
-   shadow, and 43.8px tall with a one-line announcement in it.
-
-   The one thing not taken from that site is the family. jupyter.org
-   sets its banner in a stack of its own, led by "Myriad Pro", and a
-   banner in that face sat in the page as a second sans beside the
-   heading and chrome one -- visibly a different typeface to any
-   reader who has Myriad Pro installed, and to every reader a box
-   whose family is pinned while the rest of the page follows the font
-   choice in force. So the banner takes --body-font, the same face the
-   headings, byline, captions and chrome are set in under every choice,
-   and moves with the picker as they do. Only the family changes: the
-   box keeps jupyter.org's own weight, size and leading, which is what
-   its height is measured from.
-
-   That height is the sum of two different measures, which is why the
-   banner is drawn in two elements like jupyter.org's. Its box sits at
-   the 14px/20px its body sets -- every em the box states is a 14px
-   one, so .6em of padding is 8.4px and the 1.4em dismiss is 19.6px --
-   while the announcement inside it is the 18px/27px that site sets
-   running text in (there, a <p> in .global-banner-content picking up
-   the site's own paragraph rule). .announcement-content carries the
-   18px here instead of a <p> rule, so an announcement that is bare
-   text rather than markup reads at that same size; the script wraps
-   whatever the source gives in it. The banner restates the chrome's
-   x-height after its shorthand for the reason body does: the
-   shorthand is one of the two places a `font:` would otherwise hand
-   the text back to whatever x-height the chosen face happens to
-   have. */
+/* Matches jupyter.org's .global-banner box (43.8px tall with one line),
+   but in --body-font so it follows the font picker. The box is 14px/20px
+   and .announcement-content (added by announcement.html) 18px/27px.
+   font-size-adjust must follow the `font` shorthand, as on body. */
 .announcement { position: relative; background: var(--accent); color: #fff;
                 text-shadow: 0 0 4px #000;
                 text-align: center;
@@ -331,12 +137,7 @@ a:hover { text-decoration-line: underline; }
 .announcement p { margin: 0; }
 .announcement a { color: #fff; text-decoration: underline;
                   text-decoration-thickness: 2px; }
-/* The x is jupyter.org's own: the same U+00D7, at the same 1.4em of
-   the box's 14px. A button takes the browser's UI font unless a rule
-   says otherwise -- which is what set this one apart, a system-ui x
-   beside the banner's own face -- so it is told to inherit, and the
-   x is drawn in whatever the banner is. Naming a family here instead
-   would pin the x while the words beside it follow the font choice. */
+/* buttons default to the UA's UI font */
 .announcement-close { position: absolute; right: .5em; top: 50%;
                       transform: translateY(-50%); padding: .2em .4em;
                       border: 0; background: none; color: inherit;
@@ -344,11 +145,8 @@ a:hover { text-decoration-line: underline; }
                       font-family: inherit;
                       font-size: 1.4em; line-height: 1; cursor: pointer; }
 
-/* The header stands as tall as jupyter.org's navbar, so a reader
-   moving between the two sites sees the same masthead: its 15px of
-   padding above and below a 40px logo, over a 1px rule -- 71px in
-   all. .9375rem is that 15px; the nav items' tab bar below is drawn
-   against the same figure. */
+/* Same height as jupyter.org's navbar: 15px (.9375rem) padding around a
+   40px logo, plus the 1px border. The nav tab bar depends on .9375rem. */
 .site-header { background: var(--card); border-bottom: 1px solid var(--line); }
 .site-header .bar { display: flex; align-items: center; justify-content: space-between;
                     flex-wrap: wrap; gap: .5rem;
@@ -356,41 +154,18 @@ a:hover { text-decoration-line: underline; }
 .site-title { font-size: 1.25rem; font-weight: 700; color: var(--ink);
               display: flex; align-items: center; gap: .55rem; }
 .site-title img { height: 2.1rem; width: auto; }
-/* jupyter.org's masthead, for an archive that has a logo of its own to
-   stand in for its name (site.toml "logo"): the project's rectangle
-   logo, wordmark and all, at the 40px that navbar sets it in, with no
-   title text beside it. A second file ("logo_dark") is the same mark
-   drawn for the dark palette, since the grey wordmark of the light one
-   all but disappears on the dark header; the palettes' --logo-* values
-   pick between the pair. The link carries the site's name as its
-   aria-label, so it reads the same whichever file is showing and
-   whether or not either has loaded. */
+/* Logo in place of the title (site.toml "logo"; "logo_dark" for the
+   dark palette, picked by --logo-light/--logo-dark). */
 .site-title img.site-logo { height: 2.5rem; }
 .site-title img.site-logo-light { display: var(--logo-light); }
 .site-title img.site-logo-dark { display: var(--logo-dark); }
-/* the masthead is the site's name, not a link among links: no rule on
-   hover either (a:hover outranks .site-title, so it says so itself) */
+/* a:hover outranks .site-title, so this needs its own rule */
 .site-title:hover { text-decoration-line: none; }
-/* The nav is a row of tabs, not a row of links: no text underline,
-   and the current page's item is bold ink with a 3px accent bar on
-   the header's bottom edge, the tab convention rather than the link
-   rule. jupyter.org's navbar sets the current item in orange text,
-   the 2.8:1 the link rule exists to avoid. The bar reaches the edge
-   by padding each item down through the bar's own bottom padding and
-   pulling it back with a matching negative margin, so the bar sits
-   on the header's border rather than under the text.
-
-   That pull is also why the nav is a flex row rather than a line of
-   inline-blocks: on a narrow screen its items wrap, and an inline line
-   box is sized to the pulled-in margin box, so each wrapped row would
-   be laid .9375rem short of the row above and the row above would draw
-   its accent bar straight through the words below it. A flex row is
-   measured by that same margin box, but row-gap adds the space back:
-   1.25rem clears the .9375rem the pull takes out and leaves a little
-   air besides, so each row stands clear of the one above while the
-   last row still lands its bar on the header's border. The gaps space
-   the items along the row too, so no item carries a margin of its
-   own. */
+/* Nav items are tabs: the current page is bold ink with a 3px accent
+   bar on the header's bottom border (padding down through the bar's
+   bottom padding, pulled back by a matching negative margin). A flex
+   row with row-gap, not inline-blocks, so wrapped rows don't overlap
+   the negative margin; row-gap must exceed .9375rem. */
 .site-header nav { display: flex; flex-wrap: wrap; align-items: center;
                    column-gap: 1.25rem; row-gap: 1.25rem; }
 .site-header nav a { display: inline-block;
@@ -411,36 +186,16 @@ a:hover { text-decoration-line: underline; }
                        color: var(--muted); cursor: pointer; }
 .theme-picker button:hover { color: var(--accent); }
 .theme-picker svg { width: 1rem; height: 1rem; }
-/* The font picker floats at the page's bottom-right corner, fixed to
-   the viewport instead of sitting in the header, so it stays within
-   reach once a long article has scrolled the header away. It is
-   spliced in once near the end of the body (see baseof.html/base.html)
-   rather than beside the theme button, and hidden until its script
-   runs, like the theme button, since without JS a choice could not
-   apply anyway. */
+/* The font and link pickers (font-picker.html, link-picker.html) float
+   fixed at the bottom-right; hidden until their scripts run. */
 .font-picker, .link-picker { position: fixed; right: 1.25rem; z-index: 40; }
 .font-picker { bottom: 1.25rem; }
-/* the link picker rides directly above the font one: the same box, one
-   select height and a gap higher, so the two read as one stack */
+/* one select height (2.1rem) plus a gap above the font picker */
 .link-picker { bottom: 3.85rem; color: var(--muted); }
 .font-picker[hidden], .link-picker[hidden] { display: none; }
-/* The select names the choice it is on and sets that name in the
-   family it names, so it both says and shows what you are reading: a
-   dropdown, not the theme button's cycling pill, since eight choices
-   are too many to cycle one click at a time. Each <option> carries
-   the family it offers as its own inline style, so the open list
-   previews every choice; the select's own font-family is set from
-   script on every change, so the closed box previews the current one
-   too. A fixed width holds the box steady as the choice changes --
-   sized to "Atkinson Hyperlegible Next", the longest name, in its
-   own face, since that is the one case where the box has to hold it
-   -- which would otherwise resize the floating picker on every
-   change. appearance: none drops the UA's own arrow so the picker
-   draws just the one
-   beside it; -webkit-appearance covers Safari, which appearance alone
-   does not clear on a <select>. The shadow matches the card and post
-   panels, so the picker reads as floating over the page rather than
-   as part of it. */
+/* Fixed width (fits "Atkinson Hyperlegible Next") so the box doesn't
+   resize as the script sets its font to the current choice.
+   -webkit-appearance is needed for Safari to drop the native arrow. */
 .font-picker select, .link-picker select {
                       display: block; width: 13rem; height: 2.1rem;
                       padding: 0 1.9rem 0 .9rem; border: 1px solid var(--line);
@@ -449,10 +204,8 @@ a:hover { text-decoration-line: underline; }
                       box-shadow: 0 1px 3px rgba(0,0,0,.09),
                                   0 4px 14px rgba(0,0,0,.05);
                       appearance: none; -webkit-appearance: none; }
-/* the link picker's own box takes the colour it is offering, so the
-   closed box previews the current choice the way the font picker's
-   does; the choices that leave links their inherited ink resolve to
-   currentColor, which is the picker's own muted gray */
+/* previews the current link colour; currentColor choices resolve to
+   the picker's --muted */
 .link-picker select { color: var(--link); }
 .font-picker select:hover, .font-picker select:focus-visible,
 .link-picker select:hover, .link-picker select:focus-visible { color: var(--accent); }
@@ -466,8 +219,7 @@ a:hover { text-decoration-line: underline; }
 .link-picker select:hover ~ .picker-arrow,
 .link-picker select:focus-visible ~ .picker-arrow { color: var(--accent); }
 
-/* the feed mark, in the header nav and beside a tag's or author's
-   heading where that term has a feed of its own */
+/* feed icon in the header nav and beside tag/author page titles */
 .feed-link { display: inline-flex; align-items: center; }
 .feed-icon { width: 1rem; height: 1rem; }
 .site-header nav .feed-link { vertical-align: middle; padding-bottom: 0;
@@ -495,63 +247,21 @@ a:hover { text-decoration-line: underline; }
 .card-excerpt { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
 .card-meta { margin: 1rem 0 0; color: var(--muted); font-size: .85rem; }
 
-/* The article column reads at Medium's own measure -- 15pt (1.25rem)
-   on a 1.6 line -- rather than the 1rem the rest of the page uses. It
-   sits here, on the column itself, not with any one font choice: at
-   this size the picker's choices differ only in family, which is what
-   the picker is for, and running text wants the larger size whichever
-   family wins. Headings and byline keep their own scale below.
-
-   The x-height the column is set at sits here for the same reason:
-   .475 is Source Serif 4's own, so the article under the default is
-   untouched and every other choice is scaled to read at that same
-   size. One number serves all ten, serif choices and sans alike --
-   splitting it would put the article's apparent size back where the
-   normalization took it from. The pieces that opt out to --body-font
-   take the chrome's reference instead, below. */
+/* Article text at 1.25rem/1.6 under every font choice; .475 is Source
+   Serif 4's x-height (see body). */
 .post { background: var(--card); border-radius: 8px; margin: 2rem auto 3rem;
         padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem); max-width: 52rem;
         font-size: 1.25rem; line-height: 1.6; font-size-adjust: .475;
         box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 4px 14px rgba(0,0,0,.05); }
 .post h1 { font-size: 2.1rem; line-height: 1.25; margin: 0 0 .5rem; }
-/* Headings set their own leading. .post carries line-height 1.6 for
-   running text, and a heading that inherits it computes that 1.6
-   against its own size: an h2 at the UA's 1.5em is 30px of glyph in a
-   48px line box, and the 9px of half-leading under the words reads as
-   a gap rather than as line spacing. 1.25 is what h1 and the
-   newsletter heading already state for the same reason.
-
-   The margins are asymmetric on purpose: a heading belongs to the text
-   beneath it, so the space that separates it from the section above
-   has to be several times the space that joins it to its own first
-   paragraph. Left to the UA it is neither -- h2's 0.83em top and
-   bottom, with the paragraph's own 1em collapsing into the bottom,
-   land near-equal space on both sides and the heading floats between
-   two paragraphs instead of opening one. Roughly 3:1 binds it.
-
-   h2 takes those margins in rem, the fixed measure h1 above states.
-   The deeper levels take em, so one rule serves all four: each is
-   spaced in proportion to whatever size it is set at, and h6's air
-   does not match h3's. */
+/* Headings would otherwise inherit .post's 1.6 line-height. More space
+   above than below binds a heading to the text it introduces. */
 .post :is(h2, h3, h4, h5, h6) { line-height: 1.25; }
 .post h2 { margin: 2.75rem 0 .5rem; }
 .post :is(h3, h4, h5, h6) { margin: 1.8em 0 .3em; }
-/* The link mark heading-anchor.html hangs on the end of every heading
-   in the body, the affordance jupyter.org's own pages carry: it
-   addresses the section it sits in, so a reader can send someone to
-   the part of a long post they mean rather than to its top. When it
-   shows follows the copy button's rule -- while its heading is
-   hovered, while the mark itself is focused, always where there is no
-   hover -- so a heading reads as its own words until the pointer is on
-   it; hiding it by opacity rather than display keeps the space it
-   takes reserved, so revealing it never re-wraps the heading. Its
-   only parent is the heading it marks, which is what the descendant
-   hover selector says. It is sized and spaced in em, so it stays in
-   proportion to whichever level it marks, and it takes the accent only
-   under the pointer, as the copy button does: at rest it is the muted
-   grey, which clears contrast where the accent would not (above). No
-   rule under it, at rest or on hover: an underline is for a link that
-   is words. */
+/* The section link heading-anchor.html appends to each heading: shown
+   on heading hover, on focus, or always without hover. Hidden by
+   opacity so revealing it doesn't re-wrap the heading. */
 .heading-anchor { margin-left: .3em; color: var(--muted); opacity: 0; }
 .heading-anchor, .heading-anchor:hover { text-decoration-line: none; }
 .post :hover > .heading-anchor,
@@ -559,91 +269,45 @@ a:hover { text-decoration-line: underline; }
 @media (hover: none) { .heading-anchor { opacity: 1; } }
 .heading-anchor svg { width: .8em; height: .8em; vertical-align: baseline; }
 .heading-anchor:hover, .heading-anchor:focus-visible { color: var(--accent); }
-/* The post's subtitle line, as Medium sets it: its own text under the
-   title and above the byline, in the heading font at a size between the
-   two, grey rather than the title's black. Not the body's first
-   paragraph and not styled like one -- it is the page's second line.
-   The inner <p> is pelican's: a FORMATTED_FIELD arrives as rendered
-   Markdown, a paragraph and all, where hugo's markdownify gives the
-   inline HTML alone. */
+/* The inner <p> comes from Pelican, which renders the subtitle as
+   Markdown (FORMATTED_FIELDS). */
 .post-subtitle { color: var(--muted); font-size: 1.45rem; line-height: 1.35;
                  margin: 0 0 1rem; }
 .post-subtitle p { margin: 0; font: inherit; color: inherit; }
 .post-meta { color: var(--muted); margin: 0 0 .9rem; font-size: 1rem; }
-/* A tag is a pill, in the article byline and on a card alike: one
-   form for the term wherever it appears. Hover colours the border, not
-   the text -- orange text is the contrast the link rule exists to
-   avoid. */
+/* Tag pill. Hover colours the border, not the text: orange text fails
+   contrast. */
 .tag { display: inline-flex; align-items: center;
        background: var(--code-bg); border: 1px solid var(--line);
        border-radius: 999px; padding: .05rem .65rem;
        font-size: .82rem; color: var(--soft); }
 .tag:hover { border-color: var(--accent); color: var(--ink);
              text-decoration: none; }
-/* white behind transparency, like the baked card covers: these images
-   were drawn for Medium's white page, so dark logos stay legible */
+/* white behind transparent images, which were drawn for Medium's white
+   page, so dark logos stay legible */
 .post img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
-/* An embedded player (convert writes YouTube embeds as 560x315 iframes)
-   fills the column at the 16:9 its attributes state, instead of sitting
-   at its fixed size, which overflows a phone-width column. */
+/* fluid 16:9 embeds (convert writes YouTube embeds as 560x315 iframes) */
 .post iframe { width: 100%; max-width: 100%; height: auto; aspect-ratio: 16 / 9;
                border: 0; border-radius: 4px; }
-/* A clip -- what an animated gif was placed as, and what a Giphy
-   embed was archived as -- sits where the animation it stands for did.
-   It carries a poster frame, so the box is filled before anything is
-   fetched, and its controls are the reader's way to stop the motion
-   (shared/clip-motion.html decides whether it starts at all). */
+/* clips replacing animated gifs and Giphy embeds (see clip-motion.html) */
 .post video { max-width: 100%; height: auto; border-radius: 4px; }
 .post p:has(> video:only-child) { text-align: center; }
-/* An image standing on its own -- a paragraph holding nothing but the
-   image, linked or not, or a figure -- is centred, as Medium sets
-   every body image; most are narrower than the column, and an
-   inline-left image reads as a stray. An image inside running text
-   (a badge in a sentence) is not matched and stays inline. */
+/* Centre standalone images (alone in a paragraph, optionally linked,
+   or in a figure); inline images in running text are not matched. */
 .post p:has(> img:only-child), .post p:has(> a:only-child > img:only-child),
 .post figure { text-align: center; }
-/* Code names the --mono role, so a font picker choice with a mono
-   face of its own can put it under it. The size is stated at all
-   (rather than left to the UA) because a stack ending in the generic
-   `monospace` otherwise triggers the browsers' 13px monospace default.
-   Inline code is em, so it tracks the prose it sits in. A block is
-   not prose but a grid of fixed-width characters, so its size is set
-   by how many columns fit the block: about 80, the terminal width
-   posts were written at, and about what Medium's column held. The
-   size and line height are Medium's own (14px on 1.4; its -0.022em
-   tracking is not taken, so the font's own fit stands). After the
-   column's padding each side, a block holds 688px, and at the 0.6em
-   advance of the mono candidates (0.602 for Menlo and DejaVu) that
-   is 81 columns; a wider column was tried for a few more and read as
-   too wide. An em size would have followed the 20px reading size up
-   to 18px and 66 columns. The code inside a block inherits, so it
-   does not step down again. Those 81 columns are what the default's
-   own mono holds; under another choice the count moves with both that
-   mono's set width and the used size x-height normalization (up by
-   body) draws it at -- measured in Chromium, 82 columns for Source
-   Code Pro, 87 for IBM Plex Mono, 79 for Atkinson Hyperlegible Mono.
-   The block scrolls either way, and code that reads at one size
-   across the choices is worth more here than a fixed column count. */
+/* Inline code is em so it tracks the prose. Blocks are rem (Medium's
+   14px on 1.4), which fits about 80 columns at the column's full width. */
 .post pre { overflow-x: auto; padding: 1rem; background: var(--code-bg);
             border-radius: 6px; font-family: var(--mono);
             font-size: .875rem; line-height: 1.4; }
 .post code { background: var(--code-bg); font-family: var(--mono);
              font-size: .9em; }
 .post pre code { font-size: inherit; background: none; }
-/* Token colours for highlighted blocks, on the class names Pygments
-   (Pelican, through its reader's fence rule) and Chroma (Hugo, with
-   noClasses off) share:
-   keywords, strings, comments, numbers, the names of functions and
-   classes, and builtins. The block keeps the theme's background and
-   ink, so a block reads as part of the page in either scheme, where
-   an engine's own inlined style (Chroma's Monokai) would paint a
-   dark block on the light page. The colours are GitHub's, unaltered:
-   Primer's prettylights tokens keyword, string, comment, constant,
-   entity and variable from its light and dark themes (@primer/
-   primitives 7.15). They are an AA scheme, not the AAA the text grays
-   hold to: on --code-bg every token clears 4.5:1 except the light
-   comment grey, at 4.2:1, the same shortfall GitHub's own code blocks
-   have (4.3:1 on their #f6f8fa); a test holds the set to that. */
+/* Token colours on the class names shared by Pygments (Pelican) and
+   Chroma (Hugo, noClasses = false). The --syn-* values are Primer's
+   (AA, not AAA): all clear 4.5:1 on --code-bg except the light comment
+   grey at 4.2:1; a test checks this. */
 .post .highlight .k, .post .highlight .kd, .post .highlight .kn,
 .post .highlight .kr, .post .highlight .kt, .post .highlight .kc,
 .post .highlight .ow { color: var(--syn-keyword); }
@@ -663,19 +327,11 @@ a:hover { text-decoration-line: underline; }
 .post .highlight .nt { color: var(--syn-name); }
 .post .highlight .nb, .post .highlight .bp,
 .post .highlight .na { color: var(--syn-builtin); }
-/* The copy button code-copy.html gives each block, overlaid on the
-   block's top-right corner as code hosts and documentation sites set
-   theirs. The wrapper the script adds is the button's positioning
-   box: a pre scrolls sideways, so a button placed inside it would
-   scroll away with the first line. It is hidden until the block is
-   hovered or the button focused, so it covers the end of a long first
-   line only while the pointer is on the block; it is in the page and
-   the tab order throughout, so Tab reaches it (and reveals it, by the
-   same rule as hover), Enter or Space presses it, and a screen reader
-   announces it either way, opacity being no part of the accessibility
-   tree. Where there is no hover (touch) it shows always. The status
-   line is the screen-reader announcement of a copy; it takes no space
-   on screen. */
+/* Copy button from code-copy.html. It is positioned on the .code-block
+   wrapper, not the pre, so it doesn't scroll away with the code. Shown
+   on hover, on focus, or always without hover; hidden by opacity so it
+   stays in the tab order. .code-copy-status is a visually hidden live
+   region. */
 .code-block { position: relative; }
 .code-copy { position: absolute; top: .45rem; right: .45rem;
              display: inline-flex; align-items: center; justify-content: center;
@@ -694,47 +350,27 @@ a:hover { text-decoration-line: underline; }
                     clip-path: inset(50%); white-space: nowrap; }
 .post blockquote { margin-left: 0; padding-left: 1rem;
                    border-left: 3px solid var(--accent); color: var(--soft); }
-/* A table (a Markdown gist inlined by convert; Medium itself has no
-   table markup) gets a ruled, top-aligned grid: the UA default is
-   borderless cells run together. Long cells wrap; the widths are the
-   browser's. */
+/* tables come from Markdown gists inlined by convert */
 .post table { border-collapse: collapse; width: 100%; margin: 1rem 0;
               font-size: .9em; }
 .post th, .post td { padding: .45em .6em; text-align: left;
                      vertical-align: top; border-bottom: 1px solid var(--line); }
 .post th { border-bottom: 2px solid var(--line); }
-/* the UA default indents figures 40px each side; the column is narrow.
-   Captions carry no styling markup of their own (like Medium's): the
-   muted italic look lives here. The p rules cover embed figures, whose
-   caption Goldmark renders as a paragraph. */
+/* Override the UA's 40px figure indent. Goldmark renders an embed
+   figure's caption as a paragraph. */
 .post figure { margin: 1rem 0; }
 .post figure > p { margin: 0; }
-/* The centring is for the image; a captioned code block (an inlined
-   gist or Carbon snippet) would inherit it line by line. */
+/* undo the figure centring for captioned code blocks */
 .post figure pre { text-align: left; }
-/* Centred under the image, as Medium sets its captions. The size is
-   em, so a caption stays in proportion to the column it annotates
-   rather than shrinking against it when the reading size grows: .9rem
-   was 0.9x the body when the body was 1rem, and only 0.72x once the
-   article moved to 1.25rem. */
 .post figcaption { font-size: .8em; font-style: italic;
                    margin-top: .35rem; text-align: center; }
 .post figcaption p { margin: 0; }
 .post figcaption, .post em img + em { color: var(--muted); }
 
-/* The four serif choices are the only ones that set the article in
-   something other than --body-font, so they are the only ones with
-   rules here. Only the running text is serif -- Medium keeps its
-   headings, byline, captions and chrome in a sans -- so those pieces
-   opt back out to --body-font, which under each choice is the sans
-   drawn for that serif, or, for Literata, which has none, the
-   default's Source Sans. Medium's -0.004rem tracking is not
-   reproduced: it works out to 0.064px per character, which no reader
-   can see, and leaving it off keeps every choice on the browser's
-   default tracking. Source Serif is the default -- no data-font
-   pinned -- so its rule matches :not([data-font]) rather than an
-   explicit value, the same way its --body-font/--mono live on the
-   bare :root above. */
+/* Serif choices set only the article's running text in the serif;
+   headings, subtitle, byline, share bar and captions stay in
+   --body-font. Source Serif is the default, so it matches
+   :not([data-font]). */
 :root:not([data-font]) .post { font-family: var(--source-serif); }
 :root:not([data-font]) .post :is(h1, h2, h3, h4, h5, h6),
 :root:not([data-font]) .post-subtitle,
@@ -759,27 +395,18 @@ a:hover { text-decoration-line: underline; }
 :root[data-font="merriweather"] .post-meta,
 :root[data-font="merriweather"] .post-share,
 :root[data-font="merriweather"] .post figcaption { font-family: var(--body-font); }
-/* The same pieces, plus the code, take the chrome's x-height back
-   from the column's: they are set in --body-font and --mono, not in
-   the article's face, so .486 is the reference that leaves them where
-   the default draws them. This one needs no per-choice rules -- a
-   reference belongs to the role, and the role is the same under all
-   ten -- so it states the selectors once. */
+/* parts in --body-font or --mono take body's x-height, not .post's */
 .post :is(h1, h2, h3, h4, h5, h6, code, pre, kbd, samp),
 .post-subtitle, .post-meta, .post-share,
 .post figcaption { font-size-adjust: .486; }
 
-/* The share bar, carried twice by a post: under the byline, where a
-   reader decides whether to read, and at the foot, where they have.
-   Each network's own mark, in the circles the header's theme picker
-   uses. The sprite the marks come from carries width/height 0 as well,
-   so it stays out of the flow even before the stylesheet lands. */
+/* Share bar (share-icons.html sprite), under the byline and at the foot
+   of a post. */
 .share-sprite { display: none; }
 .post-share { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem;
               margin: 2.5rem 0 0; padding-top: 1.6rem;
               border-top: 1px solid var(--line); }
-/* the byline copy takes no rule: one there would cut the head off the
-   article. .post-meta carries the tighter margin that pairs with it. */
+/* the copy under the byline has no top rule */
 .post-meta + .post-share { margin: 0 0 2rem; padding-top: 0; border-top: 0; }
 .related { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); }
 .related .page-title { font-size: 1.6rem; margin: 1rem 0; }
@@ -787,20 +414,14 @@ a:hover { text-decoration-line: underline; }
 .share-link { display: inline-flex; align-items: center; justify-content: center;
               width: 2.1rem; height: 2.1rem; border: 1px solid var(--line);
               border-radius: 999px; color: var(--muted); }
-/* hover deepens the mark rather than coloring it: these are the
-   networks' logos, and most of their brand guidelines allow a
-   one-color rendering but not a recoloring, which the site accent
-   would be. The ring around it is ours, so it takes the accent on
-   hover as a tag's does. */
+/* network logos are not recoloured with the accent (brand guidelines);
+   only the ring is */
 .share-link:hover { color: var(--ink); border-color: var(--accent);
                     text-decoration: none; }
 .share-icon { width: 1.05rem; height: 1.05rem; fill: currentColor; }
 
-/* Click-to-zoom, the one Medium reading affordance the archive would
-   otherwise lose (its "click to view image in full size" hint is
-   stripped as chrome on conversion). Only images the script finds
-   worth zooming -- the original holds detail the column does not show
-   -- are marked, so the cursor never promises a zoom that is a no-op. */
+/* Click-to-zoom (image-zoom.html marks only images whose original is
+   larger than shown as .zoomable). */
 .post img.zoomable { cursor: zoom-in; }
 .post img.zoomable:focus-visible { outline: 2px solid var(--accent);
                                    outline-offset: 3px; }
@@ -811,9 +432,7 @@ a:hover { text-decoration-line: underline; }
                justify-content: center; gap: .75rem; overflow: hidden; }
 .zoom-dialog[open] { display: flex; }
 .zoom-dialog::backdrop { background: rgba(0, 0, 0, .85); }
-/* the palette's white image backing again: these were drawn for
-   Medium's white page, so transparency must not fall through to the
-   backdrop */
+/* white behind transparency, as for .post img */
 .zoom-dialog img { max-width: 94vw; max-height: 88vh; width: auto;
                    height: auto; border-radius: 4px; background: #fff; }
 .zoom-caption { max-width: 60ch; margin: 0; padding: 0 1rem;
@@ -841,7 +460,7 @@ a:hover { text-decoration-line: underline; }
 .term-sort button:hover { border-color: var(--accent); }
 .term-sort button[aria-pressed="true"] { border-color: var(--accent);
                                          color: var(--ink); }
-/* ~, not +: the snippet's script tag sits between the two */
+/* ~, not +: term-sort.html's script tag sits between the two */
 .term-sort ~ .term-list { margin-top: .9rem; }
 
 ul.pagination { display: flex; justify-content: center; gap: .25rem;
@@ -857,18 +476,11 @@ ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
                  margin-right: .6rem; }
 .archives a { color: var(--ink); }
 
-/* Pagefind's component CSS boosts every selector to ID-level specificity
-   (its :is(*, #\#) prefix) so host styles lose by default; it leaves
-   !important to the host page as the intended override lever. Orange is
-   reserved for the highlighted matches; article titles are set off from
-   the per-section heading hits typographically -- large bold vs small
-   semibold, both in neutral ink. */
+/* Pagefind's component CSS has ID-level specificity, so overrides here
+   need !important. */
 #search { margin: 0 0 3rem;
-          /* The component styles itself from --pf-* custom properties
-             (light values on :root; it does not follow
-             prefers-color-scheme on its own). Redefining them here from
-             the site tokens makes the search UI track whichever palette
-             is active. */
+          /* map Pagefind's --pf-* variables to the site palette, since
+             it does not follow prefers-color-scheme itself */
           --pf-text: var(--ink); --pf-text-secondary: var(--soft);
           --pf-text-muted: var(--muted); --pf-background: var(--card);
           --pf-border: var(--line); --pf-skeleton: var(--code-bg);
@@ -888,26 +500,15 @@ ul.pagination .disabled .page-link { color: var(--muted); opacity: .5; }
                            color: var(--ink) !important; }
 #search .pf-heading-excerpt { color: var(--muted) !important;
                               font-size: .9rem !important; }
-/* The signup band jupyter.org closes its pages with, drawn in this
-   site's own furniture rather than that page's: a full-bleed card on
-   the bottom edge, ruled off from the page above it the way the "More
-   posts" block is, its heading at the same size and weight as that
-   block's, and the fields and button below it in the page's own ink and
-   accent. The form is HubSpot's, rendered into .newsletter-form inside
-   an iframe of its own, which no stylesheet here can reach: its look is
-   read off these same tokens and passed to the embed as a string
-   (shared/newsletter.html), laid out the way jupyter.org reads down --
-   heading, the fields on one row, the consent copy under them, the
-   button below that -- and that snippet is also where the band is
-   unhidden, once there is a form to show. */
+/* Newsletter band. The HubSpot form renders in its own iframe, so
+   newsletter.html styles it from these tokens and unhides the band. */
 .newsletter { background: var(--card); border-top: 1px solid var(--line);
               margin-top: 3rem; padding: 2.5rem 0; }
 .newsletter[hidden] { display: none; }
 .newsletter h2 { font-size: 1.6rem; font-weight: 400; line-height: 1.25;
                  margin: 0 0 1.5rem; }
-/* the footer line is Markdown (site.toml "footer"), so it arrives
-   wrapped in a paragraph of its own; the footer's own padding is the
-   space around it */
+/* the footer (site.toml "footer") is Markdown and may arrive wrapped
+   in a <p> */
 .site-footer { color: var(--muted); font-size: .85rem; padding-top: 1rem;
                padding-bottom: 2.5rem; }
 .site-footer p { margin: 0; }

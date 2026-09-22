@@ -1,8 +1,7 @@
-{{- /* The share bar, rendered twice per post (under the byline and at
-       the foot), so the marks come from the sprite share-icons.html
-       splices into the page once. Title and URL are said once here and
-       the contextual escaper encodes each for its slot, the query
-       string or fragment of an href. */ -}}
+{{- /* Share bar, rendered twice per post; the icons reference the
+       sprite that page.html includes once (shared/share-icons.html).
+       Hugo's contextual escaper encodes the title and URL for each
+       href. */ -}}
 {{- $text := printf "%s %s" .Title .Permalink -}}
 <div class="post-share" data-pagefind-ignore>
 <span class="share-label">Share</span>

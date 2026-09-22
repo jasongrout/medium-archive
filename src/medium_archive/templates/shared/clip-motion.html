@@ -1,16 +1,7 @@
-<!-- Motion for a post's clips -- the mp4s the placer made of the
-     archive's animated gifs, and the mp4s a Giphy embed was archived as.
-     Both are served as a poster frame with controls and nothing
-     preloaded, so a clip is a still picture with a play button until
-     something asks for more. This gives back what a gif did, on two
-     conditions the gif format could not honour: the reader has not
-     asked for less motion (prefers-reduced-motion), and the clip is on
-     screen, so a page never fetches clips nobody scrolled to. A clip
-     the reader pauses stays paused -- that is the whole point of
-     serving video rather than gif (WCAG 2.2.2) -- and a reader who
-     switches the preference mid-page has every clip stop where it is.
-     Without this script, or without IntersectionObserver, the controls
-     in the markup are the whole feature. -->
+<!-- Autoplays a post's clips (mp4s made from gifs and Giphy embeds) while
+     on screen, unless the reader prefers reduced motion. A clip the reader
+     pauses stays paused (WCAG 2.2.2). Without this script the native
+     controls remain. -->
 <script>
 (function () {
   var reduced = window.matchMedia
@@ -34,8 +25,7 @@
       }
     }
     clips.forEach(function (clip) {
-      // a clip the archive still serves as an autoplaying loop is one
-      // this script decides for too, so the preference is honoured
+      // this script decides playback, so reduced motion is honoured
       clip.removeAttribute("autoplay");
       if (!clip.hasAttribute("controls")) clip.setAttribute("controls", "");
       clip.addEventListener("pause", function () {

@@ -1,5 +1,5 @@
-# Substituted into STUB as a format() value, never as a format string:
-# the spliced CSS/JS is full of braces.
+# Passed to STUB.format() as a value, never used as a format string:
+# the included CSS/JS is full of braces.
 THEME_HEAD = """\
 <!-- @include shared/redirect-head.html -->
 """
@@ -15,14 +15,9 @@ STUB = """<!DOCTYPE html>
 
 
 def _write_redirects(pelican_obj):
-    # Old inbound links, from the exporter's redirects.csv -- its map of
-    # Medium slug+id, /p/<id> and Ghost-era paths to the pages this site
-    # serves -- rendered as whichever mechanism REDIRECT_STUBS and
-    # REDIRECT_FILE ask for (see the settings above).
-    #
-    # Pelican has no aliases feature, so the stubs are written here: a
-    # meta-refresh page at every old path, the same page Hugo renders
-    # for an alias.
+    # redirects.csv (old path -> new path) as a Netlify-style _redirects
+    # file and/or meta-refresh stub pages, per REDIRECT_FILE and
+    # REDIRECT_STUBS.
     import csv
     import os
     if not (REDIRECT_STUBS or REDIRECT_FILE):
@@ -53,14 +48,10 @@ def _write_redirects(pelican_obj):
     print(f"redirect stubs: {written} written from redirects.csv")
 
 
-# What the sitemap lists: the pages of the site by their URL, with a
-# last-modified date where one is known (posts: the Modified header,
-# the archive's updated date, else the post date). Collected once the
-# articles are read, written after the build beside a robots.txt that
-# names the sitemap -- what WordPress serves on its own and Hugo
-# generates for its site. The year pages are in it, as Hugo's year
-# sections are in Hugo's; search results, paginated listings and the
-# redirect stubs stay out, as they do from Hugo's.
+# Sitemap entries as (url, last-modified or None), collected once the
+# articles are read and written after the build with robots.txt. Search,
+# paginated listings and redirect stubs are left out, as in the hugo
+# site's sitemap.
 _SITEMAP = []
 
 
@@ -75,10 +66,7 @@ def _collect_sitemap(article_generator):
         _SITEMAP.append((tag.url, None))
     for author, _ in g.authors:
         _SITEMAP.append((author.url, None))
-    # the year pages, /posts/<year>/, named through the config's own
-    # scheme rather than a second spelling of it. Hugo lists its year
-    # sections in its sitemap without being asked, so leaving these out
-    # is the one thing that would part the two sites' sitemaps.
+    # the year pages, as the hugo site's sitemap lists its year sections
     first = {}
     for article in g.articles:
         first.setdefault(article.date.strftime("%Y"), article.date)
@@ -110,49 +98,34 @@ def _write_crawl_files(pelican_obj):
     print(f"sitemap: {len(_SITEMAP)} urls")
 
 
-# Responsive body images, like the hugo exporter's render hook: webp
-# variants at these widths (never upscaled), advertised via srcset with
-# this sizes hint, plus real width/height so the layout cannot shift.
+# Responsive body images: webp variants at these widths (never
+# upscaled) in srcset with this sizes hint. Keep in sync with the hugo
+# theme's _partials/post-image.html.
 VARIANT_WIDTHS = (480, 736, 1104)
 SIZES_ATTR = "(max-width: 800px) 100vw, 736px"
-# An <img> tag, spanning its attribute values rather than stopping at
-# the first ">": an alt text can hold one (a caption naming a <code>
-# span, say), and a pattern that stopped there would match a fragment
-# with no src in it, leaving the image unprocessed and its marker on.
+# An <img> tag, skipping over quoted attribute values: an alt text may
+# contain ">".
 IMG_TAG = r"""<img\b(?:[^>"']|"[^"]*"|'[^']*')*>"""
-IMG_TAG_RE = None   # compiled on first use
-# Which images this pass may touch: the ones the config's reader
-# marked, and only those. The marker is how a body image is told from
-# one the theme rendered, since by this point -- the finished HTML --
-# the two are indistinguishable markup. A path rule cannot stand in for
-# it: a related-post card points into another post's own images/
-# directory, exactly where that post's body images live.
+IMG_TAG_RE = None
+# Set by the reader on body images, so the post-build passes can tell
+# them from theme images (a related-post card's cover points into the
+# other post's images/ directory, so a path rule cannot). Removed from
+# the output by _optimize_article_images.
 BODY_IMAGE_ATTR = "data-body-image"
-# Photographs get the variant ladder. png and webp here are line art
-# the placer kept whole (see ImagePlacer), whose 9 px text does not
-# survive a 736 px variant, and an animated gif would lose its frames.
+# Only photographs get variants: png and webp images are line art whose
+# small text a downscale would blur, and a gif may be animated.
 VARIANT_SUFFIXES = (".jpg", ".jpeg")
-# An animation is placed as a clip (see ImagePlacer), so a body image
-# can be an .mp4: it leaves this pass as a <video> the reader controls
-# rather than as an <img> no browser would show. The alt text moves to
-# an aria-label, <video> having no alt of its own, and the poster the
-# placer wrote beside the clip gives the element its still and its
-# dimensions -- so nothing is fetched, and the layout cannot shift,
-# until the reader (or the theme's clip-motion script, where motion is
-# welcome) asks for the clip itself.
+# Animations are exported as .mp4 clips with a "-poster.webp" still
+# beside them; a body image with this suffix is rewritten as a <video>.
 VIDEO_SUFFIXES = (".mp4",)
 POSTER_SUFFIX = "-poster.webp"
 
 
 def _prioritize_first_images(pelican_obj):
-    # Every body image loads lazily (the config's reader marks them as
-    # it renders). The first one on a post page is the one most likely
-    # on screen at load, so it is fetched eagerly and first instead, as
-    # WordPress treats the first content image: lazy-loading the
-    # largest visible image delays the page's largest contentful paint.
-    # Body images alone qualify -- the header avatar and the
-    # related-post cards are not marked, so they cannot be picked; with
-    # none, the page is left as it is.
+    # The first body image on each post page loads eagerly with
+    # fetchpriority="high" instead of lazily, since it is likely above
+    # the fold and lazy-loading it delays the largest contentful paint.
+    # Runs before _optimize_article_images, which strips the marker.
     import glob
     import os
     import re
@@ -174,10 +147,9 @@ def _prioritize_first_images(pelican_obj):
 
 
 def _clip(src, path, attrs, output_path, here):
-    """The <video> a body .mp4 becomes: the clip's own poster, its size
-    read off that poster, and the image's alt text as the accessible
-    name (see VIDEO_SUFFIXES). Attribute values come from the rendered
-    tag, so they are already escaped."""
+    """The <video> for a body .mp4, with its poster, the poster's size
+    and the alt text as aria-label. Attribute values come from the
+    rendered tag, so they are already escaped."""
     import os
 
     from PIL import Image
@@ -202,14 +174,10 @@ def _clip(src, path, attrs, output_path, here):
 
 
 def _optimize_article_images(pelican_obj):
-    # Rewrite each article's body images -- the ones the Markdown
-    # extension marked, and nothing else: every one gets real
-    # width/height, and photographs additionally get lazily loaded
-    # responsive variants. Variants are cached by mtime, so only new or
-    # changed images are re-encoded on later builds.
-    #
-    # The marker comes off here, on every marked tag, whether or not
-    # this pass had anything to add to it, so it never reaches a reader.
+    # Rewrite marked body images on post pages: add width/height, add
+    # srcset variants for photographs, turn clips into <video>, and
+    # strip the marker from every one. Variants are re-encoded only when
+    # older than their source.
     try:
         from PIL import Image
     except ImportError:
@@ -228,23 +196,21 @@ def _optimize_article_images(pelican_obj):
 
     def rewrite(match):
         tag = match.group(0)
-        if not marker_re.search(tag):    # the theme's, not a body's
+        if not marker_re.search(tag):    # a theme image
             return tag
         bare = marker_re.sub("", tag, count=1)
         attrs = dict(attr_re.findall(tag))
         src = attrs.get("src", "")
         path = src[len(SITEURL):] if SITEURL and src.startswith(SITEURL) else src
-        # an image the archive never localized (a remote CDN URL that
-        # lint reports) has no file here to measure or re-encode
+        # a remote image has no local file to measure or re-encode
         if "srcset" in attrs or "://" in path:
             return bare
         if path.lower().endswith(VIDEO_SUFFIXES):
             return _clip(src, path, attrs, pelican_obj.output_path, here)
         parts = path.lstrip("/").split("/")
         local = os.path.join(pelican_obj.output_path, *parts)
-        # encode from (and cache against) the content-side original:
-        # Pelican freshens the output copy's mtime on every build, which
-        # would defeat the cache
+        # encode from and cache against the content-side original:
+        # Pelican refreshes the output copy's mtime on every build
         source = os.path.join(here, PATH, *parts)
         if not os.path.exists(source):
             source = local
@@ -253,8 +219,7 @@ def _optimize_article_images(pelican_obj):
             with Image.open(source) as im:
                 width, height = im.size
                 srcset = []
-                # line art and animations are read for their dimensions
-                # alone; only a photograph is decoded and re-encoded
+                # other images are only measured
                 if wants_variants:
                     if im.mode == "P":
                         im = im.convert("RGBA")
@@ -298,23 +263,10 @@ def _optimize_article_images(pelican_obj):
 
 
 def _name_tags(article_generator):
-    # A tag reaches Pelican as the archive's slug, so tag.slug -- what
-    # /tags/<slug>/, the per-tag feed's filename and the object's own
-    # hash are built from -- is exactly right, and only the name a
-    # reader sees is left to set. Pelican renders a tag from the Tag
-    # object everywhere, including the per-tag feed's title, which it
-    # builds in Python out of reach of any template; so the objects
-    # themselves are named here, the way the hugo site's content adapter
-    # titles each term from data/tags.yaml. Runs on article_generator_finalized: the
-    # tags are collected by then and nothing is written yet.
-    #
-    # Pelican builds a Tag object per article, from that article's own
-    # Tags: header, and generator.tags is a dict keyed on the slug -- so
-    # it holds one object per tag and every other article keeps its own.
-    # Naming the dict's keys alone would name a tag on its own page and
-    # on one article's card, and leave it a slug on all the others; so
-    # each article's list is pointed at the one named object instead,
-    # which leaves exactly one Tag per slug in the whole build.
+    # Tags arrive as slugs; give each Tag object its display name from
+    # TAG_DISPLAY, which also reaches the per-tag feed titles. Pelican
+    # makes a separate Tag object per article, so every article's list
+    # is pointed at one shared, named object per slug.
     canonical = {}
 
     def name(tag):
@@ -340,18 +292,7 @@ def _name_tags(article_generator):
 
 
 def _name_authors(article_generator):
-    # The authors' counterpart of _name_tags, and for the same reason: a
-    # byline reaches Pelican as the archive's slug, so author.slug --
-    # what /authors/<slug>/, the per-author feed's filename and the
-    # object's own hash are built from -- matches the hugo site exactly,
-    # and only the name a reader sees is left to set. Pelican renders an
-    # author from the Author object everywhere, the per-author feed's
-    # title included, which it builds in Python out of reach of any
-    # template; so the objects themselves are named here.
-    #
-    # generator.authors is a list of (author, articles) pairs, and each
-    # article carries its own Author objects, so as with tags every
-    # article's list is pointed at the one named object per slug.
+    # _name_tags for authors, from AUTHOR_DISPLAY.
     canonical = {}
 
     def name(author):
@@ -380,11 +321,9 @@ def _name_authors(article_generator):
 
 
 def related_posts(article, articles, limit=3):
-    # The posts most like this one, for the "More posts" block at
-    # the foot of its page: scored the way the hugo site's [related]
-    # config scores them -- a shared tag counts for most, a shared
-    # author for some, and among equals the nearer in time comes
-    # first -- and only posts that share something at all.
+    # Up to `limit` posts sharing a tag or author, ranked by shared tags,
+    # then shared authors, then nearness in date. Keep the weights in
+    # sync with the hugo site's [related] config.
     tags = {t.slug for t in getattr(article, "tags", ())}
     authors = {a.name for a in getattr(article, "authors", ())}
 
@@ -399,9 +338,7 @@ def related_posts(article, articles, limit=3):
 
 
 def _relate_articles(article_generator):
-    # Runs on article_generator_finalized, once every article and its
-    # tags exist and before anything is written; article.html reads
-    # article.related_posts.
+    # article.html reads article.related_posts
     articles = article_generator.articles
     for article in articles:
         article.related_posts = related_posts(article, articles)
@@ -409,21 +346,10 @@ def _relate_articles(article_generator):
 
 
 def _check_slugs(article_generator):
-    # A post's slug is its URL (ARTICLE_URL in the config above), so two
-    # posts sharing one write the same page. Pelican does catch that,
-    # but late and twice removed from the fix: a warning among the read
-    # log, then a FileOverwriteFailedError naming the output path and
-    # neither post -- and under `pelican -r` the error is swallowed and
-    # the last good build goes on being served. So the pair is named
-    # here instead, on article_generator_finalized, before a page is
-    # written, and the build stops.
-    #
-    # The directory names are a note rather than an error: a post keeps
-    # its URL through a rename of its directory by carrying the old slug
-    # in its front matter, which is what the field is for and what
-    # PATH_METADATA leaves it free to do. The line is there to catch the
-    # unintended one -- a slug edited without its directory, which moves
-    # the page and the images {attach} publishes beside it.
+    # Stop the build, naming the posts, when two would write the same
+    # page; Pelican's own error names neither post and is swallowed by
+    # `pelican -r`. Also report, without failing, posts whose slug or
+    # URL year differs from their directory.
     import collections
     import os
     import sys
@@ -436,14 +362,6 @@ def _check_slugs(article_generator):
         if os.path.basename(os.path.dirname(a.relative_source_path)) != a.slug)
     for line in renamed:
         print(f"slug: {line}")
-    # A post is filed under a year and served under the year of its
-    # `date:`, and the two are meant to agree. They part when a draft
-    # written in one year is published in the next and its directory
-    # never moved -- the file stays under 2026/ while the address says
-    # 2027/, which is right (the address states when it was published)
-    # and confusing (the tree no longer sorts the way it reads). Say so;
-    # moving the directory is the fix, and nothing here is broken enough
-    # to stop the build over.
     misfiled = sorted(
         f"{a.relative_source_path} is served at /{a.url}"
         for a in article_generator.articles
@@ -477,7 +395,5 @@ class _SitePlugins:
         signals.finalized.connect(_write_crawl_files)
 
 
-# _CommonMarkPlugin comes from the generated config's own section,
-# above this one: it puts the CommonMark reader in front of pelican's
-# python-markdown one.
+# _CommonMarkPlugin is defined in the config section above
 PLUGINS = [_CommonMarkPlugin, _SitePlugins]

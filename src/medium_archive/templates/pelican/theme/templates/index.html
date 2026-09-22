@@ -2,8 +2,7 @@
 {% from "macros.html" import card with context %}
 {% block content %}
 <h1 class="page-title">{{ SITENAME }}</h1>
-{# site.toml's "intro", rendered from Markdown in the config, as the
-   hugo landing page renders it from content/_index.md #}
+{# site.toml's "intro", rendered from Markdown in the config #}
 {% if INTRO %}<div class="intro">{{ INTRO|safe }}</div>{% endif %}
 <div class="card-grid">
 {% for article in articles_page.object_list %}{{ card(article) }}{% endfor %}

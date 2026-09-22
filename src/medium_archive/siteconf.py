@@ -51,94 +51,84 @@ COMMENT_WIDTH = 72
 # hugo.toml's, and its landing-page blurb is content/_index.md.
 SITE_KEYS = (
     ("title",
-     "the publication's name: the masthead beside the avatar (unless a "
-     "logo stands in for it), the end of every page's title, and the "
-     "title of the feeds.",
+     "the publication's name: in the masthead (unless a logo replaces it), "
+     "every page's title, and the feed titles.",
      "My Blog"),
     ("description",
-     "one line on what the publication is: under the name in the "
-     "masthead, in the feeds, and the description a search result or a "
-     "shared link is summarised with.",
+     "one line on what the publication is: the page description and "
+     "og:description where a page has none of its own, the feeds, the "
+     "structured data, and the footer when no footer is set.",
      "News, releases and community stories."),
     ("base_url",
-     "the address this site is served from, without the trailing slash "
-     "Pelican does not want: what every absolute link is built against "
-     "-- the feeds, the redirect stubs, the Open Graph tags, and the "
-     "share links a reader hands to LinkedIn or Facebook.",
+     "the address the site is served from. Absolute links (feeds, redirect "
+     "stubs, Open Graph tags, share links) are built from it.",
      "https://blog.example.org"),
     ("locale",
-     "the language of the pages, as <html lang> and in the feeds.",
+     "the language of the pages: <html lang> and the structured data.",
      "en"),
     ("intro",
-     "the landing-page blurb, Markdown: the paragraph above the first "
-     "row of cards.",
+     "the landing-page blurb above the cards, Markdown.",
      "News and releases from [the project](https://example.org)"),
     ("footer",
-     "the line under every page, Markdown. `{year}` in it becomes the "
-     "year the site is built, so a copyright notice stays current.",
+     "the line under every page, Markdown. `{year}` becomes the build "
+     "year. Unset, the description is shown.",
      "© {year} The Example Foundation"),
     ("avatar",
-     "the small round mark beside the site's name in the header, and "
-     "the publisher's logo in every page's structured data.",
+     "the small round image beside the site's name in the header (when "
+     "there is no logo), and the publisher's logo in the structured data.",
      "theme/img/avatar.svg"),
     ("favicon",
      "the browser-tab icon.",
      "theme/favicon.svg"),
     ("logo",
-     "a masthead logo that stands in for the site's name -- a wordmark, "
-     "the way jupyter.org's navbar carries its rectangle logo. With one "
-     "set the header shows it instead of the avatar and the name.",
+     "a masthead logo that stands in for the site's name, shown instead "
+     "of the avatar and the name.",
      "theme/img/logo.svg"),
     ("logo_dark",
-     "the same mark drawn for the dark palette.",
+     "the logo for the dark palette. Used only with logo.",
      "theme/img/logo-dark.svg"),
     ("announcement",
-     "a site-wide banner above the header: an http(s) URL the theme "
-     "fetches client-side (empty content hides the banner, like Sphinx "
-     "themes' html announcement option), or literal HTML.",
+     "a site-wide banner above the header: literal HTML, or an http(s) URL "
+     "fetched client-side (empty content hides the banner). Readers can "
+     "dismiss it until it changes.",
      "https://example.org/assets/banner.html"),
     ("twitter",
-     "the publication's @handle, credited on links shared to X/Twitter.",
+     "the publication's @handle, for the twitter:site tag.",
      "@example"),
     ("profiles",
-     "the publication's addresses elsewhere (the X/Twitter profile the "
-     "handle above names among them): the Organization's sameAs in "
-     "every page's structured data.",
+     "the publication's addresses elsewhere, including the X/Twitter "
+     "profile of the handle above: the Organization's sameAs in the "
+     "structured data.",
      ["https://example.org", "https://x.com/example"]),
     ("share_image",
      "the og:image of a page with no cover of its own.",
      "theme/img/share.png"),
     ("share_image_size",
-     "its pixel size, which the theme has no image pipeline to measure.",
+     "share_image's pixel size, for og:image:width and og:image:height.",
      [1200, 630]),
     ("cover_size",
-     "the size the card covers were baked to, or unset when they kept "
-     "their source size (the exporter having been run without Pillow).",
+     "the size the card covers were baked to, for og:image dimensions. "
+     "Unset when they kept their source size (exported without Pillow).",
      [640, 360]),
     ("noindex",
      "keep search engines off this deployment (a preview): a noindex "
      "robots tag on every page, and a robots.txt that disallows all.",
      True),
     ("redirects",
-     "what this site does about old inbound links. \"stubs\" is a "
-     "meta-refresh stub page at every old path, which works on any "
-     "static host and is the only mechanism GitHub Pages has; \"file\" "
-     "is a `_redirects` file at the site root, which Netlify, "
-     "Cloudflare Pages and their imitators answer with a real HTTP 301 "
-     "and GitHub Pages ignores; \"both\" is both, \"none\" neither. "
-     "redirects.csv, the map both are rendered from, is written either "
-     "way.",
+     "how old inbound links are redirected. \"stubs\": a meta-refresh page "
+     "at every old path, which works on any static host including GitHub "
+     "Pages; \"file\": a `_redirects` file at the site root, served as HTTP "
+     "301 by Netlify and Cloudflare Pages; \"both\"; or \"none\". "
+     "redirects.csv is written either way.",
      "both"),
     ("plausible",
-     "privacy-friendly analytics: the address of the counting script "
-     "Plausible names this site's, loaded on every page. Unset, the "
-     "pages carry no analytics and no third-party script at all.",
+     "the Plausible analytics script URL for this site, loaded on every "
+     "page. Unset, the pages load no analytics.",
      "https://plausible.io/js/pa-XXXXXXXXXXXXXXXXXXXXX.js"),
     ("logo_link",
-     "where the masthead points when the mark on it stands for "
-     "something larger than the blog -- the address, and the name the "
-     "link reads under. Unset, the masthead points at the site's own "
-     "home.",
+     "where the masthead links, and the link's accessible name, when the "
+     "logo stands for something larger than the blog. Used only with logo. "
+     "Unset, the masthead links to the site's home.",
      {"url": "https://example.org", "label": "example.org"}),
     ("newsletter",
      "the signup band at the foot of every page: its heading and the "
