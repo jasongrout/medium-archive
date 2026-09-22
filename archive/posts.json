@@ -10267,5 +10267,34 @@
     ],
     "body_source": "state",
     "dir": "posts/2026-09-11-jupyterhub-6-0"
+  },
+  "https://blog.jupyter.org/notebooks-on-demand-nod-a-jupyterlab-extension-for-a-notebook-anywhere-bf1605913127": {
+    "title": "Notebooks-On-Demand (Nod): A JupyterLab Extension for a Notebook Anywhere",
+    "subtitle": "",
+    "authors": [
+      {
+        "name": "Eric Rawn",
+        "url": "https://medium.com/@erawn65"
+      }
+    ],
+    "date": "2026-09-22T00:37:12Z",
+    "updated": "2026-09-22T00:37:12Z",
+    "original_url": "https://blog.jupyter.org/notebooks-on-demand-nod-a-jupyterlab-extension-for-a-notebook-anywhere-bf1605913127",
+    "original_path": "/notebooks-on-demand-nod-a-jupyterlab-extension-for-a-notebook-anywhere-bf1605913127",
+    "medium_id": "bf1605913127",
+    "slug": "notebooks-on-demand-nod-a-jupyterlab-extension-for-a-notebook-anywhere",
+    "canonical_url": null,
+    "ghost_url": null,
+    "description": "Nod: Notebooks-on-Demand is an open-source JupyterLab extension that lets you jump into a Jupyter notebook from anywhere in a Python…",
+    "tags": [
+      "debugging"
+    ],
+    "images": [
+      "images/001-1_aepH_Tg-Y9filKEEllMe4g.png",
+      "images/002-1_MB1vHj5UbqOnMG8FxjXLeQ.png",
+      "images/003-1_6GAT730KwNVY8NJDM2dOLw.png"
+    ],
+    "body_source": "state",
+    "dir": "posts/2026-09-22-notebooks-on-demand-nod-a-jupyterlab-extension-for-a-notebook-anywhere"
   }
 }
