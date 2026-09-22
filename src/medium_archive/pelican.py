@@ -311,6 +311,7 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
         # see sites.newsletter_params
         "newsletter": newsletter_params(config),
         "twitter": config.get("twitter") or None,
+        "plausible": config.get("plausible") or None,
         "profiles": site_profiles(config) or None,
         "share_image": share and f"theme/img/{share}",
         "share_image_size": list(share_size) if share_size else None,

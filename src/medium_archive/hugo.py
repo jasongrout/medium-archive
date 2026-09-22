@@ -345,6 +345,8 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
         params["noindex"] = True
     if config.get("twitter"):
         params["twitter"] = config["twitter"]
+    if config.get("plausible"):
+        params["plausible"] = config["plausible"]
     # the twitter handle's own profile joins the list here
     if site_profiles(config):
         params["profiles"] = site_profiles(config)
