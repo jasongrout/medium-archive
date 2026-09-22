@@ -130,7 +130,9 @@ raw/
                                 page_blocked when a bot wall refused the
                                 page itself and the post was archived
                                 from its RSS feed body instead (no
-                                page.html; a later fetch retries the page)
+                                page.html; the flag is what makes a
+                                later `fetch` ask for the page again,
+                                and it goes when the page lands)
   missing.json                posts that discovery (usually the Wayback
                                 Machine) found but Medium no longer serves
                                 (HTTP 404/410, or "soft-404": Medium's

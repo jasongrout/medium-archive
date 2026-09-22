@@ -36,7 +36,7 @@ def run_fetch(out, gone_now, monkeypatch):
         archive=archive_dir(out), base=BASE, urls=None, no_wayback=False,
         start=None, end=None,
         oldest_first=False, limit=0, existing=None, force=False, delay=0,
-        no_images=True, cookies=None, user_agent=None))
+        no_images=True, cookies=None, user_agent=None, solve_walls=False))
 
 
 def test_gone_posts_flagged_then_unflagged(tmp_path, monkeypatch):
@@ -81,7 +81,7 @@ def test_botwall_falls_back_to_feed_body(tmp_path, monkeypatch):
     fetchmod.cmd_fetch(SimpleNamespace(
         archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
         start=None, end=None, oldest_first=False, limit=0, existing=None,
-        force=False, delay=0, no_images=True, cookies=None, user_agent=None))
+        force=False, delay=0, no_images=True, cookies=None, user_agent=None, solve_walls=False))
 
     raw = archive_dir(tmp_path) / "raw"
     index = json.loads((raw / "index.json").read_text())
@@ -109,13 +109,162 @@ def test_botwall_without_feed_body_stops_the_run(tmp_path, monkeypatch):
         fetchmod.cmd_fetch(SimpleNamespace(
             archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
             start=None, end=None, oldest_first=False, limit=0, existing=None,
-            force=False, delay=0, no_images=True, cookies=None, user_agent=None))
+            force=False, delay=0, no_images=True, cookies=None, user_agent=None, solve_walls=False))
         raise AssertionError("cmd_fetch should have exited")
     except SystemExit as e:
         assert "--cookies" in str(e)
     raw = archive_dir(tmp_path) / "raw"
     assert fetchmod.read_index(raw) == {}       # nothing archived
     assert fetchmod.read_missing(raw) == {}     # and nothing false-flagged gone
+
+
+class FakeSolver:
+    """Stands in for WallSolver: no browser, no input()."""
+
+    def __init__(self, html=None, fail=False):
+        self.html = html
+        self.fail = fail
+        self.solved = []
+        self.closed = False
+
+    def solve(self, url):
+        self.solved.append(url)
+        if self.fail:
+            raise RuntimeError("challenge did not clear")
+        return self.html
+
+    def close(self):
+        self.closed = True
+
+
+FEED_ITEM = {"title": "Walled", "content_html": "<p>body</p>",
+             "date": "Tue, 01 May 2018 00:00:00 GMT", "tags": [], "authors": []}
+
+
+def walled_run(tmp_path, monkeypatch, walled, solver=None, feed=True):
+    """One cmd_fetch run over WALLED, with its page refused or not."""
+    monkeypatch.setattr(fetchmod, "discover", lambda session, base, raw_dir, wayback=True: (
+        [(WALLED, None, "feed")], {WALLED: FEED_ITEM} if feed else {}))
+
+    def fake_fetch_post(session, url, dest, feed_item, delay, images):
+        if walled:
+            raise fetchmod.BotWall("403 for " + url, response=FakeResp(status=403))
+        dest.mkdir(parents=True, exist_ok=True)
+        (dest / "page.html").write_text("<html>the real page</html>")
+        return {"published": "2018-05-01T00:00:00Z", "title": "Walled",
+                "image_count": 0, "media_count": 0}
+
+    monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
+    monkeypatch.setattr(fetchmod, "make_session", lambda **kw: FakeSession())
+    if solver is not None:
+        monkeypatch.setattr(fetchmod, "WallSolver", lambda: solver)
+    fetchmod.cmd_fetch(SimpleNamespace(
+        archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
+        start=None, end=None, oldest_first=False, limit=0, existing=None,
+        force=False, delay=0, no_images=True, cookies=None, user_agent=None,
+        solve_walls=solver is not None))
+    return archive_dir(tmp_path) / "raw"
+
+
+def test_page_blocked_post_is_retried_and_upgraded(tmp_path, monkeypatch):
+    # the feed-body fallback is a placeholder, not a verdict: the next
+    # run asks for the page again (no --force), and the entry loses
+    # page_blocked once the real page lands
+    raw = walled_run(tmp_path, monkeypatch, walled=True)
+    assert json.loads((raw / "index.json").read_text())[WALLED]["page_blocked"] is True
+
+    raw = walled_run(tmp_path, monkeypatch, walled=False)
+    entry = json.loads((raw / "index.json").read_text())[WALLED]
+    assert "page_blocked" not in entry
+    assert (raw / "222233334444" / "page.html").read_text() == "<html>the real page</html>"
+
+
+def test_still_walled_keeps_the_feed_archive_untouched(tmp_path, monkeypatch):
+    # re-archiving the same feed body every run would re-download its
+    # images for nothing, so a post still walled is left as it is
+    walled_run(tmp_path, monkeypatch, walled=True)
+    calls = []
+    real = fetchmod.archive_from_feed
+    monkeypatch.setattr(fetchmod, "archive_from_feed",
+                        lambda *a, **kw: calls.append(a) or real(*a, **kw))
+    raw = walled_run(tmp_path, monkeypatch, walled=True)
+    assert calls == []                  # not re-archived
+    assert json.loads((raw / "index.json").read_text())[WALLED]["page_blocked"] is True
+
+
+def test_solver_is_tried_before_the_feed_body(tmp_path, monkeypatch):
+    # the page is what --solve-walls exists to get, and it beats the
+    # feed body -- so a post the feed does carry still goes to the
+    # browser rather than being quietly settled for
+    solver = FakeSolver(html='<script type="application/ld+json">{}</script>ok')
+    raw = walled_run(tmp_path, monkeypatch, walled=True, solver=solver)
+    assert solver.solved == [WALLED]
+    entry = json.loads((raw / "index.json").read_text())[WALLED]
+    assert "page_blocked" not in entry
+    assert (raw / "222233334444" / "page.html").exists()
+
+
+def test_looks_unsolved():
+    # a challenge page carries neither of the two things every real
+    # Medium page carries, and must never be archived as the post
+    assert fetchmod.looks_unsolved("<html><body>Just a moment...</body></html>")
+    assert not fetchmod.looks_unsolved('<script type="application/ld+json">{}</script>')
+    assert not fetchmod.looks_unsolved("<script>window.__APOLLO_STATE__ = {}</script>")
+
+
+def test_botwall_uses_solver_when_no_feed_body(tmp_path, monkeypatch):
+    # no feed body to fall back on, but --solve-walls is set: a real
+    # (faked here) browser renders the page past the wall instead
+    fake_html = "<html><body><article><p>Real content.</p></article></body></html>"
+    monkeypatch.setattr(fetchmod, "discover", lambda session, base, raw_dir, wayback=True: (
+        [(WALLED, None, "wayback")], {}))
+
+    def fake_fetch_post(session, url, dest, feed_item, delay, images):
+        raise fetchmod.BotWall("403 for " + url, response=FakeResp(status=403))
+
+    monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
+    monkeypatch.setattr(fetchmod, "make_session", lambda **kw: FakeSession())
+    solver = FakeSolver(html=fake_html)
+    monkeypatch.setattr(fetchmod, "WallSolver", lambda: solver)
+    fetchmod.cmd_fetch(SimpleNamespace(
+        archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
+        start=None, end=None, oldest_first=False, limit=0, existing=None,
+        force=False, delay=0, no_images=True, cookies=None, user_agent=None,
+        solve_walls=True))
+
+    assert solver.solved == [WALLED]
+    raw = archive_dir(tmp_path) / "raw"
+    index = json.loads((raw / "index.json").read_text())
+    assert "page_blocked" not in index[WALLED]
+    pid = "222233334444"
+    assert (raw / pid / "page.html").read_text() == fake_html
+
+
+def test_botwall_solver_failure_does_not_abort_the_run(tmp_path, monkeypatch):
+    # --solve-walls is set but the browser fetch itself fails (e.g. the
+    # challenge never cleared): reported and counted, not treated as
+    # fatal -- a human is present with --solve-walls, so fetch does not
+    # need to give up on their behalf the way an unattended run does
+    urls = [f"https://blog.example.com/old-post-{i:012x}" for i in range(4)]
+    monkeypatch.setattr(fetchmod, "discover", lambda session, base, raw_dir, wayback=True: (
+        [(u, None, "wayback") for u in urls], {}))
+
+    def fake_fetch_post(session, url, dest, feed_item, delay, images):
+        raise fetchmod.BotWall("403 for " + url, response=FakeResp(status=403))
+
+    monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
+    monkeypatch.setattr(fetchmod, "make_session", lambda **kw: FakeSession())
+    solver = FakeSolver(fail=True)
+    monkeypatch.setattr(fetchmod, "WallSolver", lambda: solver)
+    fetchmod.cmd_fetch(SimpleNamespace(       # must not raise SystemExit
+        archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
+        start=None, end=None, oldest_first=False, limit=0, existing=None,
+        force=False, delay=0, no_images=True, cookies=None, user_agent=None,
+        solve_walls=True))
+
+    assert len(solver.solved) == 4
+    raw = archive_dir(tmp_path) / "raw"
+    assert fetchmod.read_index(raw) == {}
 
 
 def test_looks_gone():
@@ -184,7 +333,7 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
         archive=archive_dir(tmp_path), base=BASE, urls=None,
         no_wayback=False, start=None,
         end=None, oldest_first=False, limit=0, existing=None, force=False,
-        delay=0, no_images=True, cookies=None, user_agent=None))
+        delay=0, no_images=True, cookies=None, user_agent=None, solve_walls=False))
     assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.json").exists()
     assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.gist.json").exists()
 

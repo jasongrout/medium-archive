@@ -4,6 +4,7 @@ Incremental and resumable; the raw archive is the source of truth that
 convert works from.
 """
 
+import atexit
 import json
 import math
 import re
@@ -385,6 +386,38 @@ def backfill_embed_assets(session, page_text: str, mid: str, dest: Path,
     return n
 
 
+def save_post(session, text: str, url: str, dest: Path, feed_item: dict | None,
+              delay: float, images: bool) -> dict:
+    """The common tail of fetch_post and a browser-solved wall: the
+    page's HTML is already in hand (fetched normally, or rendered by a
+    real browser past a bot wall's challenge), so write it and archive
+    everything it leads to -- feed_item.json, embed media, images."""
+    if looks_gone(text):
+        raise PostGone("soft-404")
+    dest.mkdir(parents=True, exist_ok=True)
+    (dest / "page.html").write_text(text, encoding="utf-8")
+    if feed_item:
+        (dest / "feed_item.json").write_text(json.dumps(feed_item, indent=2, ensure_ascii=False))
+    media_count = fetch_media(session, text, medium_id(url) or "", dest, delay)
+
+    img_map = {}
+    if images:
+        img_dir = dest / "images"
+        srcs = collect_image_urls(text, feed_item)
+        # a shell capture renders no <img> tags; its editor state still names the images
+        srcs += [u for u in state_image_urls(text, medium_id(url) or "")
+                 if u not in srcs]
+        # the media files behind embeds (Giphy), served locally by convert
+        srcs += [u for u in embed_asset_urls(text, medium_id(url) or "", dest)
+                 if u not in srcs]
+        fetch_images(session, srcs, img_dir, img_map, delay)
+        (dest / "images.json").write_text(json.dumps(img_map, indent=2))
+
+    info = extract_metadata(BeautifulSoup(text, "html.parser"), url)
+    return {"published": info["date"], "title": info["title"],
+            "image_count": len(img_map), "media_count": media_count}
+
+
 def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
     """Save page.html, feed_item.json, media/, images/ and images.json
@@ -392,30 +425,7 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
     # a post page is a navigation, and Medium's edge reads the headers
     # of one; every other request this tool makes is a subresource
     r = fetch(session, url, headers=NAV_HEADERS)
-    if looks_gone(r.text):
-        raise PostGone("soft-404")
-    dest.mkdir(parents=True, exist_ok=True)
-    (dest / "page.html").write_text(r.text, encoding="utf-8")
-    if feed_item:
-        (dest / "feed_item.json").write_text(json.dumps(feed_item, indent=2, ensure_ascii=False))
-    media_count = fetch_media(session, r.text, medium_id(url) or "", dest, delay)
-
-    img_map = {}
-    if images:
-        img_dir = dest / "images"
-        srcs = collect_image_urls(r.text, feed_item)
-        # a shell capture renders no <img> tags; its editor state still names the images
-        srcs += [u for u in state_image_urls(r.text, medium_id(url) or "")
-                 if u not in srcs]
-        # the media files behind embeds (Giphy), served locally by convert
-        srcs += [u for u in embed_asset_urls(r.text, medium_id(url) or "", dest)
-                 if u not in srcs]
-        fetch_images(session, srcs, img_dir, img_map, delay)
-        (dest / "images.json").write_text(json.dumps(img_map, indent=2))
-
-    info = extract_metadata(BeautifulSoup(r.text, "html.parser"), url)
-    return {"published": info["date"], "title": info["title"],
-            "image_count": len(img_map), "media_count": media_count}
+    return save_post(session, r.text, url, dest, feed_item, delay, images)
 
 
 def archive_from_feed(session, url: str, dest: Path, feed_item: dict,
@@ -441,6 +451,67 @@ def archive_from_feed(session, url: str, dest: Path, feed_item: dict,
     return {"published": d.isoformat() if d else "",
             "title": feed_item.get("title", ""),
             "image_count": len(img_map), "media_count": 0}
+
+
+def looks_unsolved(html: str) -> bool:
+    """Whether this is the wall's own page rather than the post: every
+    real Medium page carries an ld+json block or the editor state its
+    client renders from, and a Cloudflare interstitial carries
+    neither. What tells a cleared challenge from a stuck one, and what
+    keeps the interstitial from being archived as if it were the
+    post."""
+    return "ld+json" not in html and "__APOLLO_STATE__" not in html
+
+
+class WallSolver:
+    """Opens a real, visible browser on first use and reuses it for the
+    rest of the run: clearing Cloudflare's challenge once usually earns
+    a session good for every wall after it, so later posts go through
+    without asking. A run that never hits a wall never imports
+    Playwright or opens a window at all."""
+
+    def __init__(self):
+        self._pw = self._browser = self._page = None
+
+    def solve(self, url: str) -> str:
+        """Navigate there and return the rendered page's HTML -- what a
+        browser sees, not what net.fetch would have. A human is asked
+        to clear the challenge only when one is actually showing, so
+        the second and later walls of a run usually cost nothing."""
+        if self._page is None:
+            try:
+                from playwright.sync_api import sync_playwright
+            except ImportError:
+                raise RuntimeError(
+                    "--solve-walls needs Playwright: pip install "
+                    "medium-archive[solve-walls] (or plain `pip install "
+                    "playwright`) && playwright install chromium")
+            self._pw = sync_playwright().start()
+            # headless is itself a Cloudflare signal, and defeats the point
+            # of a human being able to clear an interactive challenge
+            self._browser = self._pw.chromium.launch(headless=False)
+            self._page = self._browser.new_page()
+            # so an interrupted run does not leave the window behind
+            atexit.register(self.close)
+        self._page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+        html = self._page.content()
+        if looks_unsolved(html):
+            print(f"  waiting on the browser: clear the challenge showing "
+                  f"for {url}, then press Enter here", file=sys.stderr)
+            input()
+            html = self._page.content()
+        # Never archive the interstitial itself: it would be indexed as
+        # the post, and every later run would skip re-fetching it.
+        if looks_unsolved(html):
+            raise RuntimeError("the browser is still showing the wall, not "
+                               "the post; nothing archived for it")
+        return html
+
+    def close(self):
+        if self._browser is not None:
+            self._browser.close()
+            self._pw.stop()
+            self._pw = self._browser = self._page = None
 
 
 MEDIUM_ID_RE = re.compile(r"^[0-9a-f]{8,12}$")
@@ -527,6 +598,29 @@ def cmd_fetch(args):
         return next((u for ck, u in keys.items() if u != url
                      and ck.startswith(k) and len(ck) - len(k) <= 4), None)
 
+    def commit_fetch(url: str, pid: str, tmp: Path, dest: Path, alias, entry: dict):
+        """The common tail of every path that finishes archiving a post
+        -- a normal fetch, the RSS-feed fallback, or a browser-solved
+        wall: swap tmp into place (preserving an export.html fetch
+        does not own) and record it in raw/index.json."""
+        if dest.exists():
+            if (dest / "export.html").exists():   # not fetch's to lose
+                shutil.copy2(dest / "export.html", tmp / "export.html")
+            shutil.rmtree(dest)
+        tmp.rename(dest)
+        if alias is not None and alias != url:    # re-key under the fetched URL
+            old = index.pop(alias)
+            entry.update({k: old[k] for k in ("in_export", "imported_at", "draft") if k in old})
+        index[url] = entry
+        by_id[pid] = url
+        keys[norm_key(url)] = url
+        write_index(raw_dir, index)
+        if url in missing:                        # it came back; unflag it
+            del missing[url]
+            write_missing(raw_dir, missing)
+
+    solver = WallSolver() if args.solve_walls else None
+
     for url in [u for u in missing if mangled_alias(u)]:
         print(f"unflagged from missing.json: {url}\n"
               f"  is a mangled variant of the archived {mangled_alias(url)}",
@@ -544,7 +638,15 @@ def cmd_fetch(args):
         # The same post may be indexed under another URL: import-export keys
         # by the export's canonical URL. Skip only if its page was fetched.
         alias = by_id.get(pid)
-        already = url in skip or (alias is not None and (raw_dir / pid / "page.html").exists())
+        # A post archived from its RSS body alone, because a bot wall
+        # refused its page, is asked for again on a later run -- that is
+        # the only way it ever gains the page.html its entry is missing.
+        # Only that flag reopens a post: import-export (--all, drafts)
+        # and import-ghost also index posts with no page.html, and those
+        # are not Medium's to serve at all.
+        walled_before = bool((index.get(url) or {}).get("page_blocked"))
+        already = (url in skip and not walled_before) \
+            or (alias is not None and (raw_dir / pid / "page.html").exists())
         if already and not args.force:
             # posts archived before embed media was fetched: backfill
             # raw/<id>/media/ without re-fetching the post itself
@@ -578,11 +680,6 @@ def cmd_fetch(args):
                 shutil.rmtree(tmp, ignore_errors=True)
                 continue
             media_files += info.get("media_count", 0)
-            if dest.exists():
-                if (dest / "export.html").exists():   # not fetch's to lose
-                    shutil.copy2(dest / "export.html", tmp / "export.html")
-                shutil.rmtree(dest)
-            tmp.rename(dest)
             entry = {
                 "medium_id": pid,
                 "title": info["title"],
@@ -593,66 +690,96 @@ def cmd_fetch(args):
                 "images": info["image_count"],
                 "in_feed": url in feed,
             }
-            if alias is not None and alias != url:    # re-key under the fetched URL
-                old = index.pop(alias)
-                entry.update({k: old[k] for k in ("in_export", "imported_at", "draft") if k in old})
-            index[url] = entry
-            by_id[pid] = url
-            keys[norm_key(url)] = url
-            write_index(raw_dir, index)
-            if url in missing:                   # it came back; unflag it
-                del missing[url]
-                write_missing(raw_dir, missing)
+            commit_fetch(url, pid, tmp, dest, alias, entry)
             fetched += 1
             consecutive_walls = 0
         except BotWall as e:
             item = feed.get(url)
-            if item and item.get("content_html"):
+            handled = False
+            print(f"  {e}", file=sys.stderr)
+            # A browser gets the page itself, which every other way past a
+            # wall only approximates -- so it is tried before the feed
+            # body, including for the recent posts the feed does carry.
+            if solver is not None:
+                shutil.rmtree(tmp, ignore_errors=True)
+                try:
+                    html = solver.solve(url)
+                    info = save_post(session, html, url, tmp, item,
+                                     args.delay, not args.no_images)
+                except Exception as solve_err:
+                    print(f"  browser fetch failed: {solve_err}", file=sys.stderr)
+                    shutil.rmtree(tmp, ignore_errors=True)
+                else:
+                    if not in_window(parse_date(info["published"]), start, end):
+                        print(f"  skipped: published {info['published']} is "
+                              f"outside window", file=sys.stderr)
+                        shutil.rmtree(tmp, ignore_errors=True)
+                        handled = True   # not a wall failure, just out of range
+                    else:
+                        media_files += info.get("media_count", 0)
+                        entry = {
+                            "medium_id": pid, "title": info["title"],
+                            "published": info["published"],
+                            "sitemap_date": approx.isoformat() if approx else None,
+                            "found_via": source,
+                            "fetched_at": datetime.now(timezone.utc)
+                                .isoformat(timespec="seconds"),
+                            "images": info["image_count"], "in_feed": url in feed,
+                        }
+                        commit_fetch(url, pid, tmp, dest, alias, entry)
+                        print(f"  archived the page the browser rendered",
+                              file=sys.stderr)
+                        fetched += 1
+                        handled = True
+            if not handled and item and item.get("content_html"):
                 # The ten most recent posts carry a full body in the feed;
                 # a wall on the page itself does not have to lose the post.
-                print(f"  {e}\n  page walled off; archiving from the RSS "
-                      f"feed body instead", file=sys.stderr)
-                shutil.rmtree(tmp, ignore_errors=True)
-                info = archive_from_feed(session, url, tmp, item, args.delay,
-                                         not args.no_images)
-                if dest.exists():
-                    if (dest / "export.html").exists():
-                        shutil.copy2(dest / "export.html", tmp / "export.html")
-                    shutil.rmtree(dest)
-                tmp.rename(dest)
-                entry = {
-                    "medium_id": pid, "title": info["title"],
-                    "published": info["published"],
-                    "sitemap_date": approx.isoformat() if approx else None,
-                    "found_via": source,
-                    "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                    "images": info["image_count"], "in_feed": True,
-                    "page_blocked": True,   # no page.html; re-fetch to upgrade
-                }
-                if alias is not None and alias != url:
-                    old = index.pop(alias)
-                    entry.update({k: old[k] for k in ("in_export", "imported_at", "draft") if k in old})
-                index[url] = entry
-                by_id[pid] = url
-                keys[norm_key(url)] = url
-                write_index(raw_dir, index)
-                fetched += 1
+                if walled_before and dest.exists():
+                    # re-archiving the same feed body every run would
+                    # re-download its images for nothing
+                    print(f"  still walled; keeping the RSS-body archive "
+                          f"already in {dest}", file=sys.stderr)
+                else:
+                    print(f"  page walled off; archiving from the RSS feed "
+                          f"body instead", file=sys.stderr)
+                    shutil.rmtree(tmp, ignore_errors=True)
+                    info = archive_from_feed(session, url, tmp, item, args.delay,
+                                             not args.no_images)
+                    entry = {
+                        "medium_id": pid, "title": info["title"],
+                        "published": info["published"],
+                        "sitemap_date": approx.isoformat() if approx else None,
+                        "found_via": source,
+                        "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "images": info["image_count"], "in_feed": True,
+                        "page_blocked": True,   # no page.html; a later run retries
+                    }
+                    commit_fetch(url, pid, tmp, dest, alias, entry)
+                    fetched += 1
+                handled = True
+            if handled:
+                consecutive_walls = 0
             else:
-                print(f"  FAILED {url}: {e}", file=sys.stderr)
+                print(f"  FAILED {url}: nothing archived for it", file=sys.stderr)
                 shutil.rmtree(tmp, ignore_errors=True)
                 walled += 1
-            consecutive_walls += 1
-            if consecutive_walls >= 3:
-                write_readme(archive, args.base)
-                sys.exit(
-                    f"stopping: {consecutive_walls} bot-wall refusals in a row "
-                    f"-- Medium's edge is walling this session off rather than "
-                    f"this one post. Fetch a page in a browser, copy its "
-                    f"cookies (devtools -> Application/Storage -> Cookies, or "
-                    f"a 'cookies.txt' export), and re-run with --cookies FILE "
-                    f"(pair with --user-agent to match the browser they came "
-                    f"from); already-archived posts are skipped, so this "
-                    f"resumes where it stopped.")
+                consecutive_walls += 1
+                # With a solver, the human is present and can stop the run
+                # themselves; only an unattended run with no recovery option
+                # at all needs fetch to give up on its own rather than grind
+                # through the rest of a publication against a wall that
+                # isn't going to lift.
+                if solver is None and consecutive_walls >= 3:
+                    write_readme(archive, args.base)
+                    sys.exit(
+                        f"stopping: {consecutive_walls} bot-wall refusals in a row "
+                        f"-- Medium's edge is walling this session off rather than "
+                        f"this one post. Fetch a page in a browser, copy its "
+                        f"cookies (devtools -> Application/Storage -> Cookies, or "
+                        f"a 'cookies.txt' export), and re-run with --cookies FILE "
+                        f"(pair with --user-agent to match the browser they came "
+                        f"from) or --solve-walls; already-archived posts are "
+                        f"skipped, so this resumes where it stopped.")
         except Exception as e:
             status = e.status if isinstance(e, PostGone) else \
                 getattr(getattr(e, "response", None), "status_code", None)
@@ -684,6 +811,8 @@ def cmd_fetch(args):
                 print(f"  FAILED {url}: {e}", file=sys.stderr)
             shutil.rmtree(tmp, ignore_errors=True)
         time.sleep(args.delay)
+    if solver is not None:
+        solver.close()
     write_readme(archive, args.base)
     summary = f"fetch done: {fetched} new, {len(index)} total in {raw_dir}"
     if media_files:
