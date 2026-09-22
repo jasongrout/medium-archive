@@ -751,9 +751,8 @@ Feeds and sharing:
 - Replace the Pelican exporter's renderer with markdown-it-py, so the
   site renders CommonMark rather than python-markdown's approximation
   of it, and figures become a directive the reader renders instead of
-  raw HTML that needs `md_in_html`. `docs/commonmark-plan.md` holds
-  the plan, the decisions and their measurements;
-  `docs/commonmark.md` holds the page-by-page numbers behind them.
+  raw HTML that needs `md_in_html`. `docs/commonmark.md` holds
+  the decisions and their measurements.
 
 - Decide whether the page's embedded editor state should be preferred
   over the RSS feed body (`export > state > feed > page` in
