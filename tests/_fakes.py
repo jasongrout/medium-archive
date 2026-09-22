@@ -4,10 +4,11 @@ import requests
 
 
 class FakeResp:
-    def __init__(self, text="", status=200, content=None):
+    def __init__(self, text="", status=200, content=None, headers=None):
         self.text = text
         self.status_code = status
         self.content = text.encode() if content is None else content
+        self.headers = headers or {}
 
     def raise_for_status(self):
         if self.status_code >= 400:

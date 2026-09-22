@@ -31,12 +31,12 @@ def run_fetch(out, gone_now, monkeypatch):
         return {"published": "2018-05-01T00:00:00Z", "title": "T", "image_count": 0}
 
     monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
-    monkeypatch.setattr(fetchmod, "make_session", lambda: FakeSession())
+    monkeypatch.setattr(fetchmod, "make_session", lambda **kw: FakeSession())
     fetchmod.cmd_fetch(SimpleNamespace(
         archive=archive_dir(out), base=BASE, urls=None, no_wayback=False,
         start=None, end=None,
         oldest_first=False, limit=0, existing=None, force=False, delay=0,
-        no_images=True))
+        no_images=True, cookies=None, user_agent=None))
 
 
 def test_gone_posts_flagged_then_unflagged(tmp_path, monkeypatch):
@@ -60,6 +60,62 @@ def test_gone_posts_flagged_then_unflagged(tmp_path, monkeypatch):
     assert set(missing) == {SOFT}
     index = json.loads((archive_dir(tmp_path) / "raw" / "index.json").read_text())
     assert index[GONE]["found_via"] == "wayback"
+
+
+WALLED = "https://blog.example.com/walled-post-222233334444"
+
+
+def test_botwall_falls_back_to_feed_body(tmp_path, monkeypatch):
+    # a post in the feed's ~10 most recent gets archived from its RSS
+    # body when the page itself is refused, instead of being lost
+    feed_item = {"title": "Walled", "content_html": "<p>body</p>",
+                "date": "Tue, 01 May 2018 00:00:00 GMT", "tags": [], "authors": []}
+    monkeypatch.setattr(fetchmod, "discover", lambda session, base, raw_dir, wayback=True: (
+        [(WALLED, None, "feed")], {WALLED: feed_item}))
+
+    def fake_fetch_post(session, url, dest, feed_item, delay, images):
+        raise fetchmod.BotWall("403 for " + url, response=FakeResp(status=403))
+
+    monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
+    monkeypatch.setattr(fetchmod, "make_session", lambda **kw: FakeSession())
+    fetchmod.cmd_fetch(SimpleNamespace(
+        archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
+        start=None, end=None, oldest_first=False, limit=0, existing=None,
+        force=False, delay=0, no_images=True, cookies=None, user_agent=None))
+
+    raw = archive_dir(tmp_path) / "raw"
+    index = json.loads((raw / "index.json").read_text())
+    assert index[WALLED]["page_blocked"] is True
+    assert index[WALLED]["in_feed"] is True
+    pid = "222233334444"
+    assert (raw / pid / "feed_item.json").exists()
+    assert not (raw / pid / "page.html").exists()
+
+
+def test_botwall_without_feed_body_stops_the_run(tmp_path, monkeypatch):
+    # no feed content to fall back on, and the wall persists: three posts
+    # in a row is treated as the session being walled off, not one post
+    # being gone, and the run stops rather than grinding through the rest
+    urls = [f"https://blog.example.com/old-post-{i:012x}" for i in range(5)]
+    monkeypatch.setattr(fetchmod, "discover", lambda session, base, raw_dir, wayback=True: (
+        [(u, None, "wayback") for u in urls], {}))
+
+    def fake_fetch_post(session, url, dest, feed_item, delay, images):
+        raise fetchmod.BotWall("403 for " + url, response=FakeResp(status=403))
+
+    monkeypatch.setattr(fetchmod, "fetch_post", fake_fetch_post)
+    monkeypatch.setattr(fetchmod, "make_session", lambda **kw: FakeSession())
+    try:
+        fetchmod.cmd_fetch(SimpleNamespace(
+            archive=archive_dir(tmp_path), base=BASE, urls=None, no_wayback=False,
+            start=None, end=None, oldest_first=False, limit=0, existing=None,
+            force=False, delay=0, no_images=True, cookies=None, user_agent=None))
+        raise AssertionError("cmd_fetch should have exited")
+    except SystemExit as e:
+        assert "--cookies" in str(e)
+    raw = archive_dir(tmp_path) / "raw"
+    assert fetchmod.read_index(raw) == {}       # nothing archived
+    assert fetchmod.read_missing(raw) == {}     # and nothing false-flagged gone
 
 
 def test_looks_gone():
@@ -118,7 +174,7 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
                         lambda session, base, raw_dir, wayback=True: (
                             [(GOOD, None, "sitemap")], {}))
     monkeypatch.setattr(fetchmod, "make_session",
-                        lambda: FakeSession(router=media_router))
+                        lambda **kw: FakeSession(router=media_router))
 
     def fail_fetch_post(*a, **kw):
         raise AssertionError("archived post must not be re-fetched")
@@ -128,7 +184,7 @@ def test_fetch_backfills_media_for_archived_posts(tmp_path, monkeypatch):
         archive=archive_dir(tmp_path), base=BASE, urls=None,
         no_wayback=False, start=None,
         end=None, oldest_first=False, limit=0, existing=None, force=False,
-        delay=0, no_images=True))
+        delay=0, no_images=True, cookies=None, user_agent=None))
     assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.json").exists()
     assert (archive_dir(tmp_path) / "raw" / pid / "media" / "cafe01.gist.json").exists()
 

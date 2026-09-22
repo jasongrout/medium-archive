@@ -124,9 +124,13 @@ raw/
                                 wayback/file/ghost-wayback), fetched_at,
                                 images, in_feed, plus in_export/imported_at/
                                 draft for posts merged from a Medium account
-                                export, and in_ghost/ghost_url/
+                                export, in_ghost/ghost_url/
                                 ghost_imported_at for posts with a Ghost
-                                capture attached by `import-ghost`
+                                capture attached by `import-ghost`, and
+                                page_blocked when a bot wall refused the
+                                page itself and the post was archived
+                                from its RSS feed body instead (no
+                                page.html; a later fetch retries the page)
   missing.json                posts that discovery (usually the Wayback
                                 Machine) found but Medium no longer serves
                                 (HTTP 404/410, or "soft-404": Medium's

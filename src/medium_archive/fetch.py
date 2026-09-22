@@ -23,7 +23,7 @@ from .images import (collect_image_urls, giphy_media, safe_filename,
                      same_medium_asset)
 from .state import (state_embed_targets, state_image_urls,
                     state_media_resources)
-from .net import fetch, make_session
+from .net import BotWall, NAV_HEADERS, fetch, make_session
 from .pages import extract_metadata
 from .readme import write_readme
 from .urls import (canonical_url, carbon_id, medium_id, norm_key, slug_of,
@@ -389,7 +389,9 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
                delay: float, images: bool) -> dict:
     """Save page.html, feed_item.json, media/, images/ and images.json
     into dest."""
-    r = fetch(session, url)
+    # a post page is a navigation, and Medium's edge reads the headers
+    # of one; every other request this tool makes is a subresource
+    r = fetch(session, url, headers=NAV_HEADERS)
     if looks_gone(r.text):
         raise PostGone("soft-404")
     dest.mkdir(parents=True, exist_ok=True)
@@ -414,6 +416,31 @@ def fetch_post(session, url: str, dest: Path, feed_item: dict | None,
     info = extract_metadata(BeautifulSoup(r.text, "html.parser"), url)
     return {"published": info["date"], "title": info["title"],
             "image_count": len(img_map), "media_count": media_count}
+
+
+def archive_from_feed(session, url: str, dest: Path, feed_item: dict,
+                      delay: float, images: bool) -> dict:
+    """Archive a post from its RSS item alone, for a page Medium's bot
+    wall refused: feed_item.json and the images the feed body names, no
+    page.html. The feed carries the ten most recent posts with full
+    bodies, and `convert` already reads that body when there is no
+    page (`feed_body`), so the post the wall refused is still archived
+    and still converts -- it just misses what only the page and its
+    editor state carry (inline code spans, embeds, the exact
+    timestamp). A later run asks for the page again. Returns what
+    fetch_post returns."""
+    dest.mkdir(parents=True, exist_ok=True)
+    (dest / "feed_item.json").write_text(
+        json.dumps(feed_item, indent=2, ensure_ascii=False), encoding="utf-8")
+    img_map = {}
+    if images:
+        fetch_images(session, collect_image_urls("", feed_item), dest / "images",
+                     img_map, delay)
+        (dest / "images.json").write_text(json.dumps(img_map, indent=2))
+    d = parse_date(feed_item.get("date"))
+    return {"published": d.isoformat() if d else "",
+            "title": feed_item.get("title", ""),
+            "image_count": len(img_map), "media_count": 0}
 
 
 MEDIUM_ID_RE = re.compile(r"^[0-9a-f]{8,12}$")
@@ -459,7 +486,7 @@ def cmd_fetch(args):
     if end is not None and end > start:
         sys.exit("--end must not be later than --start")
 
-    session = make_session()
+    session = make_session(cookies=args.cookies, user_agent=args.user_agent)
     feed = {}
     if args.urls:
         lines = [l.strip() for l in args.urls.read_text().splitlines()]
@@ -507,7 +534,8 @@ def cmd_fetch(args):
         del missing[url]
         write_missing(raw_dir, missing)
 
-    fetched = media_files = 0
+    fetched = media_files = walled = 0
+    consecutive_walls = 0
     for n, (url, approx, source) in enumerate(entries, 1):
         if args.limit and fetched >= args.limit:
             print(f"reached --limit {args.limit}", file=sys.stderr)
@@ -576,6 +604,55 @@ def cmd_fetch(args):
                 del missing[url]
                 write_missing(raw_dir, missing)
             fetched += 1
+            consecutive_walls = 0
+        except BotWall as e:
+            item = feed.get(url)
+            if item and item.get("content_html"):
+                # The ten most recent posts carry a full body in the feed;
+                # a wall on the page itself does not have to lose the post.
+                print(f"  {e}\n  page walled off; archiving from the RSS "
+                      f"feed body instead", file=sys.stderr)
+                shutil.rmtree(tmp, ignore_errors=True)
+                info = archive_from_feed(session, url, tmp, item, args.delay,
+                                         not args.no_images)
+                if dest.exists():
+                    if (dest / "export.html").exists():
+                        shutil.copy2(dest / "export.html", tmp / "export.html")
+                    shutil.rmtree(dest)
+                tmp.rename(dest)
+                entry = {
+                    "medium_id": pid, "title": info["title"],
+                    "published": info["published"],
+                    "sitemap_date": approx.isoformat() if approx else None,
+                    "found_via": source,
+                    "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                    "images": info["image_count"], "in_feed": True,
+                    "page_blocked": True,   # no page.html; re-fetch to upgrade
+                }
+                if alias is not None and alias != url:
+                    old = index.pop(alias)
+                    entry.update({k: old[k] for k in ("in_export", "imported_at", "draft") if k in old})
+                index[url] = entry
+                by_id[pid] = url
+                keys[norm_key(url)] = url
+                write_index(raw_dir, index)
+                fetched += 1
+            else:
+                print(f"  FAILED {url}: {e}", file=sys.stderr)
+                shutil.rmtree(tmp, ignore_errors=True)
+                walled += 1
+            consecutive_walls += 1
+            if consecutive_walls >= 3:
+                write_readme(archive, args.base)
+                sys.exit(
+                    f"stopping: {consecutive_walls} bot-wall refusals in a row "
+                    f"-- Medium's edge is walling this session off rather than "
+                    f"this one post. Fetch a page in a browser, copy its "
+                    f"cookies (devtools -> Application/Storage -> Cookies, or "
+                    f"a 'cookies.txt' export), and re-run with --cookies FILE "
+                    f"(pair with --user-agent to match the browser they came "
+                    f"from); already-archived posts are skipped, so this "
+                    f"resumes where it stopped.")
         except Exception as e:
             status = e.status if isinstance(e, PostGone) else \
                 getattr(getattr(e, "response", None), "status_code", None)
@@ -613,4 +690,7 @@ def cmd_fetch(args):
         summary += f"; {media_files} embed media file(s) archived"
     if missing:
         summary += f"; {len(missing)} posts gone from Medium -> {raw_dir / 'missing.json'}"
+    if walled:
+        summary += (f"; {walled} post(s) refused by Medium's bot wall and not "
+                    f"in the feed -- re-run to retry, or see --cookies")
     print(summary, file=sys.stderr)
