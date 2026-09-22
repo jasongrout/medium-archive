@@ -16,11 +16,8 @@
       shown = null;
       return;
     }
-    // the announcement rides in a wrapper of its own, as it does in
-    // jupyter.org's .global-banner-content: the banner's own box keeps
-    // the smaller measure its padding and dismiss button are drawn
-    // against, and the wrapper sets the announcement's own size (see
-    // .announcement-content), whether the source gives markup or text
+    // .announcement-content (card.css) sets the text size, so bare text
+    // and markup render alike
     banner.innerHTML = "";
     var content = document.createElement("div");
     content.className = "announcement-content";
@@ -40,10 +37,9 @@
     shown = html;
   }
   if (/^https?:\/\//i.test(source)) {
-    // The last fetch's content renders synchronously (this script runs
-    // before the header is parsed), so navigating the site doesn't jerk
-    // the page when the banner arrives; the live fetch then corrects
-    // the rare case of an announcement that changed since.
+    // Render the cached copy synchronously (this runs before the header
+    // is parsed) so the banner does not shift the page; the fetch then
+    // updates it.
     var cached = null;
     try { cached = JSON.parse(localStorage.getItem("announcement-cache")); }
     catch (e) {}

@@ -1335,22 +1335,19 @@ def author_entries(manifest: dict) -> dict:
 
 DATA_HEADERS = {
     "tags.yaml": """\
-# Tag slug -> the name the tag is shown under. A tag reaches the site
-# as its slug, so /tags/<slug>/ stays exact whatever the name holds;
-# this file is what a tag page, a card, the chip index and the per-tag
-# feed render. A slug missing here shows as the slug itself.
+# Tag slug -> the name shown for the tag. URLs (/tags/<slug>/) use the
+# slug; a slug missing here is shown as the slug itself.
 """,
     "authors.yaml": """\
-# Author slug -> the byline it is shown as. Each entry carries:
+# Author slug -> byline:
 #
 #   <slug>:
-#     name: the name the author is shown under -- the author page and
-#           its title, every byline, the chip index, the per-author feed
-#     url:  their profile elsewhere (optional), which the structured
-#           data on posts and on their author page names as their sameAs
+#     name: the name shown on bylines, the author page and its feed
+#     url:  profile elsewhere (optional), the author's sameAs in the
+#           structured data
 #
-# A byline reaches the site as its slug, so /authors/<slug>/ is exact
-# whatever the name holds; a slug missing here shows as the slug itself.
+# URLs (/authors/<slug>/) use the slug; a slug missing here is shown as
+# the slug itself.
 """,
 }
 

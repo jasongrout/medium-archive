@@ -1,7 +1,6 @@
 <style>
-/* Backgrounds mirror --bg in card.css / dark-palette.css: redirect
-   stubs load no stylesheet, so they paint the palette themselves --
-   otherwise following a redirect flashes white in the dark scheme. */
+/* Redirect stubs load no stylesheet; paint --bg here to avoid a white
+   flash in dark mode. Keep in sync with card.css / dark-palette.css. */
 html { background: #f4f4f4; color-scheme: light; }
 html[data-theme="dark"] { background: #131313; color-scheme: dark; }
 @media (prefers-color-scheme: dark) {
