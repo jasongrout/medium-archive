@@ -977,7 +977,7 @@ def test_theme_picker_and_dark_scheme(project):
             assert f'data-set-theme="{choice}"' in text, base
         for choice in ("sans", "system-ui", "inter", "source-sans",
                        "source-serif", "atkinson", "ibm-plex-sans",
-                       "ibm-plex-serif", "merriweather"):
+                       "ibm-plex-serif", "literata", "merriweather"):
             assert f'<option value="{choice}"' in text, base
         for choice in ("ink", "ink-accent", "petrol-aaa", "link-blue",
                        "browser"):
@@ -991,7 +991,7 @@ def test_theme_picker_and_dark_scheme(project):
         # a missing file
         for family in ("Atkinson+Hyperlegible+Next", "Atkinson+Hyperlegible+Mono",
                        "IBM+Plex+Mono", "IBM+Plex+Sans", "IBM+Plex+Serif",
-                       "Inter", "Merriweather", "Merriweather+Sans",
+                       "Inter", "Literata", "Merriweather", "Merriweather+Sans",
                        "Source+Serif+4", "Source+Sans+3",
                        "Source+Code+Pro"):
             assert f"family={family}" in text, (base, family)
