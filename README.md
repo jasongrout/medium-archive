@@ -965,16 +965,38 @@ no longer lists, work through the steps in order:
   whether the body is an interactive challenge page) and falls back to
   the post's RSS feed body when the feed has one (the ten or so most
   recent posts), archiving it with no `page.html` and `page_blocked:
-  true` in `raw/index.json` so a later run knows to ask for the page
-  again. Three walled posts in a row without a feed fallback stop the
-  run outright -- that many is the whole session being walled off, not
-  one post being gone, and grinding through the rest wastes requests
-  against it. Recover with `--cookies FILE`: a Netscape cookie jar (a
-  `cookies.txt` browser-extension export) or a file holding one
-  `Cookie:` header line copied from devtools, from a browser that has
-  loaded Medium; pair it with `--user-agent` set to that browser's
-  string, since Cloudflare binds the cookies to it. Already-archived
-  posts are skipped on the re-run, so it resumes rather than restarts.
+  true` in `raw/index.json`. That flag is the one thing that reopens an
+  archived post: a later run asks Medium for its page again, without
+  `--force`, and the flag goes when the page lands, so a feed-bodied
+  post is a placeholder rather than a verdict. (While the wall is still
+  up, that run leaves the archive alone rather than re-downloading the
+  same feed body and its images.) Three walled posts in a row with
+  nothing to fall back on stop the run outright -- that many is the
+  whole session being walled off, not one post being gone, and grinding
+  through the rest wastes requests against it. `--cookies FILE` (a
+  Netscape cookie jar, a `cookies.txt` browser-extension export, or a
+  file holding one `Cookie:` header line copied from devtools, paired
+  with `--user-agent` set to that same browser's string) can get a
+  *lighter* wall to stand down, but a Cloudflare interactive challenge
+  -- the kind that shows "Just a moment..." -- typically binds its
+  clearance cookie to the solving browser's TLS fingerprint too, which
+  `requests` cannot reproduce. The recovery that does work there is
+  `--solve-walls`: one real, visible browser, opened on the first wall
+  and reused for the rest of the run, where a human clears the
+  challenge and whose rendered page is then archived. It asks only when
+  a challenge is actually on screen, since clearing one usually earns a
+  session the run's later walls pass through untouched, and it never
+  archives the interstitial as the post -- a page carrying neither an
+  ld+json block nor the editor state is refused, leaving the post
+  unarchived rather than indexed as done. The page is what it exists to
+  get, and the page outranks the feed body, so it is tried before that
+  fallback, including for the recent posts the feed does carry; if the
+  browser cannot get there, the feed body still catches the post. It
+  needs Playwright (`pip install medium-archive[solve-walls]`, then
+  `playwright install chromium`) and cannot run unattended, so it is
+  opt-in rather than automatic. Either way a run resumes rather than
+  restarts: everything already archived is skipped, bar the
+  `page_blocked` posts it exists to go back for.
 
 ## Layout
 

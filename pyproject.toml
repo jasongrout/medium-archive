@@ -22,6 +22,9 @@ dependencies = [
 [project.optional-dependencies]
 # card-cover thumbnails in the hugo and pelican exporters
 covers = ["pillow"]
+# fetch --solve-walls: a real browser for a human to clear a bot wall's
+# interactive challenge by hand; still needs `playwright install chromium`
+solve-walls = ["playwright"]
 
 [project.scripts]
 medium-archive = "medium_archive.cli:main"

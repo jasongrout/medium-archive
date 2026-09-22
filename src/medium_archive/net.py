@@ -4,6 +4,7 @@ import sys
 import time
 from http.cookiejar import MozillaCookieJar
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import requests
 
@@ -143,7 +144,12 @@ def fetch(session: requests.Session, url: str, retries: int = 4, **kw) -> reques
                 # and the caller decides (fetch falls back to the RSS
                 # body, and stops the run when the wall is systemic).
                 hint = wall_hint(r)
-                raise BotWall(f"403 for {url} -- refused by Medium's bot wall"
+                # fetch asks several hosts for a post's material, and a
+                # 403 from any of them lands here: name the one that
+                # refused rather than blaming Medium for a gists API
+                # rate limit or an oEmbed endpoint's refusal.
+                host = urlsplit(url).netloc or "the server"
+                raise BotWall(f"403 for {url} -- refused by {host}'s bot wall"
                               + (f" ({hint})" if hint else ""), response=r)
             if r.status_code in TRANSIENT_STATUSES:
                 err = requests.HTTPError(f"{r.status_code} for {url}", response=r)

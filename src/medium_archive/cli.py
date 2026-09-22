@@ -87,7 +87,9 @@ Notes:
   * Medium rate-limits and may serve a bot wall; fetch is resumable. A
     403 falls back to the post's RSS body when it has one and otherwise
     stops the run after three in a row, rather than one post at a time
-    -- see --cookies to get past a wall that persists.
+    -- --cookies gets past a lighter wall; --solve-walls (needs
+    Playwright) opens a real browser for a human to clear an
+    interactive challenge cookies alone can't fake past.
   * Fixups: files in archive/fixups/ are applied to the in-memory raw
     sources by convert and compare, so authored defects -- a broken href
     in a capture, a typo, a mangled paragraph in an export -- can be
@@ -215,6 +217,17 @@ def add_fetch_args(p):
                    help="override the User-Agent sent with every request "
                         "(default: a current desktop Chrome string); match "
                         "this to the browser --cookies came from")
+    p.add_argument("--solve-walls", action="store_true",
+                   help="when a post is refused by Medium's bot wall and "
+                        "isn't in the RSS feed, open it in a real, visible "
+                        "browser and wait for you to clear the challenge by "
+                        "hand (it may also clear on its own), then archive "
+                        "the page it renders -- one browser for the whole "
+                        "run, so solving it once usually covers every wall "
+                        "after it. Requires Playwright (pip install "
+                        "playwright && playwright install chromium). Off by "
+                        "default: it blocks on input() and can't run "
+                        "unattended")
 
 
 def add_convert_args(p):
