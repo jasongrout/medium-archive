@@ -25,7 +25,7 @@
      another host; og:url stays this page */}}
 <link rel="canonical" href="{{ or .Params.canonical $url }}">
 <meta property="og:site_name" content="{{ site.Title }}">
-{{ $post := eq .Type "posts" }}
+{{ $post := and .IsPage (eq .Type "posts") }}
 <meta property="og:type" content="{{ if $post }}article{{ else }}website{{ end }}">
 <meta property="og:title" content="{{ $name }}">
 <meta property="og:url" content="{{ $url }}">

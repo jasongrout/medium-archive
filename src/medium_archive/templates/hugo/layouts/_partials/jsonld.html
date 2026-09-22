@@ -1,7 +1,7 @@
 {{- /* schema.org JSON-LD graph (ctx: page, image -- the share image
        resource or "", url -- the page's address). Organization and
        WebSite on every page, referenced by @id; a BreadcrumbList on all
-       but home; a BlogPosting on pages of type posts; a ProfilePage on
+       but home; a BlogPosting on each post; a ProfilePage on
        an author page. Built as dicts and jsonified so every value is
        escaped for <script>. */ -}}
 {{- $p := .page -}}
@@ -39,7 +39,7 @@
 {{- with index hugo.Data.authors (path.Base .Path) -}}{{- with .url -}}{{- $person = merge $person (dict "sameAs" (slice .)) -}}{{- end -}}{{- end -}}
 {{- $authors = $authors | append $person -}}
 {{- end -}}
-{{- if eq $p.Type "posts" -}}
+{{- if and $p.IsPage (eq $p.Type "posts") -}}
 {{- $ld := dict
   "@type" "BlogPosting"
   "@id" (printf "%s#article" $url)
