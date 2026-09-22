@@ -1,132 +1,40 @@
-"""Archive a Medium publication in independent steps:
+"""Archive a Medium publication and build static sites from it.
 
-    fetch          pull raw material from Medium: page HTML, RSS feed item,
-                   full-resolution images, and the content behind embeds
-                   (gist files, tweets, Carbon snippets, Giphy files),
-                   unmodified, into archive/raw/
+Steps:
+    fetch          download page HTML, RSS items, full-size images and
+                   embed content (gists, tweets, Carbon, Giphy) into
+                   archive/raw/, unmodified; incremental and resumable
     import-export  merge a Medium account export into archive/raw/
-    import-ghost   recover a Ghost blog's posts from the Wayback Machine
-                   into archive/raw/; posts also archived from Medium get the
-                   capture attached alongside the Medium page instead
-    compare        verify the page conversion against the account export
-    convert        turn the raw archive into Markdown + front matter + local
-                   images in archive/posts/, plus posts.json and redirects.csv
-    myst           build a MyST (mystmd) site (site-myst/ by default, or
-                   --out DIR) from the converted posts, ready for
-                   `myst start` / `myst build`
-    hugo           build a Hugo site (site-hugo/ by default)
-    pelican        build a Pelican site (site-pelican/ by default)
-    lint           scan converted posts for conversion-defect signatures
-                   (--embeds: embeds whose content the archive lacks;
-                   --seo: SEO page analysis)
+    import-ghost   recover a Ghost-era blog's posts from the Wayback Machine
+    compare        diff page and export conversions of the same posts
+    convert        archive/raw/ -> Markdown in archive/posts/, plus
+                   posts.json and redirects.csv
+    hugo, pelican, myst
+                   build a site from the converted posts
+    lint           report conversion defects
     stats          summarize the converted archive
+    all            fetch, then convert
 
-Only `fetch` (and `all`) touches the network; the other steps can be re-run
-freely while tuning the conversion (selectors, Markdown style, output
-layout) without hitting Medium again. `fetch` is incremental and resumable.
-
-A Medium account export (medium.com -> Settings -> Download your
-information) can be merged into the raw archive with `import-export`; its
-posts/*.html files are the editor's own clean HTML and become the preferred
-body source on the next `convert`.
-
-Only fetch and all need the publication URL; the other steps work offline
-from the archive alone.
+Only fetch, all and import-ghost use the network.
 
 Examples:
-    medium-archive fetch https://blog.example.com/              # everything, newest first
-    medium-archive fetch https://blog.example.com/ --limit 5    # smoke test
+    medium-archive all https://blog.example.com/ --limit 5      # smoke test
+    medium-archive fetch https://blog.example.com/              # re-run until "0 new"
     medium-archive fetch https://blog.example.com/ --start 2024-12-31 --end 2024-01-01
-    medium-archive import-export medium-export.zip
-    medium-archive import-ghost https://blog.example.com/     # Ghost captures
-    medium-archive compare                                      # page vs export check
-    medium-archive convert                                      # raw -> posts/
-    medium-archive myst                                         # posts/ -> site-myst/
-    medium-archive hugo                                         # posts/ -> site-hugo/
-    medium-archive pelican --out ../blog-pelican --clean         # into a site repo
-    medium-archive stats                                        # summarize the archive
-    medium-archive all https://blog.example.com/ --limit 5      # fetch then convert
+    medium-archive import-export medium-export.zip              # once per author
+    medium-archive import-ghost https://blog.example.com/
+    medium-archive compare
+    medium-archive convert
+    medium-archive lint
+    medium-archive stats
+    medium-archive pelican --out ../blog-pelican --clean        # into a site repo
 
-Recommended workflow for a comprehensive archive:
-  1. smoke test:               all URL --limit 5
-  2. fetch everything:         fetch URL          (re-run until "0 new")
-  3. review raw/missing.json:  posts surviving only on web.archive.org;
-                               recover the ones that matter by hand
-  4. merge account exports:    import-export ZIP (per author), then compare
-  5. Ghost history:            if the blog ever lived on Ghost (e.g. before
-                               its Medium era), import-ghost URL recovers
-                               those posts from web.archive.org captures;
-                               compare --ghost then shows where the Ghost
-                               original converts better than Medium's copy
-                               (use convert --prefer-ghost for those)
-  6. convert, then stats:      a gap year in the counts means undiscovered
-                               posts; seed them with fetch --urls FILE
-  7. back up raw/; re-run fetch periodically until the blog moves
+Directories: --archive DIR (default archive/) for every step; the site
+exporters add --site-inputs DIR (default site/), --out DIR (default
+site-<generator>/) and --image-cache DIR (default .image-cache/).
 
-Notes:
-  * Discovery: sitemap merged with the RSS feed (~10 most recent posts, with
-    full bodies) and the Wayback Machine's index of past captures — Medium's
-    sitemap only lists the last few years, so older posts, still live on
-    Medium, are found through the Wayback index (--no-wayback skips it);
-    --urls FILE can seed URLs collected elsewhere. Sitemap <lastmod> and
-    first-capture dates are approximations that order and pre-filter; the
-    real publish date from each page is re-checked against --start/--end
-    after fetching. Discovered posts that Medium no longer serves (404/410,
-    or its not-found page, which it serves with status 200) are flagged in
-    raw/missing.json with a wayback_url for manual recovery.
-  * Redirects: front matter carries original_url, original_path (the path an
-    old inbound link carries), medium_id (Medium also resolves /p/<id>) and
-    slug; redirects.csv collects these for every converted post.
-  * Medium's "was originally published in ... on Medium" footer and stat
-    tracking pixels are removed. Embedded gists inline their archived
-    files (code fenced, Markdown verbatim), tweets become quotes of
-    their archived text, Carbon embeds
-    their archived code, YouTube and other known providers' embeds stay
-    players, Giphy embeds become the fetched gif or clip, other iframes
-    become links.
-  * Medium rate-limits and may serve a bot wall; fetch is resumable. A
-    403 falls back to the post's RSS body when it has one and otherwise
-    stops the run after three in a row, rather than one post at a time
-    -- --cookies gets past a lighter wall; --solve-walls (needs
-    Playwright) opens a real browser for a human to clear an
-    interactive challenge cookies alone can't fake past.
-  * Fixups: files in archive/fixups/ are applied to the in-memory raw
-    sources by convert and compare, so authored defects -- a broken href
-    in a capture, a typo, a mangled paragraph in an export -- can be
-    corrected reproducibly without editing the archived bytes. *.sub
-    files hold reviewable single-line substitutions (file: target, then
-    old:/new: pairs, optional count:, old-regex: for regexes; '#'
-    comments); *.patch files hold unified patches for structural edits
-    (targets named <medium_id>/<file>). A substitution or hunk that no
-    longer applies aborts the run rather than being skipped.
-  * Tags: an optional hand-written archive/tags.json cleans up the Medium
-    tags as convert writes each post's front matter -- "drop" lists tags
-    that only made sense on medium.com (the publication's own topic on
-    every post, SEO reach tags), "rename" maps variants to a common tag
-    ({"rename": {"notebooks": "jupyter-notebook"}}), which is how tags
-    are consolidated, and "add" puts tags on specific posts by slug
-    ({"add": {"release-of-ipython-5-0": ["releases"]}}) for posts whose
-    Medium tags never named their plain topic; dropping a tag and
-    re-adding it on chosen posts splits an over-applied tag into its
-    deliberate uses. posts.json and every
-    derived site inherit the cleaned tags; raw/ keeps the originals.
-    Stale entries (changing no post) abort a full convert run; `stats
-    --tags` lists every tag with its post count as the worklist for
-    curating the file.
-  * Directories: --archive DIR (default archive/) is the archive every
-    step reads or writes. The exporters add --site-inputs DIR (default
-    site/), --image-cache DIR (default .image-cache/) and --out DIR
-    (default site-<generator>/), so a site can be built anywhere --
-    a checkout of the published site, kept in git. --out is written in
-    place: files the exporter generates are overwritten, everything else
-    is left alone, and a page whose post has left the archive is reported
-    rather than removed. --clean empties --out first, keeping .git/ and
-    what git ignores there (each site's own .gitignore covers that
-    generator's build output and caches).
-  * The archive layout is documented in the README.md written into archive/;
-    each generated site documents itself in the README its exporter
-    writes into it.
-Progress is written to stderr.
+The archive layout is documented in archive/README.md, and each
+generated site in its own README.md. Progress is written to stderr.
 """
 
 import argparse
@@ -341,47 +249,19 @@ def main():
                        help="skip image downloads (convert will keep the "
                             "original, likely dead, URLs)")
     add_convert_args(parser("convert", help="convert archive/raw/ into archive/posts/"))
-    add_site_args(parser("myst", help="build a MyST (mystmd) site in site-myst/ "
-                        "from the converted posts: one page per post, a "
-                        "chronological "
-                        "landing page, a year-grouped table of contents, "
-                        "in-publication links rewritten to site pages, and a "
-                        "redirect map from old inbound paths to page URLs. "
-                        "Rebuilt from scratch each run; site-wide text (title, "
-                        "description, landing-page intro) comes from an "
-                        "optional hand-written site/site.toml. Render with "
-                        "`myst start` or `myst build --html` inside site-myst/ "
-                        "(https://mystmd.org)"), "myst")
-    add_site_args(parser("hugo", help="build a Hugo site in site-hugo/ from the "
-                        "converted posts: a self-contained card-grid blog "
-                        "theme (cover-image cards, paginated home, "
-                        "tag/author card listings with per-term RSS), old "
-                        "inbound paths as aliases (static redirect stubs), "
-                        "optimized images (thumbnailed covers; responsive, "
-                        "lazily-loaded body images), a /search/ page wired "
-                        "to Pagefind (run `pagefind --site public` after "
-                        "`hugo` for full-text search with highlighted "
-                        "in-context excerpts), and a redirect map. Render with "
-                        "`hugo server` inside site-hugo/ "
-                        "(https://gohugo.io)"), "hugo")
-    add_site_args(parser("pelican", help="build a Pelican site in site-pelican/ "
-                           "from the converted posts, with the same "
-                           "card-grid theme as the hugo step: cover-image "
-                           "cards (640x360 thumbnails when pillow is "
-                           "installed), tag/author card listings, chip "
-                           "indexes, an archives timeline, Atom feeds "
-                           "(site-wide and per tag/author), responsive "
-                           "lazily-loaded body images (webp srcset "
-                           "variants, encoded after each build like the "
-                           "hugo render hook), a /search/ page wired to Pagefind "
-                           "(run `pagefind --site output` after `pelican`), "
-                           "and redirect stubs at every old inbound path "
-                           "(a plugin embedded in the generated config "
-                           "renders redirects.csv into the same stub pages "
-                           "Hugo emits for aliases). Render with `pelican -l` "
-                           "inside site-pelican/ "
-                           "(https://getpelican.com; `pip install pelican "
-                           "markdown-it-py mdit-py-plugins pyyaml pillow`)"), "pelican")
+    add_site_args(parser("myst", help="build a MyST (mystmd) site in "
+                        "site-myst/ from the converted posts; render with "
+                        "`myst start` or `myst build --html`"), "myst")
+    add_site_args(parser("hugo", help="build a Hugo site in site-hugo/ "
+                        "from the converted posts; render with `hugo` "
+                        "and `pagefind --site public`, or `hugo server`"),
+                  "hugo")
+    add_site_args(parser("pelican", help="build a Pelican site in "
+                           "site-pelican/ from the converted posts; render "
+                           "with `pelican` and `pagefind --site output`, or "
+                           "`pelican -l` (needs `pip install pelican "
+                           "markdown-it-py mdit-py-plugins pyyaml pillow`)"),
+                  "pelican")
     cmp_p = parser("compare",
                    help="verify the page conversion against the account export, "
                         "offline; differences print as a unified patch on stdout "
