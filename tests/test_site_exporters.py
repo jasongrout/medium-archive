@@ -1,5 +1,6 @@
 """The hugo and pelican steps: archive/posts/ + posts.json -> a site."""
 
+import datetime
 import json
 import re
 import sys
@@ -500,7 +501,7 @@ def test_each_site_carries_what_makes_it_a_repository(project):
     ignored = (pelican_site / ".gitignore").read_text()
     assert "/output/" in ignored and "__pycache__/" in ignored
     readme = (pelican_site / "README.md").read_text()
-    for named in ("site.toml", "data/tags.json", "pelicanconf.py",
+    for named in ("site.toml", "data/tags.yaml", "pelicanconf.py",
                   "content/posts/", "pelican -l"):
         assert named in readme, named
     assert not (pelican_site / "content" / "README.md").exists()
@@ -509,7 +510,7 @@ def test_each_site_carries_what_makes_it_a_repository(project):
     assert "/public/" in ignored and "/resources/" in ignored
     readme = (hugo_site / "README.md").read_text()
     for named in ("config/_default/params.toml", "config/_default/hugo.toml",
-                  "data/tags.json", "content/posts/", "hugo server"):
+                  "data/tags.yaml", "content/posts/", "hugo server"):
         assert named in readme, named
     assert not (hugo_site / "content" / "README.md").exists()
 
@@ -619,8 +620,8 @@ def test_tag_display_names_reach_both_sites(project):
     assert front["tags"] == ["example"]           # the tag is still a slug
     # one data file names every tag; the content adapter beside the
     # posts turns it into the term pages (kind term, path = slug)
-    names = hugo_site / "data/tags.json"
-    assert json.loads(names.read_text()) == {"example": "Example Tag"}
+    names = hugo_site / "data/tags.yaml"
+    assert yaml.safe_load(names.read_text()) == {"example": "Example Tag"}
     adapter = (hugo_site / "content/tags/_content.gotmpl").read_text()
     assert "hugo.Data.tags" in adapter and '"kind" "term"' in adapter
     assert not (hugo_site / "content/tags/example").exists()
@@ -630,10 +631,10 @@ def test_tag_display_names_reach_both_sites(project):
     assert post_front(pelican_site, "second-post")["tags"] == ["example"]
     # the same data file, hand-editable beside the generated config,
     # which reads it into TAG_DISPLAY at build time
-    assert json.loads((pelican_site / "data/tags.json").read_text()) \
+    assert yaml.safe_load((pelican_site / "data/tags.yaml").read_text()) \
         == {"example": "Example Tag"}
     config = (pelican_site / "pelicanconf.py").read_text()
-    assert 'TAG_DISPLAY = _data("tags.json")' in config
+    assert 'TAG_DISPLAY = _data("tags.yaml")' in config
     assert config_namespace(pelican_site)["TAG_DISPLAY"] \
         == {"example": "Example Tag"}
     assert "_name_tags" in config          # names the Tag objects, so the
@@ -643,36 +644,49 @@ def test_tag_display_names_reach_both_sites(project):
 def test_both_sites_write_the_same_hand_editable_data_files(project):
     """The maps that are neither a post nor site.toml -- tag names,
     author names, byline profiles -- are data files beside each site's
-    config, the same three files with the same contents in both sites.
-    Hugo reads them through hugo.Data; the pelican config reads them at
-    config time, so editing one by hand renames a tag or corrects a
-    profile in the built site without re-running the exporter."""
+    config, the same two files with the same contents in both sites:
+    one per taxonomy, so everything shown for a byline is that byline's
+    one entry. Hugo reads them through hugo.Data; the pelican config
+    reads them at config time, so editing one by hand renames a tag or
+    corrects a profile in the built site without re-running the
+    exporter."""
     (archive_dir(project) / "tags.json").write_text(json.dumps(
         {"display": {"example": "Example Tag"}}))
     hugo_site = build(hugo, project)
     pelican_site = build(pelican, project)
-    for name in ("tags.json", "authornames.json", "authors.json"):
+    for name in ("tags.yaml", "authors.yaml"):
         got = (pelican_site / "data" / name).read_bytes()
         assert got == (hugo_site / "data" / name).read_bytes(), name
         assert got.endswith(b"\n")           # a diffable, editable file
-    assert json.loads((pelican_site / "data/tags.json").read_text()) \
+        # each file opens with what its entries mean, for the hand that
+        # edits it -- and is still the map it holds once parsed
+        assert got.startswith(b"#")
+    assert not list((pelican_site / "data").glob("*.json"))
+    assert yaml.safe_load((pelican_site / "data/tags.yaml").read_text()) \
         == {"example": "Example Tag"}
-    assert json.loads((pelican_site / "data/authornames.json").read_text()) \
-        == {"ada-lovelace": "Ada Lovelace"}
-    assert json.loads((pelican_site / "data/authors.json").read_text()) \
-        == {"Ada Lovelace": "https://medium.com/@ada"}
-    # nothing of the three is baked into the generated config
+    assert yaml.safe_load((pelican_site / "data/authors.yaml").read_text()) \
+        == {"ada-lovelace": {"name": "Ada Lovelace",
+                             "url": "https://medium.com/@ada"}}
+    # nothing of the two is baked into the generated config
     config = (pelican_site / "pelicanconf.py").read_text()
     assert "Example Tag" not in config and "medium.com/@ada" not in config
 
     # a hand edit reaches the config's settings, with no rebuild
-    (pelican_site / "data/tags.json").write_text(
-        json.dumps({"example": "Renamed By Hand"}))
+    (pelican_site / "data/tags.yaml").write_text(
+        "example: Renamed By Hand\n")
     assert config_namespace(pelican_site)["TAG_DISPLAY"] \
         == {"example": "Renamed By Hand"}
+    (pelican_site / "data/authors.yaml").write_text(
+        "ada-lovelace:\n  name: Renamed By Hand\n  url: https://ada.example/\n"
+        "grace-hopper:\n  name: Grace Hopper\n")
+    namespace = config_namespace(pelican_site)
+    assert namespace["AUTHOR_DISPLAY"] == {"ada-lovelace": "Renamed By Hand",
+                                           "grace-hopper": "Grace Hopper"}
+    # an author with no profile is simply an entry without one
+    assert namespace["AUTHOR_LINKS"] == {"ada-lovelace": "https://ada.example/"}
     # and a deleted file leaves a site that still builds, tags and
     # authors showing as their slugs
-    for name in ("tags.json", "authornames.json", "authors.json"):
+    for name in ("tags.yaml", "authors.yaml"):
         (pelican_site / "data" / name).unlink()
     namespace = config_namespace(pelican_site)
     assert namespace["TAG_DISPLAY"] == namespace["AUTHOR_DISPLAY"] == {}
@@ -686,7 +700,7 @@ def test_tags_display_as_slugs_with_spaces_by_default(project):
         post["tags"] = ["open-science"]
     manifest_json(project).write_text(json.dumps(manifest))
     site = build(hugo, project)
-    names = json.loads((site / "data/tags.json").read_text())
+    names = yaml.safe_load((site / "data/tags.yaml").read_text())
     assert names == {"open-science": "open science"}
 
 
@@ -2456,15 +2470,18 @@ def test_structured_data_graph(project):
         == ["https://a.b/", "https://x.com/ex"]
     assert sites.site_profiles({}) == []
     manifest = json.loads(manifest_json(project).read_text())
-    assert sites.author_links(manifest) == {"Ada Lovelace": "https://medium.com/@ada"}
+    assert sites.author_entries(manifest) == {
+        "ada-lovelace": {"name": "Ada Lovelace",
+                         "url": "https://medium.com/@ada"}}
     cfg = read_site(project)
     cfg["twitter"] = "@example"
     cfg["profiles"] = ["https://github.com/example"]
     write_site(project, cfg)
 
     hugo_site = build(hugo, project)
-    assert json.loads((hugo_site / "data/authors.json").read_text()) \
-        == {"Ada Lovelace": "https://medium.com/@ada"}
+    assert yaml.safe_load((hugo_site / "data/authors.yaml").read_text()) \
+        == {"ada-lovelace": {"name": "Ada Lovelace",
+                             "url": "https://medium.com/@ada"}}
     config = hugo_config(hugo_site)
     assert 'profiles = ["https://github.com/example", "https://x.com/example"]' in config
     # the graph on every page, not only posts
@@ -2480,10 +2497,13 @@ def test_structured_data_graph(project):
         "https://github.com/example", "https://x.com/example"]
     # the byline profiles are the same data file in both sites, read
     # into the pelican config as AUTHOR_LINKS
-    assert json.loads((pelican_site / "data/authors.json").read_text()) \
-        == {"Ada Lovelace": "https://medium.com/@ada"}
+    assert yaml.safe_load((pelican_site / "data/authors.yaml").read_text()) \
+        == {"ada-lovelace": {"name": "Ada Lovelace",
+                             "url": "https://medium.com/@ada"}}
+    # keyed by the slug the byline reaches either engine as, which is
+    # what each site's structured data looks the profile up by
     assert config_namespace(pelican_site)["AUTHOR_LINKS"] \
-        == {"Ada Lovelace": "https://medium.com/@ada"}
+        == {"ada-lovelace": "https://medium.com/@ada"}
     assert '{% include "jsonld.html" %}' in (pelican_site / "theme/templates/base.html").read_text()
     for engine, site in (("hugo", hugo_site), ("pelican", pelican_site)):
         src = _graph_source(site, engine)
@@ -2494,6 +2514,25 @@ def test_structured_data_graph(project):
             assert key in src, (engine, key)
     assert "hugo.Data.authors" in _graph_source(hugo_site, "hugo")
     assert "AUTHOR_LINKS" in _graph_source(pelican_site, "pelican")
+
+    # the profile is looked up by the author's slug, which is what the
+    # byline reaches either engine as and what data/authors.yaml is
+    # keyed by -- a lookup by the rendered name would miss every author
+    # whose name is not its own slug. Rendered, because that is the
+    # only place a template's key is right or wrong.
+    links = {"ada-lovelace": "https://medium.com/@ada"}
+    author = _Term("Ada Lovelace", "authors")
+    for page, context in (("article.html", {"article": SimpleNamespace(
+                               title="First Post", url="posts/first-post/",
+                               date=datetime.datetime(2020, 1, 5),
+                               modified=None, locale_date="2020-01-05",
+                               summary="Hello.", content="<p>Hi.</p>",
+                               cover=None, tags=[_Term("example", "tags")],
+                               authors=[author], related_posts=[])}),
+                          ("author.html", {"author": author})):
+        html = render_pelican_page(pelican_site, page, AUTHOR_LINKS=links,
+                                   output_file="x/index.html", **context)
+        assert '"sameAs": ["https://medium.com/@ada"]' in html, page
 
 
 def test_related_posts(project):
@@ -2660,26 +2699,26 @@ def test_author_slugs_are_clean_and_shared_by_both_sites(tmp_path):
     write_site(tmp_path, {"title": "T"})
     slugs = [slug for _name, slug in hard]
 
-    # the map both sites are named from: slug -> the name it shows
-    assert sites.author_names(manifest) == {s: n for n, s in hard}
+    # the map both sites are named from: slug -> the byline it shows
+    assert sites.author_entries(manifest) == {s: {"name": n} for n, s in hard}
 
     hugo_site = build(hugo, tmp_path)
     front = lambda stem: post_front(hugo_site, stem)
     assert [front(f"post-{i}")["authors"][0] for i in range(len(hard))] == slugs
     # the term pages come from that map, so the path stays the slug
     # while the title carries the name
-    names = json.loads((hugo_site / "data/authornames.json").read_text())
-    assert names == {s: n for n, s in hard}
+    names = yaml.safe_load((hugo_site / "data/authors.yaml").read_text())
+    assert names == {s: {"name": n} for n, s in hard}
     adapter = (hugo_site / "content/authors/_content.gotmpl").read_text()
-    assert "hugo.Data.authornames" in adapter and '"kind" "term"' in adapter
+    assert "hugo.Data.authors" in adapter and '"kind" "term"' in adapter
 
     pelican_site = build(pelican, tmp_path)
     assert [post_front(pelican_site, f"post-{i}")["authors"][0]
             for i in range(len(hard))] == slugs
     # the same map, as the same data file the hugo site got, read back
     # by the config
-    assert json.loads((pelican_site / "data/authornames.json").read_text()) \
-        == {s: n for n, s in hard}
+    assert yaml.safe_load((pelican_site / "data/authors.yaml").read_text()) \
+        == {s: {"name": n} for n, s in hard}
     namespace = config_namespace(pelican_site)
     assert namespace["AUTHOR_DISPLAY"] == {s: n for n, s in hard}
 

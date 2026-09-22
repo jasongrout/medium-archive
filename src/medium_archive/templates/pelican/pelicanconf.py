@@ -10,12 +10,15 @@
 # written above it in the file itself, so nothing here has to explain
 # one; edit it, and nothing here has to be touched. The names tags and
 # authors are shown under are the same arrangement one directory down,
-# in data/*.json.
+# in data/*.yaml.
 
 import datetime as _datetime
-import json as _json
 import os as _os
 import tomllib as _tomllib
+
+# the data files beside this config, and the front matter of every
+# post the reader below parses
+import yaml as _yaml
 
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
 
@@ -157,13 +160,16 @@ CATEGORY_URL = ""               # tags and authors classify posts;
 CATEGORY_SAVE_AS = ""           # the category axis stays unused
 
 # ------------------------------------------------------------- data files
-# The maps this site renders names from live in data/*.json beside this
-# file rather than in it, the same three files the hugo site reads
+# The maps this site renders names from live in data/*.yaml beside this
+# file rather than in it, the same two files the hugo site reads
 # through hugo.Data: this config is machinery, while a name or a
 # profile is exactly what a checked-in copy of a site corrects by hand
-# -- site.toml above and these three are the whole of what such a copy
-# has to touch. They are read here, at config time, so the rest of this
-# file and the site plugin below see ordinary Python dicts.
+# -- site.toml above and these two are the whole of what such a copy
+# has to touch. YAML rather than JSON because they are written to be
+# edited: an entry sits on its own unquoted line, and each file opens
+# with a comment saying what its entries mean. They are read here, at
+# config time, so the rest of this file and the site plugin below see
+# ordinary Python dicts.
 _DATA_DIR = _os.path.join(_HERE, "data")
 
 
@@ -172,28 +178,45 @@ def _data(name):
     and author simply shows as its slug, which is a site worth building."""
     try:
         with open(_os.path.join(_DATA_DIR, name), encoding="utf-8") as fh:
-            return _json.load(fh)
+            return _yaml.safe_load(fh) or {}
     except FileNotFoundError:
         return {}
 
 
-# author name -> profile address (the Medium profile of every byline):
-# the Person's sameAs in a post's structured data, and the author
-# page's. Edit data/authors.json to add or correct one.
-AUTHOR_LINKS = _data("authors.json")
+def _authors(entries):
+    """data/authors.yaml as the two maps this config renders bylines
+    from: slug -> the name shown, and slug -> the profile address (both
+    keyed by the slug a byline reaches Pelican as). One file holds both
+    because they are one author's: a byline corrected by hand is
+    corrected in one entry. A key either map has no value for is left
+    out of it, so an author with no profile gets no sameAs and one with
+    no name shows as their slug."""
+    names, links = {}, {}
+    for slug, entry in entries.items():
+        entry = entry or {}
+        if entry.get("name"):
+            names[slug] = entry["name"]
+        if entry.get("url"):
+            links[slug] = entry["url"]
+    return names, links
+
+
 # tag slug -> the name the tag is shown under. Tags reach Pelican as
 # slugs, so tag.slug and every /tags/<slug>/ URL are exact rather than
 # whatever Pelican's slugify would make of a name like "C++"; the site
 # plugin below names each Tag object from this map once the tags are
 # collected, which is what the theme and the feeds then render. Rename
-# a tag by editing data/tags.json.
-TAG_DISPLAY = _data("tags.json")
-# author slug -> the name they are shown under. Bylines reach Pelican as
-# slugs for the same reason tags do, so author.slug and every
+# a tag by editing data/tags.yaml.
+TAG_DISPLAY = _data("tags.yaml")
+# author slug -> the name they are shown under, and author slug -> their
+# profile address, both out of data/authors.yaml. Bylines reach Pelican
+# as slugs for the same reason tags do, so author.slug and every
 # /authors/<slug>/ URL match the hugo site's exactly; the site plugin
-# names each Author object from this map once they are collected.
-# Rename an author by editing data/authornames.json.
-AUTHOR_DISPLAY = _data("authornames.json")
+# names each Author object from the first map once they are collected,
+# and the second is the Person's sameAs in a post's structured data and
+# on the author's page. Rename an author, or add a profile, by editing
+# that one file.
+AUTHOR_DISPLAY, AUTHOR_LINKS = _authors(_data("authors.yaml"))
 
 FEED_ALL_ATOM = "feeds/all.atom.xml"
 FEED_MAX_ITEMS = 20             # a feed announces new posts; the site
@@ -219,8 +242,6 @@ AUTHOR_FEED_RSS = None
 import re as _re
 import shlex as _shlex
 import unicodedata as _unicodedata
-
-import yaml as _yaml
 
 from markdown_it import MarkdownIt as _MarkdownIt
 from markdown_it.rules_core.replacements import RARE_RE as _RARE_RE

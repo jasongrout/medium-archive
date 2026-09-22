@@ -33,7 +33,7 @@ a `_redirects` file for the hosts that turn one into HTTP 301s, or as
 both. Hugo's own sitemap.xml (page lastmod from the post's updated
 date) is joined by a robots.txt naming it, and the theme's pages carry the metadata search engines and
 share targets read (see templates/README.md): the structured data's
-author and publisher profiles come from data/authors.json (the Medium
+author and publisher profiles come from data/authors.yaml (the Medium
 profile of every byline) and site.toml's "profiles"/"twitter", the
 og:image of a page with no cover from its "share_image", and a post
 that declared a canonical on another host (Medium's "originally
@@ -43,17 +43,17 @@ Medium copy is never a page's canonical. Each post page closes with a
 
 Tags stay slugs in front matter, so each term and its /tags/<tag>/ URL
 are exactly the archive's tag; the names tags are shown under
-(tags.json's `display`) arrive instead as one data file, data/tags.json,
+(tags.json's `display`) arrive instead as one data file, data/tags.yaml,
 from which a content adapter, content/tags/_content.gotmpl, creates the
 term pages with those titles -- which is how every place Hugo renders a
 term (cards, the tag page and its <title>, the chip index, the per-tag
 feed) picks a name up at once, and how a checked-in copy of the site
 renames a tag by editing one file rather than a directory per tag.
-Author names (data/authornames.json) and the byline profiles the
-structured data reads (data/authors.json) are the same arrangement.
-The pelican exporter writes all three files, with the same names and
-contents, and its generated config reads them the way Hugo reads these
-(see sites.write_data_files).
+Bylines are the same arrangement, over data/authors.yaml: one entry per
+author slug, carrying the name they are shown under and the profile the
+structured data reads. The pelican exporter writes both files, with the
+same names and contents, and its generated config reads them the way
+Hugo reads these (see sites.write_data_files).
 
 Hugo has no default theme. The exporter writes a small self-contained
 one (layouts/ + css, from the package's templates/hugo/ and
@@ -143,7 +143,7 @@ TEMPLATES = {
     "layouts/_partials/post-image.html":
         "hugo/layouts/_partials/post-image.html",
     "static/css/style.css": "shared/card.css",
-    # the term pages, from data/tags.json and data/authornames.json
+    # the term pages, from data/tags.yaml and data/authors.yaml
     # (see sites.write_data_files)
     "content/tags/_content.gotmpl": "hugo/content/tags/_content.gotmpl",
     "content/authors/_content.gotmpl":
@@ -295,12 +295,11 @@ def build_site(archive: Path, out=None, inputs=DEFAULT_SITE_INPUTS,
     for year in sorted({post_year(p) for p in manifest.values()}):
         (site / "content" / "posts" / year / "_index.md").write_text(
             front_matter_yaml({"title": year}), encoding="utf-8")
-    # data/tags.json, data/authornames.json and data/authors.json: the
-    # slug-to-name maps the term content adapters build the tag and
-    # author pages from, and the byline profiles the structured data
-    # names as each author's sameAs. Hugo reads them through hugo.Data;
-    # the pelican site is given the same three files (see
-    # sites.write_data_files).
+    # data/tags.yaml and data/authors.yaml: the maps the term content
+    # adapters build the tag and author pages from, each author's entry
+    # carrying the profile the structured data names as their sameAs
+    # too. Hugo reads them through hugo.Data; the pelican site is given
+    # the same two files (see sites.write_data_files).
     write_data_files(site, manifest, archive)
 
     params = {}

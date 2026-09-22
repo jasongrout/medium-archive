@@ -447,12 +447,12 @@ Tags:
   other section's stale or contradictory entry.
 
   Each exporter carries the name the way its generator wants it. Hugo
-  gets the map as `data/tags.json`, from which a content adapter
+  gets the map as `data/tags.yaml`, from which a content adapter
   (`content/tags/_content.gotmpl`) creates a term page per tag with that
   title, so cards, the tag page and its `<title>`, the chip index and
   the per-tag RSS feed all pick it up while front matter keeps the slug,
   and a checked-in site renames a tag in one file.
-  Pelican gets the same `data/tags.json`, which its generated config
+  Pelican gets the same `data/tags.yaml`, which its generated config
   reads from beside itself into a `TAG_DISPLAY` map and the site plugin
   sets on the `Tag` objects once the tags are collected. Tags
   still reach Pelican as slugs, so `tag.slug` is exact rather than
