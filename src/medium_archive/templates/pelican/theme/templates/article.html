@@ -2,18 +2,14 @@
 {% from "macros.html" import share, card with context %}
 {% block name %}{{ article.title }}{% endblock %}
 {% block content %}
-{# title and URL, said once; the macro does the encoding. The title is
-   the plain text of the Title: header, not HTML -- pelican renders only
-   FORMATTED_FIELDS (summary) as markdown -- so stripping tags from it
-   would delete any run shaped like one rather than escape it, and drop
-   what hugo keeps. #}
+{# article.title is plain text (not in FORMATTED_FIELDS), so it is
+   passed unstripped; the share macro encodes it. #}
 {% set post_url = SITEURL ~ "/" ~ article.url %}
 {% set post_title = article.title %}
 <!-- @include shared/share-icons.html -->
 <article class="post" data-pagefind-body>
 <h1>{{ article.title }}</h1>
-{# the post's subtitle line: a FORMATTED_FIELD, so it arrives as the
-   rendered HTML of its Markdown (links and all), like article.content #}
+{# subtitle is a FORMATTED_FIELD, so it is already HTML #}
 {% if article.subtitle %}<div class="post-subtitle">{{ article.subtitle|safe }}</div>{% endif %}
 <p class="post-meta"><time>{{ article.locale_date }}</time>
 {%- for a in article.authors %} · <a href="{{ SITEURL }}/{{ a.url }}">{{ a }}</a>{% endfor %}
@@ -22,10 +18,8 @@
 {{ article.content|safe }}
 {{ share(post_url, post_title) }}
 </article>
-{# more posts (article.related_posts, from the site plugin: by
-   shared tags, then author, then date), the listing cards; kept out
-   of the search index, since the words are the other posts'. Titled
-   as hugo's _partials/related.html titles it #}
+{# article.related_posts is set by the site plugin; kept out of the
+   search index since it holds other posts' text #}
 {% if article.related_posts %}
 <section class="related" data-pagefind-ignore>
 <h2 class="page-title">More posts</h2>

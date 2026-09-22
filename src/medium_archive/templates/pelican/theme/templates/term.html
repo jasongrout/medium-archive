@@ -1,9 +1,5 @@
-{# One term's posts -- a tag's or an author's -- from whichever of the
-   two tag.html and author.html handed over as `term`, with that
-   taxonomy's feed setting as `term_feed`. The two pages differ in
-   nothing else, so they are those two lines and this file; the hugo
-   theme serves both from one template too (section.html, written into
-   the site as term.html as well). #}
+{# A tag's or author's posts; tag.html and author.html set `term` and
+   its feed setting `term_feed`. #}
 {% extends "base.html" %}
 {% from "macros.html" import card with context %}
 {% block name %}{{ term }}{% endblock %}

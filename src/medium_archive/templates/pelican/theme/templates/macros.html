@@ -12,14 +12,10 @@
 </article>
 {% endmacro %}
 
-{# The share bar, rendered twice per post (under the byline and at the
-   foot), so the marks come from the sprite share-icons.html splices
-   into the page once. Jinja does no contextual escaping of its own, so
-   each value spells out |urlencode for a query string or |e for an
-   attribute; urlencode quotes with safe="/", which would leave the
-   slashes of a nested URL raw, and LinkedIn documents its url param as
-   fully encoded, so the replace finishes the job -- and keeps this
-   emitting the same link hugo's escaper does. #}
+{# The share bar; its icons are <use> refs to the sprite from
+   share-icons.html. urlencode leaves "/" unescaped, so it is replaced
+   by hand: LinkedIn requires a fully encoded url, and this matches the
+   hugo theme's links. #}
 {% macro share(post_url, post_title) %}
 {% set share_text = post_title ~ " " ~ post_url %}
 {% set enc_url = post_url|urlencode|replace("/", "%2F") %}

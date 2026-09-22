@@ -1,17 +1,9 @@
-{# Structured data for any page: one schema.org graph, the linked set
-   WordPress's SEO plugins put on every page rather than a lone node
-   (the hugo theme's partials/jsonld.html, in Jinja). The Organization
-   (the publisher: logo, PROFILES as sameAs) and the WebSite (with the
-   search page as its SearchAction) are on every page and referenced
-   by @id from the rest; a BreadcrumbList names the page's place (home,
-   then the tag or author index for a term page, then the page); a post
-   adds its BlogPosting, the block Medium (as SocialMediaPosting)
-   carries, with each author's profile (AUTHOR_LINKS, keyed by the
-   author's slug, as data/authors.yaml is) as sameAs; an
-   author page is a ProfilePage whose main entity is that Person. Built
-   as dicts and serialized by tojson, which escapes every value for a
-   <script>. Reads base.html's page_url, page_title, is_home, og_image
-   and og_size. #}
+{# One schema.org @graph per page: Organization and WebSite always, a
+   BreadcrumbList off the home page, and a BlogPosting (post) or
+   ProfilePage (author page). Keep in sync with the hugo theme's
+   _partials/jsonld.html. Serialized with tojson, which escapes values
+   for a <script>. Reads base.html's page_url, page_title, is_home,
+   og_image and og_size. #}
 {% set home = SITEURL ~ "/" %}
 {% set org_id = home ~ "#organization" %}
 {% set site_id = home ~ "#website" %}

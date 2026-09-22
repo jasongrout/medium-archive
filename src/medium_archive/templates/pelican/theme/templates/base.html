@@ -3,44 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{# The page being rendered, by its output file: page 2 of a listing is
-   its own address, and the canonical link, og:url and <title> below
-   name it rather than page one, which search engines would otherwise
-   fold every page of the listing into. A page's own name is its
-   template's name block, defined in the title and reused (self.name)
-   for og:title; the title adds the page number and the site. #}
+{# page_url is this output file's own URL, so page 2+ of a listing gets
+   its own canonical, og:url and title rather than page one's. The name
+   block is reused (self.name) for og:title. #}
 {% set page_path = output_file[:-10] if output_file.endswith("index.html") else output_file %}
 {% set page_url = SITEURL ~ "/" ~ page_path %}
 {% set is_home = page_name == "index" %}
 {% set page_suffix = " · Page " ~ articles_page.number if articles_page and articles_page.number > 1 else "" %}
 <title>{% block name %}{{ SITENAME }}{% endblock %}{{ page_suffix }}{% if not is_home %} · {{ SITENAME }}{% endif %}</title>
 <meta name="description" content="{% if article %}{{ article.summary|striptags|e }}{% else %}{{ SITESUBTITLE }}{% endif %}">
-{# max-image-preview:large lets a search engine show the post's images
-   at full size in results and Discover, WordPress's default on every
-   page; noindex (NOINDEX in the config, for a preview deployment, or
-   set by a template, the search page) keeps a page out of the index #}
+{# noindex comes from NOINDEX (site.toml) or a template setting
+   `noindex`, as search.html does #}
 <meta name="robots" content="{% if NOINDEX or noindex %}noindex{% else %}index, follow, max-image-preview:large{% endif %}">
-{# Open Graph, which LinkedIn and Facebook read and nothing else
-   supplies: their share URLs carry only the page address, so the
-   headline, blurb and thumbnail of a share come from these tags -- a
-   share link is only ever as good as this block. Bluesky, Mastodon and
-   mail carry the title in the link itself and need none of it. Every
-   URL here is absolute against SITEURL, so they are as real as
-   site.toml's base_url (which the exporter warns about when unset). #}
-{# the share image: the post's baked cover, else SHARE_IMAGE (site.toml
-   "share_image"), so a listing or a coverless post still shares with a
-   picture; its width and height (COVER_SIZE when covers are baked,
-   the file's own for the share image) are declared so Facebook renders
-   the large card on the first share, without a fetch of its own first #}
+{# Open Graph: URLs are absolute, so they need site.toml's base_url.
+   og_image is the post's cover, else SHARE_IMAGE. Its size is declared
+   so Facebook shows the large card on the first share. #}
 {% set og_image = (page_url ~ article.cover) if article and article.cover else (SITEURL ~ "/" ~ SHARE_IMAGE if SHARE_IMAGE else "") %}
 {% set og_size = COVER_SIZE if article and article.cover else SHARE_IMAGE_SIZE %}
 {% set page_title = self.name() %}
-{# a post that is a copy of a page elsewhere (Canonical: header -- the
-   address the post itself declared on another host) names that page
-   as its canonical, as WordPress's per-post canonical field does;
-   og:url stays the page, since a share of this page previews this
-   page. Every other page is its own canonical: the archive is the
-   posts' home, not a copy of Medium's #}
+{# a post with a `canonical:` field names that page as canonical;
+   og:url stays this page #}
 <link rel="canonical" href="{{ article.canonical if article and article.canonical else page_url }}">
 <meta property="og:site_name" content="{{ SITENAME }}">
 <meta property="og:type" content="{% if article %}article{% else %}website{% endif %}">
@@ -55,8 +37,8 @@
 {% endif %}{% if article %}{% set modified = article.modified if article.modified else article.date %}
 <meta property="article:published_time" content="{{ article.date.isoformat() }}">
 <meta property="article:modified_time" content="{{ modified.isoformat() }}">
-{# article:author is a profile address by the Open Graph spec (the
-   author page here); the name itself goes in the author meta tag #}
+{# the Open Graph spec makes article:author a profile URL; the name
+   goes in the author meta tag #}
 {% for a in article.authors %}<meta property="article:author" content="{{ SITEURL }}/{{ a.url }}">
 <meta name="author" content="{{ a|e }}">
 {% endfor %}{% for t in article.tags %}<meta property="article:tag" content="{{ t|e }}">
@@ -72,10 +54,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@200..800&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Inter:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Merriweather:ital,opsz,wdth,wght@0,18..144,100,400..700;1,18..144,100,400..700&family=Merriweather+Sans:ital,wght@0,400..700;1,400..700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:ital,wght@0,400..700;1,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
 <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/style.css">
-{# privacy-friendly analytics (site.toml "plausible"): the count script
-   Plausible names this site's, and the queue stub that holds an event
-   fired before it lands. Last in the head and async, so nothing the
-   page needs to render waits on it. #}
+{# Plausible's script (site.toml "plausible") and its event queue stub,
+   async and last in the head so rendering does not wait on it #}
 {% if PLAUSIBLE %}<!-- Privacy-friendly analytics by Plausible -->
 <script async src="{{ PLAUSIBLE }}"></script>
 <!-- @include shared/plausible.html -->
@@ -84,13 +64,9 @@
 {% if ANNOUNCEMENT %}<div class="announcement" data-source="{{ ANNOUNCEMENT|e }}" hidden></div>
 <!-- @include shared/announcement.html -->
 {% endif %}<header class="site-header"><div class="wrap bar">
-{# the masthead: a logo of the publication's own standing in for its
-   name (site.toml "logo", with "logo_dark" the same mark drawn for the
-   dark palette), as jupyter.org's navbar carries its rectangle logo;
-   failing that, the site's name, with the avatar beside it. It links
-   to the site's home, or to site.toml's "logo_link" where the mark
-   stands for something larger than the blog -- and then the link is
-   named by where it goes, not by this site #}
+{# the masthead: LOGO (and LOGO_DARK for the dark palette) in place
+   of the name, else the avatar and name. With LOGO_LINK it links
+   there, labelled by LOGO_LINK.label. #}
 <a class="site-title" href="{% if LOGO_LINK %}{{ LOGO_LINK.url }}{% else %}{{ SITEURL }}/{% endif %}"{% if LOGO %} aria-label="{% if LOGO_LINK %}{{ LOGO_LINK.label }}{% else %}{{ SITENAME }}{% endif %}"{% endif %}>{% if LOGO %}<img class="site-logo{% if LOGO_DARK %} site-logo-light{% endif %}" src="{{ SITEURL }}/{{ LOGO }}" alt="">{% if LOGO_DARK %}<img class="site-logo site-logo-dark" src="{{ SITEURL }}/{{ LOGO_DARK }}" alt="">{% endif %}{% else %}{% if AVATAR %}<img src="{{ SITEURL }}/{{ AVATAR }}" alt="">{% endif %}{{ SITENAME }}{% endif %}</a>
 <nav>
 <a href="{{ SITEURL }}/">Blog</a>
@@ -108,11 +84,8 @@
 <main class="wrap">
 {% block content %}{% endblock %}
 </main>
-{# jupyter.org's newsletter band (site.toml "newsletter"), the last
-   thing on every page there and here: the heading, and the HubSpot
-   signup form the snippet renders into it. Hidden until that form is
-   on its way, so a blocked embed leaves no heading promising a form
-   that will never arrive. #}
+{# the newsletter band (site.toml "newsletter"): hidden until the
+   HubSpot form loads, so a blocked embed leaves no orphaned heading #}
 {% if NEWSLETTER %}<section class="newsletter" data-hs-portal="{{ NEWSLETTER.hubspot_portal }}" data-hs-form="{{ NEWSLETTER.hubspot_form }}" data-hs-region="{{ NEWSLETTER.hubspot_region }}" hidden>
 <div class="wrap">
 <h2 id="newsletter">{{ NEWSLETTER.heading }}</h2>
@@ -120,10 +93,8 @@
 </div>
 </section>
 <!-- @include shared/newsletter.html -->
-{% endif %}{# the line under every page: site.toml's "footer", read as
-   Markdown by the config (with `{year}` the year of the build, so a
-   copyright notice stays current as jupyter.org's own footer keeps
-   it); with no footer set, the site's description, as before #}
+{% endif %}{# FOOTER is site.toml's "footer" rendered by the config,
+   else the site description #}
 <footer class="wrap site-footer">{% if FOOTER %}{{ FOOTER|safe }}{% else %}{{ SITESUBTITLE }}{% endif %}</footer>
 <!-- @include shared/link-picker.html -->
 <!-- @include shared/font-picker.html -->
