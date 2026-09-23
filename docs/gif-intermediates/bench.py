@@ -174,6 +174,8 @@ def encoder(name):
     """ENCODERS[name], or an encode named by its settings:
     aom444_c6_crf34[_cap]  libaom 4:4:4, -cpu-used 6, CRF 34
     aom420_c6_crf34[_cap]  the same in 4:2:0 (what browsers play)
+    svt420_p6_crf30[_cap]  SVT-AV1 (4:2:0 only), preset 6, CRF 30,
+                           screen-content detection, one thread
     x264_420_crf20[_cap]   libx264 4:2:0 High profile (what browsers
                            play), -preset slower, CRF 20
     x264_444_crf20[_cap]   libx264 4:4:4 (High 4:4:4), for reference
@@ -185,6 +187,11 @@ def encoder(name):
         codec = ["-c:v", "libaom-av1", "-cpu-used", m[2], "-g", "9999",
                  "-row-mt", "0", "-crf", m[3], "-pix_fmt", f"yuv{m[1]}p"]
         vf, cap = (EVEN if m[1] == "420" else None), m[4]
+    elif m := re.fullmatch(r"svt420_p(\d+)_crf(\d+)(_cap)?", name):
+        codec = ["-c:v", "libsvtav1", "-preset", m[1], "-crf", m[2],
+                 "-g", "9999", "-svtav1-params", "scm=2:lp=1",
+                 "-pix_fmt", "yuv420p"]
+        vf, cap = EVEN, m[3]
     else:
         m = re.fullmatch(r"x264_(420|444)_crf(\d+)(_cap)?", name)
         if not m:
