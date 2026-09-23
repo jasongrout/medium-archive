@@ -3,8 +3,9 @@
 Status (2026-09-23): the experiment is complete, and its result is
 implemented in `ImagePlacer` (`src/medium_archive/sites.py`). A second
 round chose what the Pelican site stores as each animation's master
-(see [The Pelican site's masters](#the-pelican-sites-masters)); its
-full-archive measurement is still running. This page summarizes the
+(see [The Pelican site's masters](#the-pelican-sites-masters)); it is
+also complete, with its decisions recorded under
+[Decisions](#decisions-2026-09-23). This page summarizes the
 measurements behind both. The per-run tables are in this
 file's git history. The measurement tools in `docs/gif-intermediates/`
 are a record of how the numbers were produced; the build, the tests
@@ -306,10 +307,10 @@ Two candidates can be missing:
   | `a35ce050f7f7/001` | 108 | 0.3 MB |
   | `81f2eaad5706/002` | 94 | 0.2 MB |
 
-  Together 13.8 MB of gifs. A WebP would change what is stored only
-  where it beats the capped gif and the AV1 master is not within
-  `master_max_share` of it; on `9549c5dcf551/003` the AV1 master is
-  about 11-13% of the gif, so it is stored either way.
+  Together 13.8 MB of gifs. In the full export this cost nothing:
+  six of the seven store their AV1 master anyway, and
+  `81f2eaad5706/002` stores its 0.13 MB capped gif. So their last
+  frame is left as it is.
 
 **The WebP is only made where it could win, at cwebp's default
 effort.** Lossless
@@ -326,22 +327,81 @@ the gif against 0.3 x 6% = 1.8%) and skips the WebP for most gifs.
 Nothing is cached for a skipped WebP, so a larger share makes it on
 the next export. The WebP is also encoded at cwebp's default effort
 (`method=4`, `quality=75`) rather than `method=6`, `quality=100`,
-libwebp's slowest: it decides what is stored for few
-gifs, and on the first export saved about 1.1 MB net of 126 MB (see
-below). WebPs already cached at `method=6` are kept; the cache name
-does not carry the method.
+libwebp's slowest: it decides what is stored for few gifs, and at
+the halfway point of the first export (14 WebPs stored) it saved
+about 1.1 MB net of 126 MB. The size and speed of `method=4` against
+`method=6` were not measured (a benchmark was started and stopped
+before its `method=6` encodes finished); the choice rests on how
+little the WebP decides. WebPs already cached at `method=6` are kept;
+the cache name does not carry the method.
 
-What that export stored, with 121 of the 216 gifs' lossless
-candidates made: AV1 for 194 gifs, WebP for 14, the capped gif for 8;
-126.2 MB in all (21.5% of 586.6 MB of gifs), against 125.1 MB for AV1
-everywhere and 146.4 MB for H.264. Preferring lossless costs about
-1 MB there. gifsicle `-O3` mostly saves little (85-100% of the gif),
-except on two badly optimized gifs (`2e432df402c8/007` and `/008`,
-6%). WebP ranged from 4% to 468% of the gif and won on clean UI
-recordings (`edb3f80dc1c0`, `f6e2e41ab3fa`, `8096b8b223d0`). The
-capped gif of `cda20dc15a21/010` came out at 248% of the gif: the cap
-drops 9 of its 105 frames, and the whole frames written in their
-place lose the gif's partial-frame coding; it is never chosen.
+### What the full export stored (2026-09-23)
+
+A Pelican export of the whole archive, every candidate made (the
+WebP skipped for 55 gifs by the rule above; no capped gif for
+`11e5dab7c54/006`), read with `master_sizes.py`:
+
+| | gifs | MB | of 586.6 MB of gifs |
+|---|---|---|---|
+| **stored under the rule (share 0.75)** | 216 | **128.9** | **22.0%** |
+| as AV1 4:4:4 CRF 28 | 179 | 76.5 | |
+| as lossless WebP | 25 | 40.3 | |
+| as the capped gif | 12 | 12.2 | |
+| AV1 everywhere | 216 | 125.1 | 21.3% |
+| H.264 everywhere (what the other sites carry) | 216 | 146.4 | 25.0% |
+| the capped gif everywhere | 215 | 538.1 | 91.7% |
+
+- **Preferring lossless costs 3.8 MB net** (3%) against AV1
+  everywhere, for 37 lossless masters. 15 of them are also smaller
+  than their AV1 master (2.9 MB less in all): the clean UI recordings
+  of `edb3f80dc1c0`, `789fcb1a5857/001` and `/003`, and the particle
+  recording `cda20dc15a21/005`, where AV1 does badly. The other 22 are
+  larger than their AV1 master (6.8 MB more), kept because the master
+  saved less than 25%.
+- **Two gifs carry most of that cost.** `bd2524b247c2/005`, the
+  dithered chart: WebP 12.31 MB against AV1 9.25 MB (+3.06 MB), its
+  master at 75.1% of the WebP, just over the line (`--share 0.76`
+  stores AV1). `f8151c2cc6e8/003`: WebP 8.09 MB against AV1 6.60 MB
+  (+1.49 MB; AV1 at 81%). Both are where AV1 visibly changes the
+  content: `bd2524`'s dither (43.0 dB, 0.63% of pixels visibly
+  changed at CRF 28) and `f8151c/003`'s worst frames (33.9 dB at
+  CRF 24). The served H.264 is about the same either way (4:2:0 loses
+  `bd2524`'s dither whatever it is made from); the lossless master is
+  for later formats.
+- **gifsicle `-O3`** mostly saves little (85-100% of the gif), except
+  on two badly optimized gifs (`2e432df402c8/007` and `/008`, 6%).
+- **WebP** ranged from 4% to 468% of the gif and won on clean UI
+  recordings (`edb3f80dc1c0`, `f6e2e41ab3fa`, `8096b8b223d0`,
+  `789fcb1a5857`) and on `bd2524` and `f8151c/003`.
+- **The capped gif of `cda20dc15a21/010`** came out at 248% of the
+  gif: the cap drops 9 of its 105 frames, and the whole frames written
+  in their place lose the gif's partial-frame coding. It is never
+  chosen.
+- **Time:** the WebP at `method=6` took hours of that export, where
+  the capped gif takes seconds a gif; hence the skip rule and
+  `method=4` above.
+
+### Decisions (2026-09-23)
+
+- The Pelican site stores one master of each animation, frame-rate
+  capped at 29.5 ms (up to ~33 fps, the nearest gif step to 30 fps)
+  and at full size: the smaller of the capped gif (gifsicle `-O3`) and
+  lossless WebP, unless the AV1 4:4:4 CRF 28 master is at most 75% of
+  it (`master_max_share = 0.75`, kept after the full export: the
+  lossless copies it keeps cost 3.8 MB of 128.9 MB). Its build makes
+  the H.264 it serves from the master.
+- AV1 at CRF 28, not 24: 27% smaller masters for about 1.5 dB, and
+  H.264 made from either within 0.3 dB. `tune-content=screen` is not
+  used.
+- AV1 4:4:4 is stored, not served (software decoding).
+- The WebP is encoded at cwebp's defaults (`method=4`,
+  `quality=75`), and only where it could be stored
+  (`WEBP_MIN_SHARE = 0.4`).
+- Not candidates: lossless H.264 in RGB (179-624% of the gif on the
+  gifs AV1 does badly), JPEG XL, APNG (finding 1).
+- The seven gifs whose last frame is 10 ms keep it; they get no WebP,
+  which changed nothing.
+- A single-frame gif is placed as a PNG would be (finding 9).
 
 `docs/gif-intermediates/master_sizes.py` lists, from the image cache
 after a Pelican export, every candidate of every gif as a share of
@@ -358,7 +418,7 @@ presumably not at all (not checked). The clips autoplay and loop while on screen
 steady CPU load on a phone, where 4:2:0 H.264 has a hardware decoder
 everywhere.
 
-### Full-archive measurement (2026-09-23, in progress)
+### Full-archive measurement (2026-09-23, stopped)
 
 `docs/gif-intermediates/archive_measure.py` encodes every animated gif
 (largest first) as H.264 straight from the gif (`direct`, exactly as
@@ -503,16 +563,13 @@ pixi environment below: `bench.py` passes filter scripts with ffmpeg's
   `789fcb1a5857/001`) are clean UI recordings (see
   [Masters larger than their gifs](#masters-larger-than-their-gifs));
   the other seven have not been looked at.
-- **The full-archive master measurement** was still running when this
-  was written: masters for the 14 largest gifs only. It does not make
-  the capped gif and WebP candidates; those come from a Pelican export,
-  read with `master_sizes.py`.
+- **The full-archive master measurement** (`archive_measure.py`) was
+  stopped once the Pelican export answered the storage question:
+  direct H.264 for 214 of the 215 animated gifs, and every output
+  (masters, H.264 and AV1 4:2:0 made from them) for the 29 largest.
+  It resumes from its results file.
+- **WebP effort.** `method=4` against `method=6` was not measured on
+  this archive.
 - **Visual check of the masters.** CRF 28 4:4:4 was inspected on the
   seven-file ladder only; nobody has looked at a CRF 28 master of the
   archive's other gifs, or at the H.264 made from one.
-- **A short last WebP frame.** The seven gifs whose last frame is
-  10 ms have no WebP candidate. Moving 10 ms from the next-to-last
-  frame to the last (20 ms) would give them one while keeping each
-  loop's length exact, at the cost of one frame boundary moving 10 ms.
-  Worth doing only if a Pelican export stores one of them as a large
-  capped gif (`master_sizes.py` shows them with `-` under webp).
