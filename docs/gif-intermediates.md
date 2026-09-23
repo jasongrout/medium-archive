@@ -171,7 +171,13 @@ reader takes a clip full screen. That is the same reasoning by which
 `sites.py` keeps still line art at full resolution.
 
 **6. Frame-rate cap.** It affects 11 of the 216 gifs (3,749 of 61,048
-frames):
+frames). Kept frames are at least 29.5 ms apart, so up to about 33 fps:
+gif delays are whole hundredths of a second, so the steps near 30 fps
+are 30 ms (33 fps) and 40 ms (25 fps), and 29.5 ms keeps 30 ms frames.
+A strict 30 fps limit (33.4 ms) would mean 25 fps in the fast parts and
+would change 38 gifs, not 11, among them every recording made at a
+30 ms delay (`3ee42dfdc54f/002`: 2,190 frames down to 1,461). The
+limit stays at 29.5 ms.
 - **Delays:** the stored delays are used, as the author made them,
   not the 100 ms browsers substituted.
 - **ffmpeg's own options don't fit:** `-r` and `-fpsmax` require
@@ -256,7 +262,14 @@ Two candidates can be missing:
   own colors, numpy), and a frame over 256 colors cannot be written
   exactly. This affects only the 11 gifs the cap changes; for the
   rest the capped gif is the gif itself through gifsicle `-O3`,
-  never larger than the gif.
+  never larger than the gif. A scan of those 11 found one:
+  `11e5dab7c54/006` (6.0 MB), with 287 of its 288 kept frames over
+  256 colors (up to 6,141). The other ten peak at 151-255 colors
+  (`bd2524b247c2/005` 151, the nine `cda20dc15a21` recordings
+  232-255). The missing candidate costs nothing there: its AV1 4:4:4
+  CRF 28 master was 30% of the gif in the ladder (about 1.8 MB), so a
+  lossless copy would have to be under about 2.4 MB (40% of the gif)
+  to be stored instead.
 - **No WebP when a kept frame would last 10 ms or less.** The cap
   spaces kept frames at least 29.5 ms apart, but the first and last
   frames are always kept, and a frame just before a long one can
