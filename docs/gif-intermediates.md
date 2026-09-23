@@ -400,11 +400,16 @@ every one of them.
 - Capped AV1 CRF 20 (`-cpu-used 4`): `11e5dab7c54/006` 43% of the gif
   (60% uncapped), `cda20dc15a21/005` 89% (96% uncapped).
 
-### Storing the encoded files (requested 2026-09-23)
+### Storing the encoded files (requested 2026-09-23; likely unneeded)
 
-The encoded files are to be checked into this repository, so that
-building a site copies them instead of encoding gifs on every build.
-Proposed shape, not yet built:
+Superseded if the display format is H.264 4:2:0 made straight from the
+gifs (being measured): H.264 encodes fast, and `.image-cache/` already
+keeps each encode once per machine (content-addressed by the gif's
+hash, in a directory named by the settings), with CI restoring it via
+`actions/cache` (the Preview sites workflow; a cold cache is about 20
+minutes on a four-core runner, stills included). Committing encoded
+files only pays for a slow codec like AV1. The shape proposed for that
+case, not built:
 
 - `archive/animations/`, one file per source gif, named by the gif's
   content hash (as `.image-cache/` is today), with a manifest recording
@@ -469,9 +474,12 @@ Small text sets the limit: first artifacts at CRF 34, clear damage at
    source is meant to outlive this repository, stage 2 probably belongs
    with the site: a plugin plus a pinned ffmpeg.
 5. **Browser playback.** Decided (2026-09-23): AV1 is not served for
-   now (Safari plays it only on Apple M3 or later); the AV1 4:4:4 file
-   is the stored master, and the site serves a format every browser
-   plays, made from it. Serving AV1 directly is for later, once support
+   now (Safari plays it only on Apple M3 or later). The gifs in
+   `archive/raw/` stay the masters; the site serves a format every
+   browser plays. Being measured: whether H.264 4:2:0 made straight from
+   the gif (one lossy step, encoded on the fly into `.image-cache/`)
+   is as good as H.264 made from an AV1 master (two steps). If so, no
+   AV1 master is kept; AV1 can be made from the gifs later. Serving AV1 directly is for later, once support
    is broad. Which display format is open:
    - H.264 mp4 (4:2:0) in a `<video>`, as today: every browser, and a
      reader can pause it. The exporters chose this over animated images
@@ -500,6 +508,12 @@ Small text sets the limit: first artifacts at CRF 34, clear damage at
    capped gif (`fpscap.py --gif`) wherever that is smaller, including
    `3ee42dfdc54f/002` (2190 frames, not in the sample). Verify every
    output (timing, quality.py) and inspect the worst frames.
-4. Store the outputs in the repository and have the exporters copy
-   them (see "Storing the encoded files"), after settling browser
-   playback (open question 5).
+4. If H.264 4:2:0 from the gif wins: change `ImagePlacer._encode_video`
+   in `src/medium_archive/sites.py`: the frame-rate cap, `-enc_time_base
+   1:1000`, the chosen CRF and preset, a decision on the 1104 px
+   `animated_max_edge` cap, and a new `CACHE_SCHEME`. The cap's filter
+   has to reach ffmpeg in a form every supported version reads: CI
+   installs Ubuntu's ffmpeg, and `-/vf FILE` (used by `bench.py`) may
+   not exist there; `-filter_script:v FILE` or another route is needed.
+   The capped-gif fallback (`fpscap.py --gif`) replaces gifsicle's
+   resize for gifs kept as gifs.
