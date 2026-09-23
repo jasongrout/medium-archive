@@ -1,9 +1,11 @@
 # Animated gifs in the sites: findings and decisions
 
-Status (2026-09-23): implemented in `ImagePlacer` (`src/medium_archive/sites.py`).
-This page summarizes the measurements behind it. The per-run tables
-are in this file's git history, and the tools are in
-`docs/gif-intermediates/`.
+Status (2026-09-23): the experiment is complete, and its result is
+implemented in `ImagePlacer` (`src/medium_archive/sites.py`). This page
+summarizes the measurements behind it. The per-run tables are in this
+file's git history. The measurement tools in `docs/gif-intermediates/`
+are a record of how the numbers were produced; the build, the tests
+and CI do not use them.
 
 ## What the exporters do now
 
@@ -211,6 +213,12 @@ is universal, at the cost of encoding and storing both.
 
 ## Tools (`docs/gif-intermediates/`)
 
+These tools were for research only. The build does not import or run
+them; the frame-rate cap it uses is its own implementation
+(`kept_frames` and `select_frames` in `sites.py`). The tools need the
+pixi environment below: `bench.py` passes filter scripts with ffmpeg's
+`-/vf` option, which older ffmpeg versions do not have.
+
 - `pixi.toml`, `pixi.lock`: the pinned conda-forge toolchain (ffmpeg
   9.0.2, libaom 3.14.1, SVT-AV1 4.2.0, x264, libjxl 0.12, libwebp 1.6,
   gifsicle 1.96). Run tools with `pixi run --manifest-path
@@ -233,8 +241,15 @@ is universal, at the cost of encoding and storing both.
 - `pil_encode.py`: APNG and WebP with exact delays (Pillow and
   img2webp).
 
-## Still to do
+## Not done
 
-1. **Browser check.** Watch clips from a built site in browsers,
-   including the largest (3,340x1,517) and a `cda20dc15a21` particle
-   clip.
+- **Browser check.** No clip from a built site has been watched in a
+  browser yet. Worth checking: the largest (3,340x1,517) and a
+  `cda20dc15a21` particle clip.
+- **Nine larger clips.** Of the 11 clips larger than their gifs, the
+  nine outside `cda20dc15a21` have not been looked at.
+- **Single-frame gifs.** One image in the archive
+  (`3b3dfb877664/004-0_U5H7uyoSLf0pZm6q`, 52 KB, 1,515x651) is a
+  single-frame gif. It is placed unchanged, because the still-image
+  path, which would make line art lossless webp, handles only `.png`,
+  `.jpg`, `.jpeg` and `.webp`.
