@@ -9,9 +9,9 @@
 # (see todo.md, "Embeds without content"); that is deliberate, so the
 # list cannot be forgotten.
 #
-# The tool is installed from this checkout (`pip install -e .`), so a
-# pull request that changes the converter is linted against the real
-# archive before it lands, not after.
+# The tool runs from this checkout (editable, in the pixi environment),
+# so a pull request that changes the converter is linted against the
+# real archive before it lands, not after.
 
 name: Lint embeds
 
@@ -30,20 +30,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: prefix-dev/setup-pixi@v0.10.2
         with:
-          python-version: "3.12"
-
-      - name: Install medium-archive from this checkout
-        run: pip install -e .
+          cache: true
 
       - name: Rebuild archive/posts/ from archive/raw/
-        run: medium-archive convert
+        run: pixi run medium-archive convert
 
       - name: Lint, including embeds without content
         run: |
           set -o pipefail
-          medium-archive lint --embeds 2>&1 | tee lint.txt
+          pixi run medium-archive lint --embeds 2>&1 | tee lint.txt
 
       # The problem list, one line per embed, on the run's summary page
       # and as annotations on the checks tab, whether or not the lint
