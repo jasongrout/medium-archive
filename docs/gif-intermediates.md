@@ -532,8 +532,38 @@ CRF. CRF 24 is a third smaller than 20 for no visible loss there.
 
 Proposal (2026-09-23): serve H.264 4:2:0 encoded on the fly from the
 capped gifs into `.image-cache/`; no AV1 master, no committed encodes.
-Open: CRF 24 (recommended) or 20, and whether `cda20dc15a21`'s gifs
-stay capped gifs (67% of the original, but no pause control).
+Open: CRF 24 (recommended) or 20.
+
+**Decided (2026-09-23): every animation becomes video**, so a reader
+can pause it, even where the video is somewhat larger than the gif.
+This replaces `sites.py`'s rule that keeps a gif shorter than
+`MOTION_SECONDS` (5 s) when its clip does not undercut it. 15 of the
+216 gifs run under 5 s (18.1 MB): 0.9-4.8 s, 5-161 frames.
+
+Why `cda20dc15a21/005` is larger as video: it records a particle
+simulation, hundreds of small triangles outlined in aliased 1-pixel
+pure green (#00ff00) on a flat grey background, each moving on its
+own. Per changed frame, the changed area averages 7.7% of the frame
+(bounding box), and half the gif's 963 frames repeat the previous one
+(median gif frame: 25 bytes). What each codec pays:
+
+- The gif stores palette indices with LZW: a mostly flat frame with a
+  few sparse green pixels compresses to little, losslessly.
+- Motion compensation barely helps: every particle moves differently,
+  so a block holds several unrelated motions, and each changed frame
+  is coded almost from scratch.
+- Transform coding (DCT and its relatives) spreads a 1-pixel aliased
+  edge across all frequencies, which is expensive to code at any
+  quality that keeps the line crisp.
+- 4:2:0 makes it worse: a 1-pixel saturated green line cannot be
+  represented at quarter color resolution, so the encoder spends bits
+  on the brightness channel compensating, and the line still turns
+  dull (see the crops).
+
+Mean bytes per frame: gif 6,794 (963 frames); H.264 4:2:0 CRF 24
+21,042 (482 frames after the cap); AV1 4:4:4 CRF 28 9,910 (482). AV1
+comes closest because its screen-content tools (palette mode, intra
+block copy) exist for exactly this kind of content.
 
 ## Open questions
 
@@ -584,7 +614,8 @@ stay capped gifs (67% of the original, but no pause control).
 4. If H.264 4:2:0 from the gif wins: change `ImagePlacer._encode_video`
    in `src/medium_archive/sites.py`: the frame-rate cap, `-enc_time_base
    1:1000`, the chosen CRF and preset, a decision on the 1104 px
-   `animated_max_edge` cap, and a new `CACHE_SCHEME`. The cap's filter
+   `animated_max_edge` cap, every animation as video (drop the
+   `MOTION_SECONDS` size rule), and a new `CACHE_SCHEME`. The cap's filter
    has to reach ffmpeg in a form every supported version reads: CI
    installs Ubuntu's ffmpeg, and `-/vf FILE` (used by `bench.py`) may
    not exist there; `-filter_script:v FILE` or another route is needed.
