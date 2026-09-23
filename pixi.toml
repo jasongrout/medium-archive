@@ -6,8 +6,7 @@
 #   pixi run test
 #   pixi shell                      # or activate it
 #
-# uv is still what CI's `Tests` job uses; this file is for building
-# sites locally, which needs programs pip cannot install.
+# CI's `Tests` job runs `pixi run test` in this environment.
 
 [workspace]
 name = "medium-archive"

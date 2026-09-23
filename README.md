@@ -31,7 +31,7 @@ todo.md               status and remaining work
 Generated and git-ignored: `archive/posts/`, `site-hugo/`,
 `site-pelican/`, `site-myst/`, `.image-cache/`.
 
-CI: `Tests` runs the suite on Python 3.11-3.13; `Lint embeds`
+CI: `Tests` runs the suite in the pixi environment; `Lint embeds`
 reconverts the archive and runs `lint --embeds`; `Preview sites` builds
 all three sites to GitHub Pages on pushes to `main`.
 
