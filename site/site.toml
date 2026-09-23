@@ -128,7 +128,7 @@ hubspot_region = "na1"
 # "slower". The pelican site stores the AV1 4:4:4 master of each clip
 # instead, and its build makes the h264 from it (see sites.CLIP_MASTER);
 # clip_master = "none" stores the h264 clip there too, and master_crf
-# is the master's CRF (default 24).
+# is the master's CRF (default 28).
 # [images]
 # still_max_edge = 1600
 # animated_max_edge = 0
@@ -136,7 +136,7 @@ hubspot_region = "na1"
 # video_crf = 24
 # video_preset = "slower"
 # clip_master = "av1"
-# master_crf = 24
+# master_crf = 28
 
 # Anything only the hugo site should differ in: "locale", and the image
 # keys ("avatar", "logo", "logo_dark", "favicon"), each overriding the

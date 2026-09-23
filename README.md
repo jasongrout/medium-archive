@@ -298,7 +298,7 @@ filesystems):
   ffmpeg failing) stops the build with an error listing every such gif,
   unless `site.toml` asks for gifs (`animated_format = "gif"`). The
   measurements behind these choices are in `docs/gif-intermediates.md`.
-- The Pelican site stores each animation as an AV1 4:4:4 CRF 24 master
+- The Pelican site stores each animation as an AV1 4:4:4 CRF 28 master
   (frame-rate capped, full size) under the clip's name, and its build
   makes the h264 it serves from that master, with the settings above,
   cached under `$CLIP_CACHE` (`.image-cache/clips/` in the pixi task).

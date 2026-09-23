@@ -36,7 +36,7 @@ between builds, so nothing encoded is committed.
 **The Pelican site stores AV1 masters (2026-09, experimental).** The
 Pelican site is meant to become a repository of its own, where each
 committed media file stays in the history for good. It therefore
-stores each animation as an AV1 4:4:4 master (libaom, CRF 24,
+stores each animation as an AV1 4:4:4 master (libaom, CRF 28,
 `-cpu-used 6`, frame-rate capped, full size, not padded) under the
 clip's name, and its build makes the served H.264 from it with the
 settings above (`_serve_clips` in the site plugin). A later change of
@@ -44,7 +44,10 @@ served format then changes the plugin, not the committed files.
 4:4:4 is kept for fidelity, not served: browsers decode AV1 4:4:4 in
 software, where 4:2:0 H.264 has a hardware decoder everywhere. The
 cost is a second lossy step for the served clip (0.2-1.2 dB in the
-seven-file chain test, finding 3) and a slower cold encode.
+seven-file chain test, finding 3) and a slower cold encode. On the
+ten largest gifs (170 MB), CRF 28 masters came to 13.1% of the gifs
+at 42.9 dB median against CRF 24's 18.4% at 44.4 dB, and the H.264
+made from them to 9.4% at 37.0 dB against 9.8% at 37.1 dB.
 
 ### Full-archive build (2026-09-23)
 

@@ -597,14 +597,16 @@ VIDEO_PRESET = "slower"
 # 27% of the gifs against h264 CRF 24's 28%, at 47.6 dB against 36.6).
 # It is not served itself: browsers decode AV1 4:4:4 in software, if at
 # all, where 4:2:0 h264 has a hardware decoder everywhere, and a clip
-# loops for as long as it is on screen. CRF 24 is two steps under the
-# CRF 28 at which small text was last clean, as margin for every
-# encode that will be made from it; -cpu-used 6 was as small as 4 and
-# far faster. site.toml's clip_master = "none" stores the h264 clip
-# instead, and master_crf moves the CRF.
+# loops for as long as it is on screen. CRF 28 is the step under the
+# CRF 34 at which small text first showed artifacts in 4:4:4. Against
+# CRF 24 on the archive's ten largest gifs it stored 29% less for about
+# 1.5 dB, and the h264 made from either came out within 0.3 dB: the
+# 4:2:0 encode loses far more than the master does. -cpu-used 6 was as
+# small as 4 and far faster. site.toml's clip_master = "none" stores
+# the h264 clip instead, and master_crf moves the CRF.
 CLIP_MASTER = "av1"
 CLIP_MASTERS = ("av1", "none")
-MASTER_CRF = 24
+MASTER_CRF = 28
 # The still a clip carries, beside it under this suffix. It is what a
 # gif showed at rest (the clip's own first frame, so nothing jumps when
 # playback starts), what a reduced-motion reader sees instead of
