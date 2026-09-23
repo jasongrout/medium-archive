@@ -622,7 +622,7 @@ LINE_ART_QUALITY = 90
 PHOTO_QUALITY = 85
 # Bumped when the copies a given cap produces change shape, so caches
 # written by an older scheme are ignored rather than misread.
-CACHE_SCHEME = "v4"
+CACHE_SCHEME = "v5"
 
 
 def poster_path(clip: Path) -> Path:
@@ -953,10 +953,13 @@ class ImagePlacer:
         it as the poster, from one ffmpeg run: the gif is decoded once
         and feeds both outputs, so the still is free. Timestamps pass
         through untouched, so a gif's per-frame delays survive as the
-        clip's own variable frame rate; faststart puts the index first,
-        so a clip starts playing before it has all arrived. Returns
-        None -- for the caller to fall back on -- when ffmpeg fails or
-        when clip and poster together do not undercut the gif."""
+        clip's own variable frame rate. They are kept in milliseconds,
+        finer than a gif's hundredths: left to itself ffmpeg gives the
+        encoder a time base from a guessed frame rate and rounds every
+        delay to it. Faststart puts the index first, so a clip starts
+        playing before it has all arrived. Returns None -- for the
+        caller to fall back on -- when ffmpeg fails or when clip and
+        poster together do not undercut the gif."""
         size = self._probe(src)
         if size is None:
             return None
@@ -970,7 +973,8 @@ class ImagePlacer:
              *scale,
              "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
              "-crf", str(self.video_crf), "-preset", str(self.video_preset),
-             "-fps_mode", "passthrough", "-an", "-movflags", "+faststart",
+             "-fps_mode", "passthrough", "-enc_time_base", "1:1000",
+             "-an", "-movflags", "+faststart",
              "-f", "mp4", tmp,
              "-map", "0:v", *scale, "-frames:v", "1",
              "-c:v", "libwebp", "-q:v", str(POSTER_QUALITY),
