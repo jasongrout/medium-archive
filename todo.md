@@ -714,8 +714,12 @@ Feeds and sharing:
   without moving any kept frame (`kept_frames`, 11 of 216 gifs); frame
   timestamps keep millisecond precision (`-enc_time_base 1:1000`;
   before, ffmpeg rounded every one to a guessed frame rate, a 25.3 s
-  gif playing 25.5 s); odd sizes are padded by a pixel rather than
-  rescaled. `CACHE_SCHEME` v6 rebuilds the cached clips.
+  gif playing 25.5 s); no B-frames (with them the mp4 ended at the last
+  frame's decode time: 23 of the old clips and 27 of the first new ones
+  ran short, one by 1.55 s); odd sizes are padded by a pixel rather
+  than rescaled. `CACHE_SCHEME` v7 rebuilds the cached clips. Full
+  cold build of the pelican site: animations 170 MB against 187 MB
+  before, 1,026 s against 967 s on four cores.
 
 
 ### Remaining

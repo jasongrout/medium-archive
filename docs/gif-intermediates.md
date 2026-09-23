@@ -13,8 +13,8 @@ Each animated gif in `archive/raw/` stays the master. Every site gets:
   pause, even where the clip is larger than the gif. The exceptions,
   which stay gifs, are gifs with real transparency and machines
   without ffmpeg or Pillow.
-- **Settings:** 4:2:0, High profile, `-crf 24 -preset slower`, one
-  thread per encode (`warm()` encodes gifs in parallel).
+- **Settings:** 4:2:0, High profile, `-crf 24 -preset slower`, no
+  B-frames, one thread per encode (`warm()` encodes gifs in parallel).
 - **Full resolution:** `animated_max_edge` defaults to 0. Odd sizes
   are padded by a pixel rather than rescaled.
 - **A frame-rate cap near 30 fps:** `kept_frames` drops frames inside
@@ -25,8 +25,29 @@ Each animated gif in `archive/raw/` stays the master. Every site gets:
 - **A poster:** the clip's first frame as webp, at the clip's size.
 
 Clips are encoded on the fly into `.image-cache/`, keyed by the gif's
-hash and the settings (`CACHE_SCHEME` v6). CI restores that cache
+hash and the settings (`CACHE_SCHEME` v7). CI restores that cache
 between builds, so nothing encoded is committed.
+
+### Full-archive build (2026-09-23)
+
+The Pelican site, built with a cold cache on four cores with Ubuntu's
+ffmpeg 6.1, against `main`'s old settings (CRF 20, `-preset fast`,
+1,104 px cap):
+
+| | old settings | new settings |
+|---|---|---|
+| clips | 177.5 MB | 152.3 MB |
+| posters | 9.7 MB | 17.8 MB (full size) |
+| gifs kept as gifs | 2 (0.1 MB) | 1 still under a `.gif` name |
+| animations in total | 187.3 MB (32% of 586.6 MB of gifs) | 170.2 MB (29%) |
+| clip vs its gif | median 38% | median 27%; 11 larger than their gif |
+| all display images | 232 MB | 215 MB |
+| cold build | 967 s | 1,026 s |
+| clips shorter than their gif | 23 | 0 |
+
+Every new clip has its gif's size (plus any padding pixel) and length.
+The 11 clips larger than their gifs are the particle and line-drawing
+recordings (finding 7), from 103% up to 237%.
 
 ## The gifs
 
@@ -140,6 +161,11 @@ for the pause control.
   it; one 25.3 s gif played 25.5 s. `-enc_time_base 1:1000` fixes it.
 - **x264 threading:** splitting one encode across threads made one
   clip 39% larger.
+- **B-frames in mp4:** with frames reordered, x264 gives the mp4
+  muxer no packet durations, and the file ends at the last frame's
+  decode time. In the first full build, 27 clips came out short, one
+  of them by 1.55 s of a 2.64 s hold near its end; `main`'s clips had
+  23. `-bf 0` fixes it, for 4% more bytes across the archive.
 - **gif2webp** stores delays of 10 ms or less as 100 ms.
 - **ffmpeg's WebP decoder** plays stored delays of 10 ms or less as
   100 ms.
@@ -207,10 +233,6 @@ is universal, at the cost of encoding and storing both.
 
 ## Still to do
 
-1. **Full-archive build.** Build the sites from the whole archive,
-   and record the total clip size and the cold-cache build time. CI's
-   comment gives about 20 minutes cold on four cores for the old
-   settings; full resolution with `-preset slower` will take longer.
-2. **Browser check.** Watch clips from a built site in browsers,
+1. **Browser check.** Watch clips from a built site in browsers,
    including the largest (3,340x1,517) and a `cda20dc15a21` particle
    clip.
