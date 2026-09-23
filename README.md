@@ -59,8 +59,46 @@ pip install '.[covers]'           # Pillow, for card covers and image re-encodin
 pip install '.[solve-walls]'      # Playwright, for fetch --solve-walls
 ```
 
-Optional external tools used by the exporters: `ffmpeg` (animated gifs
-to mp4), `gifsicle` (gif resizing), `pagefind` (site search).
+`uv run` includes Pillow (dev dependency group); with `pip`, install
+the `covers` extra.
+
+### External tools
+
+The site exporters place every animated gif as an H.264 clip with a
+webp poster, and stop with an error when they cannot (see
+[Images](#images)). Building a site from an archive with animated gifs
+therefore requires Pillow and an `ffmpeg` built with libx264 and
+libwebp, unless `site.toml` sets `[images] animated_format = "gif"`.
+The other tools are needed only for the step that uses them.
+
+| tool | needed for |
+|---|---|
+| `ffmpeg` with libx264 and libwebp | `hugo`, `pelican`, `myst` exporters, when the archive has animated gifs |
+| `gifsicle` | resizing gifs kept as gifs (`animated_format = "gif"` with `animated_max_edge` set) |
+| `hugo`, extended, 0.156+ | building the Hugo site |
+| `pelican` with markdown-it-py, mdit-py-plugins, pyyaml, pillow | building the Pelican site |
+| `myst` (mystmd) | building the MyST site |
+| `pagefind` | search on the Hugo and Pelican sites |
+
+All except pagefind are on conda-forge. With [pixi](https://pixi.sh):
+
+```sh
+pixi global install "ffmpeg=*=gpl*" gifsicle
+pixi global install hugo
+pixi global install pelican --with markdown-it-py --with mdit-py-plugins \
+    --with pyyaml --with pillow
+pixi global install mystmd nodejs
+```
+
+The `gpl*` build selector matters: conda-forge's `lgpl` ffmpeg builds
+omit libx264. Check with `ffmpeg -hide_banner -encoders | grep -E
+'libx264|libwebp'`. pagefind comes from npm, run with the Node.js
+installed above: `npx pagefind@1.5.2 --site public` (or `npm install -g
+pagefind`). `pixi global` puts the executables in `~/.pixi/bin`, which
+the pixi installer adds to `PATH`.
+
+The versions CI builds the preview sites with are pinned in
+`.github/workflows/preview.yml`.
 
 ## Commands
 
@@ -184,6 +222,8 @@ to write a post) and `.gitignore`.
 | build | `hugo`, `hugo server` | `pelican`, `pelican -l` | `myst start`, `myst build --html` |
 | requires | Hugo extended 0.156+ | `pip install pelican markdown-it-py mdit-py-plugins pyyaml pillow` | `npm install -g mystmd` |
 | search | `pagefind --site public` | `pagefind --site output` | -- |
+
+To install these with pixi, see [External tools](#external-tools).
 
 ### Hugo and Pelican
 
