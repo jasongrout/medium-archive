@@ -421,6 +421,42 @@ Proposed shape, not yet built:
 - Size: at the sample's 24%, about 140 MB for the 587 MB of gifs, on
   top of `archive/raw/`'s 835 MB.
 
+### Capped CRF ladder (where quality gives out)
+
+AV1 4:4:4, `-cpu-used 6`, capped, CRF 28 to 52 on seven files. Size
+as % of the gif, PSNR overall/worst frame, share of pixels changed by
+more than 16 levels (quality.py, pairing from the encode's side).
+
+| file | CRF 28 | CRF 34 | CRF 40 | CRF 46 | CRF 52 |
+|---|---|---|---|---|---|
+| `bd2524` | 41%, 43.0/38.4, 0.63% | 21%, 40.1/36.0, 1.08% | 10%, 38.1/34.3, 1.42% | 7%, 36.8/32.8, 1.94% | 5%, 35.3/31.8, 2.84% |
+| `013` | 6%, 37.9/36.1, 1.23% | 3%, 37.0/35.3, 1.68% | 2%, 36.4/34.8, 2.04% | 1%, 35.8/34.3, 2.40% | 1%, 35.3/33.8, 2.82% |
+| `164eb/007` | 8%, 51.6/47.5, 0.01% | 6%, 49.7/45.8, 0.01% | 5%, 47.5/43.1, 0.03% | 4%, 45.2/40.8, 0.09% | 3%, 42.9/37.5, 0.22% |
+| `cda20dc15a21/005` | 73%, 54.7/44.6, 0.02% | 66%, 51.9/43.9, 0.04% | 61%, 48.4/38.3, 0.13% | 56%, 44.3/33.9, 0.28% | 52%, 40.0/28.6, 0.53% |
+| `11e5dab7c54/006` | 30%, 46.0/40.9, 0.11% | 23%, 43.9/38.7, 0.26% | 17%, 41.5/36.4, 0.61% | 13%, 39.2/33.3, 1.21% | 10%, 37.0/31.2, 2.02% |
+| `388d05` | 11%, 47.6/43.3, 0.03% | 9%, 45.5/40.9, 0.07% | 6%, 43.2/38.7, 0.17% | 5%, 40.8/37.2, 0.45% | 4%, 38.7/34.6, 0.92% |
+| `9549` | 11%, 49.9/49.2, 0.00% | 10%, 48.4/46.5, 0.02% | 8%, 46.1/42.8, 0.07% | 7%, 43.7/40.3, 0.21% | 6%, 41.3/37.9, 0.41% |
+
+(`-cpu-used 6` CRF 28 is smaller than `-cpu-used 4` CRF 28 on these:
+`bd2524` 41% capped against 66% uncapped at speed 4, `013` 6% against
+12%.)
+
+The same frame and region (the CRF 52 encode's worst frame, its
+highest-error window on flat background) compared across CRFs at 3x:
+
+- Tiny monospace text (`388d05`): CRF 28 matches the original; CRF 34
+  adds stray marks after a code line; CRF 40 smears a text line and
+  blotches the code; CRF 46 garbles the code; CRF 52 wipes a line and
+  shows text from elsewhere in the scrolling screen (a block copied
+  from the wrong place).
+- Larger code text (`11e5`): clean to CRF 40, slight smudge at 46,
+  soft and ghosted at 52.
+- Chart gridlines on a dithered background (`bd2524`): clean at 28,
+  dither shifts from 34, lines break into steps at 52.
+
+Small text sets the limit: first artifacts at CRF 34, clear damage at
+40. **Chosen: CRF 28**, one step below the first artifacts.
+
 ## Open questions
 
 1. **Container and codec.** Lossless is ruled out for the large files
@@ -456,13 +492,10 @@ Proposed shape, not yet built:
 
 ## Resume here
 
-1. Record the capped CRF ladder (running when this was written):
-   `aom444_c6_crf{28,34,40,46,52}_cap` on `bd2524b247c2/005`,
-   `2e432df402c8/013`, `164eb2eae102/007`, `cda20dc15a21/005`,
-   `11e5dab7c54/006`, `388d05e03442/002` and `9549c5dcf551/003`.
-   Put the same text region of each file side by side across the CRFs
-   and find where text visibly degrades; pick the CRF a step below.
-2. Check `-cpu-used 6` against 4 at the chosen CRF on a few files.
+1. (Done: CRF ladder; CRF 28 chosen.) Optionally try CRF 31 on
+   `388d05` to see whether the margin below 34 can be narrowed.
+2. Check `-cpu-used 6` against 4 at CRF 28, both capped, on a few
+   files (size, quality.py, crops).
 3. Convert the whole archive: capped AV1 at the chosen CRF, and a
    capped gif (`fpscap.py --gif`) wherever that is smaller, including
    `3ee42dfdc54f/002` (2190 frames, not in the sample). Verify every
