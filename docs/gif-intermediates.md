@@ -245,7 +245,7 @@ each lookup, so a new threshold re-encodes nothing:
 | candidate | cache name | kind |
 |---|---|---|
 | the gif, re-optimized by gifsicle `-O3` | `<hash>.capped.gif` | lossless |
-| animated WebP (Pillow, `lossless`, `quality=100`, `method=6`) | `<hash>.capped.webp` | lossless |
+| animated WebP (Pillow, `lossless`, `quality=75`, `method=4`: cwebp's defaults) | `<hash>.capped.webp` | lossless |
 | AV1 4:4:4, libaom CRF 28, `-cpu-used 6`, not padded | `<hash>.av1444-28.mp4` | lossy |
 
 The site stores the smaller lossless copy, unless the AV1 master is at
@@ -311,8 +311,9 @@ Two candidates can be missing:
   `master_max_share` of it; on `9549c5dcf551/003` the AV1 master is
   about 11-13% of the gif, so it is stored either way.
 
-**The WebP is only made where it could win.** Lossless WebP at
-`method=6` is by far the slowest candidate: the first full export
+**The WebP is only made where it could win, at cwebp's default
+effort.** Lossless
+WebP at `method=6` is by far the slowest candidate: the first full export
 spent hours on it, where the capped gif takes seconds a gif. In that
 export's first 113 WebPs, none came in under 44% of its capped gif
 (`4f58385e25bb/005`: 41% of the original gif, against 93% for the
@@ -323,7 +324,12 @@ whatever the WebP would weigh. On that export's data the rule changes
 no stored choice (the closest, `2e432df402c8/007`, has AV1 at 3% of
 the gif against 0.3 x 6% = 1.8%) and skips the WebP for most gifs.
 Nothing is cached for a skipped WebP, so a larger share makes it on
-the next export.
+the next export. The WebP is also encoded at cwebp's default effort
+(`method=4`, `quality=75`) rather than `method=6`, `quality=100`,
+libwebp's slowest: it decides what is stored for few
+gifs, and on the first export saved about 1.1 MB net of 126 MB (see
+below). WebPs already cached at `method=6` are kept; the cache name
+does not carry the method.
 
 What that export stored, with 121 of the 216 gifs' lossless
 candidates made: AV1 for 194 gifs, WebP for 14, the capped gif for 8;

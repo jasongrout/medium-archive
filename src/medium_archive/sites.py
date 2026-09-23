@@ -623,15 +623,20 @@ MASTER_CRF = 28
 MASTER_MAX_SHARE = 0.75
 CAPPED_GIF_SUFFIX = ".capped.gif"
 CAPPED_WEBP_SUFFIX = ".capped.webp"
-# Lossless WebP as docs/gif-intermediates.md measured it (Pillow, the
-# writer that keeps each delay as given; gif2webp plays 10 ms as 100).
+# Lossless WebP through Pillow, the writer that keeps each delay as
+# given (gif2webp plays 10 ms as 100), at cwebp's default effort
+# (method 4, quality 75; Pillow's own default for an animation is
+# method 0) rather than the method 6 and quality 100
+# docs/gif-intermediates.md measured: those are libwebp's slowest, and
+# the WebP only decides what is stored for a handful of gifs, where
+# the extra effort saved little.
 # It is by far the slowest candidate -- hours for the archive, where
 # the capped gif takes seconds a gif -- so it is only built where it
 # could be stored: in the first full export's 113 WebPs, none came in
 # under 44% of its capped gif, so where the master is at most master_max_share
 # of this share of the capped gif, the master wins whatever the WebP
 # would weigh, and the WebP is not made.
-WEBP_LOSSLESS = {"lossless": True, "quality": 100, "method": 6}
+WEBP_LOSSLESS = {"lossless": True, "quality": 75, "method": 4}
 WEBP_MIN_SHARE = 0.4
 # The still a clip carries, beside it under this suffix. It is what a
 # gif showed at rest (the clip's own first frame, so nothing jumps when
