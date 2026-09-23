@@ -104,6 +104,10 @@ ENCODERS = {
     "aom_444_crf20_c6": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libaom-av1", "-cpu-used", "6", "-g", "9999", "-row-mt", "0",
         "-crf", "20", "-pix_fmt", "yuv444p", o]),
+    # the same with the frame rate capped near 30 fps (fpscap.py)
+    "aom_444_crf20_cap": (".mkv", lambda i, o: capped(i, o, [
+        "-c:v", "libaom-av1", "-cpu-used", "4", "-g", "9999", "-row-mt", "0",
+        "-crf", "20", "-pix_fmt", "yuv444p"])),
     "x264_444_crf16": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libx264", "-crf", "16", "-preset", "slower", "-g", "9999",
         "-pix_fmt", "yuv444p", o]),
@@ -137,6 +141,16 @@ def via_apng(i, o, effort, *cjxl):
             ' --num_threads=0 "$2" "$3"; r=$?; rm -f "$2"; exit $r',
             "_", i, apng, o, effort, sys.executable,
             str(HERE / "pil_encode.py")]
+
+
+def capped(i, o, codec):
+    """An ffmpeg encode of the gif with fpscap.py's frame selection."""
+    vf = o + ".vf"
+    ff = " ".join(FF + ["-i", '"$1"', "-/vf", '"$3"'] + PT + codec + ['"$2"'])
+    return ["bash", "-c",
+            '"$4" "$5" "$1" "$3" >/dev/null && ' + ff
+            + '; r=$?; rm -f "$3"; exit $r',
+            "_", i, o, vf, sys.executable, str(HERE / "fpscap.py")]
 
 
 def pil(i, o, *img2webp):
