@@ -311,6 +311,32 @@ Two candidates can be missing:
   `master_max_share` of it; on `9549c5dcf551/003` the AV1 master is
   about 11-13% of the gif, so it is stored either way.
 
+**The WebP is only made where it could win.** Lossless WebP at
+`method=6` is by far the slowest candidate: the first full export
+spent hours on it, where the capped gif takes seconds a gif. In that
+export's first 113 WebPs, none came in under 44% of its capped gif
+(`4f58385e25bb/005`: 41% of the original gif, against 93% for the
+capped gif). So the exporter builds the capped gif first, and skips
+the WebP where the AV1 master is at most `master_max_share` x 0.4
+(`WEBP_MIN_SHARE`) of the capped gif: there the master is stored
+whatever the WebP would weigh. On that export's data the rule changes
+no stored choice (the closest, `2e432df402c8/007`, has AV1 at 3% of
+the gif against 0.3 x 6% = 1.8%) and skips the WebP for most gifs.
+Nothing is cached for a skipped WebP, so a larger share makes it on
+the next export.
+
+What that export stored, with 121 of the 216 gifs' lossless
+candidates made: AV1 for 194 gifs, WebP for 14, the capped gif for 8;
+126.2 MB in all (21.5% of 586.6 MB of gifs), against 125.1 MB for AV1
+everywhere and 146.4 MB for H.264. Preferring lossless costs about
+1 MB there. gifsicle `-O3` mostly saves little (85-100% of the gif),
+except on two badly optimized gifs (`2e432df402c8/007` and `/008`,
+6%). WebP ranged from 4% to 468% of the gif and won on clean UI
+recordings (`edb3f80dc1c0`, `f6e2e41ab3fa`, `8096b8b223d0`). The
+capped gif of `cda20dc15a21/010` came out at 248% of the gif: the cap
+drops 9 of its 105 frames, and the whole frames written in their
+place lose the gif's partial-frame coding; it is never chosen.
+
 `docs/gif-intermediates/master_sizes.py` lists, from the image cache
 after a Pelican export, every candidate of every gif as a share of
 the gif, which one the site stores, and the totals by winner.

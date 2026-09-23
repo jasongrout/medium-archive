@@ -19,7 +19,10 @@ and which one the site stores under the exporter's rule: the smaller
 lossless copy, unless the AV1 master is at most --share of it. The
 stored one is green (on a terminal, unless NO_COLOR is set); "-" is a
 candidate that does not exist (no exact capped gif: a frame over 256
-colors; no WebP: a kept frame of 10 ms or less). Then the totals, and
+colors; no WebP: a kept frame of 10 ms or less, or skipped because the
+master was already small enough that no WebP could win -- see
+sites.WEBP_MIN_SHARE -- which --share cannot bring back until an
+export with that share makes it). Then the totals, and
 what storing each candidate everywhere would come to.
 """
 import argparse

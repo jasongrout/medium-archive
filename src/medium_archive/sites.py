@@ -625,7 +625,14 @@ CAPPED_GIF_SUFFIX = ".capped.gif"
 CAPPED_WEBP_SUFFIX = ".capped.webp"
 # Lossless WebP as docs/gif-intermediates.md measured it (Pillow, the
 # writer that keeps each delay as given; gif2webp plays 10 ms as 100).
+# It is by far the slowest candidate -- hours for the archive, where
+# the capped gif takes seconds a gif -- so it is only built where it
+# could be stored: in the first full export's 113 WebPs, none came in
+# under 44% of its capped gif, so where the master is at most master_max_share
+# of this share of the capped gif, the master wins whatever the WebP
+# would weigh, and the WebP is not made.
 WEBP_LOSSLESS = {"lossless": True, "quality": 100, "method": 6}
+WEBP_MIN_SHARE = 0.4
 # The still a clip carries, beside it under this suffix. It is what a
 # gif showed at rest (the clip's own first frame, so nothing jumps when
 # playback starts), what a reduced-motion reader sees instead of
@@ -1112,6 +1119,9 @@ class ImagePlacer:
         for suffix, write in ((CAPPED_GIF_SUFFIX, self._capped_gif),
                               (CAPPED_WEBP_SUFFIX, self._capped_webp)):
             copy = self.cache / f"{digest}{suffix}"
+            if (write == self._capped_webp and not copy.exists()
+                    and self._webp_cannot_win(master, lossless)):
+                continue
             if not copy.exists():
                 delays = delays or self._clip_delays(src)
 
@@ -1126,6 +1136,20 @@ class ImagePlacer:
                      > self.master_max_share * best.stat().st_size):
             return best
         return master
+
+    def _webp_cannot_win(self, master: Path, lossless) -> bool:
+        """Whether the AV1 master is already small enough that no WebP
+        could be stored instead: a WebP is at least WEBP_MIN_SHARE of
+        the capped gif, so where the master is at most master_max_share
+        of that, the master is stored whatever the WebP weighs. The
+        WebP is the slow candidate by far, and this skips most of them.
+        Nothing is cached for a skipped WebP, so a larger
+        master_max_share builds it on the next lookup."""
+        gif = next((p for p in lossless
+                    if p.name.endswith(CAPPED_GIF_SUFFIX)), None)
+        return gif is not None and (
+            master.stat().st_size
+            <= self.master_max_share * WEBP_MIN_SHARE * gif.stat().st_size)
 
     def _cache_build(self, cached: Path, build):
         """Run build(tmp) into a temporary file in the cache and move

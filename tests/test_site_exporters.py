@@ -2326,6 +2326,28 @@ def test_a_lossless_copy_is_frame_rate_capped_exactly(tmp_path, kind):
                 before.convert("RGB"), after.convert("RGB")).getbbox()
 
 
+def test_a_webp_that_cannot_win_is_not_made(tmp_path):
+    """The WebP is the slow candidate, so it is made only where it could
+    be stored: not where the master is at most master_max_share of
+    WEBP_MIN_SHARE of the capped gif. Nothing is cached for it then, so
+    a larger share makes it on the next lookup."""
+    placer = sites.ImagePlacer(tmp_path / "cache", {}, masters=True)
+    master, gif = tmp_path / "m.mp4", tmp_path / ("x" + sites.CAPPED_GIF_SUFFIX)
+    gif.write_bytes(b"g" * 1000)
+    bound = sites.MASTER_MAX_SHARE * sites.WEBP_MIN_SHARE * 1000
+    master.write_bytes(b"m" * int(bound))
+    assert placer._webp_cannot_win(master, [gif])
+    master.write_bytes(b"m" * (int(bound) + 1))
+    assert not placer._webp_cannot_win(master, [gif])
+    # no capped gif to bound it by: the WebP is made
+    assert not placer._webp_cannot_win(master, [])
+    # a site that always stores the lossless copy (share 0) makes it too
+    always = sites.ImagePlacer(tmp_path / "cache",
+                               {"images": {"master_max_share": 0}},
+                               masters=True)
+    assert not always._webp_cannot_win(master, [gif])
+
+
 def test_an_unknown_clip_master_is_an_error(tmp_path):
     with pytest.raises(ValueError, match="clip_master"):
         sites.ImagePlacer(tmp_path, {"images": {"clip_master": "vp9"}},
