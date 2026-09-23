@@ -632,7 +632,7 @@ LINE_ART_QUALITY = 90
 PHOTO_QUALITY = 85
 # Bumped when the copies a given cap produces change shape, so caches
 # written by an older scheme are ignored rather than misread.
-CACHE_SCHEME = "v5"
+CACHE_SCHEME = "v6"
 
 
 def poster_path(clip: Path) -> Path:
@@ -1012,12 +1012,15 @@ class ImagePlacer:
         and feeds both outputs, so the still is free. The clip keeps the
         frames kept_frames picks, each at the gif's own timestamp, so a
         gif's per-frame delays survive as the clip's variable frame
-        rate; both outputs are padded to the same even size;
-        faststart puts the index first, so a clip starts playing before
-        it has all arrived. One thread: x264 split across threads made
-        one screencast's clip 39% larger, and warm() already encodes
-        gifs in parallel. Returns None -- for the caller to fall back
-        on -- when ffmpeg fails."""
+        rate. They are kept in milliseconds, finer than a gif's
+        hundredths: left to itself ffmpeg gives the encoder a time base
+        from a guessed frame rate and rounds every delay to it. Both
+        outputs are padded to the same even size; faststart puts the
+        index first, so a clip starts playing before it has all
+        arrived. One thread: x264 split across threads made one
+        screencast's clip 39% larger, and warm() already encodes gifs
+        in parallel. Returns None -- for the caller to fall back on --
+        when ffmpeg fails."""
         size = self._probe(src)
         if size is None:
             return None

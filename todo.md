@@ -715,7 +715,7 @@ Feeds and sharing:
   timestamps keep millisecond precision (`-enc_time_base 1:1000`;
   before, ffmpeg rounded every one to a guessed frame rate, a 25.3 s
   gif playing 25.5 s); odd sizes are padded by a pixel rather than
-  rescaled. `CACHE_SCHEME` v5 rebuilds the cached clips.
+  rescaled. `CACHE_SCHEME` v6 rebuilds the cached clips.
 
 
 ### Remaining

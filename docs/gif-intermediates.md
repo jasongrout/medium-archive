@@ -653,7 +653,7 @@ slower`, one thread per encode, with the frame-rate cap
 (`kept_frames`, passed inline as a `select` filter that ffmpeg 6.1 and
 9.0 both accept), `-enc_time_base 1:1000`, and odd sizes padded by a
 pixel for clip and poster alike; the five-second rule is gone and
-`CACHE_SCHEME` is v5. Checked on `bd2524`: 426 of 851 frames, every
+`CACHE_SCHEME` is v6. Checked on `bd2524`: 426 of 851 frames, every
 timestamp one the gif has, 14.19 s like the gif, 1798x1390 clip and
 poster, with ffmpeg 9.0.2 and Ubuntu's 6.1.1. x264 split across
 threads (the default) made the pilot's clip 39% larger (237,690 bytes

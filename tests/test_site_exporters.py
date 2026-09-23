@@ -2165,6 +2165,37 @@ def test_a_see_through_gif_keeps_its_format(tmp_path):
     assert sites.poster_path(clip).exists()
 
 
+@pytest.mark.skipif(not __import__("shutil").which("ffprobe"),
+                    reason="ffmpeg not installed")
+def test_a_clip_keeps_each_frame_of_the_gif_on_its_own_delay(tmp_path):
+    """A gif's delays are hundredths of a second, frame by frame. The
+    clip starts every frame exactly where the gif does rather than on
+    the grid of a frame rate ffmpeg would otherwise guess, so a reader
+    sees each frame for as long as its author meant. (How long the
+    last frame lasts is the muxer's guess on older ffmpeg, so only the
+    starts are compared.)"""
+    import subprocess
+
+    src = tmp_path / "src"
+    src.mkdir()
+    delays = [590, 750, 300, 450, 120, 870, 330, 1010]
+    gif = animation(src / "uneven.gif",
+                    [gradient_frame((400, 300), i * 9) for i in range(8)],
+                    duration=delays)
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    out = tmp_path / "out"
+    out.mkdir()
+    clip = placer.place(gif, out / "uneven.gif")
+    assert clip.suffix == ".mp4"
+
+    times = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v",
+         "-show_entries", "packet=pts_time", "-of", "csv=p=0", str(clip)],
+        capture_output=True, text=True, check=True).stdout.split()
+    starts = sorted(round(float(t) * 1000) for t in times)
+    assert starts == [sum(delays[:i]) for i in range(len(delays))]
+
+
 def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
     """A build without libwebp cannot write a clip's poster, and fails
     the whole run with "Encoder not found" rather than just the still.
@@ -2254,9 +2285,10 @@ def test_select_frames_nests_its_runs():
 def test_a_clip_caps_the_frame_rate_and_keeps_the_gifs_timing(tmp_path):
     """A gif recorded faster than ~30 fps loses the frames of its
     bursts in the clip, but every frame the clip keeps starts exactly
-    when the gif shows it, and the clip runs as long as the gif. The
-    gif's odd size is padded by a pixel for 4:2:0, in the clip and the
-    poster alike."""
+    when the gif shows it. (How long the last frame lasts is the
+    muxer's guess on older ffmpeg, so only the starts are compared.)
+    The gif's odd size is padded by a pixel for 4:2:0, in the clip and
+    the poster alike."""
     import subprocess
 
     src = tmp_path / "src"
@@ -2281,8 +2313,6 @@ def test_a_clip_caps_the_frame_rate_and_keeps_the_gifs_timing(tmp_path):
     gif_starts = [sum(delays[:i]) for i in range(len(delays))]
     assert starts == [gif_starts[i] for i in sites.kept_frames(delays)]
     assert len(starts) < len(delays)
-    assert round(float(probe("-show_entries", "format=duration",
-                             "-of", "csv=p=0")[0]) * 1000) == sum(delays)
     assert probe("-select_streams", "v", "-show_entries",
                  "stream=width,height", "-of", "csv=p=0") == ["202,152"]
     from PIL import Image
