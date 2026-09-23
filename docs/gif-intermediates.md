@@ -575,7 +575,8 @@ The biggest savings are on dithered or photographic content (`bd2524`,
 to code; screen text (`164eb/007`, `11e5`) saves less. Scaling also
 softens text in the page on 2x screens (at 1,104) and makes large
 screenshots unreadable full screen (at either limit), which is why
-`sites.py` keeps still line art at full resolution.
+`sites.py` keeps still line art at full resolution. **Decided: full
+resolution** (`animated_max_edge` defaults to 0).
 
 **Decided (2026-09-23): every animation becomes video**, so a reader
 can pause it, even where the video is somewhat larger than the gif.
@@ -644,23 +645,30 @@ block copy) exist for exactly this kind of content.
    have not yet been cross-checked against Pillow's compositing on the
    sample. The brief warns of past ffmpeg disposal bugs.
 
+## Implemented (2026-09-23)
+
+`ImagePlacer` in `src/medium_archive/sites.py` now places every
+animation as H.264 4:2:0 at full resolution, `-crf 24 -preset
+slower`, one thread per encode, with the frame-rate cap
+(`kept_frames`, passed inline as a `select` filter that ffmpeg 6.1 and
+9.0 both accept), `-enc_time_base 1:1000`, and odd sizes padded by a
+pixel for clip and poster alike; the five-second rule is gone and
+`CACHE_SCHEME` is v5. Checked on `bd2524`: 426 of 851 frames, every
+timestamp one the gif has, 14.19 s like the gif, 1798x1390 clip and
+poster, with ffmpeg 9.0.2 and Ubuntu's 6.1.1. x264 split across
+threads (the default) made the pilot's clip 39% larger (237,690 bytes
+against 171,293), hence `-threads 1`; `warm()` already encodes gifs in
+parallel. Tests cover the cap, the selection expression, timing, and
+padding.
+
 ## Resume here
 
-1. (Done: CRF ladder; CRF 28 chosen.) Optionally try CRF 31 on
-   `388d05` to see whether the margin below 34 can be narrowed.
-2. Check `-cpu-used 6` against 4 at CRF 28, both capped, on a few
-   files (size, quality.py, crops).
-3. Convert the whole archive: capped AV1 at the chosen CRF, and a
-   capped gif (`fpscap.py --gif`) wherever that is smaller, including
-   `3ee42dfdc54f/002` (2190 frames, not in the sample). Verify every
-   output (timing, quality.py) and inspect the worst frames.
-4. If H.264 4:2:0 from the gif wins: change `ImagePlacer._encode_video`
-   in `src/medium_archive/sites.py`: the frame-rate cap, `-enc_time_base
-   1:1000`, the chosen CRF and preset, a decision on the 1104 px
-   `animated_max_edge` cap, every animation as video (drop the
-   `MOTION_SECONDS` size rule), and a new `CACHE_SCHEME`. The cap's filter
-   has to reach ffmpeg in a form every supported version reads: CI
-   installs Ubuntu's ffmpeg, and `-/vf FILE` (used by `bench.py`) may
-   not exist there; `-filter_script:v FILE` or another route is needed.
-   The capped-gif fallback (`fpscap.py --gif`) replaces gifsicle's
-   resize for gifs kept as gifs.
+1. Build the sites from the full archive and compare the clip total and
+   a cold-cache build time with the old scheme (CI's comment says ~20
+   minutes cold on four cores; `-preset slower` at full resolution will
+   be longer).
+2. Spot-check clips from the built site in a browser, including the
+   largest (3340x1517) and a 40 fps `cda20dc15a21` one.
+3. Later, once AV1 plays broadly (Safari: Apple M3 or later only in
+   2026-09): libaom 4:2:0 was about two-thirds of H.264's size at
+   equal quality on the sample (see above).

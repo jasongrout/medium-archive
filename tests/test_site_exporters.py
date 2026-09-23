@@ -2072,9 +2072,9 @@ def test_line_art_classifier(tmp_path):
 def test_animated_gifs_placed_as_video(tmp_path):
     """An animation is placed as an h264 clip with its first frame
     beside it as a poster, and the page follows it to its new
-    extension. The clip carries the frames at the animated cap, rounded
-    to the even dimensions yuv420p is defined for; the poster is the
-    same size, so it states the clip's dimensions for the theme."""
+    extension. The clip carries the frames at the gif's own size (no
+    animated cap by default); the poster is the same size, so it states
+    the clip's dimensions for the theme."""
     from PIL import Image
 
     src = make_image_post(tmp_path, gif_bytes=True)
@@ -2084,7 +2084,7 @@ def test_animated_gifs_placed_as_video(tmp_path):
     assert (placed / "anim.mp4").stat().st_size < (
         src / "anim.gif").stat().st_size
     with Image.open(placed / "anim-poster.webp") as im:
-        assert im.size == (1104, 828)      # 1600x1200, capped
+        assert im.size == (1600, 1200)     # the gif's own size
     page = (site / "content/posts/2022/picture-post/index.md").read_text()
     assert "![a screen recording](images/anim.mp4)" in page
     # built once and shared: the pelican site links the same clip and
@@ -2099,12 +2099,13 @@ def test_animated_gifs_placed_as_video(tmp_path):
                     reason="gifsicle not installed")
 def test_animated_gifs_capped_via_gifsicle(tmp_path):
     """A site that asks for gifs keeps them: gifsicle resizes them to
-    the animated cap, and no clip is written."""
+    the animated cap it sets, and no clip is written."""
     from PIL import Image
 
     src = make_image_post(tmp_path, gif_bytes=True)
     write_site(tmp_path,
-               {"title": "Pics", "images": {"animated_format": "gif"}})
+               {"title": "Pics", "images": {"animated_format": "gif",
+                                            "animated_max_edge": 1104}})
     site = build(hugo, tmp_path)
     placed = site / "content/posts/2022/picture-post/images/anim.gif"
     with Image.open(placed) as im:
@@ -2187,13 +2188,12 @@ def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
 
 @pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
                     reason="ffmpeg not installed")
-def test_a_long_animation_is_a_clip_even_where_it_costs_more(tmp_path):
+def test_every_animation_is_a_clip_even_where_it_costs_more(tmp_path):
     """A display copy is placed only when it undercuts what it replaces
-    -- except a clip of an animation that runs past five seconds, where
-    what it buys is the pause control WCAG 2.2.2 asks for rather than
-    the bytes. Noise is the one thing gif carries more cheaply than
-    near-lossless video, so both of these cost more as clips; only the
-    long one is placed as one."""
+    -- except a clip, where what it buys is the pause control WCAG
+    2.2.2 asks for rather than the bytes. Noise is the one thing gif
+    carries more cheaply than near-lossless video, so both of these cost
+    more as clips, and both are placed as clips, the short one too."""
     import os
 
     from PIL import Image
@@ -2212,18 +2212,82 @@ def test_a_long_animation_is_a_clip_even_where_it_costs_more(tmp_path):
     placer = sites.ImagePlacer(tmp_path / "cache", {"images": {"video_crf": 1}})
     out = tmp_path / "out"
     out.mkdir()
-    clip = placer.place(long_loop, out / "long.gif")
-    assert clip.suffix == ".mp4"
-    assert (clip.stat().st_size + sites.poster_path(clip).stat().st_size
-            > long_loop.stat().st_size)          # placed for the controls
-    assert placer.place(short_loop, out / "short.gif").suffix == ".gif"
+    for loop in (long_loop, short_loop):
+        clip = placer.place(loop, out / loop.name)
+        assert clip.suffix == ".mp4"
+        assert (clip.stat().st_size + sites.poster_path(clip).stat().st_size
+                > loop.stat().st_size)           # placed for the controls
 
 
-def test_video_size_rounds_to_the_even_dimensions_video_needs():
+def test_video_size_scales_to_the_cap_only():
     assert sites.video_size((1600, 1200), 1104) == (1104, 828)
-    assert sites.video_size((801, 603), 0) == (800, 602)
+    assert sites.video_size((801, 603), 0) == (801, 603)
     assert sites.video_size((1000, 500), 1104) == (1000, 500)
-    assert sites.video_size((1, 1), 1104) == (2, 2)
+
+
+def test_kept_frames_thin_bursts_and_keep_what_stays():
+    """Frames of a burst faster than ~30 fps are dropped; the first, the
+    last, and every frame on screen for 29.5 ms or more are kept, and a
+    frame kept for its start gives way to a following long frame rather
+    than showing for less than that."""
+    assert sites.kept_frames([100, 100, 100]) == [0, 1, 2]
+    # 10/20 ms alternating: one frame about every 30 ms, and the last
+    assert sites.kept_frames([10, 20, 10, 20, 20, 10, 500]) == [0, 2, 4, 6]
+    # a burst ending in a long frame: frame 3 (kept at 30 ms) would show
+    # for 10 ms before the long frame 4, so 4 replaces it
+    assert sites.kept_frames([10, 10, 10, 10, 800, 10]) == [0, 4, 5]
+    assert sites.kept_frames([500]) == [0]
+
+
+def test_select_frames_nests_its_runs():
+    assert (sites.select_frames([0, 1, 2, 5, 7, 8])
+            == "select='(between(n,0,2)+(between(n,5,5)+between(n,7,8)))'")
+    # hundreds of runs stay shallow enough for ffmpeg's parser
+    expr = sites.select_frames(list(range(0, 2000, 2)))
+    depth = max(expr[:i].count("(") - expr[:i].count(")")
+                for i in range(len(expr)))
+    assert depth < 20
+
+
+@pytest.mark.skipif(not __import__("shutil").which("ffprobe"),
+                    reason="ffmpeg not installed")
+def test_a_clip_caps_the_frame_rate_and_keeps_the_gifs_timing(tmp_path):
+    """A gif recorded faster than ~30 fps loses the frames of its
+    bursts in the clip, but every frame the clip keeps starts exactly
+    when the gif shows it, and the clip runs as long as the gif. The
+    gif's odd size is padded by a pixel for 4:2:0, in the clip and the
+    poster alike."""
+    import subprocess
+
+    src = tmp_path / "src"
+    src.mkdir()
+    delays = [10, 20] * 12 + [400]
+    gif = animation(src / "fast.gif",
+                    [gradient_frame((201, 151), i * 9)
+                     for i in range(len(delays))], duration=delays)
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    out = tmp_path / "out"
+    out.mkdir()
+    clip = placer.place(gif, out / "fast.gif")
+    assert clip.suffix == ".mp4"
+
+    def probe(*args):
+        return subprocess.run(["ffprobe", "-v", "error", *args, str(clip)],
+                              capture_output=True, text=True,
+                              check=True).stdout.split()
+    starts = sorted(round(float(t) * 1000)
+                    for t in probe("-select_streams", "v", "-show_entries",
+                                   "packet=pts_time", "-of", "csv=p=0"))
+    gif_starts = [sum(delays[:i]) for i in range(len(delays))]
+    assert starts == [gif_starts[i] for i in sites.kept_frames(delays)]
+    assert len(starts) < len(delays)
+    assert round(float(probe("-show_entries", "format=duration",
+                             "-of", "csv=p=0")[0]) * 1000) == sum(delays)
+    assert probe("-select_streams", "v", "-show_entries",
+                 "stream=width,height", "-of", "csv=p=0") == ["202,152"]
+    from PIL import Image
+    with Image.open(sites.poster_path(clip)) as im:
+        assert im.size == (202, 152)
 
 
 def test_clips_are_video_the_reader_controls(project):

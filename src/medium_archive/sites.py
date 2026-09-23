@@ -526,11 +526,17 @@ class Covers:
 # originals -- raw/ and posts/ keep those at full resolution -- so
 # photographs past these caps are resized down to them (longest edge) as
 # they are placed into a site. 1600 px keeps them sharp past the card
-# themes' widest srcset variant (1104 px); animated gifs get no srcset
-# variants, render in the ~736 px body column, and dominate the built
-# sites byte-wise, so they are capped tighter. site.toml overrides
-# either cap ([images] with still_max_edge / animated_max_edge, 0 =
-# leave that kind untouched).
+# themes' widest srcset variant (1104 px). Animations are not capped:
+# they are screencasts, line art that moves, and a reader who takes a
+# clip full screen to read its code has only the pixels it was encoded
+# with -- a 1104 px cap shrank 129 of this archive's 216 gifs, to a
+# median 74% of their width and the largest, 3340 px wide, to a third.
+# It costs bytes where scaling would have smoothed dither or video away
+# (on a sample of seven, the clips came out 27% larger than at a
+# 1472 px cap and 64% larger than at 1104 px); plain screen text
+# barely shrinks scaled.
+# site.toml overrides either cap ([images] with still_max_edge /
+# animated_max_edge, 0 = leave that kind untouched).
 #
 # Line art -- the charts, screenshots and diagrams that most of this
 # archive's PNGs are -- is exempt from the still cap and never encoded
@@ -544,38 +550,41 @@ class Covers:
 # Lossless webp of the full-resolution original instead is pixel-exact
 # and still ~60% smaller than the source PNG.
 STILL_MAX_EDGE = 1600
-ANIMATED_MAX_EDGE = 1104
+ANIMATED_MAX_EDGE = 0
 STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
-# An animation is placed as h264 video rather than as a gif. The same
-# frames cost a seventh of the bytes -- the reference archive's 228 gifs
-# are 609 MB of its pelican site and 88 MB as mp4 -- and, more than
-# that, a <video> is something a reader can stop. An animated gif cannot
-# be paused, and any of these clips that runs past five seconds fails
-# WCAG 2.2.2 (Pause, Stop, Hide) in that format no matter what the theme
+# An animation is placed as h264 video rather than as a gif, every one
+# of them. The same frames mostly cost a fraction of the bytes, but the
+# reason is that a <video> is something a reader can stop. An animated
+# gif cannot be paused, and one that runs past five seconds fails WCAG
+# 2.2.2 (Pause, Stop, Hide) in that format no matter what the theme
 # does; a clip can be paused, replayed, and left unplayed for a reader
-# who asks for less motion. What that costs is carried deliberately
+# who asks for less motion. So a clip is placed even where it comes out
+# larger than its gif -- as it does for a few animations of sparse
+# 1-pixel lines, which gif's palette and LZW code for almost nothing and
+# a transform codec cannot. What that costs is carried deliberately
 # elsewhere: a <video> has no alt attribute, so the exporters put the
 # image's text alternative on it as an aria-label (SC 1.2.1), and the
 # poster below is what stands in for the movement.
 #
-# The encode is tuned for screencasts, which is what this archive's
-# animations are: text has to stay sharp, so -crf 20 rather than the 26
-# the 2026-09 measurement started from (on a synthetic 1104x620
-# screencast, 41.2 dB PSNR against the source gif at crf 20 against
-# 39.0 dB at crf 26, for ~30% more bytes), and -preset fast, which on
-# this archive's real screencasts lands within 0.01 dB and 0.5% of the
-# bytes of -preset medium for about three quarters of its encode time.
-# yuv420p and the high profile are what every browser decodes, and they
-# need even dimensions (see video_size).
+# The encode was chosen by measurement against the gifs (2026-09; see
+# docs/gif-intermediates.md): yuv420p and the high profile are what
+# every browser decodes -- 4:2:0 color is what softens colored text,
+# and no CRF buys that back -- and at -crf 24 -preset slower text
+# looked the same as at crf 16 and 20 while the clips came out a third
+# smaller than at 20. Frame timestamps pass through untouched, on a
+# millisecond time base (left to itself, ffmpeg rounds every one to a
+# guessed frame rate), and odd dimensions are padded by a pixel rather
+# than scaled (see video_size). Frames inside a burst faster than
+# ~30 fps are dropped first (see kept_frames).
 #
 # site.toml's [images] table tunes all of it: animated_format = "gif"
 # keeps gifsicle's resized gifs instead, and video_crf / video_preset
-# trade bytes against detail. animated_max_edge still caps the longest
-# edge; 0 leaves a clip at its own size rather than turning video off.
+# trade bytes against detail. animated_max_edge caps the longest edge;
+# 0 leaves a clip at its own size rather than turning video off.
 ANIMATED_FORMAT = "mp4"
-VIDEO_CRF = 20
-VIDEO_PRESET = "fast"
+VIDEO_CRF = 24
+VIDEO_PRESET = "slower"
 # The still a clip carries, beside it under this suffix. It is what a
 # gif showed at rest (the clip's own first frame, so nothing jumps when
 # playback starts), what a reduced-motion reader sees instead of
@@ -592,16 +601,17 @@ VIDEO_PRESET = "fast"
 # through Pillow it measured longer than encoding the whole clip.
 POSTER_SUFFIX = "-poster.webp"
 POSTER_QUALITY = 90
-# What WCAG 2.2.2 (Pause, Stop, Hide) turns on: motion that runs longer
-# than five seconds has to be stoppable. A display copy is normally
-# placed only when it undercuts what it replaces, and a clip past this
-# length is the exception -- what it buys there is the pause control,
-# not the bytes. On the reference archive that is 18 gifs, the longest
-# of them 76 seconds, whose clips came out no smaller: small, heavily
-# optimized animations where h264 spends more on the gif's dithering
-# than the gif does. Under five seconds the smaller file wins and the
-# gif stays a gif.
-MOTION_SECONDS = 5
+# A clip drops the frames of a burst faster than a reader can follow:
+# one is kept when it is the first or the last, when it stays on screen
+# at least this long, or when it starts at least this long after the
+# last frame kept (see kept_frames). That thins recordings made at 40,
+# 50 or 100 fps to at most ~34 while every kept frame starts exactly
+# when the gif shows it -- where ffmpeg's own fps=30 would move every
+# frame boundary onto its grid -- and costs nothing where a gif has no
+# such bursts, 205 of the reference archive's 216. The delays are the
+# ones the gif stores, not the 100 ms browsers play delays of 10 ms or
+# less at: the animation as its author made it.
+MIN_FRAME_MS = 29.5
 
 # A still is line art when it holds few enough distinct colors and
 # enough flat runs. The two classes separate cleanly on that pair --
@@ -622,7 +632,7 @@ LINE_ART_QUALITY = 90
 PHOTO_QUALITY = 85
 # Bumped when the copies a given cap produces change shape, so caches
 # written by an older scheme are ignored rather than misread.
-CACHE_SCHEME = "v4"
+CACHE_SCHEME = "v5"
 
 
 def poster_path(clip: Path) -> Path:
@@ -639,14 +649,59 @@ def discard_copy(tmp: str):
 
 
 def video_size(size, cap: int):
-    """The (width, height) a gif this size is encoded at: scaled to cap
-    on its longest edge, then rounded down to the even dimensions
-    yuv420p is defined for. A cap of 0 only rounds."""
+    """The (width, height) a gif this size is scaled to: cap on its
+    longest edge, or its own size under a cap of 0. yuv420p is defined
+    for even dimensions only; the encode pads an odd one by a pixel
+    (EVEN_PAD) rather than resampling the whole picture to lose it."""
     w, h = size
     if cap and max(w, h) > cap:
         scale = cap / max(w, h)
         w, h = max(1, round(w * scale)), max(1, round(h * scale))
-    return max(2, w - w % 2), max(2, h - h % 2)
+    return w, h
+
+
+EVEN_PAD = "pad=ceil(iw/2)*2:ceil(ih/2)*2"
+
+
+def kept_frames(delays, min_ms: float = MIN_FRAME_MS) -> list[int]:
+    """The indexes of the frames a clip keeps, given each frame's delay
+    in ms: see MIN_FRAME_MS. A frame kept only for when it starts gives
+    way to a following frame kept for its length when the two would be
+    less than min_ms apart, so no kept frame is on screen for less."""
+    keep, starts, t = [], [], 0
+    by_start = False           # the last frame was kept only for its start
+    last = len(delays) - 1
+    for i, d in enumerate(delays):
+        pinned = i == 0 or i == last or d >= min_ms
+        if pinned or t - starts[-1] >= min_ms:
+            if pinned and by_start and t - starts[-1] < min_ms:
+                keep.pop()
+                starts.pop()
+            keep.append(i)
+            starts.append(t)
+            by_start = not pinned
+        t += d
+    return keep
+
+
+def select_frames(keep: list[int]) -> str:
+    """An ffmpeg select filter passing exactly the frames in keep. The
+    runs of consecutive frames are summed as a balanced tree: ffmpeg's
+    expression parser recurses on every +, and a flat sum of a few
+    hundred terms fails ("Cannot allocate memory")."""
+    runs = []
+    for i in keep:
+        if runs and runs[-1][1] == i - 1:
+            runs[-1][1] = i
+        else:
+            runs.append([i, i])
+
+    def tree(terms):
+        if len(terms) == 1:
+            return terms[0]
+        mid = len(terms) // 2
+        return f"({tree(terms[:mid])}+{tree(terms[mid:])})"
+    return "select='" + tree([f"between(n,{a},{b})" for a, b in runs]) + "'"
 
 
 def transparent_first_frame(im) -> bool:
@@ -728,7 +783,6 @@ class ImagePlacer:
         self.ffmpeg = (shutil.which("ffmpeg")
                        if self.animated_format == "mp4" else None)
         self.ffmpeg_webp = None            # asked once, on the first clip
-        self.ffprobe = None                # looked up on the first clip
         try:
             from PIL import Image
             self.pillow = Image
@@ -866,10 +920,9 @@ class ImagePlacer:
 
     def _worth_placing(self, copy: Path, src: Path) -> bool:
         """Whether a display copy is placed at all: it has to undercut
-        what it replaces -- except a clip, which _encode_video has
-        already weighed against the gif and against what a reader can
-        do with it (see MOTION_SECONDS), and which is never in the
-        cache unless it won that."""
+        what it replaces -- except a clip, which is placed for the pause
+        control it gives a reader whatever it weighs (see
+        ANIMATED_FORMAT)."""
         return (copy.suffix == ".mp4"
                 or copy.stat().st_size < src.stat().st_size)
 
@@ -892,40 +945,45 @@ class ImagePlacer:
         video: the clip, or -- for a gif that cannot become one, and for
         an ffmpeg that failed on it -- the resized gif gifsicle makes of
         it, or nothing."""
-        if self._encodes_video(src):
-            built = self._encode_video(src, tmp, cap)
+        delays = self._clip_delays(src)
+        if delays:
+            built = self._encode_video(src, tmp, cap, delays)
             if built:
                 return built
             discard_copy(tmp)              # a clip that came to nothing
         return (self._resize_gif(src, tmp, cap)
                 if self._resizes_gif(src, cap) else None)
 
-    def _encodes_video(self, src: Path) -> bool:
-        """Whether this gif is placed as a clip: an animation, with the
-        tools to encode it and to read it, and nothing see-through to
-        lose on the way."""
+    def _clip_delays(self, src: Path):
+        """Each frame's delay in ms, when this gif is placed as a clip:
+        an animation, with the tools to encode it and to read it, and
+        nothing see-through to lose on the way. None otherwise."""
         if not self.ffmpeg:
             self._note("ffmpeg not installed: animated gifs stay gifs "
                        "(install ffmpeg to place them as video)")
-            return False
+            return None
         if not self.pillow:
             self._note("pillow not installed: animated gifs stay gifs")
-            return False
+            return None
         if not self._writes_webp():
-            return False
+            return None
         try:
             with self.pillow.open(src) as im:
                 if getattr(im, "n_frames", 1) < 2:
-                    return False           # a still under a .gif name
+                    return None            # a still under a .gif name
                 if transparent_first_frame(im):
                     self._note(f"{src.name} is transparent where it is "
                                "shown, which video cannot carry; "
                                "kept as a gif")
-                    return False
+                    return None
+                delays = []
+                for i in range(im.n_frames):
+                    im.seek(i)
+                    delays.append(im.info.get("duration", 0))
+                return delays
         except Exception as e:
             self._note(f"unreadable gif {src.name} ({e}); kept as a gif")
-            return False
-        return True
+            return None
 
     def _writes_webp(self) -> bool:
         """Whether this ffmpeg can write a clip's poster. Most builds
@@ -948,31 +1006,37 @@ class ImagePlacer:
                     "stop asking for clips.")
         return self.ffmpeg_webp
 
-    def _encode_video(self, src: Path, tmp: str, cap: int):
+    def _encode_video(self, src: Path, tmp: str, cap: int, delays):
         """The gif's frames as h264 in mp4, and its first frame beside
         it as the poster, from one ffmpeg run: the gif is decoded once
-        and feeds both outputs, so the still is free. Timestamps pass
-        through untouched, so a gif's per-frame delays survive as the
-        clip's own variable frame rate; faststart puts the index first,
-        so a clip starts playing before it has all arrived. Returns
-        None -- for the caller to fall back on -- when ffmpeg fails or
-        when clip and poster together do not undercut the gif."""
+        and feeds both outputs, so the still is free. The clip keeps the
+        frames kept_frames picks, each at the gif's own timestamp, so a
+        gif's per-frame delays survive as the clip's variable frame
+        rate; both outputs are padded to the same even size;
+        faststart puts the index first, so a clip starts playing before
+        it has all arrived. One thread: x264 split across threads made
+        one screencast's clip 39% larger, and warm() already encodes
+        gifs in parallel. Returns None -- for the caller to fall back
+        on -- when ffmpeg fails."""
         size = self._probe(src)
         if size is None:
             return None
         width, height = video_size(size, cap)
-        scale = ([] if (width, height) == tuple(size)
-                 else ["-vf", f"scale={width}:{height}:flags=lanczos"])
+        shape = ([] if (width, height) == tuple(size)
+                 else [f"scale={width}:{height}:flags=lanczos"]) + [EVEN_PAD]
+        keep = kept_frames(delays)
+        select = [select_frames(keep)] if len(keep) < len(delays) else []
         poster = poster_path(Path(tmp))
         run = subprocess.run(
             [self.ffmpeg, "-nostdin", "-loglevel", "error", "-y",
              "-i", str(src),
-             *scale,
+             "-vf", ",".join(select + shape),
              "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
              "-crf", str(self.video_crf), "-preset", str(self.video_preset),
-             "-fps_mode", "passthrough", "-an", "-movflags", "+faststart",
-             "-f", "mp4", tmp,
-             "-map", "0:v", *scale, "-frames:v", "1",
+             "-threads", "1",
+             "-fps_mode", "passthrough", "-enc_time_base", "1:1000",
+             "-an", "-movflags", "+faststart", "-f", "mp4", tmp,
+             "-map", "0:v", "-vf", ",".join(shape), "-frames:v", "1",
              "-c:v", "libwebp", "-q:v", str(POSTER_QUALITY),
              "-f", "webp", str(poster)],
             capture_output=True, text=True)
@@ -982,28 +1046,7 @@ class ImagePlacer:
                        + (f": {detail[-1]}" if detail else "")
                        + "; kept as a gif")
             return None
-        if (os.path.getsize(tmp) + poster.stat().st_size
-                >= src.stat().st_size
-                and self._clip_seconds(tmp) <= MOTION_SECONDS):
-            return None      # no smaller, and short enough to leave as a gif
         return ".mp4"
-
-    def _clip_seconds(self, clip: str) -> float:
-        """How long a clip runs. ffprobe reads it from the container it
-        just wrote, without decoding anything; where ffprobe is not on
-        the path the answer is 0, which leaves the byte rule to decide
-        alone (see MOTION_SECONDS)."""
-        if self.ffprobe is None:
-            self.ffprobe = shutil.which("ffprobe") or ""
-        if not self.ffprobe:
-            return 0.0
-        run = subprocess.run([self.ffprobe, "-v", "error", "-show_entries",
-                              "format=duration", "-of", "csv=p=0", clip],
-                             capture_output=True, text=True)
-        try:
-            return float((run.stdout or "").strip())
-        except ValueError:
-            return 0.0
 
     def _resizes_gif(self, src: Path, cap: int) -> bool:
         """Whether gifsicle has anything to do for this gif."""

@@ -701,6 +701,22 @@ Feeds and sharing:
   again. The Giphy clips `convert` writes lost their `autoplay` and
   gained `controls`, so a post's animations all behave alike.
 
+- **Clip encode revised from measurement (2026-09).** The encode was
+  benchmarked against the gifs (lossless formats, AV1, H.264, 4:2:0
+  and 4:4:4, CRF ladders, resolution caps); the method, numbers and
+  crops are in `docs/gif-intermediates.md`. Changed in `sites.py`:
+  every animation is a clip, whatever the bytes (`MOTION_SECONDS` is
+  gone: a pause control is worth a larger file); clips are at full
+  resolution (`animated_max_edge` defaults to 0 -- a 1104 px cap had
+  shrunk 129 of 216 gifs, the largest to a third); `-crf 24 -preset
+  slower`, one thread per encode (x264 split across threads made one
+  clip 39% larger); frames of bursts faster than ~30 fps are dropped
+  without moving any kept frame (`kept_frames`, 11 of 216 gifs); frame
+  timestamps keep millisecond precision (`-enc_time_base 1:1000`;
+  before, ffmpeg rounded every one to a guessed frame rate, a 25.3 s
+  gif playing 25.5 s); odd sizes are padded by a pixel rather than
+  rescaled. `CACHE_SCHEME` v5 rebuilds the cached clips.
+
 
 ### Remaining
 
