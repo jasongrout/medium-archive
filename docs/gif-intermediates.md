@@ -519,6 +519,20 @@ single-thread encode time for all seven):
 | SVT-AV1 p6 CRF 36 | 28% | 36.1 | 232 s | 23, 9, 3, 7, 11, 9, 214 |
 | SVT-AV1 p8 CRF 30 | 41% | 36.5 | 143 s | 36, 13, 8, 12, 17, 22, 266 |
 
+libaom 4:2:0 (`-cpu-used 6`, capped), same files and columns:
+
+| encode | total | median PSNR | encode | per file (% of gif) |
+|---|---|---|---|---|
+| libaom 4:2:0 CRF 24 | 20% | 36.6 | 880 s | 24, 9, 7, 10, 11, 22, 74 |
+| libaom 4:2:0 CRF 28 | 17% | 36.2 | 814 s | 20, 7, 4, 9, 10, 16, 70 |
+| libaom 4:2:0 CRF 34 | 12% | 35.7 | 784 s | 16, 5, 2, 7, 9, 8, 62 |
+
+At equal median PSNR, libaom 4:2:0 CRF 24 is 20% of the gifs against
+H.264 CRF 24's 28% (15% each leaving out `cda20dc15a21/005`), and on
+the particle gif it is 74% of the gif where H.264 is 155% and SVT-AV1
+258%: libaom's screen-content tools work in 4:2:0 too. Its timing is
+exact; it encodes about 2.5x slower than H.264 `-preset slower`.
+
 Leaving out `cda20dc15a21/005`, SVT-AV1 CRF 30 is 30-70% of H.264 CRF
 20's size at similar PSNR; that one file (1-pixel saturated lines)
 erases the gain in the total. SVT-AV1's timing: starts are exact but
