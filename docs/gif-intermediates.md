@@ -267,6 +267,29 @@ Two candidates can be missing:
   build time.) Also none where `animated_max_edge` shrinks the gif:
   a resampled frame gains the colors lossless pays for.
 
+  A scan of all 215 animated gifs found seven with such a frame, in
+  every case the **last** frame, stored as 10 ms; none of the seven
+  loses a frame to the cap. The two gifs with runs of 10 ms frames
+  (`bd2524b247c2/005`, `11e5dab7c54/006`) are not among them: the cap
+  merges those runs, and `11e5dab7c54/006` keeps 288 of its 691
+  frames, 30-180 ms apart (22.4 fps on average), with a 70 ms last
+  frame.
+
+  | gif | frames | size |
+  |---|---|---|
+  | `11e5dab7c54/002` | 440 | 6.0 MB |
+  | `52f9657fa7a/007` | 130 | 5.0 MB |
+  | `fe9b54227d92/011` | 78 | 0.9 MB |
+  | `9549c5dcf551/003` | 72 | 0.8 MB |
+  | `ae191bc6fb8e/005` | 174 | 0.6 MB |
+  | `a35ce050f7f7/001` | 108 | 0.3 MB |
+  | `81f2eaad5706/002` | 94 | 0.2 MB |
+
+  Together 13.8 MB of gifs. A WebP would change what is stored only
+  where it beats the capped gif and the AV1 master is not within
+  `master_max_share` of it; on `9549c5dcf551/003` the AV1 master is
+  about 11-13% of the gif, so it is stored either way.
+
 `docs/gif-intermediates/master_sizes.py` lists, from the image cache
 after a Pelican export, every candidate of every gif as a share of
 the gif, which one the site stores, and the totals by winner.
@@ -439,6 +462,9 @@ pixi environment below: `bench.py` passes filter scripts with ffmpeg's
 - **Visual check of the masters.** CRF 28 4:4:4 was inspected on the
   seven-file ladder only; nobody has looked at a CRF 28 master of the
   archive's other gifs, or at the H.264 made from one.
-- **A short last WebP frame.** A WebP candidate is skipped where a
-  kept frame lasts 10 ms or less; lengthening that frame (or merging
-  it into its neighbour) would let those gifs have one.
+- **A short last WebP frame.** The seven gifs whose last frame is
+  10 ms have no WebP candidate. Moving 10 ms from the next-to-last
+  frame to the last (20 ms) would give them one while keeping each
+  loop's length exact, at the cost of one frame boundary moving 10 ms.
+  Worth doing only if a Pelican export stores one of them as a large
+  capped gif (`master_sizes.py` shows them with `-` under webp).
