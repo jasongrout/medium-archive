@@ -462,6 +462,56 @@ highest-error window on flat background) compared across CRFs at 3x:
 Small text sets the limit: first artifacts at CRF 34, clear damage at
 40. **Chosen: CRF 28**, one step below the first artifacts.
 
+### H.264 against AV1, and 4:2:0 against 4:4:4
+
+Seven files (the ladder set, 68.4 MB of gifs), all capped. 4:4:4 keeps
+color at full resolution; 4:2:0 keeps one color sample per 2x2 pixels
+(brightness stays full) and is what every browser plays.
+
+| encode | browsers | total vs gif | median PSNR | encode, 1 core, 7 files |
+|---|---|---|---|---|
+| AV1 4:4:4 CRF 28 (libaom, `-cpu-used 6`) | Chrome/Firefox | 27% | 47.6 dB | 1072 s |
+| H.264 4:4:4 CRF 20 | no | 48% | 41.6 dB | 453 s |
+| H.264 4:2:0 CRF 16 | all | 56% | 37.9 dB | 335 s |
+| H.264 4:2:0 CRF 20 | all | 40% | 37.3 dB | 318 s |
+| H.264 4:2:0 CRF 24 | all | 28% | 36.6 dB | 318 s |
+| AV1 CRF 28 master -> H.264 4:2:0 CRF 20 | all | 35% | 36.1 dB | 168 s + AV1 |
+
+H.264 is `-preset slower`, High (4:2:0) or High 4:4:4 profile; 4:2:0
+pads odd dimensions by a pixel. Per file, `x264_420_crf20` against the
+chain, % of gif and PSNR: `bd2524` 30%/25.1 vs 27%/25.0; `013` 26%/37.3
+vs 10%/36.1; `164eb/007` 12%/46.0 vs 11%/45.6; `cda20dc15a21/005`
+182%/32.2 vs 181%/32.0; `11e5` 36%/32.8 vs 35%/32.5; `388d05` 15%/40.2
+vs 15%/39.8; `9549` 25%/39.1 vs 27%/38.9.
+
+- Same chroma, AV1 is about half H.264's size at higher quality (4:4:4:
+  27% at 47.6 dB against 48% at 41.6 dB).
+- 4:2:0 sets the quality ceiling, whatever the codec: every 4:2:0
+  encode sits at 36-38 dB median. Crops of the same frame and region:
+  red code strings turn pink and soft (`11e5`), 1-pixel saturated
+  green lines turn dull and blotchy (`cda20dc15a21/005`), the faint
+  yellow dither dots of `bd2524` vanish, green/purple code text
+  (`9549`) is slightly lighter at stroke edges. Both 4:4:4 encodes
+  keep all of it. The site's current mp4s already have this loss.
+- The two-step chain is slightly smaller than direct H.264 at the same
+  CRF but lower quality on every file (0.2-1.2 dB): no reason for it
+  unless AV1 masters are kept for their own sake.
+- `cda20dc15a21`'s 40 fps gifs of 1-pixel colored lines are larger
+  than the gif in every 4:2:0 encode (H.264 155-211%, SVT-AV1
+  214-305%); the capped gif is 67%. Keeping them as gifs gives up the
+  `<video>` pause control.
+- SVT-AV1 (4:2:0, preset 6, `scm=2`, one thread) is fast (4 s on the
+  pilot) and about half H.264's size at equal PSNR on most files, worse
+  on `cda20dc15a21/005`. It writes a fixed 150 ms duration on every
+  frame (from a guessed rate): starts are exact, but the last frame
+  plays 150 ms (the pilot's gif says 10 ms). Libaom 4:2:0 and the rest
+  of SVT-AV1 were still running when this was written.
+
+Proposal (2026-09-23): serve H.264 4:2:0 encoded on the fly from the
+capped gifs into `.image-cache/`; no AV1 master, no committed encodes.
+Open: CRF 20 or 24 (a third smaller for 0.7 dB median; crops to
+check), and whether `cda20dc15a21`'s gifs stay capped gifs.
+
 ## Open questions
 
 1. **Container and codec.** Lossless is ruled out for the large files
