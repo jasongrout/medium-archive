@@ -157,8 +157,17 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
    decisions (528,236 bytes from constant-rate raw input against
    555,167 from the gif), and some paths hit the fault. Any AV1
    intermediate would need every file verified, with a fallback for
-   files that fail. `-cpu-used 4` is dropped; `aom_ll_c2` is being
-   tested.
+   files that fail. `-cpu-used 4` is dropped. `-cpu-used 2` was exact
+   on the large file below.
+8. **Lossless video codecs lose badly on dithered photographic
+   content.** The large file below is a screen recording of a notebook
+   playing a video clip. The clip area is photographic, quantized to the
+   gif's 256-color palette with dithering: 255 colors per frame, about
+   10% of pixels changing per frame. Reproducing that dither exactly in
+   RGB costs every video codec more than the gif's own palette indices
+   do. Only formats that can code a palette beat the gif there: WebP
+   lossless (73%), against 190-257% for x264rgb, x265 and AV1. APNG and
+   JPEG XL also have palette modes and are untested.
 
 ### Pilot numbers (one file, not a conclusion)
 
@@ -182,6 +191,29 @@ On this file, x264rgb lossless beats x265, webp and AV1, contrary to
 the brief's expectation that AV1 would win. One file is not a sample:
 the large-file run below tests whether that holds where the bytes are.
 
+### Large file (the least favourable case for video so far)
+
+`2e432df402c8/images/013-0_ArP2iU5tKYDHvvZd.gif`: 1836x970, 101 frames
+(60 after merging repeated frames), 10.1 s, 17,564,258 bytes. Five
+jobs shared four cores for part of the run, so encode times are
+slightly inflated.
+
+| encode | bytes | vs gif | encode s | decode s | exact |
+|---|---|---|---|---|---|
+| gif2webp `-m 6 -q 100` | 12,851,572 | 73% | 1057 | 0.80 | yes |
+| gifsicle `-O3` | 17,131,328 | 98% | 5 | 0.55 | yes |
+| libx264rgb `-qp 0 -preset placebo` | 33,341,342 | 190% | 70 | 4.40 | yes |
+| libx265 lossless `placebo` | 41,332,559 | 235% | 633 | 4.41 | yes |
+| libaom `-crf 0 -cpu-used 1` | 44,791,394 | 255% | 1819 | 4.58 | yes |
+| libaom `-crf 0 -cpu-used 2` | 45,059,073 | 257% | 751 | 4.62 | yes |
+
+Together with the pilot, no single format wins: x264rgb was best on a
+plain screencast, WebP on a screencast that contains video. The winner
+depends on content. Two outcomes are possible: one format that is
+never much worse than the gif (WebP is the candidate), or a choice per
+file between a video codec and a palette format, taking the smaller
+exact result.
+
 ## Open questions
 
 1. **Container and codec.** Decide after the sample benchmark, using the
@@ -200,10 +232,10 @@ the large-file run below tests whether that holds where the bytes are.
 
 ## Resume here
 
-0. Record the large-file run (in progress when this was written):
-   `2e432df402c8/013`, 17.6 MB, 101 frames at 1836x970, with
-   `aom_ll_c1`, `aom_ll_c2`, `x265_ll`, `x264rgb_ll`, `webp_ll` and
-   `gifsicle_O3`.
+0. Add palette-capable candidates to `bench.py`: APNG (ffmpeg
+   `-c:v apng -pred mixed`, or `apngopt`) and JPEG XL (item 2). WebP's
+   encode time (about 18 minutes on the large file) is acceptable for
+   a one-time conversion but worth watching on the 2190-frame file.
 1. Fix `psnr()` in `bench.py`. For example, decode both files to rgb24
    frames and compare frames paired by the merged timeline, in Python.
 2. Get animated JPEG XL working: pass ffmpeg `libjxl_anim` an explicit
