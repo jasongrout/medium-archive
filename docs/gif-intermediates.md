@@ -432,12 +432,24 @@ Proposed shape, not yet built:
    step, with a cache) or in the exporter as today. Since the site
    source is meant to outlive this repository, stage 2 probably belongs
    with the site: a plugin plus a pinned ffmpeg.
-5. **Browser playback of the stored files.** Browsers reliably decode
-   AV1 in 4:2:0; 4:4:4 (AV1 High profile) support is uncertain and
-   needs checking, as does the container (MKV is fine for storage;
-   browsers play WebM and MP4). If the stored file must play as it is,
-   the choice is 4:2:0 (costs colored text) or a light stage-2
-   transcode at site build time.
+5. **Browser playback.** Decided (2026-09-23): AV1 is not served for
+   now (Safari plays it only on Apple M3 or later); the AV1 4:4:4 file
+   is the stored master, and the site serves a format every browser
+   plays, made from it. Serving AV1 directly is for later, once support
+   is broad. Which display format is open:
+   - H.264 mp4 (4:2:0) in a `<video>`, as today: every browser, and a
+     reader can pause it. The exporters chose this over animated images
+     for WCAG 2.2.2 (Pause, Stop, Hide): 201 of the 216 animations run
+     over 5 s, and an `<img>` animation cannot be paused (see the
+     comments above `ANIMATED_FORMAT` in `sites.py`). Recommended.
+   - Animated WebP in an `<img>`: every current browser, but no pause
+     control, and larger (lossy q90 49-217% of the gif in the sweep,
+     near-lossless 60-73%).
+   The display copy would be transcoded from the AV1 master at site
+   build (cached in `.image-cache/` as today) or committed alongside
+   it so a build only copies. To check before deciding: quality of
+   H.264 made from the AV1 master (two lossy steps) against H.264 made
+   from the gif directly, both scored against the gif.
 4. **Decoder trust.** The reference frames are ffmpeg's gif decode. They
    have not yet been cross-checked against Pillow's compositing on the
    sample. The brief warns of past ffmpeg disposal bugs.
