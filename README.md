@@ -235,15 +235,20 @@ filesystems):
 - Photographs: capped at 1600 px, with 480/736/1104 px webp `srcset`
   variants. The first body image loads eagerly, the rest lazily.
 - Line art (most PNGs): lossless webp at full resolution.
-- Animated gifs: h264 mp4 (capped at 1104 px) with a poster, rendered
+- Animated gifs: h264 mp4 at full resolution with a poster, rendered
   as `<video controls>`; they autoplay only on screen and when the
-  reader has not requested reduced motion. A gif stays a gif when
-  ffmpeg or Pillow is missing, when it has real transparency, or when
-  the clip would be larger and the animation is under five seconds.
+  reader has not requested reduced motion. Frames of bursts faster
+  than ~30 fps are dropped, and every kept frame keeps the gif's
+  timing. A clip is placed even where it is larger than the gif, for
+  the pause control. An animated gif that cannot become a clip (ffmpeg,
+  its libwebp or Pillow missing, real transparency, an unreadable gif,
+  ffmpeg failing) stops the build with an error listing every such gif,
+  unless `site.toml` asks for gifs (`animated_format = "gif"`). The
+  measurements behind these choices are in `docs/gif-intermediates.md`.
 
 Configure with `site.toml`'s `[images]` table: `still_max_edge`,
-`animated_max_edge` (0 disables a cap), `animated_format` (`"mp4"` or
-`"gif"`), `video_crf` (default 20), `video_preset` (default `"fast"`).
+`animated_max_edge` (0, the default for animations, disables the cap), `animated_format` (`"mp4"` or
+`"gif"`), `video_crf` (default 24), `video_preset` (default `"slower"`).
 
 ### Redirects and feeds
 

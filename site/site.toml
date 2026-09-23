@@ -118,19 +118,20 @@ hubspot_region = "na1"
 # set to.
 #
 # An animated gif is placed as an h264 clip with a poster beside it,
-# which is both what keeps this archive's screen recordings from
-# dominating the built site (609 MB of gif, 88 MB of mp4) and what
-# lets a reader pause them at all. animated_format = "gif" keeps
-# gifsicle's resized gifs instead; video_crf and video_preset are the
-# ffmpeg settings, whose defaults are chosen for screencasts, where
-# the text has to stay sharp. Unset, the defaults are 1600 (still),
-# 1104 (animated), "mp4", 20 and "fast".
+# at its own size, which is what lets a reader pause it at all (and
+# mostly keeps this archive's screen recordings from dominating the
+# built site). animated_format = "gif" keeps gifs instead, resized by
+# gifsicle when animated_max_edge is set; video_crf and video_preset
+# are the ffmpeg settings, whose defaults were measured on this
+# archive's screencasts (docs/gif-intermediates.md). Unset, the
+# defaults are 1600 (still), 0 (animated: no cap), "mp4", 24 and
+# "slower".
 # [images]
 # still_max_edge = 1600
-# animated_max_edge = 1104
+# animated_max_edge = 0
 # animated_format = "mp4"
-# video_crf = 20
-# video_preset = "fast"
+# video_crf = 24
+# video_preset = "slower"
 
 # Anything only the hugo site should differ in: "locale", and the image
 # keys ("avatar", "logo", "logo_dark", "favicon"), each overriding the
