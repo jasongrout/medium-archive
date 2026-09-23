@@ -507,10 +507,33 @@ vs 15%/39.8; `9549` 25%/39.1 vs 27%/38.9.
   plays 150 ms (the pilot's gif says 10 ms). Libaom 4:2:0 and the rest
   of SVT-AV1 were still running when this was written.
 
+SVT-AV1 4:2:0 on the same seven files (total vs gif; median PSNR;
+single-thread encode time for all seven):
+
+| encode | total | median PSNR | encode | per file (% of gif) |
+|---|---|---|---|---|
+| H.264 4:2:0 CRF 20 | 40% | 37.3 | 318 s | `11e5` 36, `164eb` 12, `013` 26, `388d05` 15, `9549` 25, `bd2524` 30, `cda20` 182 |
+| H.264 4:2:0 CRF 24 | 28% | 36.6 | 318 s | 27, 8, 13, 11, 21, 17, 155 |
+| SVT-AV1 p6 CRF 24 | 50% | 37.0 | 224 s | 40, 15, 14, 12, 16, 32, 305 |
+| SVT-AV1 p6 CRF 30 | 38% | 36.5 | 214 s | 30, 12, 7, 10, 13, 18, 258 |
+| SVT-AV1 p6 CRF 36 | 28% | 36.1 | 232 s | 23, 9, 3, 7, 11, 9, 214 |
+| SVT-AV1 p8 CRF 30 | 41% | 36.5 | 143 s | 36, 13, 8, 12, 17, 22, 266 |
+
+Leaving out `cda20dc15a21/005`, SVT-AV1 CRF 30 is 30-70% of H.264 CRF
+20's size at similar PSNR; that one file (1-pixel saturated lines)
+erases the gain in the total. SVT-AV1's timing: starts are exact but
+the last frame's duration is not kept (ends 60-335 ms off:
+`164eb` 13,495 ms against 13,830).
+
+CRF for H.264 4:2:0: crops of the same text regions (`388d05`,
+`11e5`, `9549`, `164eb/007`) at CRF 16, 20 and 24 look alike at 3x;
+the difference from the original is the 4:2:0 color, the same at each
+CRF. CRF 24 is a third smaller than 20 for no visible loss there.
+
 Proposal (2026-09-23): serve H.264 4:2:0 encoded on the fly from the
 capped gifs into `.image-cache/`; no AV1 master, no committed encodes.
-Open: CRF 20 or 24 (a third smaller for 0.7 dB median; crops to
-check), and whether `cda20dc15a21`'s gifs stay capped gifs.
+Open: CRF 24 (recommended) or 20, and whether `cda20dc15a21`'s gifs
+stay capped gifs (67% of the original, but no pause control).
 
 ## Open questions
 
