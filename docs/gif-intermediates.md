@@ -1,12 +1,13 @@
 # Animated gifs in the Pelican site source: plan and findings
 
 Status (2026-09-23): lossless storage is ruled out for the large gifs,
-which make up most of the bytes. On a 14-file sample (143 MB), lossy
-AV1 4:4:4 at CRF 28 stores 24% of the gifs' bytes with text visually
-intact, keeping the gif for the one file AV1 does not shrink. Open:
-the timing policy for 10 ms frames, and whether `-cpu-used 6` at
-CRF 28 holds up. Nothing in `src/` has changed. The last section says
-where to resume.
+which make up most of the bytes. Decided: every stored file has the
+frame-rate cap (`fpscap.py`), computed on the gif's stored delays; the
+format is lossy AV1 4:4:4, or a capped gif where that is smaller. Open:
+the CRF, from a capped ladder (28-52) now running. On a 14-file sample
+(143 MB), CRF 28 stored 24% of the gifs' bytes with text visually
+intact. Nothing in `src/` has changed. The last section says where to
+resume.
 
 ## Goal
 
@@ -370,19 +371,42 @@ every one of them.
 | `bd2524b247c2/005` | 425 of 851 | 283 of 851 |
 | `11e5dab7c54/006` | 403 of 691 | 0 of 691 |
 
+### Decisions (2026-09-23)
+
+- **Timing is the gif's stored delays**, as the author made it, not
+  what browsers played (≤ 10 ms as 100 ms).
+- **Every stored file has the frame-rate cap**, applied before
+  encoding as the `select` filter in the same ffmpeg run (capping after
+  encoding would need a second lossy encode). On a gif without bursts
+  the cap keeps every frame, and the encode's video stream is
+  identical to an uncapped one (checked: same packets, only container
+  metadata differs), so uncapped results on such files stand.
+- **A gif kept as the fallback is capped too** (`fpscap.py --gif`).
+  gifsicle cannot drop frames from a gif with per-frame color tables
+  ("GIF too complex to unoptimize"; the result was 11 dB off), so
+  Pillow composites each kept frame, writes it whole with a palette of
+  exactly its colors and the merged delay, and gifsicle `-O3`
+  re-optimizes. Exact (verified: infinite PSNR, same length) when no
+  composited frame has over 256 colors; otherwise refused. All nine
+  40 fps gifs of `cda20dc15a21` and `bd2524` qualify; `11e5dab7c54/006`
+  (up to 6,141 colors per frame) does not, and its capped AV1 is 43%
+  of the gif anyway. Capped gifs: `cda20dc15a21/005` 67% of the
+  original (the same as uncapped `-O3`: whole frames with their own
+  color tables cost what the dropped frames saved), `bd2524` 64%.
+- `quality.py` now pairs from the encode's side (each encoded frame
+  against the gif frame on screen at its start), so frames the cap
+  drops by design are not counted as errors. Uncapped scores are
+  unchanged.
+- Capped AV1 CRF 20 (`-cpu-used 4`): `11e5dab7c54/006` 43% of the gif
+  (60% uncapped), `cda20dc15a21/005` 89% (96% uncapped).
+
 ## Open questions
 
 1. **Container and codec.** Lossless is ruled out for the large files
    (finding 13). The working proposal is two formats: AV1 4:4:4 at
    CRF 28 in MKV, and the original gif (gifsicle-optimized) wherever
    that is smaller. `-cpu-used 6` at CRF 28 is being measured.
-2. **Short delays.** Either store the gif's delays verbatim, or store
-   what browsers played (≤ 10 ms as 100 ms). Two files are affected:
-   `bd2524b247c2/005` (14.2 s stored, 39.7 s as played) and
-   `11e5dab7c54/006` (12.9 s, 63.7 s). Browser timing is what every
-   reader saw, and under it the frame-rate cap drops none of the
-   second file's frames and fewer of the first's. Recommended: browser
-   timing. Awaiting the decision.
+2. **Short delays.** Decided: the gif's stored delays (see Decisions).
 3. **Where stage 2 runs.** It could run in the Pelican build (a plugin
    step, with a cache) or in the exporter as today. Since the site
    source is meant to outlive this repository, stage 2 probably belongs
@@ -393,17 +417,16 @@ every one of them.
 
 ## Resume here
 
-1. Record the runs in progress when this was written: AV1 CRF 28 at
-   `-cpu-used 6` on the 14 sample files, and AV1 CRF 20 with
-   `fpscap.py` (stored timing) on the three sample files the cap
-   affects (`cda20dc15a21/005`, `bd2524b247c2/005`,
-   `11e5dab7c54/006`).
-2. Decide the timing policy (open question 2). For browser timing,
-   rewrite ≤ 10 ms delays as 100 ms before the cap and the encode.
-3. Choose between CRF 28 at `-cpu-used 4` and `-cpu-used 6`, then
-   convert the whole archive with the cap and the gif fallback,
-   including `3ee42dfdc54f/002` (2190 frames, not in the sample).
-   Verify every output (timing, and quality.py's numbers) and inspect
-   the worst frames.
+1. Record the capped CRF ladder (running when this was written):
+   `aom444_c6_crf{28,34,40,46,52}_cap` on `bd2524b247c2/005`,
+   `2e432df402c8/013`, `164eb2eae102/007`, `cda20dc15a21/005`,
+   `11e5dab7c54/006`, `388d05e03442/002` and `9549c5dcf551/003`.
+   Put the same text region of each file side by side across the CRFs
+   and find where text visibly degrades; pick the CRF a step below.
+2. Check `-cpu-used 6` against 4 at the chosen CRF on a few files.
+3. Convert the whole archive: capped AV1 at the chosen CRF, and a
+   capped gif (`fpscap.py --gif`) wherever that is smaller, including
+   `3ee42dfdc54f/002` (2190 frames, not in the sample). Verify every
+   output (timing, quality.py) and inspect the worst frames.
 4. Change the pelican exporter to place the intermediate instead of
    the display copy, and add stage 2.

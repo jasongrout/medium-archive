@@ -3,16 +3,17 @@
 usage: python quality.py GIF ENCODED [SNAPSHOT_DIR]
 
 Both files are decoded to rgb24 by ffmpeg (1 ms time base) and paired by
-display time: every frame of the gif is compared with the frame of the
-encode that is on screen at the same moment, so formats that merge or
-split repeated frames are compared on what is shown. Prints one JSON
-object:
+display time: every frame of the encode is compared with the gif frame
+on screen at the moment it starts. Formats that merge repeated frames
+are compared on what is shown, and an encode whose frame rate was
+capped (fpscap.py) is judged on the frames it keeps -- the frames it
+dropped by design are not counted as errors. Prints one JSON object:
 
   psnr        over all compared pixels (dB; inf when identical)
   psnr_min    the worst single frame
   max_err     the largest per-channel error anywhere
   visible     fraction of pixels whose largest channel error is > 16
-  worst_frame index of the gif frame with the lowest PSNR
+  worst_frame index of the encode's frame with the lowest PSNR
 
 With SNAPSHOT_DIR, that worst frame is saved as ref.png, enc.png and
 diff.png (the absolute error, amplified 8x), for looking at text.
@@ -91,19 +92,19 @@ def main():
     w2, h2, enc_pts = probe(enc)
     if (w, h) != (w2, h2):
         sys.exit(f"size differs: {w}x{h} vs {w2}x{h2}")
-    enc_frames = frames(enc, w, h)
-    cur, nxt = next(enc_frames), next(enc_frames, None)
+    gif_frames = frames(gif, w, h)
+    cur, nxt = next(gif_frames), next(gif_frames, None)
     j = 0
     sse = 0.0
     count = 0
     max_err = 0
     visible = 0
     worst = (math.inf, -1, None, None)
-    for i, (t, ref) in enumerate(zip(ref_pts, frames(gif, w, h))):
-        # advance to the encode's frame on screen at time t
-        while nxt is not None and j + 1 < len(enc_pts) and enc_pts[j + 1] <= t + 0.5:
-            cur, nxt, j = nxt, next(enc_frames, None), j + 1
-        d = np.abs(ref.astype(np.int16) - cur.astype(np.int16))
+    for i, (t, got) in enumerate(zip(enc_pts, frames(enc, w, h))):
+        # advance to the gif frame on screen at time t
+        while nxt is not None and j + 1 < len(ref_pts) and ref_pts[j + 1] <= t + 0.5:
+            cur, nxt, j = nxt, next(gif_frames, None), j + 1
+        d = np.abs(cur.astype(np.int16) - got.astype(np.int16))
         mse = float((d.astype(np.float64) ** 2).mean())
         sse += mse
         count += 1
@@ -111,7 +112,7 @@ def main():
         visible += int((d.max(axis=2) > 16).sum())
         p = math.inf if mse == 0 else 10 * math.log10(255 ** 2 / mse)
         if p < worst[0]:
-            worst = (p, i, ref.copy(), cur.copy())
+            worst = (p, i, cur.copy(), got.copy())
     mse = sse / count
     out = {
         "psnr": round(10 * math.log10(255 ** 2 / mse), 2) if mse else math.inf,

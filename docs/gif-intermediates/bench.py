@@ -10,6 +10,7 @@ judged on what is shown and for how long, not on frame count. Appends
 one JSON line per job to OUTDIR/results.jsonl.
 """
 import json
+import re
 import os
 import subprocess
 import sys
@@ -161,6 +162,22 @@ def pil(i, o, *img2webp):
             *img2webp]
 
 
+def encoder(name):
+    """ENCODERS[name], or a libaom 4:4:4 encode named like
+    aom444_c6_crf34 or aom444_c6_crf34_cap (-cpu-used 6, CRF 34, with
+    fpscap.py's frame selection)."""
+    if name in ENCODERS:
+        return ENCODERS[name]
+    m = re.fullmatch(r"aom444_c(\d+)_crf(\d+)(_cap)?", name)
+    if not m:
+        raise KeyError(name)
+    codec = ["-c:v", "libaom-av1", "-cpu-used", m[1], "-g", "9999",
+             "-row-mt", "0", "-crf", m[2], "-pix_fmt", "yuv444p"]
+    if m[3]:
+        return ".mkv", lambda i, o: capped(i, o, codec)
+    return ".mkv", lambda i, o: FF + ["-i", i] + PT + codec + [o]
+
+
 def timeline(path):
     """[(hash, ms)] of what is shown, consecutive identical frames merged,
     plus the raw frame count. The 1 ms time base matters: left to
@@ -238,7 +255,7 @@ _refs = {}
 
 
 def job(outdir, gif, enc):
-    ext, cmd = ENCODERS[enc]
+    ext, cmd = encoder(enc)
     gif = Path(gif)
     name = f"{gif.parent.parent.name[:40]}__{gif.stem}"
     out = Path(outdir) / enc / (name + ext)
