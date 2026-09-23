@@ -1015,13 +1015,14 @@ class ImagePlacer:
             if copy is not NotImplemented:
                 return copy
         if ext == ".gif":
-            # the extensions an animation's copy can carry, newest
-            # scheme first: a clip in .mp4, and a resized gif -- or the
-            # verdict that neither paid off -- under .gif. Which of the
-            # two is built is decided on a cache miss, inside
+            # the extensions a gif's copy can carry, newest scheme
+            # first: a clip in .mp4, a still's webp or jpg, and a
+            # resized gif -- or the verdict that none paid off -- under
+            # .gif. Which is built is decided on a cache miss, inside
             # _place_animation: reading a gif's frames to find out
             # whether it can become a clip costs more than the lookup
-            cap, candidates = self.gif_cap, (self.clip_suffix, ext)
+            cap = self.gif_cap
+            candidates = (self.clip_suffix, ".webp", ".jpg", ext)
             if self.animated_format == "mp4":
                 build = self._place_animation
             elif self._resizes_gif(src, cap):
@@ -1225,12 +1226,15 @@ class ImagePlacer:
 
     def _place_animation(self, src: Path, tmp: str, cap: int):
         """A gif's display copy where this archive places animations as
-        video: the clip, or for a still under a .gif name the resized
-        gif gifsicle makes of it, or nothing. An animation that cannot
-        become a clip raises AnimationError."""
+        video: the clip, or for a still under a .gif name what a PNG
+        becomes -- lossless webp for line art, the photo path for a
+        photograph (see _copy_png), with the still cap -- or nothing.
+        An animation that cannot become a clip raises AnimationError."""
         delays = self._clip_delays(src)
         if delays:
             return self._encode_video(src, tmp, cap, delays)
+        if self.still_cap:
+            return self._copy_png(src, tmp, self.still_cap)
         return (self._resize_gif(src, tmp, cap)
                 if self._resizes_gif(src, cap) else None)
 

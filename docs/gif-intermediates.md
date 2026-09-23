@@ -20,7 +20,9 @@ Each animated gif in `archive/raw/` stays the master. Every site gets:
   every such gif (a missing ffmpeg, libwebp or Pillow, real
   transparency, an unreadable gif, ffmpeg failing), and the command
   exits with an error. Only `animated_format = "gif"` in `site.toml`
-  keeps gifs. A single-frame gif is a still and is placed as it is.
+  keeps gifs. A single-frame gif is a still and is placed as a PNG
+  would be: line art as lossless webp, a photograph down the photo
+  path.
 - **Settings:** 4:2:0, High profile, `-crf 24 -preset slower`, no
   B-frames, one thread per encode (`warm()` encodes gifs in parallel).
 - **Full resolution:** `animated_max_edge` defaults to 0. Odd sizes
@@ -216,6 +218,12 @@ for the pause control.
 - **cjxl** rejects gifs whose partial frames dispose to background.
 - **gifsicle** cannot drop frames from gifs with per-frame color
   tables.
+
+**9. Single-frame gifs.** One image in the archive
+(`3b3dfb877664/004-0_U5H7uyoSLf0pZm6q`, 1,515x651, stored as `.bin`
+and typed as a gif by convert) is a gif of one frame. It is placed as
+a PNG would be; as lossless webp it is 32,156 bytes against 52,546,
+61%, pixel for pixel.
 
 ## The Pelican site's masters
 
@@ -463,11 +471,6 @@ pixi environment below: `bench.py` passes filter scripts with ffmpeg's
   `789fcb1a5857/001`) are clean UI recordings (see
   [Masters larger than their gifs](#masters-larger-than-their-gifs));
   the other seven have not been looked at.
-- **Single-frame gifs.** One image in the archive
-  (`3b3dfb877664/004-0_U5H7uyoSLf0pZm6q`, 52 KB, 1,515x651) is a
-  single-frame gif. It is placed unchanged, because the still-image
-  path, which would make line art lossless webp, handles only `.png`,
-  `.jpg`, `.jpeg` and `.webp`.
 - **The full-archive master measurement** was still running when this
   was written: masters for the 14 largest gifs only. It does not make
   the capped gif and WebP candidates; those come from a Pelican export,

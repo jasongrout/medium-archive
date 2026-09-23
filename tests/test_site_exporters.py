@@ -2503,11 +2503,35 @@ def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
         placer.place(gif, out / "clip.gif")
 
 
+def test_a_single_frame_gif_is_placed_as_a_png_would_be(tmp_path):
+    """A gif of one frame is a still under a .gif name: line art becomes
+    lossless webp, every pixel kept, as a line-art PNG does -- in every
+    site, the pelican site too, and without ffmpeg."""
+    from PIL import Image, ImageChops
+
+    src = tmp_path / "src"
+    src.mkdir()
+    still = src / "chart.gif"
+    line_art(1200, 500).convert("P").save(still)
+    for masters in (False, True):
+        placer = sites.ImagePlacer(tmp_path / "cache", {}, masters=masters)
+        placer.ffmpeg = None
+        out = tmp_path / f"out-{masters}"
+        out.mkdir()
+        placed = placer.place(still, out / "chart.gif")
+        assert placed == out / "chart.webp"
+        assert placed.stat().st_size < still.stat().st_size
+        assert not sites.poster_path(placed).exists()
+        with Image.open(still) as before, Image.open(placed) as after:
+            assert not ImageChops.difference(
+                before.convert("RGB"), after.convert("RGB")).getbbox()
+
+
 def test_an_animation_without_ffmpeg_is_an_error(tmp_path):
     """Where clips are asked for, an animated gif that cannot become one
     stops the build: no ffmpeg is an error, not a note. A still under a
-    .gif name is not an animation and is placed as it is, and a site
-    that asks for gifs keeps them without ffmpeg."""
+    .gif name is not an animation and needs no ffmpeg, and a site that
+    asks for gifs keeps them without ffmpeg."""
     from PIL import Image
 
     src = tmp_path / "src"
@@ -2523,7 +2547,7 @@ def test_an_animation_without_ffmpeg_is_an_error(tmp_path):
     placer.ffmpeg = None
     with pytest.raises(sites.AnimationError, match="ffmpeg is not installed"):
         placer.place(moving, out / "moving.gif")
-    assert placer.place(still, out / "still.gif") == out / "still.gif"
+    assert placer.place(still, out / "still.gif").stem == "still"
 
     as_gifs = sites.ImagePlacer(tmp_path / "cache",
                                 {"images": {"animated_format": "gif"}})
