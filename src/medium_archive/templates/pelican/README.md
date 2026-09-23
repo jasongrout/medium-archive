@@ -20,9 +20,10 @@ images are served as they are. `pagefind` (`npm install -g pagefind`)
 is needed for search results.
 
 ffmpeg, built with libx264, is needed for the animations. Each is kept
-in `content/` as an AV1 master (`.mp4`, 4:4:4 color, beside its
-`-poster.webp`), and every build makes the h264 served in `output/`
-from it, cached under `cache/clips/` (or `$CLIP_CACHE`). The master is
+in `content/` as one master beside its `-poster.webp`: a lossless gif
+or animated WebP, or an AV1 `.mp4` (4:4:4 color) where that is much
+smaller. Every build makes the h264 served in `output/` from it,
+cached under `cache/clips/` (or `$CLIP_CACHE`). The master is
 the one copy to keep: a later change of served format is a change to
 the plugin, not a new copy of every clip.
 

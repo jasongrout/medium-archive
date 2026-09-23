@@ -2116,6 +2116,9 @@ def video_stream(path):
             round(float(probe["format"]["duration"]) * 1000))
 
 
+# a site.toml that stores every animation as its AV1 master
+ALWAYS_MASTER = {"images": {"master_max_share": 1000}}
+
 needs_av1_and_h264 = pytest.mark.skipif(
     not (has_encoder("libaom-av1") and has_encoder("libx264")
          and __import__("shutil").which("ffprobe")),
@@ -2147,10 +2150,12 @@ def test_the_pelican_site_stores_av1_masters_of_its_clips(tmp_path):
     build makes the served h264 from: under the clip's name, at the
     gif's own size (4:4:4 needs no padding), as long as the gif, and
     with the poster the served clip will have, padded to its even
-    size. The hugo site, which serves what it stores, keeps h264."""
+    size. The hugo site, which serves what it stores, keeps h264.
+    (master_max_share stores the master whatever the lossless copies
+    weigh, since this is what is being tested.)"""
     from PIL import Image
 
-    gif, delays = make_clip_post(tmp_path)
+    gif, delays = make_clip_post(tmp_path, ALWAYS_MASTER)
     images = "content/posts/2022/clip-post/images"
     pelican_site = build(pelican, tmp_path)
     master = pelican_site / images / "anim.mp4"
@@ -2174,7 +2179,7 @@ def test_the_pelican_build_serves_h264_made_from_each_master(
     by the master's hash, so the next build encodes nothing."""
     import shutil
 
-    gif, delays = make_clip_post(tmp_path)
+    gif, delays = make_clip_post(tmp_path, ALWAYS_MASTER)
     site = build(pelican, tmp_path)
     master = site / "content/posts/2022/clip-post/images/anim.mp4"
     output = tmp_path / "output"
@@ -2214,6 +2219,111 @@ def test_a_pelican_site_can_store_h264_instead(tmp_path, monkeypatch,
         SimpleNamespace(output_path=str(output)))
     assert served.read_bytes() == stored
     assert "0 served as h264" in capsys.readouterr().out
+
+
+@needs_av1_and_h264
+def stored_lossless(images):
+    """The one lossless copy of `anim` a site stores: gif or WebP."""
+    found = [p for p in images.iterdir()
+             if p.name in ("anim.gif", "anim.webp")]
+    assert len(found) == 1, found
+    return found[0]
+
+
+@needs_av1_and_h264
+def test_a_pelican_site_stores_a_lossless_copy_where_a_master_does_not_pay(
+        tmp_path, monkeypatch, capsys):
+    """Where the AV1 master is not enough smaller than the smaller of
+    the capped gif and the capped lossless WebP (master_max_share; 0
+    here, so never), the site stores that copy -- frame for frame the
+    animation's -- with the clip's poster beside it, and the page
+    points at it. The build makes the h264 beside it and shows that as
+    the page's <video>; the copy stays for the feeds."""
+    from PIL import Image, ImageChops
+
+    gif, delays = make_clip_post(tmp_path, {"images": {"master_max_share": 0}})
+    site = build(pelican, tmp_path)
+    images = site / "content/posts/2022/clip-post/images"
+    stored = stored_lossless(images)
+    assert (images / "anim-poster.webp").exists()
+    assert not (images / "anim.mp4").exists()
+    page = (site / "content/posts/2022/clip-post/index.md").read_text()
+    assert f"![a screen recording]({{attach}}images/{stored.name})" in page
+    with Image.open(gif) as before, Image.open(stored) as after:
+        assert after.n_frames == before.n_frames
+        for i in range(before.n_frames):
+            before.seek(i)
+            after.seek(i)
+            after.load()             # WebP sets a frame's duration then
+            assert after.info["duration"] == delays[i]
+            assert not ImageChops.difference(
+                before.convert("RGB"), after.convert("RGB")).getbbox()
+
+    # the build, as pelican runs it: the stored files copied into the
+    # output, the page rendered with the gif as a body image
+    output = tmp_path / "output"
+    served = output / "posts/2022/clip-post/images"
+    served.mkdir(parents=True)
+    for f in images.iterdir():
+        (served / f.name).write_bytes(f.read_bytes())
+    page = output / "posts/2022/clip-post/index.html"
+    page.write_text(f'<p><img src="/posts/2022/clip-post/images/{stored.name}" '
+                    'alt="a screen recording" data-body-image '
+                    'loading="lazy"></p>\n')
+    monkeypatch.setenv("CLIP_CACHE", str(tmp_path / "clips"))
+    namespace = config_namespace(site)
+    namespace["_serve_clips"](SimpleNamespace(output_path=str(output)))
+    assert ("0 served as h264 made from AV1 masters and 1 from gifs and "
+            "WebPs") in capsys.readouterr().out
+    assert video_stream(served / "anim.mp4") == ("h264", "yuv420p", 202, 152,
+                                                 sum(delays))
+    assert (served / stored.name).exists()
+    namespace["_optimize_article_images"](
+        SimpleNamespace(output_path=str(output)))
+    html = page.read_text()
+    assert '<video src="/posts/2022/clip-post/images/anim.mp4"' in html
+    assert 'poster="/posts/2022/clip-post/images/anim-poster.webp"' in html
+    assert "<img" not in html
+
+
+@needs_av1_and_h264
+@pytest.mark.parametrize("kind", ["gif", "webp"])
+def test_a_lossless_copy_is_frame_rate_capped_exactly(tmp_path, kind):
+    """A lossless copy stored in place of a master, gif or WebP, drops
+    the frames a clip drops (kept_frames), and keeps every other one
+    pixel for pixel, each from its own start until the next kept
+    frame's -- the gif written whole, since dropping a frame breaks the
+    partial frames after it."""
+    from PIL import Image, ImageChops
+
+    src = tmp_path / "src"
+    src.mkdir()
+    delays = [10] * 12 + [500, 10, 10, 10, 400]
+    gif = animation(src / "burst.gif",
+                    [gradient_frame((96, 64), i * 7)
+                     for i in range(len(delays))], duration=delays)
+    keep = sites.kept_frames(delays)
+    assert len(keep) < len(delays)
+    placer = sites.ImagePlacer(tmp_path / "cache",
+                               {"images": {"master_max_share": 0}},
+                               masters=True)
+    out = tmp_path / "out"
+    out.mkdir()
+    placer.place(gif, out / "burst.gif")
+    stored = next(placer.cache.glob(f"*.capped.{kind}"))
+    assert stored.stat().st_size
+    assert sites.poster_path(stored).exists()
+    starts = [sum(delays[:i]) for i in range(len(delays) + 1)]
+    ends = keep[1:] + [len(delays)]
+    with Image.open(gif) as before, Image.open(stored) as after:
+        assert after.n_frames == len(keep)
+        for j, (i, end) in enumerate(zip(keep, ends)):
+            before.seek(i)
+            after.seek(j)
+            after.load()             # WebP sets a frame's duration then
+            assert after.info["duration"] == starts[end] - starts[i]
+            assert not ImageChops.difference(
+                before.convert("RGB"), after.convert("RGB")).getbbox()
 
 
 def test_an_unknown_clip_master_is_an_error(tmp_path):

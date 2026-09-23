@@ -33,13 +33,15 @@ Clips are encoded on the fly into `.image-cache/`, keyed by the gif's
 hash and the settings (`CACHE_SCHEME` v7). CI restores that cache
 between builds, so nothing encoded is committed.
 
-**The Pelican site stores AV1 masters (2026-09, experimental).** The
+**The Pelican site stores masters (2026-09, experimental).** The
 Pelican site is meant to become a repository of its own, where each
 committed media file stays in the history for good. It therefore
-stores each animation as an AV1 4:4:4 master (libaom, CRF 28,
-`-cpu-used 6`, frame-rate capped, full size, not padded) under the
-clip's name, and its build makes the served H.264 from it with the
-settings above (`_serve_clips` in the site plugin). A later change of
+stores one master of each animation, frame-rate capped and at full
+size: the smaller of the gif re-optimized by gifsicle `-O3` and
+lossless WebP (both exact), or an AV1 4:4:4 master (libaom, CRF 28,
+`-cpu-used 6`, not padded) where that is at most 75% of it. Its build
+makes the served H.264 from the master with the settings above
+(`_serve_clips` in the site plugin). A later change of
 served format then changes the plugin, not the committed files.
 4:4:4 is kept for fidelity, not served: browsers decode AV1 4:4:4 in
 software, where 4:2:0 H.264 has a hardware decoder everywhere. The
