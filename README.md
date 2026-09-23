@@ -59,14 +59,22 @@ conda-forge except Pagefind (PyPI). With [pixi](https://pixi.sh):
 pixi install                      # create .pixi/envs/default from pixi.lock
 pixi run medium-archive --help    # run any command in it
 pixi run test                     # the test suite
-pixi shell                        # or activate it
 ```
 
-Tasks: `pixi run convert`, and `pixi run build-hugo`, `build-pelican`,
-`build-myst` (export the site, build it, and index it with
-Pagefind for Hugo and Pelican). `pixi run pagefind ARGS` runs
-Pagefind, whose PyPI package installs no `pagefind` executable
-(`python -m pagefind` also works).
+Every command in this README runs through `pixi run`, as CI does. The
+tool's commands are `pixi run medium-archive <command>`. The pixi
+tasks cover only what takes more than one command:
+
+| task | runs |
+|---|---|
+| `test` | `pytest -q` |
+| `build-hugo` | `medium-archive hugo`, then `hugo` and Pagefind in `site-hugo/` |
+| `build-pelican` | `medium-archive pelican`, then `pelican` and Pagefind in `site-pelican/` |
+| `build-myst` | `medium-archive myst`, then `myst build --html` in `site-myst/` |
+| `pagefind` | `python -m pagefind` (its PyPI package installs no `pagefind` executable) |
+
+`medium-archive hugo|pelican|myst` only writes a site's sources; the
+`build-*` task is what produces the built site.
 
 `fetch --solve-walls` needs Playwright and a browser, in a separate
 environment:
@@ -84,7 +92,7 @@ webp poster, and stop with an error when they cannot (see
 therefore requires Pillow and an `ffmpeg` built with libx264 and
 libwebp, unless `site.toml` sets `[images] animated_format = "gif"`.
 The other tools are needed only for the step that uses them. The pixi
-environment has all of them.
+environment has all of them, at the versions `pixi.toml` pins.
 
 | tool | needed for |
 |---|---|
@@ -97,14 +105,15 @@ environment has all of them.
 
 `pixi.toml` asks for conda-forge's `gpl` ffmpeg build, because its
 `lgpl` builds omit libx264. To check an ffmpeg: `ffmpeg -hide_banner
--encoders | grep -E 'libx264|libwebp'`. The versions CI builds the
-preview sites with are pinned in `.github/workflows/preview.yml`.
+-encoders | grep -E 'libx264|libwebp'`, or `pixi run ffmpeg ...` for
+the environment's. CI builds the preview sites with the same
+environment and the same `build-*` tasks.
 
 ## Commands
 
 Only `fetch`, `all` and `import-ghost` use the network. Every command
-takes `--archive DIR` (default `archive/`). Run `medium-archive
-<command> --help` for all options.
+takes `--archive DIR` (default `archive/`). Run `pixi run
+medium-archive <command> --help` for all options.
 
 | command | does |
 |---|---|
@@ -125,16 +134,16 @@ The site exporters also take `--site-inputs DIR` (default `site/`),
 ## Workflow
 
 ```sh
-medium-archive all https://blog.example.com/ --limit 5     # smoke test
-medium-archive fetch https://blog.example.com/             # re-run until "0 new"
-medium-archive import-export alice-export.zip              # once per author (optional)
-medium-archive compare
-medium-archive import-ghost https://blog.example.com/      # if the blog was on Ghost (optional)
-medium-archive compare --ghost
-medium-archive convert
-medium-archive lint
-medium-archive stats
-medium-archive pelican                                     # or hugo, myst
+pixi run medium-archive all https://blog.example.com/ --limit 5   # smoke test
+pixi run medium-archive fetch https://blog.example.com/           # re-run until "0 new"
+pixi run medium-archive import-export alice-export.zip            # once per author (optional)
+pixi run medium-archive compare
+pixi run medium-archive import-ghost https://blog.example.com/    # if the blog was on Ghost (optional)
+pixi run medium-archive compare --ghost
+pixi run medium-archive convert
+pixi run medium-archive lint
+pixi run medium-archive stats
+pixi run build-pelican                                            # or build-hugo, build-myst
 ```
 
 - **Discovery** merges the sitemap, the RSS feed (about the ten most
@@ -219,12 +228,14 @@ to write a post) and `.gitignore`.
 
 | | Hugo | Pelican | MyST |
 |---|---|---|---|
-| build | `hugo`, `hugo server` | `pelican`, `pelican -l` | `myst start`, `myst build --html` |
-| requires | Hugo extended 0.156+ | `pip install pelican markdown-it-py mdit-py-plugins pyyaml pillow` | `npm install -g mystmd` |
-| search | `pagefind --site public` | `pagefind --site output` | -- |
-| pixi task | `pixi run build-hugo` | `pixi run build-pelican` | `pixi run build-myst` |
+| export and build | `pixi run build-hugo` | `pixi run build-pelican` | `pixi run build-myst` |
+| output | `site-hugo/public/` | `site-pelican/output/` | `site-myst/_build/html/` |
+| serve (in the site directory) | `pixi run hugo server` | `pixi run pelican -l` | `pixi run myst start` |
 
-The pixi environment has all of these; see [Installation](#installation).
+`pixi run` finds `pixi.toml` from a subdirectory, so the serve commands
+run inside `site-hugo/` etc. use the same environment. The generated
+README in each site directory gives install instructions for building
+it outside this repository.
 
 ### Hugo and Pelican
 
@@ -315,7 +326,7 @@ absolute URLs.
 
 ```sh
 git init ../blog-pelican
-medium-archive pelican --out ../blog-pelican
+pixi run medium-archive pelican --out ../blog-pelican
 ```
 
 `--out` is written in place: generated files are overwritten and other
