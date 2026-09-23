@@ -4,9 +4,11 @@
 #   pixi install                    # create .pixi/envs/default
 #   pixi run medium-archive --help  # run anything in it
 #   pixi run test
-#   pixi shell                      # or activate it
+#   pixi run build-pelican          # or build-hugo, build-myst
 #
-# CI's `Tests` job runs `pixi run test` in this environment.
+# Everything, locally and in CI, runs through `pixi run`. The tool's
+# commands are run as `pixi run medium-archive <command>`; tasks exist
+# only for what is more than one command.
 
 [workspace]
 name = "medium-archive"
@@ -55,11 +57,13 @@ playwright-python = "*"
 solve-walls = ["solve-walls"]
 
 [tasks]
-# The build tasks are not named after their generators, which would
-# shadow the executables: `pixi run hugo server` must reach Hugo.
+# A build task runs the exporter (`medium-archive hugo`, which only
+# writes the site's sources into site-hugo/), then the generator, then
+# Pagefind; CI's preview build runs these same tasks. They are not
+# named after their generators, which would shadow the executables:
+# `pixi run hugo server` must reach Hugo.
 test = "pytest -q"
 pagefind = "python -m pagefind"
-convert = "medium-archive convert"
 build-hugo = { cmd = "medium-archive hugo && cd site-hugo && hugo && python -m pagefind --site public", description = "Export and build the Hugo site into site-hugo/public/" }
 build-pelican = { cmd = "medium-archive pelican && cd site-pelican && pelican && python -m pagefind --site output", description = "Export and build the Pelican site into site-pelican/output/" }
 build-myst = { cmd = "medium-archive myst && cd site-myst && myst build --html", description = "Export and build the MyST site into site-myst/_build/html/" }
