@@ -19,9 +19,11 @@ python = ">=3.11"
 # that cannot make one stops. conda-forge's lgpl ffmpeg builds lack
 # libx264, so the gpl build is asked for by name.
 ffmpeg = { version = "*", build = "gpl*" }
-# Hugo extended, which conda-forge's build is
-hugo = ">=0.156"
-mystmd = "*"
+# Hugo extended, which conda-forge's build is. Hugo and mystmd are
+# pinned to the versions the archive's sites were last validated
+# against (see todo.md); CI's preview build uses these too.
+hugo = "0.158.*"
+mystmd = "1.10.*"
 # what the generated pelicanconf.py reads posts and data files with
 pelican = ">=4.12"
 markdown-it-py = "*"
@@ -45,10 +47,22 @@ medium-archive = { path = ".", editable = true }
 # pagefind` (the task below) or `python -m pagefind`.
 pagefind = { version = "==1.5.2", extras = ["bin"] }
 
+# fetch --solve-walls: a real browser for a human to clear a bot
+# wall's challenge. A separate environment, since only fetch needs it:
+#   pixi run -e solve-walls playwright install chromium
+#   pixi run -e solve-walls medium-archive fetch URL --solve-walls
+[feature.solve-walls.dependencies]
+playwright-python = "*"
+
+[environments]
+solve-walls = ["solve-walls"]
+
 [tasks]
+# The build tasks are not named after their generators, which would
+# shadow the executables: `pixi run hugo server` must reach Hugo.
 test = "pytest -q"
 pagefind = "python -m pagefind"
 convert = "medium-archive convert"
-hugo = { cmd = "medium-archive hugo && cd site-hugo && hugo && python -m pagefind --site public", description = "Export and build the Hugo site into site-hugo/public/" }
-pelican = { cmd = "medium-archive pelican && cd site-pelican && pelican && python -m pagefind --site output", description = "Export and build the Pelican site into site-pelican/output/" }
-myst = { cmd = "medium-archive myst && cd site-myst && myst build --html", description = "Export and build the MyST site into site-myst/_build/html/" }
+build-hugo = { cmd = "medium-archive hugo && cd site-hugo && hugo && python -m pagefind --site public", description = "Export and build the Hugo site into site-hugo/public/" }
+build-pelican = { cmd = "medium-archive pelican && cd site-pelican && pelican && python -m pagefind --site output", description = "Export and build the Pelican site into site-pelican/output/" }
+build-myst = { cmd = "medium-archive myst && cd site-myst && myst build --html", description = "Export and build the MyST site into site-myst/_build/html/" }
