@@ -173,6 +173,104 @@ def _clip(src, path, attrs, output_path, here):
             % (src, extra, ' aria-label="%s"' % label if label else ""))
 
 
+# A clip under content/ is the AV1 4:4:4 master of an animation, and
+# what a browser is served is h264 made from it here, on every build:
+# 4:2:0 h264 plays everywhere, on a hardware decoder, where AV1 4:4:4
+# plays in some browsers and in software. These are the settings the
+# archive's exporter encodes the h264 clips of its other sites with
+# (medium_archive's sites.ImagePlacer), less the frame selection, which
+# the master already carries: each frame keeps its timestamp on a
+# millisecond time base, an odd size is padded by a pixel, one thread
+# per encode, and no B-frames, without which the mp4 runs as long as the
+# gif. A clip that is not AV1 -- a site exported with clip_master =
+# "none" -- is served as it is.
+CLIP_H264 = ["-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+             "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
+             "-crf", "24", "-preset", "slower", "-threads", "1", "-bf", "0",
+             "-fps_mode", "passthrough", "-enc_time_base", "1:1000",
+             "-an", "-movflags", "+faststart", "-f", "mp4"]
+# The h264 made from each master is kept by the master's content hash,
+# under this name for the settings above -- change it with them -- in
+# $CLIP_CACHE, or cache/clips/ beside this config.
+CLIP_SCHEME = "h264-crf24-slower"
+
+
+def _serve_clips(pelican_obj):
+    # Replace each AV1 master Pelican copied into the output with the
+    # h264 made from it, encoding the ones not yet cached in parallel.
+    # A master that cannot be served stops the build, as an animation
+    # that cannot become a clip stops the export: an AV1 4:4:4 file in
+    # the output would not play in Safari at all.
+    import glob
+    import hashlib
+    import os
+    import shutil
+    import subprocess
+    import sys
+    import tempfile
+    from concurrent.futures import ThreadPoolExecutor
+
+    clips = sorted(glob.glob(os.path.join(pelican_obj.output_path, "posts",
+                                          "**", "*.mp4"), recursive=True))
+    if not clips:
+        return
+    here = os.path.dirname(os.path.abspath(__file__))
+    cache = os.path.join(os.environ.get("CLIP_CACHE")
+                         or os.path.join(here, "cache", "clips"), CLIP_SCHEME)
+    os.makedirs(cache, exist_ok=True)
+    ffmpeg, ffprobe = shutil.which("ffmpeg"), shutil.which("ffprobe")
+
+    def serve(path):
+        # what became of the clip: "made" (from the cache), "encoded",
+        # "as stored", or why it could not be served
+        with open(path, "rb") as fh:
+            digest = hashlib.file_digest(fh, "sha256").hexdigest()[:16]
+        made = os.path.join(cache, digest + ".mp4")
+        # the verdict that a clip is served as it is, remembered too
+        stored = os.path.join(cache, digest + ".as-stored")
+        if os.path.exists(stored):
+            return "as stored"
+        outcome = "made"
+        if not os.path.exists(made):
+            if not (ffmpeg and ffprobe):
+                return "%s: ffmpeg is not installed" % path
+            probe = subprocess.run(
+                [ffprobe, "-v", "error", "-select_streams", "v:0",
+                 "-show_entries", "stream=codec_name", "-of", "csv=p=0",
+                 path], capture_output=True, text=True)
+            if probe.stdout.strip() != "av1":
+                open(stored, "w").close()
+                return "as stored"
+            fd, tmp = tempfile.mkstemp(dir=cache, suffix=".mp4")
+            os.close(fd)
+            run = subprocess.run(
+                [ffmpeg, "-nostdin", "-loglevel", "error", "-y",
+                 "-i", path] + CLIP_H264 + [tmp],
+                capture_output=True, text=True)
+            if run.returncode or not os.path.getsize(tmp):
+                os.unlink(tmp)
+                detail = (run.stderr or "").strip().splitlines()
+                return "%s: ffmpeg failed%s" % (
+                    path, ": " + detail[-1] if detail else "")
+            os.replace(tmp, made)
+            outcome = "encoded"
+        shutil.copyfile(made, path)
+        return outcome
+
+    with ThreadPoolExecutor(os.cpu_count() or 1) as pool:
+        outcomes = list(pool.map(serve, clips))
+    failed = [o for o in outcomes if ": " in o]
+    if failed:
+        sys.exit("%d clip(s) could not be made from their AV1 masters "
+                 "(the site's clips need ffmpeg with libx264):\n%s"
+                 % (len(failed), "\n".join(failed)))
+    encoded = outcomes.count("encoded")
+    print("clips: %d served as h264 made from their AV1 masters "
+          "(%d encoded), %d as stored"
+          % (outcomes.count("made") + encoded, encoded,
+             outcomes.count("as stored")))
+
+
 def _optimize_article_images(pelican_obj):
     # Rewrite marked body images on post pages: add width/height, add
     # srcset variants for photographs, turn clips into <video>, and
@@ -391,6 +489,7 @@ class _SitePlugins:
         signals.article_generator_finalized.connect(_collect_sitemap)
         signals.finalized.connect(_prioritize_first_images)
         signals.finalized.connect(_optimize_article_images)
+        signals.finalized.connect(_serve_clips)
         signals.finalized.connect(_write_redirects)
         signals.finalized.connect(_write_crawl_files)
 

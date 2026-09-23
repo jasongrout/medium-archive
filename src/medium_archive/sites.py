@@ -585,6 +585,26 @@ STILL_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 ANIMATED_FORMAT = "mp4"
 VIDEO_CRF = 24
 VIDEO_PRESET = "slower"
+# A site that encodes its own clips when it is built -- the pelican
+# site, whose plugin makes the served h264 from what the site stores --
+# stores a master instead: AV1 in 4:4:4 color, frame-rate capped like
+# a clip, at the gif's own size. A site checked in as a repository of
+# its own keeps its media for good, and a format change later would
+# otherwise mean committing a second copy of every clip. The master is
+# what every later format is made from: 4:4:4 keeps the colored text,
+# 1-pixel lines and dither that 4:2:0 loses, at about the bytes of
+# today's h264 (docs/gif-intermediates.md: libaom 4:4:4 CRF 28 came to
+# 27% of the gifs against h264 CRF 24's 28%, at 47.6 dB against 36.6).
+# It is not served itself: browsers decode AV1 4:4:4 in software, if at
+# all, where 4:2:0 h264 has a hardware decoder everywhere, and a clip
+# loops for as long as it is on screen. CRF 24 is two steps under the
+# CRF 28 at which small text was last clean, as margin for every
+# encode that will be made from it; -cpu-used 6 was as small as 4 and
+# far faster. site.toml's clip_master = "none" stores the h264 clip
+# instead, and master_crf moves the CRF.
+CLIP_MASTER = "av1"
+CLIP_MASTERS = ("av1", "none")
+MASTER_CRF = 24
 # The still a clip carries, beside it under this suffix. It is what a
 # gif showed at rest (the clip's own first frame, so nothing jumps when
 # playback starts), what a reduced-motion reader sees instead of
@@ -773,9 +793,15 @@ class ImagePlacer:
     extension when the copy changed format -- the exporters rewrite
     their pages' image references from it. A clip's poster is placed
     beside it under the name poster_path() gives, which is how the hugo
-    and pelican themes find it."""
+    and pelican themes find it.
 
-    def __init__(self, cache: Path, config: dict):
+    masters=True is for a site that encodes its served clips itself
+    when it is built: an animation's .mp4 is then the AV1 4:4:4 master
+    that site makes them from (see CLIP_MASTER), unless site.toml's
+    clip_master turns that off. Its poster is the one the clip would
+    have, at the size of the h264 served."""
+
+    def __init__(self, cache: Path, config: dict, masters: bool = False):
         images = config.get("images", {})
         self.still_cap = images.get("still_max_edge", STILL_MAX_EDGE) or 0
         self.gif_cap = images.get("animated_max_edge", ANIMATED_MAX_EDGE) or 0
@@ -783,6 +809,17 @@ class ImagePlacer:
                                 or ANIMATED_FORMAT).lower()
         self.video_crf = images.get("video_crf", VIDEO_CRF)
         self.video_preset = images.get("video_preset", VIDEO_PRESET)
+        self.master = (str(images.get("clip_master") or CLIP_MASTER).lower()
+                       if masters else "none")
+        if self.master not in CLIP_MASTERS:
+            raise ValueError(f"site.toml [images] clip_master: "
+                             f"{self.master!r} is not one of "
+                             + ", ".join(map(repr, CLIP_MASTERS)))
+        self.master_crf = images.get("master_crf", MASTER_CRF)
+        # a master is cached beside the clips and the stills, which the
+        # sites share, under a name carrying its own settings
+        self.clip_suffix = (f".av1444-{self.master_crf}.mp4"
+                            if self.master == "av1" else ".mp4")
         # the encode settings name the cache directory beside the caps:
         # they decide what a clip comes out as, the way a cap does
         video = (f"-mp4{self.video_crf}-{self.video_preset}"
@@ -793,7 +830,7 @@ class ImagePlacer:
         self.gifsicle = shutil.which("gifsicle")
         self.ffmpeg = (shutil.which("ffmpeg")
                        if self.animated_format == "mp4" else None)
-        self.ffmpeg_webp = None            # asked once, on the first clip
+        self.ffmpeg_encoders = None        # asked once, on the first clip
         try:
             from PIL import Image
             self.pillow = Image
@@ -887,7 +924,7 @@ class ImagePlacer:
             # two is built is decided on a cache miss, inside
             # _place_animation: reading a gif's frames to find out
             # whether it can become a clip costs more than the lookup
-            cap, candidates = self.gif_cap, (".mp4", ext)
+            cap, candidates = self.gif_cap, (self.clip_suffix, ext)
             if self.animated_format == "mp4":
                 build = self._place_animation
             elif self._resizes_gif(src, cap):
@@ -930,7 +967,8 @@ class ImagePlacer:
         if not built:
             discard_copy(tmp)
             return None
-        if built != ".mp4" and os.path.getsize(tmp) >= src.stat().st_size:
+        if (built != self.clip_suffix
+                and os.path.getsize(tmp) >= src.stat().st_size):
             discard_copy(tmp)              # the copy did not pay off
             built = ext                    # cache the verdict all the same
             cached = self.cache / f"{digest}{built}"
@@ -1019,18 +1057,29 @@ class ImagePlacer:
                 "built with libwebp (the ffmpeg package on Debian, "
                 "Ubuntu and Homebrew is), or set [images] "
                 'animated_format = "gif" in site.toml to keep gifs')
+        if self.master == "av1" and not self._has_encoder("libaom-av1"):
+            raise AnimationError(
+                f"{src.name}: {self.ffmpeg} was built without libaom, "
+                "which the AV1 master this site stores needs. Install "
+                "an ffmpeg built with libaom (pixi.toml's is), or set "
+                '[images] clip_master = "none" in site.toml to store '
+                "h264 clips")
         return delays
 
     def _writes_webp(self) -> bool:
         """Whether this ffmpeg can write a clip's poster. Most builds
         carry libwebp; one that does not fails with "Encoder not found",
         which is worth saying plainly rather than as an ffmpeg error."""
-        if self.ffmpeg_webp is None:
+        return self._has_encoder("libwebp")
+
+    def _has_encoder(self, name: str) -> bool:
+        """Whether this ffmpeg lists the encoder `name`, asked once."""
+        if self.ffmpeg_encoders is None:
             run = subprocess.run([self.ffmpeg, "-hide_banner", "-loglevel",
                                   "error", "-encoders"],
                                  capture_output=True, text=True)
-            self.ffmpeg_webp = " libwebp " in (run.stdout or "")
-        return self.ffmpeg_webp
+            self.ffmpeg_encoders = run.stdout or ""
+        return f" {name} " in self.ffmpeg_encoders
 
     def _encode_video(self, src: Path, tmp: str, cap: int, delays):
         """The gif's frames as h264 in mp4, and its first frame beside
@@ -1049,23 +1098,39 @@ class ImagePlacer:
         the muxer no durations, and the mp4 then ends at the last
         frame's decode time -- 27 of the archive's clips came out
         short, one by 1.55 s of the 2.64 s its gif holds near the end.
-        Raises AnimationError when ffmpeg fails."""
+
+        Where the site stores a master (see CLIP_MASTER), the mp4 is
+        AV1 4:4:4 from libaom instead, with the same frames and
+        timestamps, and without the padding: 4:4:4 has no even-size
+        rule, and the h264 the site makes from the master pads it
+        then. The poster is padded all the same, to the size of that
+        h264. Raises AnimationError when ffmpeg fails."""
         size = self._probe(src)
         if size is None:
             raise AnimationError(f"cannot read the size of {src.name}")
         width, height = video_size(size, cap)
-        shape = ([] if (width, height) == tuple(size)
-                 else [f"scale={width}:{height}:flags=lanczos"]) + [EVEN_PAD]
+        scale = ([] if (width, height) == tuple(size)
+                 else [f"scale={width}:{height}:flags=lanczos"])
+        shape = scale + [EVEN_PAD]
         keep = kept_frames(delays)
         select = [select_frames(keep)] if len(keep) < len(delays) else []
         poster = poster_path(Path(tmp))
+        if self.master == "av1":
+            frames = select + scale
+            codec = ["-c:v", "libaom-av1", "-pix_fmt", "yuv444p",
+                     "-crf", str(self.master_crf), "-cpu-used", "6",
+                     "-g", "9999", "-row-mt", "0"]
+        else:
+            frames = select + shape
+            codec = ["-c:v", "libx264", "-profile:v", "high",
+                     "-pix_fmt", "yuv420p", "-crf", str(self.video_crf),
+                     "-preset", str(self.video_preset), "-bf", "0"]
         run = subprocess.run(
             [self.ffmpeg, "-nostdin", "-loglevel", "error", "-y",
-             "-i", str(src),
-             "-vf", ",".join(select + shape),
-             "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
-             "-crf", str(self.video_crf), "-preset", str(self.video_preset),
-             "-threads", "1", "-bf", "0",
+             "-i", str(src)]
+            + (["-vf", ",".join(frames)] if frames else [])
+            + codec +
+            ["-threads", "1",
              "-fps_mode", "passthrough", "-enc_time_base", "1:1000",
              "-an", "-movflags", "+faststart", "-f", "mp4", tmp,
              "-map", "0:v", "-vf", ",".join(shape), "-frames:v", "1",
@@ -1076,7 +1141,7 @@ class ImagePlacer:
             detail = (run.stderr or "").strip().splitlines()
             raise AnimationError(f"ffmpeg failed on {src.name}"
                                  + (f": {detail[-1]}" if detail else ""))
-        return ".mp4"
+        return self.clip_suffix
 
     def _resizes_gif(self, src: Path, cap: int) -> bool:
         """Whether gifsicle has anything to do for this gif."""
