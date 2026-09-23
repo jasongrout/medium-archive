@@ -166,8 +166,38 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
    10% of pixels changing per frame. Reproducing that dither exactly in
    RGB costs every video codec more than the gif's own palette indices
    do. Only formats that can code a palette beat the gif there: WebP
-   lossless (73%), against 190-257% for x264rgb, x265 and AV1. APNG and
-   JPEG XL also have palette modes and are untested.
+   lossless (73%), against 190-257% for x264rgb, x265 and AV1.
+9. **Timing: every tool except Pillow and gifsicle changed it at first.**
+   - ffmpeg encodes (and the harness's own reference decode) used a time
+     base guessed from the frame rate: 3/20 s or 1/20 s, which rounds
+     every delay. The pilot gif's 25.30 s came out 25.50 s. `-enc_time_base
+     1:1000` fixes both. **The site's current mp4 clips have this
+     rounding** (checked with `sites.py`'s exact arguments); queued as a
+     separate fix. The earlier "timing exact" results in the tables above
+     were measured against a rounded reference, and the x264rgb/x265/AV1
+     files had rounded timestamps.
+   - gif2webp plays delays of 10 ms or less as 100 ms, as browsers do: the
+     564-short-delay gif came out 63.7 s instead of 12.9 s. Pillow's WebP
+     writer (`pil_encode.py webp`, the same libwebp encoder and settings)
+     keeps the gif's delays and gives byte-identical sizes otherwise.
+   - ffmpeg's GIF demuxer does *not* alter short delays in 9.0.2 (its
+     `min_delay` option notwithstanding): the same gif reads as 12.9 s.
+   - ffmpeg's APNG muxer rounds delays even with a 1/100 time base
+     (25.30 s came out 25.66 s).
+10. **JPEG XL works through an APNG written by Pillow.** ffmpeg has no
+    animated-JPEG XL muxer and cjxl rejects some gifs directly, but cjxl
+    reads APNG. `pil_encode.py apng` writes one with exact delays (RGB,
+    fast deflate), and cjxl encodes it losslessly. On the pilot gif:
+    493,941 bytes (60%) at effort 7 in 6 s, 479,626 (58%) at effort 9 in
+    19 s, both exact in pixels and timing.
+11. **APNG itself is not a candidate.** It allows one palette per file.
+    The pilot gif uses 1,140 colors across its frames (per-frame
+    palettes), so `pal8` loses colors, and RGB APNG is 196% of the gif.
+    Only an animation with 256 colors or fewer in total (the large file
+    has 255) could use `pal8`.
+12. **AV1 at `-cpu-used 2` is not reliably exact either**: 606,475 bytes
+    on the pilot gif, with pixels differing. Exactness failures are now
+    seen at `-cpu-used` 1, 2 and 4.
 
 ### Pilot numbers (one file, not a conclusion)
 
@@ -232,27 +262,27 @@ exact result.
 
 ## Resume here
 
-0. Add palette-capable candidates to `bench.py`: APNG (ffmpeg
-   `-c:v apng -pred mixed`, or `apngopt`) and JPEG XL (item 2). WebP's
-   encode time (about 18 minutes on the large file) is acceptable for
-   a one-time conversion but worth watching on the 2190-frame file.
-1. Fix `psnr()` in `bench.py`. For example, decode both files to rgb24
-   frames and compare frames paired by the merged timeline, in Python.
-2. Get animated JPEG XL working: pass ffmpeg `libjxl_anim` an explicit
-   muxer, or give cjxl an APNG made by ffmpeg.
-3. Cross-check ffmpeg's gif decode against Pillow on the sample
-   (open question 4).
-4. Run the sample. Proposed files, all under `archive/raw/`: the 8
-   largest (`bd2524b247c2/005`, `77df24c8db80/002`, `164eb2eae102/003`,
-   `3ee42dfdc54f/002` with 2190 frames, `2e432df402c8/013`,
-   `701e7b9841e6/002`, `a2ce7ef99130/003`, `164eb2eae102/007` at
-   2642x1872); `c9d93542f20b/014` (1920x1080); `11e5dab7c54/006` (short
-   delays); and the size quantiles `2e432df402c8/009` (p10),
-   `8096b8b223d0/007` (p25), `388d05e03442/002` (p50),
-   `03e6b78bacc0/003` (p75), `cda20dc15a21/005` (p90). Encoders:
-   `aom_ll_c1`, `aom_ll_c2`, `x264rgb_ll`,
-   `x265_ll`, `webp_ll`, `webp_ll_min`, `jxl_ll_e9`, `gifsicle_O3`,
-   `aom_crf4`, `x264rgb_crf4` (drop `vp9_ll` and `ffv1`, which lost
-   badly). Expect hours for AV1 `-cpu-used 1` on the largest files.
-5. Choose the format, then change the pelican exporter to place the
+1. Record the sample run (in progress when this was written): the files
+   below, with `webp_pil`, `jxl_e9`, `jxl_e7`, `aom_ll_c2`, `x264rgb_ll`
+   and `gifsicle_O3`. The goal is one format, two at most. Files, all
+   under `archive/raw/`: the largest (`bd2524b247c2/005`,
+   `77df24c8db80/002`, `164eb2eae102/003`, `2e432df402c8/013`,
+   `701e7b9841e6/002`, `164eb2eae102/007` at 2642x1872);
+   `c9d93542f20b/014` (1920x1080); `11e5dab7c54/006` (short delays);
+   the pilot `9549c5dcf551/003`; and the size quantiles
+   `2e432df402c8/009` (p10), `8096b8b223d0/007` (p25),
+   `388d05e03442/002` (p50), `03e6b78bacc0/003` (p75),
+   `cda20dc15a21/005` (p90). `3ee42dfdc54f/002` (2190 frames at
+   1616x1568) was left out for time and still needs a run with the
+   chosen format; Pillow's APNG writer holds all frames in memory, which
+   matters there for JPEG XL.
+2. Cross-check decoders (open question 4). Pillow writes the WebP and
+   the APNG behind JPEG XL, and the harness compares them with ffmpeg's
+   gif decode, so an exact result means the two gif decoders agree on
+   that file. A mismatch needs a third opinion (for example
+   ImageMagick) before blaming either.
+3. Fix `psnr()` in `bench.py` if a near-lossless option is still wanted.
+   For example, decode both files to rgb24 frames and compare frames
+   paired by the merged timeline, in Python.
+4. Choose the format, then change the pelican exporter to place the
    intermediate instead of the display copy, and add stage 2.

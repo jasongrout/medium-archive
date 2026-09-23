@@ -15,12 +15,17 @@ import re
 import subprocess
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from fractions import Fraction
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
 FF = ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y"]
-PT = ["-fps_mode", "passthrough", "-an", "-threads", "1"]
+# -enc_time_base: left to itself, ffmpeg gives the encoder a time base
+# from a guessed frame rate (1/20 s for one gif), which rounds every
+# frame's timestamp -- the site's mp4 clips carry that rounding today
+PT = ["-fps_mode", "passthrough", "-enc_time_base", "1:1000", "-an",
+      "-threads", "1"]
 
 ENCODERS = {
     # lossless GIF re-optimization: the "stay a gif" baseline
@@ -56,13 +61,31 @@ ENCODERS = {
         "-context", "1", "-g", "1", "-slices", "4", "-pix_fmt", "bgr0", o]),
     "webp_ll": (".webp", lambda i, o: [
         "gif2webp", "-quiet", "-m", "6", "-q", "100", i, "-o", o]),
+    # gif2webp plays delays of 10 ms or less as 100 ms, as browsers do;
+    # webp_pil keeps the gif's delays exactly
+    "webp_pil": (".webp", lambda i, o: [
+        sys.executable, str(HERE / "pil_encode.py"), "webp", i, o]),
     "webp_ll_min": (".webp", lambda i, o: [
         "gif2webp", "-quiet", "-min_size", "-m", "6", "-q", "100",
         i, "-o", o]),
+    # APNG has one palette per file: pal8 is exact only when the whole
+    # animation has <= 256 colors (palettegen then keeps them as they
+    # are), and fails the exactness check otherwise. ffmpeg's APNG muxer
+    # also rounds frame delays (25.30 s came out 25.66 s).
+    "apng_pal8": (".apng", lambda i, o: FF + ["-i", i] + PT + [
+        "-filter_complex",
+        "split[a][b];[a]palettegen=max_colors=256:reserve_transparent=0"
+        ":stats_mode=full[p];[b][p]paletteuse=dither=none",
+        "-c:v", "apng", "-pred", "mixed", "-plays", "0", "-f", "apng", o]),
+    "apng_rgb": (".apng", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "apng", "-pred", "mixed", "-plays", "0", "-pix_fmt", "rgb24",
+        "-f", "apng", o]),
     # cjxl 0.12 rejects gifs whose partial frames dispose to background
-    # ("GIF with dispose-to-0 is not supported"); see the plan's open items
-    "jxl_ll_e9": (".jxl", lambda i, o: [
-        "cjxl", "--quiet", "-d", "0", "-e", "9", "--num_threads=0", i, o]),
+    # ("GIF with dispose-to-0 is not supported"), and ffmpeg has no
+    # animated-jxl muxer, so the gif goes through an RGB APNG that
+    # Pillow writes with the gif's exact delays (pil_encode.py)
+    "jxl_e7": (".jxl", lambda i, o: via_apng(i, o, "7")),
+    "jxl_e9": (".jxl", lambda i, o: via_apng(i, o, "9")),
     # near-lossless
     "aom_crf4": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libaom-av1", "-cpu-used", "1", "-g", "9999", "-row-mt", "0",
@@ -74,13 +97,25 @@ ENCODERS = {
 }
 
 
+def via_apng(i, o, effort):
+    apng = o + ".apng"
+    return ["bash", "-c",
+            '"$5" "$6" apng "$1" "$2" && cjxl --quiet -d 0 -e "$4"'
+            ' --num_threads=0 "$2" "$3"; r=$?; rm -f "$2"; exit $r',
+            "_", i, apng, o, effort, sys.executable,
+            str(HERE / "pil_encode.py")]
+
+
 def timeline(path):
     """[(hash, ms)] of what is shown, consecutive identical frames merged,
-    plus the raw frame count."""
+    plus the raw frame count. The 1 ms time base matters: left to
+    itself, ffmpeg picks one from a guessed frame rate (3/20 s for one
+    gif), which rounds every delay."""
     run = subprocess.run(
         ["ffmpeg", "-nostdin", "-v", "error", "-i", str(path), "-map", "0:v",
-         "-fps_mode", "passthrough", "-pix_fmt", "rgb24", "-f", "framemd5",
-         "-"], capture_output=True, text=True)
+         "-fps_mode", "passthrough", "-enc_time_base", "1:1000",
+         "-pix_fmt", "rgb24", "-f", "framemd5", "-"],
+        capture_output=True, text=True)
     tb = None
     rows = []
     for line in run.stdout.splitlines():
@@ -175,11 +210,15 @@ def main():
         _refs[g] = (tl, n)
     jobs = [(g, e) for g in gifs for e in encs]
     # slowest encoders first so the pool drains evenly
-    jobs.sort(key=lambda j: (not j[1].startswith(("aom", "x265", "vp9", "jxl")),
+    jobs.sort(key=lambda j: (not j[1].startswith(("aom", "x265", "vp9", "jxl",
+                                                  "webp")),
                              -Path(j[0]).stat().st_size))
     res = Path(outdir) / "results.jsonl"
+    Path(outdir).mkdir(parents=True, exist_ok=True)
     with ThreadPoolExecutor(int(os.environ.get("JOBS", os.cpu_count()))) as pool:
-        for rec in pool.map(lambda j: job(outdir, *j), jobs):
+        futures = [pool.submit(job, outdir, *j) for j in jobs]
+        for fut in as_completed(futures):   # record each job as it ends
+            rec = fut.result()
             with open(res, "a") as f:
                 f.write(json.dumps(rec) + "\n")
             print(rec["enc"], rec["name"][:50], rec.get("out_bytes"),
