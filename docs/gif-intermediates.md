@@ -400,6 +400,27 @@ every one of them.
 - Capped AV1 CRF 20 (`-cpu-used 4`): `11e5dab7c54/006` 43% of the gif
   (60% uncapped), `cda20dc15a21/005` 89% (96% uncapped).
 
+### Storing the encoded files (requested 2026-09-23)
+
+The encoded files are to be checked into this repository, so that
+building a site copies them instead of encoding gifs on every build.
+Proposed shape, not yet built:
+
+- `archive/animations/`, one file per source gif, named by the gif's
+  content hash (as `.image-cache/` is today), with a manifest recording
+  for each: source path and hash, frames kept by the cap, format and
+  encoder settings, tool versions (ffmpeg, libaom), quality.py's
+  numbers and the output size.
+- A `medium-archive` subcommand that converts with the pinned
+  toolchain (`docs/gif-intermediates/pixi.toml`), verifies each output
+  (timing; quality.py floor; capped gif exact) and only encodes files
+  that are missing or whose settings changed. libaom output depends on
+  its version, so the committed files, not a re-run, are the record.
+- `sites.ImagePlacer` looks each gif up in the manifest and copies the
+  stored file; encoding stays only as the path for a gif not in it.
+- Size: at the sample's 24%, about 140 MB for the 587 MB of gifs, on
+  top of `archive/raw/`'s 835 MB.
+
 ## Open questions
 
 1. **Container and codec.** Lossless is ruled out for the large files
@@ -411,6 +432,12 @@ every one of them.
    step, with a cache) or in the exporter as today. Since the site
    source is meant to outlive this repository, stage 2 probably belongs
    with the site: a plugin plus a pinned ffmpeg.
+5. **Browser playback of the stored files.** Browsers reliably decode
+   AV1 in 4:2:0; 4:4:4 (AV1 High profile) support is uncertain and
+   needs checking, as does the container (MKV is fine for storage;
+   browsers play WebM and MP4). If the stored file must play as it is,
+   the choice is 4:2:0 (costs colored text) or a light stage-2
+   transcode at site build time.
 4. **Decoder trust.** The reference frames are ffmpeg's gif decode. They
    have not yet been cross-checked against Pillow's compositing on the
    sample. The brief warns of past ffmpeg disposal bugs.
@@ -428,5 +455,6 @@ every one of them.
    capped gif (`fpscap.py --gif`) wherever that is smaller, including
    `3ee42dfdc54f/002` (2190 frames, not in the sample). Verify every
    output (timing, quality.py) and inspect the worst frames.
-4. Change the pelican exporter to place the intermediate instead of
-   the display copy, and add stage 2.
+4. Store the outputs in the repository and have the exporters copy
+   them (see "Storing the encoded files"), after settling browser
+   playback (open question 5).
