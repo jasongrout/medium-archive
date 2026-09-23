@@ -1,7 +1,9 @@
 # The tool's own test suite: offline, canned HTTP responses, no
 # network. It ran only on contributors' machines while the tool lived
 # in its own repository; it runs here on every push and pull request,
-# across the Python versions pyproject.toml claims to support.
+# in the pixi environment (pixi.toml, pinned by pixi.lock): the latest
+# Python, and the ffmpeg and gifsicle without which the tests that
+# encode gifs to clips and resize gifs are skipped.
 #
 # `Lint embeds` covers the other half -- the converter against the real
 # archive -- so between them a pull request is checked against both the
@@ -21,16 +23,20 @@ permissions:
 jobs:
   pytest:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
 
-      - uses: astral-sh/setup-uv@v5
+      - uses: prefix-dev/setup-pixi@v0.10.2
         with:
-          enable-cache: true
+          cache: true
+
+      # a gpl ffmpeg build; the check fails the job if either encoder
+      # a clip needs is missing
+      - name: Check ffmpeg's encoders
+        run: |
+          pixi run ffmpeg -hide_banner -encoders > encoders.txt
+          grep ' libx264 ' encoders.txt
+          grep ' libwebp ' encoders.txt
 
       - name: Run the tests
-        run: uv run --python ${{ matrix.python-version }} pytest -q
+        run: pixi run test -rs
