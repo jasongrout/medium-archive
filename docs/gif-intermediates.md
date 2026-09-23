@@ -1,674 +1,216 @@
-# Animated gifs in the Pelican site source: plan and findings
+# Animated gifs in the sites: findings and decisions
 
-Status (2026-09-23): lossless storage is ruled out for the large gifs,
-which make up most of the bytes. Decided: every stored file has the
-frame-rate cap (`fpscap.py`), computed on the gif's stored delays; the
-format is lossy AV1 4:4:4, or a capped gif where that is smaller. Open:
-the CRF, from a capped ladder (28-52) now running. On a 14-file sample
-(143 MB), CRF 28 stored 24% of the gifs' bytes with text visually
-intact. Nothing in `src/` has changed. The last section says where to
-resume.
+Status (2026-09-23): implemented in `ImagePlacer` (`src/medium_archive/sites.py`).
+This page summarizes the measurements behind it. The per-run tables
+are in this file's git history, and the tools are in
+`docs/gif-intermediates/`.
 
-## Goal
+## What the exporters do now
 
-`site-pelican/` is meant to become the blog's own source repository once
-the archive has done its job (see `pelican.py`). Today its content holds
-*display copies* of the archive's animated gifs, not the originals. The
-goal is to make the checked-in file for each animation:
+Each animated gif in `archive/raw/` stays the master. Every site gets:
 
-- faithful: pixel-exact if possible, and nearly so only if that saves a
-  lot of space, with the original frame timing;
-- compact: much smaller than the 587 MB of source gifs;
-- an intermediate: a build step (the "second stage") transcodes it to
-  whatever browsers are served. Browser support for the intermediate
-  itself does not matter, but it should decode reasonably fast.
+- **An H.264 clip for every animation**, in a `<video>` a reader can
+  pause, even where the clip is larger than the gif. The exceptions,
+  which stay gifs, are gifs with real transparency and machines
+  without ffmpeg or Pillow.
+- **Settings:** 4:2:0, High profile, `-crf 24 -preset slower`, one
+  thread per encode (`warm()` encodes gifs in parallel).
+- **Full resolution:** `animated_max_edge` defaults to 0. Odd sizes
+  are padded by a pixel rather than rescaled.
+- **A frame-rate cap near 30 fps:** `kept_frames` drops frames inside
+  faster bursts, and every kept frame starts exactly when the gif
+  shows it.
+- **Exact timing:** timestamps use a millisecond time base, taken
+  from the gif's stored delays.
+- **A poster:** the clip's first frame as webp, at the clip's size.
 
-The hypotheses and candidate encodes come from an external brief. It is
-summarized here, with corrections where measurement contradicted it.
+Clips are encoded on the fly into `.image-cache/`, keyed by the gif's
+hash and the settings (`CACHE_SCHEME` v6). CI restores that cache
+between builds, so nothing encoded is committed.
 
-## What happens today
+## The gifs
 
-`sites.ImagePlacer` (`src/medium_archive/sites.py`) places each gif into
-every site as:
+- **Count:** 216 gifs in 76 posts, 587 MB, all unique. The 47 over
+  5 MB hold 59% of the bytes.
+- **Content:** screen recordings, some with embedded video or
+  dithered backgrounds. All are opaque and all loop forever.
+- **Length:** a median of 17 s. 15 run under 5 s (18 MB in total).
+- **Size:** longest edge median 1,200 px, maximum 3,340 px. 129 are
+  wider or taller than 1,104 px.
+- **Short delays:** two gifs store 10 ms delays that browsers play as
+  100 ms, so they ran 3-5 times longer on Medium than their stored
+  timing. `bd2524b247c2/005` is stored as 14.2 s and played as
+  39.7 s; `11e5dab7c54/006` as 12.9 s and 63.7 s.
+- **Fast recordings:** one post (`cda20dc15a21`) has nine 40 fps
+  recordings.
 
-- an H.264 mp4 (`libx264`, `yuv420p`, `-crf 20 -preset fast`, frame
-  timestamps passed through), scaled to 1104 px on the longest edge and
-  rounded to even dimensions, plus a lossy webp poster (`-q 90`) of the
-  first frame beside it; or
-- the gif itself, or a gifsicle-resized copy, when the gif is shorter
-  than 5 s and the clip is no smaller, when ffmpeg, Pillow or libwebp is
-  missing, when the first frame is transparent, or when
-  `animated_format = "gif"` is set in `site.toml`.
+`gif-intermediates/inventory.tsv` has the per-file survey.
 
-The mp4 is lossy three times over: chroma subsampling, CRF 20, and a
-downscale for 129 of the 216 gifs. A site-source repository built from
-it cannot get the originals back. Under the plan here, the site source
-would hold a lossless intermediate at full resolution, and the mp4,
-poster and resize would move into the second stage.
+## Findings
 
-## Gif survey
+**1. Lossless storage does not pay on the large gifs.** On the four
+largest, no lossless format beat the gif:
 
-The full per-file inventory is in `gif-intermediates/inventory.tsv`
-(`inventory.py` regenerates it). Every `.gif` under `archive/raw/`:
-
-| | |
+| format | size vs the gif |
 |---|---|
-| files | 216, in 76 posts; all unique by content hash |
-| bytes | 586.6 MB total. Median 1.30 MB, p90 6.5 MB, max 22.6 MB |
-| size bands | <0.5 MB: 54 files, 13.6 MB. 0.5-1 MB: 40 files, 29.7 MB. 1-5 MB: 85 files, 198.5 MB. 5-10 MB: 27 files, 174.6 MB. >10 MB: 10 files, 170.2 MB |
-| frames | 61,048 total. Median 190 per file, max 2,190 |
-| duration | 4,526 s total. Median 17.1 s, max 107 s. 201 of 216 run longer than 5 s |
-| dimensions | median longest edge 1200 px, max 3340 px. 129 exceed the current 1104 px cap |
-| animated | all 216 (none is a still under a `.gif` name) |
-| transparency | none. No composited frame of any file has a pixel with alpha < 255, so RGB-only formats lose nothing |
-| loop count | all 216 loop forever (`loop=0`). No loop metadata needs to be recorded |
+| WebP lossless | 73-150% |
+| JPEG XL | 82-582% |
+| AV1 lossless | 257-597% |
 
-The 47 files over 5 MB hold 345 MB, 59% of the total. Their result
-decides the overall size.
+A gif stores per-frame palettes compressed with LZW, and only the
+rectangle that changed in each frame. That is hard to beat without
+loss on screen content. Libaom's lossless mode was also not reliably
+exact: single pixels came out off by one at `-cpu-used` 1, 2 and 4.
 
-### Short frame delays
+**2. Browsers set the quality ceiling, through 4:2:0 color.** Video
+stores brightness at full resolution. 4:4:4 keeps color at full
+resolution too; 4:2:0, the only format every browser plays, keeps one
+color sample per 2x2 block of pixels. On screen content that makes
+red code strings pinkish and soft, dulls 1-pixel saturated lines, and
+erases dither dots, whatever the codec or CRF. Every 4:2:0 encode sat
+at 36-38 dB median PSNR against the gif; 4:4:4 encodes reached
+41-48 dB. The site's earlier clips had this loss too.
 
-Browsers play a gif delay of 0 or 1 cs (≤ 10 ms) as 100 ms. Nine
-files have such frames:
+**3. Codecs compared.** Seven difficult files (68 MB of gifs), all
+frame-rate capped:
 
-| file (under `archive/raw/`) | frames ≤ 10 ms | metadata length | browser length |
+| encode | plays in | size vs gifs | median PSNR |
 |---|---|---|---|
-| `11e5dab7c54/images/006-1_DQA3TQcVSJBtWxSMD-sq-g.gif` | 564 of 691 | 12.9 s | 63.7 s |
-| `bd2524b247c2/images/005-1_AQTFHOwHXS3uJUC6WKR6WA.gif` | 283 of 851 (the rest 20 ms) | 14.2 s | 39.7 s |
-| 7 others (`11e5dab7c54/002`, `52f9657fa7a/007`, `81f2eaad5706/002`, `9549c5dcf551/003`, `a35ce050f7f7/001`, `ae191bc6fb8e/005`, `fe9b54227d92/011`) | 1 each | | +90 ms |
+| H.264 4:2:0 CRF 20 | all browsers | 40% | 37.3 dB |
+| H.264 4:2:0 CRF 24 (chosen) | all browsers | 28% | 36.6 dB |
+| AV1 4:2:0 CRF 24 (libaom `-cpu-used 6`) | not Safari before Apple M3 | 20% | 36.6 dB |
+| AV1 4:2:0 CRF 28 (libaom) | not Safari before Apple M3 | 17% | 36.2 dB |
+| AV1 4:4:4 CRF 28 (libaom) | Chrome and Firefox | 27% | 47.6 dB |
+| H.264 4:4:4 CRF 20 | no browser | 48% | 41.6 dB |
+| SVT-AV1 4:2:0 CRF 30, preset 6 | not Safari before Apple M3 | 38% | 36.5 dB |
 
-For the first two, the gif's own timing and what readers saw on Medium
-disagree by 3-5x. Today's mp4 already plays them at metadata speed. The
-intermediate should store the delays exactly as the gif has them.
-Whether stage 2 applies the browser clamp is a separate decision (open
-question 2).
+- **Two-step chain:** making H.264 from an AV1 master was slightly
+  smaller than H.264 straight from the gif, but lower quality on every
+  file (0.2-1.2 dB). So nothing is stored between the gif and the clip.
+- **SVT-AV1** is fast, but it lost badly on 1-pixel line content, and
+  it does not keep the last frame's duration.
 
-## Toolchain
+**4. CRF.**
+- **H.264 4:2:0:** CRF 16, 20 and 24 looked alike in crops of text at
+  3x zoom. What differed from the gif was the 4:2:0 color, the same at
+  each CRF. CRF 24 is about a third smaller than CRF 20.
+- **AV1:** a ladder from CRF 28 to 52 found where small text breaks.
+  First artifacts appear at CRF 34, damage is clear at 40, and CRF 52
+  shows text copied from the wrong place.
 
-The benchmark environment is pinned in `gif-intermediates/pixi.toml` and
-`pixi.lock` (conda-forge; linux-64, osx-arm64, osx-64). Run commands
-with `pixi run --manifest-path docs/gif-intermediates/pixi.toml ...`.
+**5. Resolution.** H.264 CRF 24 at a limit on the longest edge,
+against full resolution:
 
-| component | version | note |
+| limit | size vs gifs | vs full resolution |
 |---|---|---|
-| ffmpeg | 9.0.2 | decodes animated webp and jxl, so every candidate is verified the same way |
-| libaom | 3.14.1 | |
-| SVT-AV1 | 4.2.0 | accepts `yuv420p` only, so it cannot be RGB-lossless. Excluded |
-| x264 | 164.3095 | |
-| x265 | 3.5 | conda-forge's ffmpeg links it, although upstream has 4.x. Its results reflect an older encoder |
-| libvpx | 1.17.0 | |
-| libjxl / cjxl | 0.12.0 | needs the `libjxl-tools` package for the command-line tools |
-| libwebp / gif2webp | 1.6.0 | |
-| gifsicle | 1.96 | |
-| Pillow | 12.3.0 | |
-
-Ubuntu 24.04's apt versions (ffmpeg 6.1, cjxl 0.7, libaom about 3.8)
-were tried first and dropped as too old. In the Claude Code cloud
-environment, pixi.sh and GitHub release downloads are blocked, but
-conda.anaconda.org is not. pixi was installed by extracting `bin/pixi`
-from the conda-forge `pixi` package.
-
-## Benchmark harness
-
-`gif-intermediates/bench.py OUTDIR ENC[,ENC...] GIF...` encodes each
-(gif, encoder) pair single-threaded, running jobs in parallel. It then
-decodes the output and compares it with the gif as a *timeline*: a list
-of (rgb24 frame md5, display ms), with consecutive identical frames
-merged. Formats that merge or split unchanged frames (webp, jxl) are
-therefore judged on what is shown and for how long, not on frame
-count. Each job appends a line to `OUTDIR/results.jsonl` with the
-fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
-`pixels_equal`, `timing_equal`, `max_ms_diff`, and the frame counts.
-
-## Findings so far
-
-1. **libaom ignores `lossless=1` without `-crf 0`.** Given
-   `-aom-params lossless=1` alone, ffmpeg's wrapper applies its default
-   CRF 32 and the output is lossy. With `-crf 0` (with or without
-   `lossless=1`) it is bit-exact. The brief's AV1 command is wrong on
-   this point, and so were the first pilot's AV1 numbers.
-2. **`tune-content=screen` changes nothing.** libaom 3.14 turns its
-   screen-content tools on by itself. With and without the tune, the
-   full pilot gif came out byte-identical at `-cpu-used 1` (555,167
-   bytes), as did its first 20 frames at `-cpu-used 4`. The tools do
-   help: on raw gbrp input at `-cpu-used 1`, turning off palette mode
-   (`enable-palette=0`) gave +4%, turning off intra block copy
-   (`enable-intrabc=0`) +5%, and both +10%. `aom_ll_c1_noscreen` is
-   therefore redundant.
-3. **gif2webp 1.6 has no `-lossless` flag.** Lossless is its default.
-   `-m 6 -q 100` was bit-exact on the pilot gif.
-4. **cjxl 0.12 rejects gifs that dispose partial frames to background**
-   ("GIF with dispose-to-0 is not supported for non-full or blended
-   frames"). The pilot gif is one of them. ffmpeg's `libjxl_anim`
-   encoder avoids the gif reader but needs an explicit output muxer;
-   the attempt with a `.jxl` name went to the image2 muxer and failed.
-   Unresolved.
-5. **The harness's first PSNR was broken** (25.018 dB for every inexact
-   encode). `quality.py` replaces it: it pairs frames by display time
-   and reports PSNR overall and for the worst frame, the largest
-   per-channel error, and the share of pixels changed by more than 16
-   levels, and saves the worst frame (reference, encode, error x8).
-6. **MKV preserved the gif's timing exactly**, last frame included
-   (`max_ms_diff` 0), for every lossless video encode. The brief's
-   `-fps_mode passthrough` + MKV approach works.
-7. **libaom lossless is not reliably exact.** With `-crf 0`, the pilot
-   gif at `-cpu-used 4` came back with 10 pixels off by 1 in one channel
-   (9 in frame 24, 1 in frame 40), and at `-cpu-used 1` with 1 pixel
-   (frame 40). dav1d and libaom's own decoder agree, so the fault is in
-   the encoder. It is not ffmpeg's bgra-to-gbrp conversion, and not
-   palette mode or intra block copy: encoding from raw gbrp at a
-   constant 10 fps, `-cpu-used 4` still differed in 42 bytes with those
-   tools on or off, while `-cpu-used 1` was exact in all five tool
-   combinations. The gif's variable frame timing changes the encoder's
-   decisions (528,236 bytes from constant-rate raw input against
-   555,167 from the gif), and some paths hit the fault. Any AV1
-   intermediate would need every file verified, with a fallback for
-   files that fail. `-cpu-used 4` is dropped. `-cpu-used 2` was exact
-   on the large file below.
-8. **Lossless video codecs lose badly on dithered photographic
-   content.** The large file below is a screen recording of a notebook
-   playing a video clip. The clip area is photographic, quantized to the
-   gif's 256-color palette with dithering: 255 colors per frame, about
-   10% of pixels changing per frame. Reproducing that dither exactly in
-   RGB costs every video codec more than the gif's own palette indices
-   do. Only formats that can code a palette beat the gif there: WebP
-   lossless (73%), against 190-257% for x264rgb, x265 and AV1.
-9. **Timing: every tool except Pillow and gifsicle changed it at first.**
-   - ffmpeg encodes (and the harness's own reference decode) used a time
-     base guessed from the frame rate: 3/20 s or 1/20 s, which rounds
-     every delay. The pilot gif's 25.30 s came out 25.50 s. `-enc_time_base
-     1:1000` fixes both. **The site's current mp4 clips have this
-     rounding** (checked with `sites.py`'s exact arguments); queued as a
-     separate fix. The earlier "timing exact" results in the tables above
-     were measured against a rounded reference, and the x264rgb/x265/AV1
-     files had rounded timestamps.
-   - gif2webp stores delays of 10 ms or less as 100 ms, as browsers play
-     them (checked with `webpmux -info`: the 564-short-delay gif came out
-     with 570 frames of 100 ms, 63.7 s instead of 12.9 s). Pillow's WebP
-     writer (`pil_encode.py webp`, the same libwebp encoder and settings)
-     and img2webp store the delays as given.
-   - ffmpeg's WebP *decoder* plays stored delays of 10 ms or less as
-     100 ms. The harness therefore reads WebP delays with `webpmux`
-     (`quality.webp_durations`); before that fix, WebP encodes of the
-     short-delay gifs were wrongly reported as mistimed.
-   - ffmpeg's GIF demuxer does *not* alter short delays in 9.0.2 (its
-     `min_delay` option notwithstanding): the same gif reads as 12.9 s.
-   - ffmpeg's APNG muxer rounds delays even with a 1/100 time base
-     (25.30 s came out 25.66 s).
-10. **JPEG XL works through an APNG written by Pillow.** ffmpeg has no
-    animated-JPEG XL muxer and cjxl rejects some gifs directly, but cjxl
-    reads APNG. `pil_encode.py apng` writes one with exact delays (RGB,
-    fast deflate), and cjxl encodes it losslessly. On the pilot gif:
-    493,941 bytes (60%) at effort 7 in 6 s, 479,626 (58%) at effort 9 in
-    19 s, both exact in pixels and timing.
-11. **APNG itself is not a candidate.** It allows one palette per file.
-    The pilot gif uses 1,140 colors across its frames (per-frame
-    palettes), so `pal8` loses colors, and RGB APNG is 196% of the gif.
-    Only an animation with 256 colors or fewer in total (the large file
-    has 255) could use `pal8`.
-12. **AV1 at `-cpu-used 2` is not reliably exact either**: 606,475 bytes
-    on the pilot gif, with pixels differing. Exactness failures are now
-    seen at `-cpu-used` 1, 2 and 4.
-13. **No lossless format is smaller than the gif on the large files.**
-    On the four largest sample files, WebP lossless was 73-150% of the
-    gif, JPEG XL 82-582%, AV1 lossless 257-597% (several inexact). The
-    gif's per-frame palettes, LZW and changed-rectangle frames are hard
-    to beat losslessly on this content. Lossless would at best shrink
-    the small, plain screencasts (x264rgb 51% on the pilot).
-14. **JPEG XL lost no colors going through the APNG.** Pillow writes the
-    APNG in RGB, not with a palette; the JPEG XL was pixel-exact against
-    the gif's 1,140 colors. (The color loss was only in the separate
-    ffmpeg `pal8` APNG test.) Pillow's APNG writer holds every frame in
-    memory, which killed the effort-9 encode of the 851-frame
-    1798x1390 gif.
-15. **Lossy AV1 4:4:4 is the strongest option.** See the lossy sweep
-    below. JPEG XL lossy (VarDCT or modular) came out larger than the
-    gif with the worst quality in the sweep; WebP lossy (4:2:0 only) was
-    up to 217% of the gif; WebP near-lossless keeps the error at 4 or
-    less but saves only 27-40%.
-
-### Pilot numbers (one file, not a conclusion)
-
-`9549c5dcf551/images/003-1_BIDimBvS_g8QH5fuHS_QRQ.gif`: 1000x600, 72
-frames, 25.3 s, 821,378 bytes.
-
-| encode | bytes | vs gif | encode s | decode s | exact |
-|---|---|---|---|---|---|
-| libx264rgb `-qp 0 -preset placebo` | 422,719 | 51% | 7.6 | 0.19 | yes |
-| libx265 lossless `placebo` | 479,004 | 58% | 73.6 | 0.28 | yes |
-| gif2webp `-m 6 -q 100` | 511,574 | 62% | 124 | not measured | yes |
-| gifsicle `-O3` | 788,532 | 96% | 0.5 | 0.12 | yes |
-| libvpx-vp9 lossless `-cpu-used 0` | 1,231,696 | 150% | 35 | 0.25 | yes |
-| ffv1 (intra only) | 3,344,058 | 407% | 1.2 | 1.32 | yes |
-| libaom lossless `-crf 0 -cpu-used 1` | 555,167 | 68% | 92 | 0.21 | no: 1 pixel off by 1 (finding 7) |
-| libaom lossless `-crf 0 -cpu-used 4` | 607,292 | 74% | 21 | 0.23 | no: 10 pixels off by 1 (finding 7) |
-| libaom `-crf 4` | 236,770 | 29% | 103 | 0.18 | no, PSNR unknown |
-| libx264rgb `-crf 4` | 562,054 | 68% | 18 | 0.21 | no, and larger than its lossless encode |
-
-On this file, x264rgb lossless beats x265, webp and AV1, contrary to
-the brief's expectation that AV1 would win. One file is not a sample:
-the large-file run below tests whether that holds where the bytes are.
-
-### Large file (the least favourable case for video so far)
-
-`2e432df402c8/images/013-0_ArP2iU5tKYDHvvZd.gif`: 1836x970, 101 frames
-(60 after merging repeated frames), 10.1 s, 17,564,258 bytes. Five
-jobs shared four cores for part of the run, so encode times are
-slightly inflated.
-
-| encode | bytes | vs gif | encode s | decode s | exact |
-|---|---|---|---|---|---|
-| gif2webp `-m 6 -q 100` | 12,851,572 | 73% | 1057 | 0.80 | yes |
-| gifsicle `-O3` | 17,131,328 | 98% | 5 | 0.55 | yes |
-| libx264rgb `-qp 0 -preset placebo` | 33,341,342 | 190% | 70 | 4.40 | yes |
-| libx265 lossless `placebo` | 41,332,559 | 235% | 633 | 4.41 | yes |
-| libaom `-crf 0 -cpu-used 1` | 44,791,394 | 255% | 1819 | 4.58 | yes |
-| libaom `-crf 0 -cpu-used 2` | 45,059,073 | 257% | 751 | 4.62 | yes |
-
-Together with the pilot, no single format wins: x264rgb was best on a
-plain screencast, WebP on a screencast that contains video. The winner
-depends on content. Two outcomes are possible: one format that is
-never much worse than the gif (WebP is the candidate), or a choice per
-file between a video codec and a palette format, taking the smaller
-exact result.
-
-### Lossy sweep
-
-Five files: the pilot (text screencast, `9549`), a 2642x1872 screencast
-(`164eb/007`), the median-size gif (`388d05`), the notebook playing
-video (`013`), and the largest gif (`bd2524`: a notebook whose cell
-background is a faint two-color dither, recorded at 50-100 frames per
-second). Size as % of the gif, then overall PSNR. AV1 used
-`-cpu-used 4`, H.264 `-preset slower`, both `yuv444p`.
-
-| file | AV1 CRF 20 | AV1 CRF 12 | H.264 CRF 16 | H.264 CRF 12 | WebP near-lossless 40 |
-|---|---|---|---|---|---|
-| `9549` | 11%, 51.5 dB | 13%, 52.0 | 30%, 50.9 | 35%, 51.7 | 63%, 58.1 |
-| `164eb/007` | 12%, 55.2 | 19%, 57.2 | 18%, 50.9 | 27%, 53.7 | 60%, 51.7 |
-| `388d05` | 13%, 50.5 | 19%, 52.5 | 25%, 49.5 | 38%, 52.0 | 65%, 46.6 |
-| `013` | 27%, 41.6 | 53%, 44.5 | 57%, 42.7 | 92%, 45.7 | 73%, 65.4 |
-| `bd2524` | 98%, 47.7 | 128%, 50.4 | 76%, 38.9 | 119%, 42.3 | 66%, 63.3 |
-
-Also tried and dropped: JPEG XL `-d 1` (48-1111%), JPEG XL modular
-`-m 1 -d 0.5` (71-1252%), WebP `-lossy -q 90 -sharp_yuv` (49-217%),
-WebP near-lossless 60 (no saving over lossless).
-
-PSNR undercounts quality where a codec smooths dither: the smoothing
-is a large pixel error that is invisible. The worst frame of each AV1
-CRF 20 encode was inspected at 2x at its highest-error spot: code, a
-clock readout and small monospace text were visually unchanged (the
-error is faint edge noise); the video region of `013` lost its dither
-and grain, which is acceptable here.
-
-AV1 encode times at `-cpu-used 4` were 20-650 s, and 1900 s on
-`bd2524`; decoding took 0.2-13.6 s per file. A one-time conversion can
-afford that; `-cpu-used 6` is being measured.
-
-### AV1 on the 14-file sample
-
-`aom_444_*` is libaom, `yuv444p`, `-g 9999`, single-threaded; `c6` is
-`-cpu-used 6`, otherwise 4. Size as % of the gif, overall PSNR, and
-the share of pixels changed by more than 16 levels.
-
-| file | MB | gifsicle `-O3` | CRF 20 | CRF 28 | CRF 20 c6 |
-|---|---|---|---|---|---|
-| `bd2524b247c2/005` | 22.6 | 93% | 98%, 47.7 dB, 0.083% | 66%, 45.2, 0.296% | 98%, 46.2, 0.168% |
-| `77df24c8db80/002` | 22.5 | 118% | 36%, 42.8, 0.264% | 17%, 40.6, 0.790% | 31%, 41.6, 0.422% |
-| `164eb2eae102/003` | 19.9 | 121% | 15%, 41.8, 0.254% | 8%, 40.5, 0.447% | 12%, 41.0, 0.340% |
-| `2e432df402c8/013` | 17.6 | 98% | 27%, 41.6, 0.224% | 12%, 39.6, 0.588% | 16%, 39.4, 0.618% |
-| `701e7b9841e6/002` | 16.1 | 98% | 18%, 46.4, 0.010% | 12%, 44.5, 0.045% | 18%, 44.6, 0.024% |
-| `164eb2eae102/007` | 13.6 | 108% | 12%, 55.2, 0.001% | 9%, 53.4, 0.003% | 11%, 53.5, 0.002% |
-| `c9d93542f20b/014` | 12.0 | 98% | 16%, 46.7, 0.020% | 9%, 45.4, 0.037% | 13%, 45.5, 0.031% |
-| `cda20dc15a21/005` | 6.5 | 67% | 96%, 62.6, 0.000% | 86%, 59.4, 0.001% | 75%, 59.6, 0.002% |
-| `11e5dab7c54/006` | 6.0 | 96% | 60%, 50.4, 0.015% | 45%, 48.7, 0.038% | 56%, 49.0, 0.024% |
-| `03e6b78bacc0/003` | 3.3 | 96% | 25%, 45.0, 0.028% | 17%, 42.9, 0.083% | 26%, 44.3, 0.043% |
-| `388d05e03442/002` | 1.3 | 98% | 13%, 50.5, 0.006% | 10%, 48.4, 0.015% | 15%, 49.9, 0.008% |
-| `9549c5dcf551/003` | 0.8 | 96% | 11%, 51.5, 0.000% | 10%, 50.7, 0.001% | 13%, 51.0, 0.001% |
-| `8096b8b223d0/007` | 0.5 | 95% | 58%, 52.0, 0.000% | 46%, 51.3, 0.002% | 55%, 51.6, 0.003% |
-| `2e432df402c8/009` | 0.2 | 93% | 30%, 63.1, 0.000% | 25%, 60.5, 0.000% | 30%, 62.3, 0.000% |
-| **total** | 142.9 | 103% | 39% | 25% | 35% |
-
-With the gif (gifsicle `-O3`) kept wherever it is smaller: CRF 28
-24%, CRF 20 c6 34%, CRF 20 37%. At CRF 28 only `cda20dc15a21/005`
-keeps its gif.
-
-Encode times at `-cpu-used 4` were 18-1911 s per file, at
-`-cpu-used 6` 8-669 s; c6 was also slightly *smaller* at CRF 20, with
-somewhat lower PSNR on some files.
-
-Visual check at CRF 28: from each file's worst frame, the region with
-the most error on flat backgrounds (where text damage shows) was
-inspected at 2x. Text ("Name: chevrolet", code) and chart lines are
-intact, with faint edge noise; dithered backgrounds, video and
-satellite imagery are smoothed.
-
-### Frame-rate cap
-
-`fpscap.py` writes an ffmpeg `select` filter script that drops frames
-inside bursts faster than about 30 fps. It keeps the first and last
-frame, every frame on screen for 29.5 ms or longer, and every frame
-starting 29.5 ms or more after the last kept one; a frame kept for its
-start gives way to a following long frame when the two would be under
-29.5 ms apart. Kept frames keep their exact timestamps and the total
-length is unchanged (checked on three files). The expression is nested
-as a balanced tree: ffmpeg's parser fails on a flat sum of a few
-hundred terms.
-
-ffmpeg's own options do not do this: `-r`/`-fpsmax` require
-constant-rate output ("contradictory" with `-fps_mode vfr`), and
-`fps=30` resamples, moving 284 of 426 kept frames of `bd2524` onto a
-33 ms grid, with higher pixel error than `fpscap.py`.
-
-The cap affects 11 of the 216 gifs (3,749 of 61,048 frames). Nine are
-from one post (`cda20dc15a21`), recorded at a steady 40 fps (25 ms
-frames), where it drops about half the frames. The other two are the
-gifs with 10 ms frames, which depend on the timing policy (open
-question 2): browsers play those frames at 100 ms, so readers saw
-every one of them.
-
-| file | dropped, stored timing | dropped, browser timing |
-|---|---|---|
-| `bd2524b247c2/005` | 425 of 851 | 283 of 851 |
-| `11e5dab7c54/006` | 403 of 691 | 0 of 691 |
-
-### Decisions (2026-09-23)
-
-- **Timing is the gif's stored delays**, as the author made it, not
-  what browsers played (≤ 10 ms as 100 ms).
-- **Every stored file has the frame-rate cap**, applied before
-  encoding as the `select` filter in the same ffmpeg run (capping after
-  encoding would need a second lossy encode). On a gif without bursts
-  the cap keeps every frame, and the encode's video stream is
-  identical to an uncapped one (checked: same packets, only container
-  metadata differs), so uncapped results on such files stand.
-- **A gif kept as the fallback is capped too** (`fpscap.py --gif`).
-  gifsicle cannot drop frames from a gif with per-frame color tables
-  ("GIF too complex to unoptimize"; the result was 11 dB off), so
-  Pillow composites each kept frame, writes it whole with a palette of
-  exactly its colors and the merged delay, and gifsicle `-O3`
-  re-optimizes. Exact (verified: infinite PSNR, same length) when no
-  composited frame has over 256 colors; otherwise refused. All nine
-  40 fps gifs of `cda20dc15a21` and `bd2524` qualify; `11e5dab7c54/006`
-  (up to 6,141 colors per frame) does not, and its capped AV1 is 43%
-  of the gif anyway. Capped gifs: `cda20dc15a21/005` 67% of the
-  original (the same as uncapped `-O3`: whole frames with their own
-  color tables cost what the dropped frames saved), `bd2524` 64%.
-- `quality.py` now pairs from the encode's side (each encoded frame
-  against the gif frame on screen at its start), so frames the cap
-  drops by design are not counted as errors. Uncapped scores are
-  unchanged.
-- Capped AV1 CRF 20 (`-cpu-used 4`): `11e5dab7c54/006` 43% of the gif
-  (60% uncapped), `cda20dc15a21/005` 89% (96% uncapped).
-
-### Storing the encoded files (requested 2026-09-23; likely unneeded)
-
-Superseded if the display format is H.264 4:2:0 made straight from the
-gifs (being measured): H.264 encodes fast, and `.image-cache/` already
-keeps each encode once per machine (content-addressed by the gif's
-hash, in a directory named by the settings), with CI restoring it via
-`actions/cache` (the Preview sites workflow; a cold cache is about 20
-minutes on a four-core runner, stills included). Committing encoded
-files only pays for a slow codec like AV1. The shape proposed for that
-case, not built:
-
-- `archive/animations/`, one file per source gif, named by the gif's
-  content hash (as `.image-cache/` is today), with a manifest recording
-  for each: source path and hash, frames kept by the cap, format and
-  encoder settings, tool versions (ffmpeg, libaom), quality.py's
-  numbers and the output size.
-- A `medium-archive` subcommand that converts with the pinned
-  toolchain (`docs/gif-intermediates/pixi.toml`), verifies each output
-  (timing; quality.py floor; capped gif exact) and only encodes files
-  that are missing or whose settings changed. libaom output depends on
-  its version, so the committed files, not a re-run, are the record.
-- `sites.ImagePlacer` looks each gif up in the manifest and copies the
-  stored file; encoding stays only as the path for a gif not in it.
-- Size: at the sample's 24%, about 140 MB for the 587 MB of gifs, on
-  top of `archive/raw/`'s 835 MB.
-
-### Capped CRF ladder (where quality gives out)
-
-AV1 4:4:4, `-cpu-used 6`, capped, CRF 28 to 52 on seven files. Size
-as % of the gif, PSNR overall/worst frame, share of pixels changed by
-more than 16 levels (quality.py, pairing from the encode's side).
-
-| file | CRF 28 | CRF 34 | CRF 40 | CRF 46 | CRF 52 |
-|---|---|---|---|---|---|
-| `bd2524` | 41%, 43.0/38.4, 0.63% | 21%, 40.1/36.0, 1.08% | 10%, 38.1/34.3, 1.42% | 7%, 36.8/32.8, 1.94% | 5%, 35.3/31.8, 2.84% |
-| `013` | 6%, 37.9/36.1, 1.23% | 3%, 37.0/35.3, 1.68% | 2%, 36.4/34.8, 2.04% | 1%, 35.8/34.3, 2.40% | 1%, 35.3/33.8, 2.82% |
-| `164eb/007` | 8%, 51.6/47.5, 0.01% | 6%, 49.7/45.8, 0.01% | 5%, 47.5/43.1, 0.03% | 4%, 45.2/40.8, 0.09% | 3%, 42.9/37.5, 0.22% |
-| `cda20dc15a21/005` | 73%, 54.7/44.6, 0.02% | 66%, 51.9/43.9, 0.04% | 61%, 48.4/38.3, 0.13% | 56%, 44.3/33.9, 0.28% | 52%, 40.0/28.6, 0.53% |
-| `11e5dab7c54/006` | 30%, 46.0/40.9, 0.11% | 23%, 43.9/38.7, 0.26% | 17%, 41.5/36.4, 0.61% | 13%, 39.2/33.3, 1.21% | 10%, 37.0/31.2, 2.02% |
-| `388d05` | 11%, 47.6/43.3, 0.03% | 9%, 45.5/40.9, 0.07% | 6%, 43.2/38.7, 0.17% | 5%, 40.8/37.2, 0.45% | 4%, 38.7/34.6, 0.92% |
-| `9549` | 11%, 49.9/49.2, 0.00% | 10%, 48.4/46.5, 0.02% | 8%, 46.1/42.8, 0.07% | 7%, 43.7/40.3, 0.21% | 6%, 41.3/37.9, 0.41% |
-
-(`-cpu-used 6` CRF 28 is smaller than `-cpu-used 4` CRF 28 on these:
-`bd2524` 41% capped against 66% uncapped at speed 4, `013` 6% against
-12%.)
-
-The same frame and region (the CRF 52 encode's worst frame, its
-highest-error window on flat background) compared across CRFs at 3x:
-
-- Tiny monospace text (`388d05`): CRF 28 matches the original; CRF 34
-  adds stray marks after a code line; CRF 40 smears a text line and
-  blotches the code; CRF 46 garbles the code; CRF 52 wipes a line and
-  shows text from elsewhere in the scrolling screen (a block copied
-  from the wrong place).
-- Larger code text (`11e5`): clean to CRF 40, slight smudge at 46,
-  soft and ghosted at 52.
-- Chart gridlines on a dithered background (`bd2524`): clean at 28,
-  dither shifts from 34, lines break into steps at 52.
-
-Small text sets the limit: first artifacts at CRF 34, clear damage at
-40. **Chosen: CRF 28**, one step below the first artifacts.
-
-### H.264 against AV1, and 4:2:0 against 4:4:4
-
-Seven files (the ladder set, 68.4 MB of gifs), all capped. 4:4:4 keeps
-color at full resolution; 4:2:0 keeps one color sample per 2x2 pixels
-(brightness stays full) and is what every browser plays.
-
-| encode | browsers | total vs gif | median PSNR | encode, 1 core, 7 files |
-|---|---|---|---|---|
-| AV1 4:4:4 CRF 28 (libaom, `-cpu-used 6`) | Chrome/Firefox | 27% | 47.6 dB | 1072 s |
-| H.264 4:4:4 CRF 20 | no | 48% | 41.6 dB | 453 s |
-| H.264 4:2:0 CRF 16 | all | 56% | 37.9 dB | 335 s |
-| H.264 4:2:0 CRF 20 | all | 40% | 37.3 dB | 318 s |
-| H.264 4:2:0 CRF 24 | all | 28% | 36.6 dB | 318 s |
-| AV1 CRF 28 master -> H.264 4:2:0 CRF 20 | all | 35% | 36.1 dB | 168 s + AV1 |
-
-H.264 is `-preset slower`, High (4:2:0) or High 4:4:4 profile; 4:2:0
-pads odd dimensions by a pixel. Per file, `x264_420_crf20` against the
-chain, % of gif and PSNR: `bd2524` 30%/25.1 vs 27%/25.0; `013` 26%/37.3
-vs 10%/36.1; `164eb/007` 12%/46.0 vs 11%/45.6; `cda20dc15a21/005`
-182%/32.2 vs 181%/32.0; `11e5` 36%/32.8 vs 35%/32.5; `388d05` 15%/40.2
-vs 15%/39.8; `9549` 25%/39.1 vs 27%/38.9.
-
-- Same chroma, AV1 is about half H.264's size at higher quality (4:4:4:
-  27% at 47.6 dB against 48% at 41.6 dB).
-- 4:2:0 sets the quality ceiling, whatever the codec: every 4:2:0
-  encode sits at 36-38 dB median. Crops of the same frame and region:
-  red code strings turn pink and soft (`11e5`), 1-pixel saturated
-  green lines turn dull and blotchy (`cda20dc15a21/005`), the faint
-  yellow dither dots of `bd2524` vanish, green/purple code text
-  (`9549`) is slightly lighter at stroke edges. Both 4:4:4 encodes
-  keep all of it. The site's current mp4s already have this loss.
-- The two-step chain is slightly smaller than direct H.264 at the same
-  CRF but lower quality on every file (0.2-1.2 dB): no reason for it
-  unless AV1 masters are kept for their own sake.
-- `cda20dc15a21`'s 40 fps gifs of 1-pixel colored lines are larger
-  than the gif in every 4:2:0 encode (H.264 155-211%, SVT-AV1
-  214-305%); the capped gif is 67%. Keeping them as gifs gives up the
-  `<video>` pause control.
-- SVT-AV1 (4:2:0, preset 6, `scm=2`, one thread) is fast (4 s on the
-  pilot) and about half H.264's size at equal PSNR on most files, worse
-  on `cda20dc15a21/005`. It writes a fixed 150 ms duration on every
-  frame (from a guessed rate): starts are exact, but the last frame
-  plays 150 ms (the pilot's gif says 10 ms). Libaom 4:2:0 and the rest
-  of SVT-AV1 were still running when this was written.
-
-SVT-AV1 4:2:0 on the same seven files (total vs gif; median PSNR;
-single-thread encode time for all seven):
-
-| encode | total | median PSNR | encode | per file (% of gif) |
-|---|---|---|---|---|
-| H.264 4:2:0 CRF 20 | 40% | 37.3 | 318 s | `11e5` 36, `164eb` 12, `013` 26, `388d05` 15, `9549` 25, `bd2524` 30, `cda20` 182 |
-| H.264 4:2:0 CRF 24 | 28% | 36.6 | 318 s | 27, 8, 13, 11, 21, 17, 155 |
-| SVT-AV1 p6 CRF 24 | 50% | 37.0 | 224 s | 40, 15, 14, 12, 16, 32, 305 |
-| SVT-AV1 p6 CRF 30 | 38% | 36.5 | 214 s | 30, 12, 7, 10, 13, 18, 258 |
-| SVT-AV1 p6 CRF 36 | 28% | 36.1 | 232 s | 23, 9, 3, 7, 11, 9, 214 |
-| SVT-AV1 p8 CRF 30 | 41% | 36.5 | 143 s | 36, 13, 8, 12, 17, 22, 266 |
-
-libaom 4:2:0 (`-cpu-used 6`, capped), same files and columns:
-
-| encode | total | median PSNR | encode | per file (% of gif) |
-|---|---|---|---|---|
-| libaom 4:2:0 CRF 24 | 20% | 36.6 | 880 s | 24, 9, 7, 10, 11, 22, 74 |
-| libaom 4:2:0 CRF 28 | 17% | 36.2 | 814 s | 20, 7, 4, 9, 10, 16, 70 |
-| libaom 4:2:0 CRF 34 | 12% | 35.7 | 784 s | 16, 5, 2, 7, 9, 8, 62 |
-
-At equal median PSNR, libaom 4:2:0 CRF 24 is 20% of the gifs against
-H.264 CRF 24's 28% (15% each leaving out `cda20dc15a21/005`), and on
-the particle gif it is 74% of the gif where H.264 is 155% and SVT-AV1
-258%: libaom's screen-content tools work in 4:2:0 too. Its timing is
-exact; it encodes about 2.5x slower than H.264 `-preset slower`.
-
-Leaving out `cda20dc15a21/005`, SVT-AV1 CRF 30 is 30-70% of H.264 CRF
-20's size at similar PSNR; that one file (1-pixel saturated lines)
-erases the gain in the total. SVT-AV1's timing: starts are exact but
-the last frame's duration is not kept (ends 60-335 ms off:
-`164eb` 13,495 ms against 13,830).
-
-CRF for H.264 4:2:0: crops of the same text regions (`388d05`,
-`11e5`, `9549`, `164eb/007`) at CRF 16, 20 and 24 look alike at 3x;
-the difference from the original is the 4:2:0 color, the same at each
-CRF. CRF 24 is a third smaller than 20 for no visible loss there.
-
-Proposal (2026-09-23): serve H.264 4:2:0 encoded on the fly from the
-capped gifs into `.image-cache/`; no AV1 master, no committed encodes.
-**Decided: CRF 24.**
-
-### Resolution
-
-The body column is about 736 CSS px (1,472 device px on a 2x screen).
-Longest edges of the 216 gifs: up to 736 px 17, 737-1,104 70,
-1,105-1,472 63, 1,473-2,000 53, 2,001-3,340 13 (median 1,200; largest
-3,340x1,517). Today's `animated_max_edge` of 1,104 px shrinks 129 gifs
-(379 of the 587 MB): to a median 74% of their width (54% of their
-pixels), the largest to 33% (11%).
-
-H.264 4:2:0 CRF 24, capped frame rate, scaled with Lanczos where over
-the limit (size as % of the full-resolution encode):
-
-| file | gif | full resolution | 1,472 px limit | 1,104 px limit |
-|---|---|---|---|---|
-| `bd2524` 1798x1390 | 22.6 MB | 3.82 MB | 1.96 MB, 51% | 1.02 MB, 27% |
-| `013` 1836x970 | 17.6 MB | 2.34 MB | 0.85 MB, 36% | 0.42 MB, 18% |
-| `164eb/007` 2642x1872 | 13.6 MB | 1.12 MB | 0.74 MB, 66% | 0.54 MB, 48% |
-| `cda20` 1266x970 | 6.5 MB | 10.15 MB | (not scaled) | 8.68 MB, 86% |
-| `11e5` 1764x860 | 6.0 MB | 1.61 MB | 1.26 MB, 78% | 0.81 MB, 50% |
-| `388d05`, `9549` | 2.1 MB | 0.31 MB | (not scaled) | (not scaled) |
-| total | 68.4 MB | 19.4 MB (28% of gif) | 15.3 MB (22%), 79% | 11.8 MB (17%), 61% |
-
-The biggest savings are on dithered or photographic content (`bd2524`,
-`013`), where scaling smooths what the encoder would otherwise have
-to code; screen text (`164eb/007`, `11e5`) saves less. Scaling also
-softens text in the page on 2x screens (at 1,104) and makes large
-screenshots unreadable full screen (at either limit), which is why
-`sites.py` keeps still line art at full resolution. **Decided: full
-resolution** (`animated_max_edge` defaults to 0).
-
-**Decided (2026-09-23): every animation becomes video**, so a reader
-can pause it, even where the video is somewhat larger than the gif.
-This replaces `sites.py`'s rule that keeps a gif shorter than
-`MOTION_SECONDS` (5 s) when its clip does not undercut it. 15 of the
-216 gifs run under 5 s (18.1 MB): 0.9-4.8 s, 5-161 frames.
-
-Why `cda20dc15a21/005` is larger as video: it records a particle
-simulation, hundreds of small triangles outlined in aliased 1-pixel
-pure green (#00ff00) on a flat grey background, each moving on its
-own. Per changed frame, the changed area averages 7.7% of the frame
-(bounding box), and half the gif's 963 frames repeat the previous one
-(median gif frame: 25 bytes). What each codec pays:
-
-- The gif stores palette indices with LZW: a mostly flat frame with a
-  few sparse green pixels compresses to little, losslessly.
-- Motion compensation barely helps: every particle moves differently,
-  so a block holds several unrelated motions, and each changed frame
-  is coded almost from scratch.
-- Transform coding (DCT and its relatives) spreads a 1-pixel aliased
-  edge across all frequencies, which is expensive to code at any
-  quality that keeps the line crisp.
-- 4:2:0 makes it worse: a 1-pixel saturated green line cannot be
-  represented at quarter color resolution, so the encoder spends bits
-  on the brightness channel compensating, and the line still turns
-  dull (see the crops).
-
-Mean bytes per frame: gif 6,794 (963 frames); H.264 4:2:0 CRF 24
-21,042 (482 frames after the cap); AV1 4:4:4 CRF 28 9,910 (482). AV1
-comes closest because its screen-content tools (palette mode, intra
-block copy) exist for exactly this kind of content.
-
-## Open questions
-
-1. **Container and codec.** Lossless is ruled out for the large files
-   (finding 13). The working proposal is two formats: AV1 4:4:4 at
-   CRF 28 in MKV, and the original gif (gifsicle-optimized) wherever
-   that is smaller. `-cpu-used 6` at CRF 28 is being measured.
-2. **Short delays.** Decided: the gif's stored delays (see Decisions).
-3. **Where stage 2 runs.** It could run in the Pelican build (a plugin
-   step, with a cache) or in the exporter as today. Since the site
-   source is meant to outlive this repository, stage 2 probably belongs
-   with the site: a plugin plus a pinned ffmpeg.
-5. **Browser playback.** Decided (2026-09-23): AV1 is not served for
-   now (Safari plays it only on Apple M3 or later). The gifs in
-   `archive/raw/` stay the masters; the site serves a format every
-   browser plays. Being measured: whether H.264 4:2:0 made straight from
-   the gif (one lossy step, encoded on the fly into `.image-cache/`)
-   is as good as H.264 made from an AV1 master (two steps). If so, no
-   AV1 master is kept; AV1 can be made from the gifs later. Serving AV1 directly is for later, once support
-   is broad. Which display format is open:
-   - H.264 mp4 (4:2:0) in a `<video>`, as today: every browser, and a
-     reader can pause it. The exporters chose this over animated images
-     for WCAG 2.2.2 (Pause, Stop, Hide): 201 of the 216 animations run
-     over 5 s, and an `<img>` animation cannot be paused (see the
-     comments above `ANIMATED_FORMAT` in `sites.py`). Recommended.
-   - Animated WebP in an `<img>`: every current browser, but no pause
-     control, and larger (lossy q90 49-217% of the gif in the sweep,
-     near-lossless 60-73%).
-   The display copy would be transcoded from the AV1 master at site
-   build (cached in `.image-cache/` as today) or committed alongside
-   it so a build only copies. To check before deciding: quality of
-   H.264 made from the AV1 master (two lossy steps) against H.264 made
-   from the gif directly, both scored against the gif.
-4. **Decoder trust.** The reference frames are ffmpeg's gif decode. They
-   have not yet been cross-checked against Pillow's compositing on the
-   sample. The brief warns of past ffmpeg disposal bugs.
-
-## Implemented (2026-09-23)
-
-`ImagePlacer` in `src/medium_archive/sites.py` now places every
-animation as H.264 4:2:0 at full resolution, `-crf 24 -preset
-slower`, one thread per encode, with the frame-rate cap
-(`kept_frames`, passed inline as a `select` filter that ffmpeg 6.1 and
-9.0 both accept), `-enc_time_base 1:1000`, and odd sizes padded by a
-pixel for clip and poster alike; the five-second rule is gone and
-`CACHE_SCHEME` is v6. Checked on `bd2524`: 426 of 851 frames, every
-timestamp one the gif has, 14.19 s like the gif, 1798x1390 clip and
-poster, with ffmpeg 9.0.2 and Ubuntu's 6.1.1. x264 split across
-threads (the default) made the pilot's clip 39% larger (237,690 bytes
-against 171,293), hence `-threads 1`; `warm()` already encodes gifs in
-parallel. Tests cover the cap, the selection expression, timing, and
-padding.
-
-## Resume here
-
-1. Build the sites from the full archive and compare the clip total and
-   a cold-cache build time with the old scheme (CI's comment says ~20
-   minutes cold on four cores; `-preset slower` at full resolution will
-   be longer).
-2. Spot-check clips from the built site in a browser, including the
-   largest (3340x1517) and a 40 fps `cda20dc15a21` one.
-3. Later, once AV1 plays broadly (Safari: Apple M3 or later only in
-   2026-09): libaom 4:2:0 was about two-thirds of H.264's size at
-   equal quality on the sample (see above).
+| none (full resolution) | 28% | 100% |
+| 1,472 px (twice the body column) | 22% | 79% |
+| 1,104 px (the old default) | 17% | 61% |
+
+Scaling saves most on dithered or video content and least on screen
+text, which it blurs. Full resolution keeps code readable when a
+reader takes a clip full screen. That is the same reasoning by which
+`sites.py` keeps still line art at full resolution.
+
+**6. Frame-rate cap.** It affects 11 of the 216 gifs (3,749 of 61,048
+frames):
+- **Delays:** the stored delays are used, as the author made them,
+  not the 100 ms browsers substituted.
+- **ffmpeg's own options don't fit:** `-r` and `-fpsmax` require
+  constant-rate output, and `fps=30` moves frame boundaries onto its
+  grid.
+- **Filter form:** the `select` expression is nested as a balanced
+  tree, because ffmpeg's parser fails on a flat sum of a few hundred
+  terms.
+- **Savings:** a clip of `11e5dab7c54/006` came out 43% of the gif
+  capped against 60% uncapped (AV1 CRF 20, 4:4:4).
+
+**7. Clips that are larger than their gifs.** The 40 fps
+`cda20dc15a21` recordings are particle simulations: hundreds of
+triangles drawn with aliased 1-pixel pure-green lines, each moving on
+its own. A gif codes these almost for free. A video codec gets little
+from motion prediction here and pays heavily to transform-code
+1-pixel edges, and 4:2:0 cannot represent the thin green lines. H.264
+comes out at 155-211% of the gif. These are placed as clips anyway,
+for the pause control.
+
+**8. Timing traps** (all avoided now):
+- **ffmpeg's guessed time base:** left alone, ffmpeg gives the encoder
+  a time base from a guessed frame rate and rounds every timestamp to
+  it; one 25.3 s gif played 25.5 s. `-enc_time_base 1:1000` fixes it.
+- **x264 threading:** splitting one encode across threads made one
+  clip 39% larger.
+- **gif2webp** stores delays of 10 ms or less as 100 ms.
+- **ffmpeg's WebP decoder** plays stored delays of 10 ms or less as
+  100 ms.
+- **ffmpeg's APNG muxer** rounds delays.
+- **cjxl** rejects gifs whose partial frames dispose to background.
+- **gifsicle** cannot drop frames from gifs with per-frame color
+  tables.
+
+## Later: re-encoding to AV1
+
+AV1 is not served now because Safari plays it only on Apple M3 or
+later hardware (2026-09). Once it plays broadly, re-encoding from the
+gif masters is a change to the codec arguments and `CACHE_SCHEME`,
+plus a longer cold cache.
+
+What AV1 gains, from the seven-file sample:
+
+- **About 30% smaller in 4:2:0 at equal quality:** libaom CRF 24 was
+  20% of the gifs against H.264 CRF 24's 28%, both at 36.6 dB median.
+  CRF 28 is 17% for a small drop.
+- **Much smaller on line-drawing content:** libaom 4:2:0 was 70-74% of
+  the particle gifs against 155% for H.264. Its screen-content tools
+  (palette mode and intra block copy) work in 4:2:0 too.
+- **Full color (4:4:4), if browsers decode it:** Chrome and Firefox do
+  today. AV1 4:4:4 CRF 28 was 27% of the gifs at 47.6 dB median, and
+  it keeps colored text, 1-pixel lines and dither that 4:2:0 loses.
+  CRF 28 was clean on small text; CRF 34 showed the first artifacts.
+
+What it costs:
+
+- **Encode time:** libaom at `-cpu-used 6` encodes about 2.5 times
+  slower than H.264 `-preset slower`, and `-cpu-used 4` is slower
+  still with no gain in size. The image cache absorbs this, as it does
+  H.264.
+- **SVT-AV1** is fast, but it is not the encoder to use (finding 3).
+
+A possible intermediate step: a `<video>` can list several
+`<source>` elements, and the browser plays the first one it
+supports. The site could serve AV1 with an H.264 fallback before AV1
+is universal, at the cost of encoding and storing both.
+
+## Tools (`docs/gif-intermediates/`)
+
+- `pixi.toml`, `pixi.lock`: the pinned conda-forge toolchain (ffmpeg
+  9.0.2, libaom 3.14.1, SVT-AV1 4.2.0, x264, libjxl 0.12, libwebp 1.6,
+  gifsicle 1.96). Run tools with `pixi run --manifest-path
+  docs/gif-intermediates/pixi.toml ...`. In a Claude Code cloud
+  session, pixi.sh and GitHub downloads are blocked, but
+  conda.anaconda.org is reachable, so pixi was installed by extracting
+  it from its conda-forge package.
+- `inventory.py`, `inventory.tsv`: the survey of all 216 gifs.
+- `bench.py`: encodes gif × encoder jobs in parallel and checks each
+  against the gif (timeline of frame hashes and display time). It
+  calls `quality.py` for inexact encodes. Encoders are named by their
+  settings, for example `x264_420_crf24_cap`, `aom420_c6_crf28_cap`
+  or `svt420_p6_crf30_cap`.
+- `quality.py`: PSNR (overall and worst frame), largest error and the
+  share of visibly changed pixels. It pairs each encoded frame with
+  the gif frame on screen at the same moment, and saves the worst
+  frame for inspection.
+- `fpscap.py`: the frame-rate cap as an ffmpeg filter script, and
+  `--gif` for an exact capped gif (Pillow, then gifsicle).
+- `pil_encode.py`: APNG and WebP with exact delays (Pillow and
+  img2webp).
+
+## Still to do
+
+1. **Full-archive build.** Build the sites from the whole archive,
+   and record the total clip size and the cold-cache build time. CI's
+   comment gives about 20 minutes cold on four cores for the old
+   settings; full resolution with `-preset slower` will take longer.
+2. **Browser check.** Watch clips from a built site in browsers,
+   including the largest (3,340x1,517) and a `cda20dc15a21` particle
+   clip.
