@@ -46,8 +46,10 @@ ffmpeg 6.1, against `main`'s old settings (CRF 20, `-preset fast`,
 | clips shorter than their gif | 23 | 0 |
 
 Every new clip has its gif's size (plus any padding pixel) and length.
-The 11 clips larger than their gifs are the particle and line-drawing
-recordings (finding 7), from 103% up to 237%.
+The 11 clips larger than their gifs run from 103% to 237% of them.
+Two are the `cda20dc15a21` particle recordings (finding 7); the other
+nine, from posts `edb3f80dc1c0` (four), `789fcb1a5857` (three),
+`a4ad73a1a718` and `f6e2e41ab3fa`, have not been looked at.
 
 ## The gifs
 
