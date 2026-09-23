@@ -89,7 +89,7 @@ environment has all of them.
 | tool | needed for |
 |---|---|
 | `ffmpeg` with libx264 and libwebp | `hugo`, `pelican`, `myst` exporters, when the archive has animated gifs |
-| `gifsicle` | resizing gifs kept as gifs (`animated_format = "gif"` with `animated_max_edge` set); not in the pixi environment on Windows |
+| `gifsicle` | resizing gifs kept as gifs (`animated_format = "gif"` with `animated_max_edge` set) |
 | `hugo`, extended, 0.156+ | building the Hugo site |
 | `pelican` with markdown-it-py, mdit-py-plugins, pyyaml, pillow | building the Pelican site |
 | `myst` (mystmd) | building the MyST site |

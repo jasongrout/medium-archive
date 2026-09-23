@@ -11,7 +11,7 @@
 [workspace]
 name = "medium-archive"
 channels = ["conda-forge"]
-platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+platforms = ["linux-64", "osx-arm64"]
 
 [dependencies]
 python = ">=3.11"
@@ -31,14 +31,11 @@ mdit-py-plugins = "*"
 pygments = "*"
 pyyaml = "*"
 pillow = "*"
+# resizes gifs kept as gifs (site.toml animated_format = "gif")
+gifsicle = "*"
 # the tests: pytest, and jinja2 to render the pelican theme's pages
 pytest = "*"
 jinja2 = "*"
-
-# resizes gifs kept as gifs (site.toml animated_format = "gif");
-# conda-forge has no Windows build
-[target.unix.dependencies]
-gifsicle = "*"
 
 [pypi-dependencies]
 medium-archive = { path = ".", editable = true }
