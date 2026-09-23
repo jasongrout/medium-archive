@@ -147,12 +147,15 @@ def via_apng(i, o, effort, *cjxl):
             str(HERE / "pil_encode.py")]
 
 
-def capped(i, o, codec):
-    """An ffmpeg encode of the gif with fpscap.py's frame selection."""
+def capped(i, o, codec, extra_vf=None):
+    """An ffmpeg encode of the gif with fpscap.py's frame selection,
+    followed by extra_vf when given."""
     vf = o + ".vf"
     ff = " ".join(FF + ["-i", '"$1"', "-/vf", '"$3"'] + PT + codec + ['"$2"'])
+    append = (f"sed -i '$ s#$#,{extra_vf}#' \"$3\" && " if extra_vf
+              else "")
     return ["bash", "-c",
-            '"$4" "$5" "$1" "$3" >/dev/null && ' + ff
+            '"$4" "$5" "$1" "$3" >/dev/null && ' + append + ff
             + '; r=$?; rm -f "$3"; exit $r',
             "_", i, o, vf, sys.executable, str(HERE / "fpscap.py")]
 
@@ -162,20 +165,37 @@ def pil(i, o, *img2webp):
             *img2webp]
 
 
+# 4:2:0 needs even dimensions: pad by a pixel rather than scale, so the
+# encode's frames line up with the gif's (quality.py crops the pad off)
+EVEN = "pad=ceil(iw/2)*2:ceil(ih/2)*2"
+
+
 def encoder(name):
-    """ENCODERS[name], or a libaom 4:4:4 encode named like
-    aom444_c6_crf34 or aom444_c6_crf34_cap (-cpu-used 6, CRF 34, with
-    fpscap.py's frame selection)."""
+    """ENCODERS[name], or an encode named by its settings:
+    aom444_c6_crf34[_cap]  libaom 4:4:4, -cpu-used 6, CRF 34
+    x264_420_crf20[_cap]   libx264 4:2:0 High profile (what browsers
+                           play), -preset slower, CRF 20
+    x264_444_crf20[_cap]   libx264 4:4:4 (High 4:4:4), for reference
+    _cap applies fpscap.py's frame selection."""
     if name in ENCODERS:
         return ENCODERS[name]
     m = re.fullmatch(r"aom444_c(\d+)_crf(\d+)(_cap)?", name)
-    if not m:
-        raise KeyError(name)
-    codec = ["-c:v", "libaom-av1", "-cpu-used", m[1], "-g", "9999",
-             "-row-mt", "0", "-crf", m[2], "-pix_fmt", "yuv444p"]
-    if m[3]:
-        return ".mkv", lambda i, o: capped(i, o, codec)
-    return ".mkv", lambda i, o: FF + ["-i", i] + PT + codec + [o]
+    if m:
+        codec = ["-c:v", "libaom-av1", "-cpu-used", m[1], "-g", "9999",
+                 "-row-mt", "0", "-crf", m[2], "-pix_fmt", "yuv444p"]
+        vf, cap = None, m[3]
+    else:
+        m = re.fullmatch(r"x264_(420|444)_crf(\d+)(_cap)?", name)
+        if not m:
+            raise KeyError(name)
+        codec = ["-c:v", "libx264", "-preset", "slower", "-crf", m[2],
+                 "-pix_fmt", f"yuv{m[1]}p",
+                 "-profile:v", "high" if m[1] == "420" else "high444"]
+        vf, cap = (EVEN if m[1] == "420" else None), m[3]
+    if cap:
+        return ".mkv", lambda i, o: capped(i, o, codec, vf)
+    return ".mkv", lambda i, o: (FF + ["-i", i] + PT
+                                 + (["-vf", vf] if vf else []) + codec + [o])
 
 
 def timeline(path):

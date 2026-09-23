@@ -90,7 +90,7 @@ def main():
     snap = Path(sys.argv[3]) if len(sys.argv) > 3 else None
     w, h, ref_pts = probe(gif)
     w2, h2, enc_pts = probe(enc)
-    if (w, h) != (w2, h2):
+    if not (0 <= w2 - w <= 1 and 0 <= h2 - h <= 1):
         sys.exit(f"size differs: {w}x{h} vs {w2}x{h2}")
     gif_frames = frames(gif, w, h)
     cur, nxt = next(gif_frames), next(gif_frames, None)
@@ -100,7 +100,9 @@ def main():
     max_err = 0
     visible = 0
     worst = (math.inf, -1, None, None)
-    for i, (t, got) in enumerate(zip(enc_pts, frames(enc, w, h))):
+    # a 4:2:0 encode may carry a pixel of padding to even dimensions
+    enc_frames = (f[:h, :w] for f in frames(enc, w2, h2))
+    for i, (t, got) in enumerate(zip(enc_pts, enc_frames)):
         # advance to the gif frame on screen at time t
         while nxt is not None and j + 1 < len(ref_pts) and ref_pts[j + 1] <= t + 0.5:
             cur, nxt, j = nxt, next(gif_frames, None), j + 1
