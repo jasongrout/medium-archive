@@ -17,6 +17,7 @@ object:
 With SNAPSHOT_DIR, that worst frame is saved as ref.png, enc.png and
 diff.png (the absolute error, amplified 8x), for looking at text.
 """
+import itertools
 import json
 import math
 import subprocess
@@ -25,6 +26,21 @@ from fractions import Fraction
 from pathlib import Path
 
 import numpy as np
+
+
+def webp_durations(path):
+    """Each frame's stored duration (ms) in an animated WebP, from
+    webpmux. ffmpeg's WebP decoder plays durations of 10 ms or less as
+    100 ms, as browsers do, so its timestamps are not what the file
+    says."""
+    run = subprocess.run(["webpmux", "-info", str(path)],
+                         capture_output=True, text=True, check=True)
+    out = []
+    for line in run.stdout.splitlines():
+        f = line.split()
+        if f and f[0].endswith(":") and f[0][:-1].isdigit():
+            out.append(int(f[6]))
+    return out
 
 
 def probe(path):
@@ -42,6 +58,10 @@ def probe(path):
             size = tuple(int(x) for x in line.split(":", 1)[1].split("x"))
         elif line and not line.startswith("#"):
             pts.append(float(int(line.split(",")[2]) * tb * 1000))
+    if str(path).endswith(".webp"):
+        d = webp_durations(path)
+        if len(d) == len(pts):
+            pts = [0.0, *map(float, itertools.accumulate(d[:-1]))]
     return size[0], size[1], pts
 
 

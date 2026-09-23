@@ -19,6 +19,7 @@ from fractions import Fraction
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 FF = ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y"]
 # -enc_time_base: left to itself, ffmpeg gives the encoder a time base
 # from a guessed frame rate (1/20 s for one gif), which rounds every
@@ -97,6 +98,12 @@ ENCODERS = {
     "x264_444_crf12": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libx264", "-crf", "12", "-preset", "slower", "-g", "9999",
         "-pix_fmt", "yuv444p", o]),
+    "aom_444_crf28": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libaom-av1", "-cpu-used", "4", "-g", "9999", "-row-mt", "0",
+        "-crf", "28", "-pix_fmt", "yuv444p", o]),
+    "aom_444_crf20_c6": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libaom-av1", "-cpu-used", "6", "-g", "9999", "-row-mt", "0",
+        "-crf", "20", "-pix_fmt", "yuv444p", o]),
     "x264_444_crf16": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libx264", "-crf", "16", "-preset", "slower", "-g", "9999",
         "-pix_fmt", "yuv444p", o]),
@@ -157,6 +164,17 @@ def timeline(path):
             rows.append((int(f[2]), int(f[3]), f[5]))
     if not rows or tb is None:
         return None, 0, run.stderr.strip()[-300:]
+    if str(path).endswith(".webp"):
+        # ffmpeg reads WebP delays of 10 ms or less as 100 ms; use the
+        # file's own (see quality.webp_durations)
+        from quality import webp_durations
+        d = webp_durations(path)
+        if len(d) == len(rows):
+            ms = Fraction(1, 1000) / tb
+            t = 0
+            for k, (pts, dur, h) in enumerate(rows):
+                rows[k] = (int(t * ms), int(d[k] * ms), h)
+                t += d[k]
     out = []
     for k, (pts, dur, h) in enumerate(rows):
         end = rows[k + 1][0] if k + 1 < len(rows) else pts + dur

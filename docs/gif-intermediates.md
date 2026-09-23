@@ -1,8 +1,10 @@
 # Animated gifs in the Pelican site source: plan and findings
 
-Status (2026-09-22): survey done, toolchain pinned, benchmark harness
-written and piloted on one gif. No format has been chosen. Nothing in
-`src/` has changed. The last section says where to resume.
+Status (2026-09-23): lossless storage is ruled out for the large gifs,
+which make up most of the bytes. The lead candidate is lossy AV1 in
+4:4:4 at CRF 20, with the gif kept where AV1 saves too little; it is
+being checked on the full 14-file sample. Nothing in `src/` has
+changed. The last section says where to resume.
 
 ## Goal
 
@@ -138,10 +140,11 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
    encoder avoids the gif reader but needs an explicit output muxer;
    the attempt with a `.jxl` name went to the image2 muxer and failed.
    Unresolved.
-5. **The harness's PSNR is broken.** It reported 25.018 dB for every
-   non-exact encode of the pilot gif, CRF 4 and CRF 32 alike, so the
-   psnr filter is not pairing frames correctly. No near-lossless quality
-   number exists yet.
+5. **The harness's first PSNR was broken** (25.018 dB for every inexact
+   encode). `quality.py` replaces it: it pairs frames by display time
+   and reports PSNR overall and for the worst frame, the largest
+   per-channel error, and the share of pixels changed by more than 16
+   levels, and saves the worst frame (reference, encode, error x8).
 6. **MKV preserved the gif's timing exactly**, last frame included
    (`max_ms_diff` 0), for every lossless video encode. The brief's
    `-fps_mode passthrough` + MKV approach works.
@@ -176,10 +179,15 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
      separate fix. The earlier "timing exact" results in the tables above
      were measured against a rounded reference, and the x264rgb/x265/AV1
      files had rounded timestamps.
-   - gif2webp plays delays of 10 ms or less as 100 ms, as browsers do: the
-     564-short-delay gif came out 63.7 s instead of 12.9 s. Pillow's WebP
+   - gif2webp stores delays of 10 ms or less as 100 ms, as browsers play
+     them (checked with `webpmux -info`: the 564-short-delay gif came out
+     with 570 frames of 100 ms, 63.7 s instead of 12.9 s). Pillow's WebP
      writer (`pil_encode.py webp`, the same libwebp encoder and settings)
-     keeps the gif's delays and gives byte-identical sizes otherwise.
+     and img2webp store the delays as given.
+   - ffmpeg's WebP *decoder* plays stored delays of 10 ms or less as
+     100 ms. The harness therefore reads WebP delays with `webpmux`
+     (`quality.webp_durations`); before that fix, WebP encodes of the
+     short-delay gifs were wrongly reported as mistimed.
    - ffmpeg's GIF demuxer does *not* alter short delays in 9.0.2 (its
      `min_delay` option notwithstanding): the same gif reads as 12.9 s.
    - ffmpeg's APNG muxer rounds delays even with a 1/100 time base
@@ -198,6 +206,23 @@ fields `out_bytes`, `enc_s`, `dec_s` (single-threaded ffmpeg decode),
 12. **AV1 at `-cpu-used 2` is not reliably exact either**: 606,475 bytes
     on the pilot gif, with pixels differing. Exactness failures are now
     seen at `-cpu-used` 1, 2 and 4.
+13. **No lossless format is smaller than the gif on the large files.**
+    On the four largest sample files, WebP lossless was 73-150% of the
+    gif, JPEG XL 82-582%, AV1 lossless 257-597% (several inexact). The
+    gif's per-frame palettes, LZW and changed-rectangle frames are hard
+    to beat losslessly on this content. Lossless would at best shrink
+    the small, plain screencasts (x264rgb 51% on the pilot).
+14. **JPEG XL lost no colors going through the APNG.** Pillow writes the
+    APNG in RGB, not with a palette; the JPEG XL was pixel-exact against
+    the gif's 1,140 colors. (The color loss was only in the separate
+    ffmpeg `pal8` APNG test.) Pillow's APNG writer holds every frame in
+    memory, which killed the effort-9 encode of the 851-frame
+    1798x1390 gif.
+15. **Lossy AV1 4:4:4 is the strongest option.** See the lossy sweep
+    below. JPEG XL lossy (VarDCT or modular) came out larger than the
+    gif with the worst quality in the sweep; WebP lossy (4:2:0 only) was
+    up to 217% of the gif; WebP near-lossless keeps the error at 4 or
+    less but saves only 27-40%.
 
 ### Pilot numbers (one file, not a conclusion)
 
@@ -244,11 +269,45 @@ never much worse than the gif (WebP is the candidate), or a choice per
 file between a video codec and a palette format, taking the smaller
 exact result.
 
+### Lossy sweep
+
+Five files: the pilot (text screencast, `9549`), a 2642x1872 screencast
+(`164eb/007`), the median-size gif (`388d05`), the notebook playing
+video (`013`), and the largest gif (`bd2524`: a notebook whose cell
+background is a faint two-color dither, recorded at 50-100 frames per
+second). Size as % of the gif, then overall PSNR. AV1 used
+`-cpu-used 4`, H.264 `-preset slower`, both `yuv444p`.
+
+| file | AV1 CRF 20 | AV1 CRF 12 | H.264 CRF 16 | H.264 CRF 12 | WebP near-lossless 40 |
+|---|---|---|---|---|---|
+| `9549` | 11%, 51.5 dB | 13%, 52.0 | 30%, 50.9 | 35%, 51.7 | 63%, 58.1 |
+| `164eb/007` | 12%, 55.2 | 19%, 57.2 | 18%, 50.9 | 27%, 53.7 | 60%, 51.7 |
+| `388d05` | 13%, 50.5 | 19%, 52.5 | 25%, 49.5 | 38%, 52.0 | 65%, 46.6 |
+| `013` | 27%, 41.6 | 53%, 44.5 | 57%, 42.7 | 92%, 45.7 | 73%, 65.4 |
+| `bd2524` | 98%, 47.7 | 128%, 50.4 | 76%, 38.9 | 119%, 42.3 | 66%, 63.3 |
+
+Also tried and dropped: JPEG XL `-d 1` (48-1111%), JPEG XL modular
+`-m 1 -d 0.5` (71-1252%), WebP `-lossy -q 90 -sharp_yuv` (49-217%),
+WebP near-lossless 60 (no saving over lossless).
+
+PSNR undercounts quality where a codec smooths dither: the smoothing
+is a large pixel error that is invisible. The worst frame of each AV1
+CRF 20 encode was inspected at 2x at its highest-error spot: code, a
+clock readout and small monospace text were visually unchanged (the
+error is faint edge noise); the video region of `013` lost its dither
+and grain, which is acceptable here.
+
+AV1 encode times at `-cpu-used 4` were 20-650 s, and 1900 s on
+`bd2524`; decoding took 0.2-13.6 s per file. A one-time conversion can
+afford that; `-cpu-used 6` is being measured.
+
 ## Open questions
 
-1. **Container and codec.** Decide after the sample benchmark, using the
-   brief's rule: lossless unless near-lossless is several times smaller
-   at PSNR > ~50 dB with clean difference images.
+1. **Container and codec.** Lossless is ruled out for the large files
+   (finding 13). The working proposal is two formats: AV1 4:4:4 at
+   CRF 20 in MKV, and the original gif (gifsicle-optimized) wherever
+   AV1 does not save enough, as on `bd2524` (98%). The cut-off is to be
+   set from the full-sample run.
 2. **Short delays.** Store the gif's delays verbatim (recommended) and
    decide in stage 2 whether to clamp ≤ 10 ms to 100 ms, which would
    reproduce what Medium readers saw for the two files above.
@@ -262,27 +321,19 @@ exact result.
 
 ## Resume here
 
-1. Record the sample run (in progress when this was written): the files
-   below, with `webp_pil`, `jxl_e9`, `jxl_e7`, `aom_ll_c2`, `x264rgb_ll`
-   and `gifsicle_O3`. The goal is one format, two at most. Files, all
-   under `archive/raw/`: the largest (`bd2524b247c2/005`,
+1. Record the AV1 run (in progress when this was written): AV1 4:4:4
+   CRF 20 on the nine sample files the lossy sweep did not cover, and
+   CRF 28 and CRF 20 at `-cpu-used 6` on all 14, with `gifsicle_O3` as
+   the baseline. Files, all under `archive/raw/`: `bd2524b247c2/005`,
    `77df24c8db80/002`, `164eb2eae102/003`, `2e432df402c8/013`,
-   `701e7b9841e6/002`, `164eb2eae102/007` at 2642x1872);
-   `c9d93542f20b/014` (1920x1080); `11e5dab7c54/006` (short delays);
-   the pilot `9549c5dcf551/003`; and the size quantiles
-   `2e432df402c8/009` (p10), `8096b8b223d0/007` (p25),
-   `388d05e03442/002` (p50), `03e6b78bacc0/003` (p75),
-   `cda20dc15a21/005` (p90). `3ee42dfdc54f/002` (2190 frames at
-   1616x1568) was left out for time and still needs a run with the
-   chosen format; Pillow's APNG writer holds all frames in memory, which
-   matters there for JPEG XL.
-2. Cross-check decoders (open question 4). Pillow writes the WebP and
-   the APNG behind JPEG XL, and the harness compares them with ffmpeg's
-   gif decode, so an exact result means the two gif decoders agree on
-   that file. A mismatch needs a third opinion (for example
-   ImageMagick) before blaming either.
-3. Fix `psnr()` in `bench.py` if a near-lossless option is still wanted.
-   For example, decode both files to rgb24 frames and compare frames
-   paired by the merged timeline, in Python.
-4. Choose the format, then change the pelican exporter to place the
-   intermediate instead of the display copy, and add stage 2.
+   `701e7b9841e6/002`, `164eb2eae102/007`, `c9d93542f20b/014`,
+   `cda20dc15a21/005`, `11e5dab7c54/006`, `03e6b78bacc0/003`,
+   `388d05e03442/002`, `9549c5dcf551/003`, `8096b8b223d0/007`,
+   `2e432df402c8/009`. Inspect the worst frames of each (the harness
+   saves them under `<outdir>/<encoder>/<file>.worst/`).
+2. Set the fallback rule (keep the gif when AV1 is above some fraction
+   of it) and estimate the archive total from the sample.
+3. Convert the whole archive with the chosen setting and fallback,
+   including `3ee42dfdc54f/002` (2190 frames, not in the sample).
+4. Change the pelican exporter to place the intermediate instead of
+   the display copy, and add stage 2.
