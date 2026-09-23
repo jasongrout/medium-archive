@@ -11,7 +11,6 @@ one JSON line per job to OUTDIR/results.jsonl.
 """
 import json
 import os
-import re
 import subprocess
 import sys
 import time
@@ -86,6 +85,30 @@ ENCODERS = {
     # Pillow writes with the gif's exact delays (pil_encode.py)
     "jxl_e7": (".jxl", lambda i, o: via_apng(i, o, "7")),
     "jxl_e9": (".jxl", lambda i, o: via_apng(i, o, "9")),
+    # lossy: smooths the gif's dither, which lossless coding has to keep
+    "webp_nl60": (".webp", lambda i, o: pil(i, o, "-near_lossless", "60",
+                                           "-m", "6", "-q", "100")),
+    "webp_nl40": (".webp", lambda i, o: pil(i, o, "-near_lossless", "40",
+                                           "-m", "6", "-q", "100")),
+    "webp_q90": (".webp", lambda i, o: pil(i, o, "-lossy", "-q", "90",
+                                          "-m", "6", "-sharp_yuv")),
+    "jxl_d05": (".jxl", lambda i, o: via_apng(i, o, "7", "-d", "0.5")),
+    "jxl_d1": (".jxl", lambda i, o: via_apng(i, o, "7", "-d", "1")),
+    "x264_444_crf12": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libx264", "-crf", "12", "-preset", "slower", "-g", "9999",
+        "-pix_fmt", "yuv444p", o]),
+    "x264_444_crf16": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libx264", "-crf", "16", "-preset", "slower", "-g", "9999",
+        "-pix_fmt", "yuv444p", o]),
+    # modular (not VarDCT) lossy: JPEG XL's mode for non-photographic art
+    "jxl_m_d05": (".jxl", lambda i, o: via_apng(i, o, "7", "-m", "1",
+                                               "-d", "0.5")),
+    "aom_444_crf12": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libaom-av1", "-cpu-used", "4", "-g", "9999", "-row-mt", "0",
+        "-crf", "12", "-pix_fmt", "yuv444p", o]),
+    "aom_444_crf20": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libaom-av1", "-cpu-used", "4", "-g", "9999", "-row-mt", "0",
+        "-crf", "20", "-pix_fmt", "yuv444p", o]),
     # near-lossless
     "aom_crf4": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libaom-av1", "-cpu-used", "1", "-g", "9999", "-row-mt", "0",
@@ -97,13 +120,21 @@ ENCODERS = {
 }
 
 
-def via_apng(i, o, effort):
+def via_apng(i, o, effort, *cjxl):
+    """cjxl from an exact-timing RGB APNG; lossless unless cjxl options
+    (a distance) are given."""
     apng = o + ".apng"
+    opts = " ".join(cjxl) or "-d 0"
     return ["bash", "-c",
-            '"$5" "$6" apng "$1" "$2" && cjxl --quiet -d 0 -e "$4"'
+            '"$5" "$6" apng "$1" "$2" && cjxl --quiet ' + opts + ' -e "$4"'
             ' --num_threads=0 "$2" "$3"; r=$?; rm -f "$2"; exit $r',
             "_", i, apng, o, effort, sys.executable,
             str(HERE / "pil_encode.py")]
+
+
+def pil(i, o, *img2webp):
+    return [sys.executable, str(HERE / "pil_encode.py"), "img2webp", i, o,
+            *img2webp]
 
 
 def timeline(path):
@@ -150,17 +181,15 @@ def compare(ref, got):
     return True, all(d <= 1 for d in body), max(diffs), tr, tg
 
 
-def psnr(gif, out):
-    # KNOWN BROKEN: reported ~25.018 dB for every non-exact encode of the
-    # pilot gif, crf 4 and crf 32 alike -- the psnr filter is not pairing
-    # frames. Replace before trusting any near-lossless number.
-    run = subprocess.run(
-        ["ffmpeg", "-nostdin", "-hide_banner", "-i", str(out), "-i", str(gif),
-         "-lavfi", "[0:v]format=rgb24[a];[1:v]format=rgb24[b];[a][b]psnr",
-         "-fps_mode", "passthrough", "-f", "null", "-"],
-        capture_output=True, text=True)
-    m = re.search(r"average:(\S+)", run.stderr)
-    return m.group(1) if m else None
+def quality(gif, out, snap):
+    """quality.py's numbers for an inexact encode, and its worst frame
+    saved under snap for looking at."""
+    run = subprocess.run([sys.executable, str(HERE / "quality.py"), str(gif),
+                          str(out), str(snap)], capture_output=True, text=True)
+    try:
+        return json.loads(run.stdout)
+    except ValueError:
+        return {"quality_error": (run.stderr or "").strip()[-200:]}
 
 
 def decode_seconds(out):
@@ -199,7 +228,7 @@ def job(outdir, gif, enc):
                timing_equal=timing, max_ms_diff=maxdiff,
                ms_ref=round(tr), ms_out=round(tg))
     if not px:
-        rec["psnr"] = psnr(gif, out)
+        rec.update(quality(gif, out, Path(outdir) / enc / (name + ".worst")))
     return rec
 
 

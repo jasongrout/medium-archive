@@ -2,6 +2,11 @@
 frame's delay exactly as the gif stores it.
 
 usage: python pil_encode.py apng|webp IN.gif OUT
+       python pil_encode.py img2webp IN.gif OUT [IMG2WEBP OPTION...]
+
+img2webp is for the WebP options Pillow does not expose (near-lossless
+preprocessing, lossy with sharp YUV): the frames go to it as RGB PNGs,
+each with its own delay.
 
 The command-line tools each change timing: ffmpeg's APNG muxer rounds
 delays (a 25.30 s gif came out 25.66 s), and gif2webp plays delays of
@@ -14,7 +19,10 @@ frames (see RGBFrames), and the WebP writer seeks the gif itself.
 The APNG writer still keeps its (cropped) frames in memory until it
 writes the file.
 """
+import subprocess
 import sys
+import tempfile
+from pathlib import Path
 
 from PIL import Image
 
@@ -58,6 +66,15 @@ def main():
     elif kind == "webp":
         im.save(dst, format="WEBP", save_all=True, duration=d, loop=0,
                 lossless=True, quality=100, method=6)
+    elif kind == "img2webp":
+        with tempfile.TemporaryDirectory() as tmp:
+            args = ["img2webp", "-loop", "0", *sys.argv[4:]]
+            for i, frame in enumerate(RGBFrames(im, 0)):
+                png = Path(tmp) / f"{i:05d}.png"
+                frame.save(png, compress_level=1)
+                args += ["-d", str(d[i]), str(png)]
+            args += ["-o", dst]
+            subprocess.run(args, check=True, stdout=subprocess.DEVNULL)
     else:
         sys.exit(f"unknown kind {kind}")
 
