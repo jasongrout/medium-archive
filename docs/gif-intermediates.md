@@ -546,7 +546,36 @@ CRF. CRF 24 is a third smaller than 20 for no visible loss there.
 
 Proposal (2026-09-23): serve H.264 4:2:0 encoded on the fly from the
 capped gifs into `.image-cache/`; no AV1 master, no committed encodes.
-Open: CRF 24 (recommended) or 20.
+**Decided: CRF 24.**
+
+### Resolution
+
+The body column is about 736 CSS px (1,472 device px on a 2x screen).
+Longest edges of the 216 gifs: up to 736 px 17, 737-1,104 70,
+1,105-1,472 63, 1,473-2,000 53, 2,001-3,340 13 (median 1,200; largest
+3,340x1,517). Today's `animated_max_edge` of 1,104 px shrinks 129 gifs
+(379 of the 587 MB): to a median 74% of their width (54% of their
+pixels), the largest to 33% (11%).
+
+H.264 4:2:0 CRF 24, capped frame rate, scaled with Lanczos where over
+the limit (size as % of the full-resolution encode):
+
+| file | gif | full resolution | 1,472 px limit | 1,104 px limit |
+|---|---|---|---|---|
+| `bd2524` 1798x1390 | 22.6 MB | 3.82 MB | 1.96 MB, 51% | 1.02 MB, 27% |
+| `013` 1836x970 | 17.6 MB | 2.34 MB | 0.85 MB, 36% | 0.42 MB, 18% |
+| `164eb/007` 2642x1872 | 13.6 MB | 1.12 MB | 0.74 MB, 66% | 0.54 MB, 48% |
+| `cda20` 1266x970 | 6.5 MB | 10.15 MB | (not scaled) | 8.68 MB, 86% |
+| `11e5` 1764x860 | 6.0 MB | 1.61 MB | 1.26 MB, 78% | 0.81 MB, 50% |
+| `388d05`, `9549` | 2.1 MB | 0.31 MB | (not scaled) | (not scaled) |
+| total | 68.4 MB | 19.4 MB (28% of gif) | 15.3 MB (22%), 79% | 11.8 MB (17%), 61% |
+
+The biggest savings are on dithered or photographic content (`bd2524`,
+`013`), where scaling smooths what the encoder would otherwise have
+to code; screen text (`164eb/007`, `11e5`) saves less. Scaling also
+softens text in the page on 2x screens (at 1,104) and makes large
+screenshots unreadable full screen (at either limit), which is why
+`sites.py` keeps still line art at full resolution.
 
 **Decided (2026-09-23): every animation becomes video**, so a reader
 can pause it, even where the video is somewhat larger than the gif.
