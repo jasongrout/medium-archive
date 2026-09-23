@@ -2196,6 +2196,32 @@ def test_a_clip_keeps_each_frame_of_the_gif_on_its_own_delay(tmp_path):
     assert starts == [sum(delays[:i]) for i in range(len(delays))]
 
 
+@pytest.mark.skipif(not __import__("shutil").which("ffprobe"),
+                    reason="ffmpeg not installed")
+def test_a_clip_runs_as_long_as_its_gif(tmp_path):
+    """The clip holds the gif's frames to the gif's end, the last one
+    included: with B-frames, x264 gave the mp4 muxer no durations and
+    the clip ended at its last frame's decode time, cutting a long hold
+    near the end short."""
+    import subprocess
+
+    src = tmp_path / "src"
+    src.mkdir()
+    delays = [50] * 20 + [2640, 60, 130]
+    gif = animation(src / "hold.gif",
+                    [gradient_frame((320, 240), i * 9)
+                     for i in range(len(delays))], duration=delays)
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    out = tmp_path / "out"
+    out.mkdir()
+    clip = placer.place(gif, out / "hold.gif")
+    length = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "csv=p=0", str(clip)],
+        capture_output=True, text=True, check=True).stdout
+    assert round(float(length) * 1000) == sum(delays)
+
+
 def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
     """A build without libwebp cannot write a clip's poster, and fails
     the whole run with "Encoder not found" rather than just the still.

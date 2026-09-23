@@ -632,7 +632,7 @@ LINE_ART_QUALITY = 90
 PHOTO_QUALITY = 85
 # Bumped when the copies a given cap produces change shape, so caches
 # written by an older scheme are ignored rather than misread.
-CACHE_SCHEME = "v6"
+CACHE_SCHEME = "v7"
 
 
 def poster_path(clip: Path) -> Path:
@@ -1019,8 +1019,12 @@ class ImagePlacer:
         index first, so a clip starts playing before it has all
         arrived. One thread: x264 split across threads made one
         screencast's clip 39% larger, and warm() already encodes gifs
-        in parallel. Returns None -- for the caller to fall back on --
-        when ffmpeg fails."""
+        in parallel. No B-frames: with frames reordered, x264 hands
+        the muxer no durations, and the mp4 then ends at the last
+        frame's decode time -- 27 of the archive's clips came out
+        short, one by 1.55 s of the 2.64 s its gif holds near the end.
+        Returns None -- for the caller to fall back on -- when ffmpeg
+        fails."""
         size = self._probe(src)
         if size is None:
             return None
@@ -1036,7 +1040,7 @@ class ImagePlacer:
              "-vf", ",".join(select + shape),
              "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
              "-crf", str(self.video_crf), "-preset", str(self.video_preset),
-             "-threads", "1",
+             "-threads", "1", "-bf", "0",
              "-fps_mode", "passthrough", "-enc_time_base", "1:1000",
              "-an", "-movflags", "+faststart", "-f", "mp4", tmp,
              "-map", "0:v", "-vf", ",".join(shape), "-frames:v", "1",
