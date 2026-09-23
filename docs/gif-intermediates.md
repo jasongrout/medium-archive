@@ -1,10 +1,12 @@
 # Animated gifs in the Pelican site source: plan and findings
 
 Status (2026-09-23): lossless storage is ruled out for the large gifs,
-which make up most of the bytes. The lead candidate is lossy AV1 in
-4:4:4 at CRF 20, with the gif kept where AV1 saves too little; it is
-being checked on the full 14-file sample. Nothing in `src/` has
-changed. The last section says where to resume.
+which make up most of the bytes. On a 14-file sample (143 MB), lossy
+AV1 4:4:4 at CRF 28 stores 24% of the gifs' bytes with text visually
+intact, keeping the gif for the one file AV1 does not shrink. Open:
+the timing policy for 10 ms frames, and whether `-cpu-used 6` at
+CRF 28 holds up. Nothing in `src/` has changed. The last section says
+where to resume.
 
 ## Goal
 
@@ -301,16 +303,86 @@ AV1 encode times at `-cpu-used 4` were 20-650 s, and 1900 s on
 `bd2524`; decoding took 0.2-13.6 s per file. A one-time conversion can
 afford that; `-cpu-used 6` is being measured.
 
+### AV1 on the 14-file sample
+
+`aom_444_*` is libaom, `yuv444p`, `-g 9999`, single-threaded; `c6` is
+`-cpu-used 6`, otherwise 4. Size as % of the gif, overall PSNR, and
+the share of pixels changed by more than 16 levels.
+
+| file | MB | gifsicle `-O3` | CRF 20 | CRF 28 | CRF 20 c6 |
+|---|---|---|---|---|---|
+| `bd2524b247c2/005` | 22.6 | 93% | 98%, 47.7 dB, 0.083% | 66%, 45.2, 0.296% | 98%, 46.2, 0.168% |
+| `77df24c8db80/002` | 22.5 | 118% | 36%, 42.8, 0.264% | 17%, 40.6, 0.790% | 31%, 41.6, 0.422% |
+| `164eb2eae102/003` | 19.9 | 121% | 15%, 41.8, 0.254% | 8%, 40.5, 0.447% | 12%, 41.0, 0.340% |
+| `2e432df402c8/013` | 17.6 | 98% | 27%, 41.6, 0.224% | 12%, 39.6, 0.588% | 16%, 39.4, 0.618% |
+| `701e7b9841e6/002` | 16.1 | 98% | 18%, 46.4, 0.010% | 12%, 44.5, 0.045% | 18%, 44.6, 0.024% |
+| `164eb2eae102/007` | 13.6 | 108% | 12%, 55.2, 0.001% | 9%, 53.4, 0.003% | 11%, 53.5, 0.002% |
+| `c9d93542f20b/014` | 12.0 | 98% | 16%, 46.7, 0.020% | 9%, 45.4, 0.037% | 13%, 45.5, 0.031% |
+| `cda20dc15a21/005` | 6.5 | 67% | 96%, 62.6, 0.000% | 86%, 59.4, 0.001% | 75%, 59.6, 0.002% |
+| `11e5dab7c54/006` | 6.0 | 96% | 60%, 50.4, 0.015% | 45%, 48.7, 0.038% | 56%, 49.0, 0.024% |
+| `03e6b78bacc0/003` | 3.3 | 96% | 25%, 45.0, 0.028% | 17%, 42.9, 0.083% | 26%, 44.3, 0.043% |
+| `388d05e03442/002` | 1.3 | 98% | 13%, 50.5, 0.006% | 10%, 48.4, 0.015% | 15%, 49.9, 0.008% |
+| `9549c5dcf551/003` | 0.8 | 96% | 11%, 51.5, 0.000% | 10%, 50.7, 0.001% | 13%, 51.0, 0.001% |
+| `8096b8b223d0/007` | 0.5 | 95% | 58%, 52.0, 0.000% | 46%, 51.3, 0.002% | 55%, 51.6, 0.003% |
+| `2e432df402c8/009` | 0.2 | 93% | 30%, 63.1, 0.000% | 25%, 60.5, 0.000% | 30%, 62.3, 0.000% |
+| **total** | 142.9 | 103% | 39% | 25% | 35% |
+
+With the gif (gifsicle `-O3`) kept wherever it is smaller: CRF 28
+24%, CRF 20 c6 34%, CRF 20 37%. At CRF 28 only `cda20dc15a21/005`
+keeps its gif.
+
+Encode times at `-cpu-used 4` were 18-1911 s per file, at
+`-cpu-used 6` 8-669 s; c6 was also slightly *smaller* at CRF 20, with
+somewhat lower PSNR on some files.
+
+Visual check at CRF 28: from each file's worst frame, the region with
+the most error on flat backgrounds (where text damage shows) was
+inspected at 2x. Text ("Name: chevrolet", code) and chart lines are
+intact, with faint edge noise; dithered backgrounds, video and
+satellite imagery are smoothed.
+
+### Frame-rate cap
+
+`fpscap.py` writes an ffmpeg `select` filter script that drops frames
+inside bursts faster than about 30 fps. It keeps the first and last
+frame, every frame on screen for 29.5 ms or longer, and every frame
+starting 29.5 ms or more after the last kept one; a frame kept for its
+start gives way to a following long frame when the two would be under
+29.5 ms apart. Kept frames keep their exact timestamps and the total
+length is unchanged (checked on three files). The expression is nested
+as a balanced tree: ffmpeg's parser fails on a flat sum of a few
+hundred terms.
+
+ffmpeg's own options do not do this: `-r`/`-fpsmax` require
+constant-rate output ("contradictory" with `-fps_mode vfr`), and
+`fps=30` resamples, moving 284 of 426 kept frames of `bd2524` onto a
+33 ms grid, with higher pixel error than `fpscap.py`.
+
+The cap affects 11 of the 216 gifs (3,749 of 61,048 frames). Nine are
+from one post (`cda20dc15a21`), recorded at a steady 40 fps (25 ms
+frames), where it drops about half the frames. The other two are the
+gifs with 10 ms frames, which depend on the timing policy (open
+question 2): browsers play those frames at 100 ms, so readers saw
+every one of them.
+
+| file | dropped, stored timing | dropped, browser timing |
+|---|---|---|
+| `bd2524b247c2/005` | 425 of 851 | 283 of 851 |
+| `11e5dab7c54/006` | 403 of 691 | 0 of 691 |
+
 ## Open questions
 
 1. **Container and codec.** Lossless is ruled out for the large files
    (finding 13). The working proposal is two formats: AV1 4:4:4 at
-   CRF 20 in MKV, and the original gif (gifsicle-optimized) wherever
-   AV1 does not save enough, as on `bd2524` (98%). The cut-off is to be
-   set from the full-sample run.
-2. **Short delays.** Store the gif's delays verbatim (recommended) and
-   decide in stage 2 whether to clamp ≤ 10 ms to 100 ms, which would
-   reproduce what Medium readers saw for the two files above.
+   CRF 28 in MKV, and the original gif (gifsicle-optimized) wherever
+   that is smaller. `-cpu-used 6` at CRF 28 is being measured.
+2. **Short delays.** Either store the gif's delays verbatim, or store
+   what browsers played (≤ 10 ms as 100 ms). Two files are affected:
+   `bd2524b247c2/005` (14.2 s stored, 39.7 s as played) and
+   `11e5dab7c54/006` (12.9 s, 63.7 s). Browser timing is what every
+   reader saw, and under it the frame-rate cap drops none of the
+   second file's frames and fewer of the first's. Recommended: browser
+   timing. Awaiting the decision.
 3. **Where stage 2 runs.** It could run in the Pelican build (a plugin
    step, with a cache) or in the exporter as today. Since the site
    source is meant to outlive this repository, stage 2 probably belongs
@@ -321,19 +393,17 @@ afford that; `-cpu-used 6` is being measured.
 
 ## Resume here
 
-1. Record the AV1 run (in progress when this was written): AV1 4:4:4
-   CRF 20 on the nine sample files the lossy sweep did not cover, and
-   CRF 28 and CRF 20 at `-cpu-used 6` on all 14, with `gifsicle_O3` as
-   the baseline. Files, all under `archive/raw/`: `bd2524b247c2/005`,
-   `77df24c8db80/002`, `164eb2eae102/003`, `2e432df402c8/013`,
-   `701e7b9841e6/002`, `164eb2eae102/007`, `c9d93542f20b/014`,
-   `cda20dc15a21/005`, `11e5dab7c54/006`, `03e6b78bacc0/003`,
-   `388d05e03442/002`, `9549c5dcf551/003`, `8096b8b223d0/007`,
-   `2e432df402c8/009`. Inspect the worst frames of each (the harness
-   saves them under `<outdir>/<encoder>/<file>.worst/`).
-2. Set the fallback rule (keep the gif when AV1 is above some fraction
-   of it) and estimate the archive total from the sample.
-3. Convert the whole archive with the chosen setting and fallback,
+1. Record the runs in progress when this was written: AV1 CRF 28 at
+   `-cpu-used 6` on the 14 sample files, and AV1 CRF 20 with
+   `fpscap.py` (stored timing) on the three sample files the cap
+   affects (`cda20dc15a21/005`, `bd2524b247c2/005`,
+   `11e5dab7c54/006`).
+2. Decide the timing policy (open question 2). For browser timing,
+   rewrite ≤ 10 ms delays as 100 ms before the cap and the encode.
+3. Choose between CRF 28 at `-cpu-used 4` and `-cpu-used 6`, then
+   convert the whole archive with the cap and the gif fallback,
    including `3ee42dfdc54f/002` (2190 frames, not in the sample).
+   Verify every output (timing, and quality.py's numbers) and inspect
+   the worst frames.
 4. Change the pelican exporter to place the intermediate instead of
    the display copy, and add stage 2.

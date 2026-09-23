@@ -104,6 +104,9 @@ ENCODERS = {
     "aom_444_crf20_c6": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
         "-c:v", "libaom-av1", "-cpu-used", "6", "-g", "9999", "-row-mt", "0",
         "-crf", "20", "-pix_fmt", "yuv444p", o]),
+    "aom_444_crf28_c6": (".mkv", lambda i, o: FF + ["-i", i] + PT + [
+        "-c:v", "libaom-av1", "-cpu-used", "6", "-g", "9999", "-row-mt", "0",
+        "-crf", "28", "-pix_fmt", "yuv444p", o]),
     # the same with the frame rate capped near 30 fps (fpscap.py)
     "aom_444_crf20_cap": (".mkv", lambda i, o: capped(i, o, [
         "-c:v", "libaom-av1", "-cpu-used", "4", "-g", "9999", "-row-mt", "0",
