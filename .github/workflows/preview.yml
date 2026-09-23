@@ -53,17 +53,19 @@ jobs:
       # The pixi environment (pixi.toml, pinned by pixi.lock) carries
       # the tool, ffmpeg, gifsicle, Pillow, Hugo extended, Pelican,
       # MyST and Pagefind, at the versions the archive was last
-      # validated against (see todo.md). Activated, so every step
-      # below runs in it.
+      # validated against (see todo.md). Every step runs in it through
+      # `pixi run`, and the sites are built by the same pixi tasks a
+      # local build uses.
       - uses: prefix-dev/setup-pixi@v0.10.2
         with:
           cache: true
-          activate-environment: true
 
       - name: Tool versions
         run: |
-          hugo version && myst --version && python -m pagefind --version
-          ffmpeg -version | head -1
+          pixi run hugo version
+          pixi run myst --version
+          pixi run pagefind --version
+          pixi run ffmpeg -version | head -1
 
       # The exporters place display copies of the archive's images,
       # built once into .image-cache/ (content-addressed, so a restored
@@ -92,7 +94,7 @@ jobs:
           # decides what a copy comes out as. It is asked of a real
           # placer rather than spelled out here, which would be the
           # same drift one file further away.
-          id=$(python - <<'EOF'
+          id=$(pixi run python - <<'EOF'
           from pathlib import Path
           from medium_archive.paths import site_config
           from medium_archive.siteconf import load_toml
@@ -106,7 +108,7 @@ jobs:
           # pixi.lock pins them: a new ffmpeg, x264, libwebp, Pillow
           # or gifsicle can change every copy, where a lock change
           # elsewhere (a test dependency) changes none
-          tools=$(pixi list --json | python -c '
+          tools=$(pixi list --json | pixi run python -c '
           import hashlib, json, sys
           pins = sorted("=".join((p["name"], p["version"], p.get("build", "")))
                         for p in json.load(sys.stdin)
@@ -137,29 +139,22 @@ jobs:
           restore-keys: image-cache-${{ steps.imgcache.outputs.id }}-${{ steps.imgcache.outputs.tools }}-
 
       - name: Rebuild archive/posts/ from archive/raw/
-        run: medium-archive convert
+        run: pixi run medium-archive convert
 
       - name: Build the Hugo site
         run: |
-          python3 .github/scripts/set_base_url.py site/site.toml "${{ steps.pages.outputs.base_url }}/hugo"
-          medium-archive hugo
-          cd site-hugo
-          hugo
-          python -m pagefind --site public
+          pixi run python .github/scripts/set_base_url.py site/site.toml "${{ steps.pages.outputs.base_url }}/hugo"
+          pixi run build-hugo
 
       - name: Build the Pelican site
         run: |
-          python3 .github/scripts/set_base_url.py site/site.toml "${{ steps.pages.outputs.base_url }}/pelican"
-          medium-archive pelican
-          cd site-pelican
-          pelican
-          python -m pagefind --site output
+          pixi run python .github/scripts/set_base_url.py site/site.toml "${{ steps.pages.outputs.base_url }}/pelican"
+          pixi run build-pelican
 
+      # MyST takes its base path from the environment, which `pixi run`
+      # passes through to the task.
       - name: Build the MyST site
-        run: |
-          medium-archive myst
-          cd site-myst
-          BASE_URL="${{ steps.pages.outputs.base_path }}/myst" myst build --html
+        run: BASE_URL="${{ steps.pages.outputs.base_path }}/myst" pixi run build-myst
 
       - name: Assemble the deployment
         run: |
