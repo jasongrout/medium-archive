@@ -1,0 +1,55 @@
+# One environment with the tool, the external programs the site
+# exporters call, the three site generators and the test suite:
+#
+#   pixi install                    # create .pixi/envs/default
+#   pixi run medium-archive --help  # run anything in it
+#   pixi run test
+#   pixi shell                      # or activate it
+#
+# uv is still what CI's `Tests` job uses; this file is for building
+# sites locally, which needs programs pip cannot install.
+
+[workspace]
+name = "medium-archive"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.11"
+# Animated gifs are placed as H.264 clips with a webp poster; a build
+# that cannot make one stops. conda-forge's lgpl ffmpeg builds lack
+# libx264, so the gpl build is asked for by name.
+ffmpeg = { version = "*", build = "gpl*" }
+# Hugo extended, which conda-forge's build is
+hugo = ">=0.156"
+mystmd = "*"
+# what the generated pelicanconf.py reads posts and data files with
+pelican = ">=4.12"
+markdown-it-py = "*"
+mdit-py-plugins = "*"
+pygments = "*"
+pyyaml = "*"
+pillow = "*"
+# the tests: pytest, and jinja2 to render the pelican theme's pages
+pytest = "*"
+jinja2 = "*"
+
+# resizes gifs kept as gifs (site.toml animated_format = "gif");
+# conda-forge has no Windows build
+[target.unix.dependencies]
+gifsicle = "*"
+
+[pypi-dependencies]
+medium-archive = { path = ".", editable = true }
+# search index for the Hugo and Pelican sites; not on conda-forge. The
+# package installs no `pagefind` executable: run it as `pixi run
+# pagefind` (the task below) or `python -m pagefind`.
+pagefind = { version = "==1.5.2", extras = ["bin"] }
+
+[tasks]
+test = "pytest -q"
+pagefind = "python -m pagefind"
+convert = "medium-archive convert"
+hugo = { cmd = "medium-archive hugo && cd site-hugo && hugo && python -m pagefind --site public", description = "Export and build the Hugo site into site-hugo/public/" }
+pelican = { cmd = "medium-archive pelican && cd site-pelican && pelican && python -m pagefind --site output", description = "Export and build the Pelican site into site-pelican/output/" }
+myst = { cmd = "medium-archive myst && cd site-myst && myst build --html", description = "Export and build the MyST site into site-myst/_build/html/" }
