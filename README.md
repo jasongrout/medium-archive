@@ -240,9 +240,11 @@ filesystems):
   reader has not requested reduced motion. Frames of bursts faster
   than ~30 fps are dropped, and every kept frame keeps the gif's
   timing. A clip is placed even where it is larger than the gif, for
-  the pause control. A gif stays a gif when ffmpeg or Pillow is
-  missing or when it has real transparency. The measurements behind
-  these choices are in `docs/gif-intermediates.md`.
+  the pause control. An animated gif that cannot become a clip (ffmpeg,
+  its libwebp or Pillow missing, real transparency, an unreadable gif,
+  ffmpeg failing) stops the build with an error listing every such gif,
+  unless `site.toml` asks for gifs (`animated_format = "gif"`). The
+  measurements behind these choices are in `docs/gif-intermediates.md`.
 
 Configure with `site.toml`'s `[images]` table: `still_max_edge`,
 `animated_max_edge` (0, the default for animations, disables the cap), `animated_format` (`"mp4"` or

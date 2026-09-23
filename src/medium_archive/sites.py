@@ -744,6 +744,13 @@ def has_alpha(im) -> bool:
     return im.mode in ("RGBA", "LA", "PA") or "transparency" in im.info
 
 
+class AnimationError(RuntimeError):
+    """An animated gif that was to be placed as a clip and could not be
+    (see ImagePlacer): the build stops rather than ship the animation
+    as a gif a reader cannot pause. Carries every such gif of a run,
+    one per line."""
+
+
 class ImagePlacer:
     """Place a post's images into a site: hard-link each unchanged when
     nothing is to be gained (or nothing available can process it), else
@@ -754,9 +761,13 @@ class ImagePlacer:
     cannot be done, go through gifsicle. Copies are built once into the
     project's .image-cache/<scheme-caps>/ and hard-linked into every
     site that wants them, so the three exporters (and re-runs) share the
-    work. Stills need Pillow, clips need Pillow and ffmpeg, and resized
-    gifs need gifsicle; when a tool is missing the affected images are
-    placed by whatever is left, with a note in the summary.
+    work. Stills need Pillow, clips need Pillow and ffmpeg (with
+    libwebp, for the poster), and resized gifs need gifsicle. A still
+    whose tool is missing is placed by whatever is left, with a note in
+    the summary; an animation that cannot become a clip -- a tool
+    missing, real transparency, a gif that will not read, ffmpeg
+    failing -- raises AnimationError instead, unless the site asked for
+    gifs (animated_format = "gif").
 
     place() returns the path it actually wrote, which carries a new
     extension when the copy changed format -- the exporters rewrite
@@ -826,9 +837,22 @@ class ImagePlacer:
         paths = [img for p in manifest.values()
                  if (d := archive / p["dir"] / "images").is_dir()
                  for img in d.iterdir()]
+
+        def build(path):
+            try:
+                self._display_copy(path)
+            except AnimationError as e:
+                # the path says which gif; drop the name the error repeats
+                why = str(e).removeprefix(f"{path.name}: ")
+                return f"{path.relative_to(archive)}: {why}"
+        # every gif is tried before the build stops, so one run names
+        # all that failed rather than the first
         with ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as pool:
-            for _ in pool.map(self._display_copy, paths):
-                pass
+            failed = [f for f in pool.map(build, paths) if f]
+        if failed:
+            raise AnimationError(
+                f"{len(failed)} animated gif(s) could not be placed as "
+                "video:\n" + "\n".join(failed))
 
     def report(self):
         if self.resized or self.converted:
@@ -898,7 +922,11 @@ class ImagePlacer:
         self.cache.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=self.cache, suffix=ext)
         os.close(fd)
-        built = build(src, tmp, cap)
+        try:
+            built = build(src, tmp, cap)
+        except AnimationError:
+            discard_copy(tmp)
+            raise
         if not built:
             discard_copy(tmp)
             return None
@@ -942,68 +970,66 @@ class ImagePlacer:
 
     def _place_animation(self, src: Path, tmp: str, cap: int):
         """A gif's display copy where this archive places animations as
-        video: the clip, or -- for a gif that cannot become one, and for
-        an ffmpeg that failed on it -- the resized gif gifsicle makes of
-        it, or nothing."""
+        video: the clip, or for a still under a .gif name the resized
+        gif gifsicle makes of it, or nothing. An animation that cannot
+        become a clip raises AnimationError."""
         delays = self._clip_delays(src)
         if delays:
-            built = self._encode_video(src, tmp, cap, delays)
-            if built:
-                return built
-            discard_copy(tmp)              # a clip that came to nothing
+            return self._encode_video(src, tmp, cap, delays)
         return (self._resize_gif(src, tmp, cap)
                 if self._resizes_gif(src, cap) else None)
 
     def _clip_delays(self, src: Path):
-        """Each frame's delay in ms, when this gif is placed as a clip:
-        an animation, with the tools to encode it and to read it, and
-        nothing see-through to lose on the way. None otherwise."""
-        if not self.ffmpeg:
-            self._note("ffmpeg not installed: animated gifs stay gifs "
-                       "(install ffmpeg to place them as video)")
-            return None
+        """Each frame's delay in ms, for an animation to be placed as a
+        clip; None for a still under a .gif name. Raises AnimationError
+        for an animation that cannot become a clip: one that will not
+        read, one that is see-through where it is shown (video carries
+        no alpha), or a missing tool."""
         if not self.pillow:
-            self._note("pillow not installed: animated gifs stay gifs")
-            return None
-        if not self._writes_webp():
-            return None
+            raise AnimationError(
+                f"{src.name}: Pillow is not installed, and placing "
+                "animated gifs as video needs it (pip install "
+                "'medium-archive[covers]'), or set [images] "
+                'animated_format = "gif" in site.toml to keep gifs')
         try:
             with self.pillow.open(src) as im:
                 if getattr(im, "n_frames", 1) < 2:
                     return None            # a still under a .gif name
                 if transparent_first_frame(im):
-                    self._note(f"{src.name} is transparent where it is "
-                               "shown, which video cannot carry; "
-                               "kept as a gif")
-                    return None
+                    raise AnimationError(
+                        f"{src.name} is transparent where it is shown, "
+                        "which video cannot carry")
                 delays = []
                 for i in range(im.n_frames):
                     im.seek(i)
                     delays.append(im.info.get("duration", 0))
-                return delays
+        except AnimationError:
+            raise
         except Exception as e:
-            self._note(f"unreadable gif {src.name} ({e}); kept as a gif")
-            return None
+            raise AnimationError(f"unreadable gif {src.name} ({e})") from e
+        if not self.ffmpeg:
+            raise AnimationError(
+                f"{src.name}: ffmpeg is not installed, and placing "
+                "animated gifs as video needs it, or set [images] "
+                'animated_format = "gif" in site.toml to keep gifs')
+        if not self._writes_webp():
+            raise AnimationError(
+                f"{src.name}: {self.ffmpeg} was built without libwebp, "
+                "which a clip's poster frame needs. Install an ffmpeg "
+                "built with libwebp (the ffmpeg package on Debian, "
+                "Ubuntu and Homebrew is), or set [images] "
+                'animated_format = "gif" in site.toml to keep gifs')
+        return delays
 
     def _writes_webp(self) -> bool:
         """Whether this ffmpeg can write a clip's poster. Most builds
-        carry libwebp; one that does not fails the whole run with
-        "Encoder not found", taking the clip down with the still, which
-        is worth saying plainly once rather than reporting as an ffmpeg
-        error per gif."""
+        carry libwebp; one that does not fails with "Encoder not found",
+        which is worth saying plainly rather than as an ffmpeg error."""
         if self.ffmpeg_webp is None:
             run = subprocess.run([self.ffmpeg, "-hide_banner", "-loglevel",
                                   "error", "-encoders"],
                                  capture_output=True, text=True)
             self.ffmpeg_webp = " libwebp " in (run.stdout or "")
-            if not self.ffmpeg_webp:
-                self._note(
-                    f"{self.ffmpeg} was built without libwebp, which a "
-                    "clip's poster frame needs: animated gifs stay gifs. "
-                    "Install an ffmpeg built with libwebp (the ffmpeg "
-                    "package on Debian, Ubuntu and Homebrew is), or set "
-                    '[images] animated_format = "gif" in site.toml to '
-                    "stop asking for clips.")
         return self.ffmpeg_webp
 
     def _encode_video(self, src: Path, tmp: str, cap: int, delays):
@@ -1023,11 +1049,10 @@ class ImagePlacer:
         the muxer no durations, and the mp4 then ends at the last
         frame's decode time -- 27 of the archive's clips came out
         short, one by 1.55 s of the 2.64 s its gif holds near the end.
-        Returns None -- for the caller to fall back on -- when ffmpeg
-        fails."""
+        Raises AnimationError when ffmpeg fails."""
         size = self._probe(src)
         if size is None:
-            return None
+            raise AnimationError(f"cannot read the size of {src.name}")
         width, height = video_size(size, cap)
         shape = ([] if (width, height) == tuple(size)
                  else [f"scale={width}:{height}:flags=lanczos"]) + [EVEN_PAD]
@@ -1049,10 +1074,8 @@ class ImagePlacer:
             capture_output=True, text=True)
         if run.returncode or not os.path.getsize(tmp) or not poster.exists():
             detail = (run.stderr or "").strip().splitlines()
-            self._note(f"ffmpeg failed on {src.name}"
-                       + (f": {detail[-1]}" if detail else "")
-                       + "; kept as a gif")
-            return None
+            raise AnimationError(f"ffmpeg failed on {src.name}"
+                                 + (f": {detail[-1]}" if detail else ""))
         return ".mp4"
 
     def _resizes_gif(self, src: Path, cap: int) -> bool:

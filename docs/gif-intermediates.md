@@ -12,9 +12,12 @@ and CI do not use them.
 Each animated gif in `archive/raw/` stays the master. Every site gets:
 
 - **An H.264 clip for every animation**, in a `<video>` a reader can
-  pause, even where the clip is larger than the gif. The exceptions,
-  which stay gifs, are gifs with real transparency and machines
-  without ffmpeg or Pillow.
+  pause, even where the clip is larger than the gif. An animated gif
+  that cannot become a clip stops the build: `AnimationError` names
+  every such gif (a missing ffmpeg, libwebp or Pillow, real
+  transparency, an unreadable gif, ffmpeg failing), and the command
+  exits with an error. Only `animated_format = "gif"` in `site.toml`
+  keeps gifs. A single-frame gif is a still and is placed as it is.
 - **Settings:** 4:2:0, High profile, `-crf 24 -preset slower`, no
   B-frames, one thread per encode (`warm()` encodes gifs in parallel).
 - **Full resolution:** `animated_max_edge` defaults to 0. Odd sizes

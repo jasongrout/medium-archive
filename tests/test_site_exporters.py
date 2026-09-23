@@ -195,7 +195,9 @@ def captioned_archive(project):
               images=["images/001-fig.gif"])
     d = archive_dir(project) / "posts/2022-06-01-captioned-post"
     (d / "images").mkdir()
-    (d / "images" / "001-fig.gif").write_bytes(b"GIF")
+    # a real one-frame gif: a file that will not read as a gif is an
+    # error where animations become clips
+    gradient_frame((16, 12), 0).save(d / "images" / "001-fig.gif")
     manifest_json(project).write_text(json.dumps(manifest))
     return project
 
@@ -2139,12 +2141,13 @@ def gradient_frame(size, shift, see_through=False):
 
 @pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),
                     reason="ffmpeg not installed")
-def test_a_see_through_gif_keeps_its_format(tmp_path):
+def test_a_see_through_gif_is_an_error(tmp_path):
     """Gif spends its transparent index on "unchanged since the
     previous frame", so declaring one says nothing about whether a
     reader sees through the picture. What decides is alpha on the
     composited first frame: a gif transparent there cannot become a
-    clip, and one that is merely delta-coded can."""
+    clip -- which stops the build rather than ship an animation a
+    reader cannot pause -- and one that is merely delta-coded can."""
     src = tmp_path / "src"
     src.mkdir()
     size = (400, 300)
@@ -2158,8 +2161,9 @@ def test_a_see_through_gif_keeps_its_format(tmp_path):
     placer = sites.ImagePlacer(tmp_path / "cache", {})
     out = tmp_path / "out"
     out.mkdir()
-    assert placer.place(holes, out / "holes.gif").suffix == ".gif"
-    assert any("transparent" in note for note in placer.notes)
+    with pytest.raises(sites.AnimationError, match="transparent"):
+        placer.place(holes, out / "holes.gif")
+    assert not (out / "holes.gif").exists()
     clip = placer.place(deltas, out / "deltas.gif")
     assert clip.suffix == ".mp4"
     assert sites.poster_path(clip).exists()
@@ -2224,9 +2228,9 @@ def test_a_clip_runs_as_long_as_its_gif(tmp_path):
 
 def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
     """A build without libwebp cannot write a clip's poster, and fails
-    the whole run with "Encoder not found" rather than just the still.
-    That is asked about once, up front, and reported as the thing to
-    fix -- not as an ffmpeg error against every gif in the archive."""
+    with "Encoder not found". That is asked about up front, and the
+    error names it as the thing to fix -- or animated_format = "gif"
+    for a site that means to keep gifs."""
     src = tmp_path / "src"
     src.mkdir()
     gif = animation(src / "clip.gif",
@@ -2238,9 +2242,73 @@ def test_an_ffmpeg_without_libwebp_says_so(tmp_path):
     placer.ffmpeg = str(build)
     out = tmp_path / "out"
     out.mkdir()
-    assert placer.place(gif, out / "clip.gif").suffix == ".gif"
-    assert any("libwebp" in note and "animated_format" in note
-               for note in placer.notes), placer.notes
+    with pytest.raises(sites.AnimationError,
+                       match="libwebp.*animated_format"):
+        placer.place(gif, out / "clip.gif")
+
+
+def test_an_animation_without_ffmpeg_is_an_error(tmp_path):
+    """Where clips are asked for, an animated gif that cannot become one
+    stops the build: no ffmpeg is an error, not a note. A still under a
+    .gif name is not an animation and is placed as it is, and a site
+    that asks for gifs keeps them without ffmpeg."""
+    from PIL import Image
+
+    src = tmp_path / "src"
+    src.mkdir()
+    moving = animation(src / "moving.gif",
+                       [gradient_frame((200, 150), i * 9) for i in range(4)])
+    still = src / "still.gif"
+    gradient_frame((200, 150), 0).save(still)
+    out = tmp_path / "out"
+    out.mkdir()
+
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    placer.ffmpeg = None
+    with pytest.raises(sites.AnimationError, match="ffmpeg is not installed"):
+        placer.place(moving, out / "moving.gif")
+    assert placer.place(still, out / "still.gif") == out / "still.gif"
+
+    as_gifs = sites.ImagePlacer(tmp_path / "cache",
+                                {"images": {"animated_format": "gif"}})
+    assert as_gifs.place(moving, out / "kept.gif") == out / "kept.gif"
+    with Image.open(out / "kept.gif") as im:
+        assert im.n_frames == 4
+
+
+def test_warm_names_every_animation_it_could_not_place(tmp_path):
+    """warm() tries every image before it gives up, so one build names
+    all the gifs that failed, not only the first."""
+    archive = tmp_path / "archive"
+    for post in ("a", "b"):
+        images = archive / "posts" / post / "images"
+        images.mkdir(parents=True)
+        animation(images / f"{post}.gif",
+                  [gradient_frame((100, 80), i * 9) for i in range(3)])
+    manifest = {f"https://x/{post}": {"dir": f"posts/{post}"}
+                for post in ("a", "b")}
+    placer = sites.ImagePlacer(tmp_path / "cache", {})
+    placer.ffmpeg = None
+    with pytest.raises(sites.AnimationError) as err:
+        placer.warm(archive, manifest)
+    message = str(err.value)
+    assert message.startswith("2 animated gif(s)")
+    assert "posts/a/images/a.gif" in message
+    assert "posts/b/images/b.gif" in message
+
+
+def test_the_cli_reports_an_animation_error_without_a_traceback(
+        monkeypatch, capsys):
+    from medium_archive import cli
+
+    def fail(args):
+        raise sites.AnimationError("1 animated gif(s) could not be placed")
+    monkeypatch.setattr(cli, "cmd_pelican", fail)
+    monkeypatch.setattr("sys.argv", ["medium-archive", "pelican"])
+    with pytest.raises(SystemExit) as exit_:
+        cli.main()
+    assert exit_.value.code == ("error: 1 animated gif(s) could not be "
+                                "placed")
 
 
 @pytest.mark.skipif(not __import__("shutil").which("ffmpeg"),

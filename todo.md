@@ -719,7 +719,10 @@ Feeds and sharing:
   ran short, one by 1.55 s); odd sizes are padded by a pixel rather
   than rescaled. `CACHE_SCHEME` v7 rebuilds the cached clips. Full
   cold build of the pelican site: animations 170 MB against 187 MB
-  before, 1,026 s against 967 s on four cores.
+  before, 1,026 s against 967 s on four cores. An animated gif that
+  cannot become a clip is now an error (`AnimationError`, listing every
+  such gif; the command exits non-zero) rather than a gif placed with a
+  note, unless `animated_format = "gif"`.
 
 
 ### Remaining

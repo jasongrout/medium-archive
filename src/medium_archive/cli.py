@@ -39,6 +39,7 @@ generated site in its own README.md. Progress is written to stderr.
 
 import argparse
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -49,6 +50,7 @@ from .lint import cmd_lint
 from .hugo import cmd_hugo
 from .myst import cmd_myst
 from .pelican import cmd_pelican
+from .sites import AnimationError
 from .stats import cmd_stats
 from .dates import parse_date
 from .paths import (DEFAULT_ARCHIVE, DEFAULT_IMAGE_CACHE, DEFAULT_SITE_INPUTS,
@@ -310,7 +312,13 @@ def main():
     add_fetch_args(both)
     add_convert_args(both)
     args = ap.parse_args()
+    try:
+        run(args)
+    except AnimationError as e:
+        sys.exit(f"error: {e}")
 
+
+def run(args):
     if args.command in ("fetch", "all"):
         cmd_fetch(args)
     if args.command == "import-export":
